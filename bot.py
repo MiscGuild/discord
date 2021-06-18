@@ -3684,18 +3684,17 @@ async def rolecheck(ctx):
         active_role = discord.utils.get(ctx.guild.roles, name="Active")
         inactive_role = discord.utils.get(ctx.guild.roles, name="Inactive")
         xl_ally = discord.utils.get(ctx.guild.roles, name="XL - Ally")
-        jenos_ally = discord.utils.get(ctx.guild.roles, name="Jenos - Ally")
-        betrayed_ally = discord.utils.get(ctx.guild.roles, name="Betrayed - Ally")
+
 
         msg = await ctx.send("**Processing all the prerequisites**")
 
-        misc_uuids, xl_uuids, jenos_uuids, betrayed_uuids = hypixel.get_guild_members("Miscellaneous"),hypixel.get_guild_members("XL"),hypixel.get_guild_members("Jenos"),hypixel.get_guild_members("Betrayed")
+        misc_uuids, xl_uuids, = hypixel.get_guild_members("Miscellaneous"),hypixel.get_guild_members("XL")
 
 
-        misc_members, calm_members, xl_members, jenos_members, betrayed_members = [], [], [],[],[]
+        misc_members, calm_members, xl_members= [], [], []
 
         #Miscellaneous Member Names
-        await msg.edit(content="**Processing** - 1/4")
+        await msg.edit(content="**Processing** - 1/2")
         with ThreadPoolExecutor(max_workers=10) as executor:
             with requests.Session() as session:
                 # Set any session parameters here before calling `fetch`
@@ -3713,7 +3712,7 @@ async def rolecheck(ctx):
 
 
         #XL Member Names
-        await msg.edit(content="**Processing** - 2/4")
+        await msg.edit(content="**Processing** - 2/2")
         with ThreadPoolExecutor(max_workers=10) as executor:
             with requests.Session() as session:
                 # Set any session parameters here before calling `fetch`
@@ -3729,39 +3728,6 @@ async def rolecheck(ctx):
                 for response in await asyncio.gather(*tasks):  # Puts the result into a list
                     xl_members.append(response)
 
-        #Betrayed Member Names
-        await msg.edit(content="**Processing** - 3/4")
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            with requests.Session() as session:
-                # Set any session parameters here before calling `fetch`
-                loop = asyncio.get_event_loop()
-                tasks = [
-                    loop.run_in_executor(
-                        executor,
-                        hypixel.fetch,
-                        *(session, individual_uuid)  # Allows us to pass in multiple arguments to `fetch`
-                    )
-                    for individual_uuid in jenos_uuids
-                ]
-                for response in await asyncio.gather(*tasks):  # Puts the result into a list
-                    jenos_members.append(response)
-
-        # Betrayed Member Names
-        await msg.edit(content="**Processing** - 4/4")
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            with requests.Session() as session:
-                # Set any session parameters here before calling `fetch`
-                loop = asyncio.get_event_loop()
-                tasks = [
-                    loop.run_in_executor(
-                        executor,
-                        hypixel.fetch,
-                        *(session, individual_uuid)  # Allows us to pass in multiple arguments to `fetch`
-                    )
-                    for individual_uuid in betrayed_uuids
-                ]
-                for response in await asyncio.gather(*tasks):  # Puts the result into a list
-                    betrayed_members.append(response)
 
         if staff in ctx.author.roles:  # Making sure that the user is Staff
             for guild in client.guilds:
@@ -3850,19 +3816,6 @@ async def rolecheck(ctx):
                                         await member.remove_roles(member_role, new_member, active_role)
                                         await message.edit(content=f"{name} ||{member}|| Member of XL **++XL - Ally \| ++Guest | --Member | --Active**")
 
-                                    elif ign in jenos_members:
-                                        await member.add_roles(guest, jenos_ally)
-                                        await member.remove_roles(member_role, new_member, active_role)
-
-                                        await message.edit(
-                                            content=f"{name} ||{member}|| Member of Jenos **++Jenos - Ally \| ++Guest | --Member | --Active**")
-
-                                    elif ign in betrayed_members:
-                                        await member.add_roles(guest, betrayed_ally)
-                                        await member.remove_roles(member_role, new_member, active_role)
-                                        await message.edit(content=f"{name} ||{member}|| Member of Betrayed **++Betrayed - Ally \| ++Guest | --Member | --Active**")
-
-
                                     else:
                                         await member.add_roles(guest)
                                         await member.remove_roles(member_role, new_member, active_role)
@@ -3910,27 +3863,23 @@ async def newrolecheck(ctx):
         member_role = discord.utils.get(ctx.guild.roles, name="Member")
         active_role = discord.utils.get(ctx.guild.roles, name="Active")
         inactive_role = discord.utils.get(ctx.guild.roles, name="Inactive")
-        calm_ally = discord.utils.get(ctx.guild.roles, name="Calm - Ally")
         xl_ally = discord.utils.get(ctx.guild.roles, name="XL - Ally")
-        jenos_ally = discord.utils.get(ctx.guild.roles, name="Jenos - Ally")
-        betrayed_ally = discord.utils.get(ctx.guild.roles, name="Betrayed - Ally")
 
-        misc_info, calm_members, xl_members, jenos_members, betrayed_members,discord_members,\
+        misc_info, xl_members, discord_members,\
         invalid_members, active_members, regular_members,inactive_members,\
-        calm_discord_members, xl_discord_members, betrayed_discord_members, jenos_discord_members , guest_list = [], [], [], [], [], [], [], [], [], [], [], [], [], [], []
+        xl_discord_members, guest_list = [], [], [], [], [], [], [], [], []
 
         guild = client.get_guild(522586672148381726)
         memberList = guild.members
 
         msg = await ctx.send("**Processing all the prerequisites**")
 
-        misc_details, calm_uuids, xl_uuids, jenos_uuids, betrayed_uuids = hypixel.get_misc_members(
-            "Miscellaneous"), hypixel.get_guild_members("Calm"), hypixel.get_guild_members("XL"), hypixel.get_guild_members(
-            "Jenos"), hypixel.get_guild_members("Betrayed")
+        misc_details, xl_uuids, = hypixel.get_misc_members(
+            "Miscellaneous"), hypixel.get_guild_members("XL")
 
         count = 0
         # Miscellaneous Member Names + gexp
-        await msg.edit(content="**Processing** - 1/5")
+        await msg.edit(content="**Processing** - 1/2")
         with ThreadPoolExecutor(max_workers=10) as executor:
             with requests.Session() as session:
                 # Set any session parameters here before calling `fetch`
@@ -3947,25 +3896,8 @@ async def newrolecheck(ctx):
                     misc_details[count][0] = response
                     count = count + 1
 
-        # Calm Member Names
-        await msg.edit(content="**Processing** - 2/5")
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            with requests.Session() as session:
-                # Set any session parameters here before calling `fetch`
-                loop = asyncio.get_event_loop()
-                tasks = [
-                    loop.run_in_executor(
-                        executor,
-                        hypixel.fetch,
-                        *(session, individual_uuid)  # Allows us to pass in multiple arguments to `fetch`
-                    )
-                    for individual_uuid in calm_uuids
-                ]
-                for response in await asyncio.gather(*tasks):  # Puts the result into a list
-                    calm_members.append(response)
-
         # XL Member Names
-        await msg.edit(content="**Processing** - 3/5")
+        await msg.edit(content="**Processing** - 2/2")
         with ThreadPoolExecutor(max_workers=10) as executor:
             with requests.Session() as session:
                 # Set any session parameters here before calling `fetch`
@@ -3981,39 +3913,6 @@ async def newrolecheck(ctx):
                 for response in await asyncio.gather(*tasks):  # Puts the result into a list
                     xl_members.append(response)
 
-        # Betrayed Member Names
-        await msg.edit(content="**Processing** - 4/5")
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            with requests.Session() as session:
-                # Set any session parameters here before calling `fetch`
-                loop = asyncio.get_event_loop()
-                tasks = [
-                    loop.run_in_executor(
-                        executor,
-                        hypixel.fetch,
-                        *(session, individual_uuid)  # Allows us to pass in multiple arguments to `fetch`
-                    )
-                    for individual_uuid in jenos_uuids
-                ]
-                for response in await asyncio.gather(*tasks):  # Puts the result into a list
-                    jenos_members.append(response)
-
-        # Betrayed Member Names
-        await msg.edit(content="**Processing** - 5/5")
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            with requests.Session() as session:
-                # Set any session parameters here before calling `fetch`
-                loop = asyncio.get_event_loop()
-                tasks = [
-                    loop.run_in_executor(
-                        executor,
-                        hypixel.fetch,
-                        *(session, individual_uuid)  # Allows us to pass in multiple arguments to `fetch`
-                    )
-                    for individual_uuid in betrayed_uuids
-                ]
-                for response in await asyncio.gather(*tasks):  # Puts the result into a list
-                    betrayed_members.append(response)
 
         if staff in ctx.author.roles:  # Making sure that the user is Staff
             for guild in client.guilds:
@@ -4022,7 +3921,7 @@ async def newrolecheck(ctx):
                         if not member.bot:
                             discord_members.append(member)
 
-            invalid_names = active_names = inactive_names = member_names = calm_names = xl_names = betrayed_names = jenos_names = ""
+            invalid_names = active_names = inactive_names = member_names = xl_names = ""
             for member in discord_members:
                 name = member.nick  # Obtaining their nick
                 if name is None:  # If they don't have a nick, it uses their name.
@@ -4054,43 +3953,22 @@ async def newrolecheck(ctx):
                             inactive_members.append(member)
                             inactive_names = inactive_names + str(member) + "\n"
 
-                if name in calm_members:
-                    if calm_ally not in member.roles:
-                        calm_discord_members.append(member)
-                        calm_names = calm_names + str(member) + "\n"
-                elif name in xl_members:
+                if name in xl_members:
                     if xl_ally not in member.roles:
                         xl_discord_members.append(member)
                         xl_names = xl_names + str(member) + "\n"
-                elif name in betrayed_members:
-                    if betrayed_ally not in member.roles:
-                        betrayed_discord_members.append(member)
-                        betrayed_names = betrayed_names + str(member) + "\n"
-                elif name in jenos_members:
-                    if jenos_ally not in member.roles:
-                        jenos_discord_members.append(member)
-                        jenos_names = jenos_names + str(member) + "\n"
                 else:
                     guest_list.append(member)
             invalid_embed = discord.Embed(title="Invalid: Given @New Member", description=invalid_names, color=0x620B06)
             active_embed = discord.Embed(title="Active: Given @Active", description=active_names, color=0x0073BF)
             member_embed = discord.Embed(title="Member: Given @Member", description=member_names, color=0x4DFF00)
             inactive_embed = discord.Embed(title="Inactive: Given @inactive", description=inactive_names, color=0xFF4C6E)
-            calm_embed = discord.Embed(title="Calm: Given @calm_ally", description=calm_names, color=0xA05E75)
             xl_embed = discord.Embed(title="XL: Given @xl_ally", description=xl_names, color=0xA05E75)
-            betrayed_embed = discord.Embed(title="Betrayed: Given @betrayed_ally", description=betrayed_names, color=0xA05E75)
-            jenos_embed = discord.Embed(title="Jenos: Given @jenos_ally", description=jenos_names, color=0xA05E75)
             await ctx.send(embed=invalid_embed)
             await ctx.send(embed=active_embed)
             await ctx.send(embed=member_embed)
             await ctx.send(embed=inactive_embed)
-            await ctx.send(embed=calm_embed)
             await ctx.send(embed=xl_embed)
-            await ctx.send(embed=betrayed_embed)
-            await ctx.send(embed=jenos_embed)
-
-
-
 
 
 
