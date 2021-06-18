@@ -25,7 +25,7 @@ The bot used by the Miscellaneous Hypixel guild's discord.
 * Run the following commands in a terminal or command prompt in the bots directory.
 
 ```bash
-python3 bot1.py
+python3 bot.py
 ```
 
 ## Contributing
