@@ -1,5 +1,0 @@
-discord.py
-requests
-datetime
-aiohttp
-quickchart.io
