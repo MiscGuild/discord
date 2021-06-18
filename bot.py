@@ -267,6 +267,7 @@ async def on_guild_channel_create(channel):
                 embed.add_field(name="Milestone", value="Reply with `Milestone`", inline=False)
                 embed.add_field(name="Staff Application", value="Reply with `Staff`", inline=False)
                 embed.add_field(name="GvG Application", value="Reply with `GvG`", inline=False)
+                embed.add_field(name="Event", value="Reply with `Event`",inline=False)
                 embed.add_field(name="Other", value="Reply with `Other`", inline=False)
                 await channel.send(embed=embed)
                 reply = await client.wait_for('message', check=lambda x: x.channel == channel)
@@ -1132,6 +1133,10 @@ async def on_guild_channel_create(channel):
                                 "Hmm, seems like I'm dumb.\nKindly specify your reason behind creating this ticket and await staff assistance!")
                             break
 
+                elif reply == "Event":
+                    await channel.edit(name=f"Event-{name}", category=discord.utils.get(channel.guild.categories, name="EVENT"))
+                    await channel.send("Alright, kindly enter the requested details for registering!")
+                    break
 
                 elif reply == "Other":
                         await channel.edit(name=f"Unknown-{name}", category=discord.utils.get(channel.guild.categories, name="OTHER"))
@@ -1607,7 +1612,7 @@ async def delete(ctx):
         logs = client.get_channel(714821811832881222)
         Staff = discord.utils.get(ctx.guild.roles, name="Staff")
         if Staff in ctx.author.roles:
-            if ctx.channel.category.name in ('RTickets',  '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL'):
+            if ctx.channel.category.name in ('RTickets',  '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL','EVENT'):
                 name = ctx.channel.name
                 embed = discord.Embed(title='This ticket will be deleted in 5 seconds!', description='', color=0xff0000)
                 msg = await ctx.send(embed=embed)
@@ -4119,15 +4124,16 @@ async def ticketss(ctx):
                                       "> Reporting a player\n"
                                       "> Milestone\n"
                                       "> Staff Application\n"
+                                      "> Event\n"
                                       "> Other\n"
                                       "The ticket reasons have been explained in detail towards the end of this message.\n"
                                       " Once you have created a ticket by reacting to the bot's message, you will see that there is a new ticket in the \"🎫 Ticket Section\" category.\n"
                                       " When you open the ticket, you will be greeted by a message from the Miscellaneous Bot.\n"
                                       " The bot will ask you to choose the reason behind the creation of your ticket from a given list."
                                       " Choose the appropriate reason and then proceed!\n"
-                                      "Once you have created your ticket, staff will respond within 24 hours.\n",color = 0x8368ff)
+                                      "Once you have created your ticket, staff will respond within 24 hours.\n",color= 0x8368ff)
     embed.set_thumbnail(url='https://media.discordapp.net/attachments/650248396480970782/727875702187229234/Tickets.png?width=1440&height=360')
-    embed2 = discord.Embed(title='',description="**Do Not Kick List**:-"
+    embed2 = discord.Embed(title='', description="**Do Not Kick List**:-"
                                                 "Once the ticket is created, follow the bots instructions.\n"
                                                 "You must either have a valid reason for applying and also meet the do not kick list requirements.\n"
                                                 "Accepted Reasons:\n"
@@ -4163,18 +4169,5 @@ async def ticketss(ctx):
     await ctx.send(embed=embed)
     await ctx.send(embed=embed2)
 
-@client.command()
-async def deltest(ctx,msgid):
-    try:
-        print(type(msgid))
-        msg = await ctx.fetch_message(msgid)
-        await msg.delete()
-    except Exception as e:
-        print(e)
-
-@client.command()
-async def abc(ctx):
-    message = await ctx.send('kjsdnas')
-    print(message.id)
 
 client.run(configFile['Token'])
