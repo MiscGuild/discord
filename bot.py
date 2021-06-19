@@ -10,7 +10,7 @@ intents = discord.Intents.default()
 intents.reactions = True
 intents.members = True
 
-client = commands.Bot(command_prefix=commands.when_mentioned_or(config['bot']['prefix']), intents=intents)
+client = commands.Bot(command_prefix=commands.when_mentioned_or(config['bot']['prefix']), intents=intents, status=discord.Status.idle, activity=discord.Game(config['bot']['status']))
 client.config = config
 client.token = config['bot']['token']
 client.api_tokens = config['hypixel']['api_keys']
@@ -24,11 +24,7 @@ new_member = int(25000)
 @client.event
 async def on_ready():
     try:
-        statuses = ['with Miscellaneous members!', 'with cool kids of Miscellaneous!']
         print('The Bot is up and running!')
-        for status in statuses:
-            await client.change_presence(status=discord.Status.idle, activity=discord.Game(status))
-            await asyncio.sleep(600)
 
         with open('dnkl.json', 'r') as f:
             data = str(f.read()).replace("'", '"')

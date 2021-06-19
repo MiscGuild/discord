@@ -1,6 +1,7 @@
 [bot]
 prefix = ','
 token = 'TOKEN'
+status = 'with Miscellaneous members!'
 
 [hypixel]
 api_keys = ['xxxx', 'xxxx']
