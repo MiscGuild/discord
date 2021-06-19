@@ -1,4 +1,4 @@
-import discord, random, math, requests, toml, hypixel, time, aiohttp, asyncio, json
+import discord, random, math, requests, toml, hypixel, time, aiohttp, asyncio, json, sys
 from quickchart import QuickChart
 from discord.ext import commands
 from datetime import datetime
@@ -20,6 +20,35 @@ active = int(275000)
 inactive = int(100000)
 dnkl = int(200000)
 new_member = int(25000)
+
+class HelpCommand(commands.MinimalHelpCommand):
+    async def send_pages(self):
+        destination = self.get_destination()
+        for page in self.paginator.pages:
+            emby = discord.Embed(description=page, color=0x8368ff)
+            await destination.send(embed=emby)
+
+    async def send_command_help(self, command):
+        embed = discord.Embed(title=self.get_command_signature(command), color=0x8368ff)
+        embed.add_field(name="Help", value=command.help)
+        alias = command.aliases
+        if alias:
+            embed.add_field(name="Aliases", value=", ".join(alias), inline=False)
+
+        channel = self.get_destination()
+        await channel.send(embed=embed)
+
+client.help_command = HelpCommand(command_attrs={'hidden': True})
+
+initial_extensions = ['cogs.mod', 'cogs.misc', 'cogs.ticket']
+
+if __name__ == '__main__':
+    for extension in initial_extensions:
+        try:
+            client.load_extension(extension)
+            print(f'{extension} Loaded!')
+        except Exception as e:
+            print(f'Failed to load extention {extension}', file=sys.stderr)
 
 @client.event
 async def on_ready():
@@ -1455,140 +1484,12 @@ async def _8ball(ctx, *, question):
     embed.set_author(name=f"{question}")
     embed.set_footer(text=f'{user_name}')
     await ctx.send(embed=embed)
+
 @_8ball.error
 async def _8ball_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         embed = discord.Embed(title="You're supposed to ask me a question ._.", description="8ball `question`",
                               color=0xff0000)
-        await ctx.send(embed=embed)
-
-
-# clear
-@client.command(aliases=["purge", "prune"])
-@commands.has_permissions(manage_messages=True)
-async def clear(ctx, amount: int):
-    await ctx.channel.purge(limit=amount)
-@clear.error
-async def clear_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        embed = discord.Embed(title='Please specify the number of messages to be deleted',
-                              description='clear `amount of messages`', color=0xff0000)
-        await ctx.send(embed=embed)
-    elif isinstance(error, commands.MissingPermissions):
-        embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
-                              description="Your role lacks permissions to clear chat", color=0xff0000)
-        await ctx.send(embed=embed)
-
-
-# Mute
-@client.command()
-@commands.has_permissions(kick_members=True)
-async def mute(ctx, member: discord.Member):
-    role = discord.utils.get(ctx.guild.roles, name="Muted")
-    await member.add_roles(role)
-    embed = discord.Embed(title="User Muted!",
-                          description="**{0}** was muted by **{1}**!".format(member, ctx.message.author),
-                          color=0xff00f6)
-    await ctx.send(embed=embed)
-@mute.error
-async def mute_error(ctx, error):
-    if isinstance(error, commands.MissingPermissions):
-        embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
-                              description="Your role lacks permissions to mute a user", color=0xff0000)
-        await ctx.channel.purge(limit=1)
-        await ctx.send(embed=embed)
-
-
-# Unmute
-@client.command()
-@commands.has_permissions(kick_members=True)
-async def unmute(ctx, member: discord.Member):
-    role = discord.utils.get(ctx.guild.roles, name="Muted")
-    await member.remove_roles(role)
-    embed = discord.Embed(title="User unmuted!",
-                          description="**{0}** was unmuted by **{1}**!".format(member, ctx.message.author),
-                          color=0xff00f6)
-    await ctx.send(embed=embed)
-@unmute.error
-async def unmute_error(ctx, error):
-    if isinstance(error, commands.MissingPermissions):
-        embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
-                              description="Your role lacks permissions to unmute a user", color=0xff0000)
-        await ctx.channel.purge(limit=1)
-        await ctx.send(embed=embed)
-
-
-# kick
-@client.command()
-@commands.has_permissions(kick_members=True)
-async def kick(ctx, member: discord.Member, *, reason=None):
-    await member.kick(reason=reason)
-    await ctx.send(f"{member} was kicked!")
-@kick.error
-async def kick_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        embed = discord.Embed(title='Please specify the player to be banned! The syntax is as follows',
-                              description="kick `Discord @` `reason`", color=0xff0000)
-        await ctx.channel.purge(limit=1)
-        await ctx.send(embed=embed)
-
-    elif isinstance(error, commands.MissingPermissions):
-        embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
-                              description="Your role lacks permissions to kick a user", color=0xff0000)
-        await ctx.channel.purge(limit=1)
-        await ctx.send(embed=embed)
-
-
-# ban
-@client.command()
-@commands.has_permissions(ban_members=True, kick_members=True)
-async def ban(ctx, member: discord.Member, *, reason=None):
-    try:
-        await member.ban(reason=reason)
-        await ctx.send(f"{member} was banned!")
-    except Exception as e:
-        error_channel = client.get_channel(523743721443950612)
-        print(e)
-        await error_channel.send(f"Error in {ctx.channel.name} while trying to use `ban`\n{e}\n<@!326399363943497728>")
-@ban.error
-async def ban_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        embed = discord.Embed(title='Please specify the player to be banned! The syntax is as follows',
-                              description="ban `Discord @` `reason`", color=0xff0000)
-        await ctx.channel.purge(limit=1)
-        await ctx.send(embed=embed)
-
-    elif isinstance(error, commands.MissingPermissions):
-        embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
-                              description="Your role lacks permissions to ban a user", color=0xff0000)
-        await ctx.channel.purge(limit=1)
-        await ctx.send(embed=embed)
-# unban
-@client.command()
-@commands.has_permissions(ban_members=True, kick_members=True)
-async def unban(ctx, *, member):
-    banned_users = await ctx.guild.bans()
-    member_name, member_discrimitator = member.split('#')
-
-    for ban_entry in banned_users:
-        user = ban_entry.user
-
-        if (user.name, user.member_discrimitator) == (member_name, member_discrimitator):
-            await ctx.guild.unban(user)
-            await ctx.send(f'{user.mention} has been unbanned')
-            return
-@unban.error
-async def unban_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        embed = discord.Embed(title='Please specify the player to be banned! The syntax is as follows',
-                              description="unban `Discord @`", color=0xff0000)
-        await ctx.channel.purge(limit=1)
-        await ctx.send(embed=embed)
-
-    elif isinstance(error, commands.MissingPermissions):
-        embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
-                              description="Your role lacks permissions to unban a user", color=0xff0000)
-        await ctx.channel.purge(limit=1)
         await ctx.send(embed=embed)
 
 
