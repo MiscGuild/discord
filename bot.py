@@ -508,8 +508,6 @@ async def on_guild_channel_create(channel):
                         member = discord.utils.get(channel.guild.roles, name="Member")
                         awaiting_app = discord.utils.get(channel.guild.roles, name="Awaiting Approval")
                         xl_ally = discord.utils.get(channel.guild.roles, name="XL - Ally")
-#
-#
                         await author.edit(nick=ign)
                         if guild_name == "Miscellaneous":
                             await author.remove_roles(guest, awaiting_app)
