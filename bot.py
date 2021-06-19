@@ -1,33 +1,25 @@
-import discord, json, random, math, requests
-import hypixel
-import time
-import aiohttp
-import asyncio
+import discord, random, math, requests, toml, hypixel, time, aiohttp, asyncio, json
 from quickchart import QuickChart
 from discord.ext import commands
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 
-with open('config.json') as config_file:
-    configFile = json.load(config_file)
-
+config = toml.load('config.toml')
 
 intents = discord.Intents.default()
 intents.reactions = True
 intents.members = True
-client = commands.Bot(command_prefix=[',', '@Miscellaneous#4333'], intents=intents)
 
-client.remove_command('help')
-
+client = commands.Bot(command_prefix=commands.when_mentioned_or(config['bot']['prefix']), intents=intents)
+client.config = config
+client.token = config['bot']['token']
+client.api_tokens = config['hypixel']['api_keys']
 
 resident_req = int(50000)
 active = int(275000)
 inactive = int(100000)
 dnkl = int(200000)
 new_member = int(25000)
-
-
-"-------------------------------------------------------------------------------------------------General--------------------------------------------------------------------------------------------------------------------"
 
 @client.event
 async def on_ready():
@@ -4048,4 +4040,4 @@ async def ticketss(ctx):
     await ctx.send(embed=embed2)
 
 
-client.run(configFile['Token'])
+client.run(client.token)
