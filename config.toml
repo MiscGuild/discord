@@ -1,0 +1,6 @@
+[bot]
+prefix = ','
+token = 'TOKEN'
+
+[hypixel]
+api_keys = ['xxxx', 'xxxx']
