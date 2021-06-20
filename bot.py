@@ -1176,7 +1176,7 @@ async def on_guild_channel_create(channel):
                                         "• Cheating, use of blacklisted modifications is disallowed.\n"
                                         "• Forging of screenshots is disallowed.\n",
                             color=0x4b89e4)
-                        embed.set_footer(text="Violation of any of these rules (except the first will result) in immediate disqualification along with a temporary/permanent blacklist."
+                        embed.set_footer(text="Violation of any of these rules (except the first will result) in immediate disqualification along with a temporary/permanent blacklist.")
                         await channel.send(embed=rules_embed)
                         await channel.send("**Do you agree to abide by these rules and face the consequences if any of the rules are broken?**\n(Yes/No)")
                         rules = await client.wait_for('message',
