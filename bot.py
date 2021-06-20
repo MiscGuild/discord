@@ -107,6 +107,7 @@ async def tickets(ctx):
                               "> Reporting a player\n"
                               "> Milestone\n"
                               "> Staff  Application\n"
+                              "> Event\n"
                               "> Other",
                         inline=False)
         embed.add_field(name="React to the message sent by @TicketTool",
@@ -1714,9 +1715,9 @@ async def delete(ctx):
         if Staff in ctx.author.roles:
             if ctx.channel.category.name in ('RTickets',  '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL','EVENT'):
                 name = ctx.channel.name
-                embed = discord.Embed(title='This ticket will be deleted in 5 seconds!', description='', color=0xff0000)
+                embed = discord.Embed(title='This ticket will be deleted in 10 seconds!', description='', color=0xDE3163)
                 msg = await ctx.send(embed=embed)
-                time.sleep(5)
+                await asyncio.sleep(10)
                 await discord.TextChannel.delete(ctx.channel)
 
                 author = ctx.author
