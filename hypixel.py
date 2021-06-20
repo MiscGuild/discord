@@ -158,9 +158,11 @@ def get_gtag(name):
 
 def get_dispname(name):
     request = requests.get(f'https://api.mojang.com/users/profiles/minecraft/{name}').json()
-    ign = request["name"]
-    print(ign)
-    return ign
+    if 'error' not in request:
+        ign = request["name"]
+        return ign
+    else:
+        return None
 
 
 def get_flogin(name):
