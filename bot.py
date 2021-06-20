@@ -1136,7 +1136,6 @@ async def on_guild_channel_create(channel):
 
                 elif reply == "Event":
                     await channel.edit(name=f"Event-{name}", category=discord.utils.get(channel.guild.categories, name="EVENT"))
-                    await channel.send("Please re-register once Hypixel is back online!")
 
 
                     name_embed = discord.Embed(title="What is your Minecraft Username?",color=0x4b89e4)
@@ -1155,8 +1154,8 @@ async def on_guild_channel_create(channel):
                         await author.edit(nick=ign)
                         div_embed = discord.Embed(title="Which division would you like to partcipaticate in? Division 1 or Division 2?",
                                                   description="Please reply with the following:\n"
-                                                              "1 - Division 1\n"
-                                                              "2 - Divison 2",
+                                                              "1 for Division 1\n"
+                                                              "2 for Divison 2",
                                                   color=0x4b89e4)
                         await channel.send(embed=div_embed)
                         division = await client.wait_for('message',
