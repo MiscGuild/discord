@@ -1988,7 +1988,7 @@ async def register(ctx, name):
         else:
             error_channel = client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while trying to use `register`\n{e}\n<@!326399363943497728>")`
+            await error_channel.send(f"Error in {ctx.channel.name} while trying to use `register`\n{e}\n<@!326399363943497728>")
 
 
 @client.command()
