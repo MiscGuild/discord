@@ -1449,7 +1449,7 @@ async def pizza(ctx):
              'https://bit.ly/2R893Qx', 'https://bit.ly/3gHvBVH', 'https://bit.ly/3gJf8AB', 'https://bit.ly/3vJ3mdu',
              'https://bit.ly/3vCJ6uh', 'https://bit.ly/3zOScaH', 'https://bit.ly/3h2EAjx', 'https://bit.ly/3cXPxRU',
              'https://bit.ly/3qaI1bM', 'https://bit.ly/3vHyzOn']
-    image = random.choice(links)
+    image = links[random.randint(0,len(links)+1)]
     embed = discord.Embed(title="Here's the pizza you requested:", color=0xD2691e)
     embed.set_image(url=image)
     await ctx.send(embed=embed)
