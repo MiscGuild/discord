@@ -1,10 +1,11 @@
-import discord, random, math, requests, toml, hypixel, time, aiohttp, asyncio, json, sys
+import discord, random, math, requests, toml, time, aiohttp, asyncio, json, sys
 from quickchart import QuickChart
 from discord.ext import commands
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
+from cogs.utils import hypixel
 
-config = toml.load('config.toml')
+config = toml.load('config.toml') 
 
 intents = discord.Intents.default()
 intents.reactions = True
@@ -14,12 +15,11 @@ client = commands.Bot(command_prefix=commands.when_mentioned_or(config['bot']['p
 client.config = config
 client.token = config['bot']['token']
 client.api_tokens = config['hypixel']['api_keys']
-
-resident_req = int(50000)
-active = int(275000)
-inactive = int(100000)
-dnkl = int(200000)
-new_member = int(25000)
+client.resident_req = int(50000)
+client.active = int(275000)
+client.inactive = int(100000)
+client.dnkl = int(200000)
+client.new_member = int(25000)
 
 class HelpCommand(commands.MinimalHelpCommand):
     async def send_pages(self):
@@ -97,11 +97,11 @@ async def requirements(ctx):
         embed = discord.Embed(title="Miscellaneous Guild Requirements",
                               description="These requirements are subject to change!",
                               color=0x8368ff)
-        embed.add_field(name="Active", value=f"•  {format(active,',d')} Weekly Guild Experience", inline=False)
-        embed.add_field(name="Do Not Kick List Eligibility", value=f"•  {format(dnkl,',d')} Weekly Guild Experience", inline=False)
-        embed.add_field(name="Resident", value=f"•  {format(resident_req,',d')} Weekly Guild Experience", inline=False)
-        embed.add_field(name="Member", value=f"•  {format(inactive,',d')} Weekly Guild Experience", inline=False)
-        embed.add_field(name="New Member", value=f"•  {format(new_member,',d')} Daily Guild Experience", inline=False)
+        embed.add_field(name="Active", value=f"•  {format(client.active,',d')} Weekly Guild Experience", inline=False)
+        embed.add_field(name="Do Not Kick List Eligibility", value=f"•  {format(client.dnkl,',d')} Weekly Guild Experience", inline=False)
+        embed.add_field(name="Resident", value=f"•  {format(client.resident_req,',d')} Weekly Guild Experience", inline=False)
+        embed.add_field(name="Member", value=f"•  {format(client.inactive,',d')} Weekly Guild Experience", inline=False)
+        embed.add_field(name="New Member", value=f"•  {format(client.new_member,',d')} Daily Guild Experience", inline=False)
         embed.set_footer(text="You are considered a New Member for the first 7 days after joining the guild"
                               "\nIf you fail to meet the New Member/Member requirements, you will be kicked!")
         await ctx.send(embed=embed)
@@ -149,7 +149,7 @@ async def resident(ctx):
                         inline=False)
         embed.add_field(name="Sugar Daddy", value="Spend Money on the guild by doing giveaways, sponsoring events!",
                         inline=False)
-        embed.set_footer(text=f"Everyone who has the resident rank must get {format(resident_req,',d')} weekly guild experience! (Except YouTubers)")
+        embed.set_footer(text=f"Everyone who has the resident rank must get {format(client.resident_req,',d')} weekly guild experience! (Except YouTubers)")
         await ctx.send(embed=embed)
     except Exception as e:
         print(e)
@@ -185,18 +185,18 @@ async def on_guild_channel_create(channel):
                                                color=0x8368ff)
                         embed1.set_author(name="While you wait, kindly take a look a the guild requirements!")
                         embed1.add_field(name="Active",
-                                         value=f"•  {format(active,',d')} Weekly Guild Experience",
+                                         value=f"•  {format(client.active,',d')} Weekly Guild Experience",
                                          inline=False)
                         embed1.add_field(name="Do Not Kick List Eligibility",
-                                         value=f"•  {format(dnkl,',d')} Weekly Guild Experience",
+                                         value=f"•  {format(client.dnkl,',d')} Weekly Guild Experience",
                                          inline=False)
-                        embed1.add_field(name="Resident", value=f"•  {format(resident_req,',d')} Weekly Guild Experience",
+                        embed1.add_field(name="Resident", value=f"•  {format(client.resident_req,',d')} Weekly Guild Experience",
                                          inline=False)
                         embed1.add_field(name="Member",
-                                         value=f"•  {format(inactive,',d')} Weekly Guild Experience",
+                                         value=f"•  {format(client.inactive,',d')} Weekly Guild Experience",
                                          inline=False)
                         embed1.add_field(name="New Member",
-                                         value=f"•  {format(new_member,',d')} Daily Guild Experience",
+                                         value=f"•  {format(client.new_member,',d')} Daily Guild Experience",
                                          inline=False)
                         embed1.set_footer(text="You are considered a New Member for the first 7 days after joining the guild"
                                                "\nIf you fail to meet the New Member/Member requirements, you will be kicked!")
@@ -335,7 +335,7 @@ async def on_guild_channel_create(channel):
                                         embed.set_author(name="Do-not-kick-list: Eligibility Check")
                                         embed.set_footer(text="Miscellaneous Bot | Coded by Rowdies")
                                         embed.add_field(name="You are not eligible to apply for the do not kick list.",
-                                                        value=f"You need a minimum of {format(dnkl,',d')} weekly guild experience."
+                                                        value=f"You need a minimum of {format(client.dnkl,',d')} weekly guild experience."
                                                               f"\n You have {totalexp} weekly guild experience.",
                                                         inline=True)
                                         await channel.send(embed=embed)
@@ -370,7 +370,7 @@ async def on_guild_channel_create(channel):
                                         embed.set_author(name='Do-not-kick-list: Eligibility Check')
                                         embed.set_footer(text="Miscellaneous Bot | Coded by Rowdies")
                                         embed.add_field(name="You are eligible to apply for the do not kick list.",
-                                                        value=f"You meet the minimum of {format(dnkl,',d')} weekly guild experience."
+                                                        value=f"You meet the minimum of {format(client.dnkl,',d')} weekly guild experience."
                                                               f"\n You have {totalexp} weekly guild experience.",
                                                         inline=True)
                                         await channel.send(embed=embed)
@@ -1445,54 +1445,6 @@ async def help(ctx, *, a=None):
         await ctx.send(embed=embed2)
 
 
-# Ping
-@client.command()
-async def ping(ctx):
-    embed = discord.Embed(title='Pong',
-                          description=f"{round(client.latency * 1000)}ms",
-                          color=0x8368ff)
-    await ctx.send(embed=embed)
-
-
-# Pizza
-@client.command()
-async def pizza(ctx):
-    links = ['https://bit.ly/3ibK6PQ', 'https://bit.ly/2EZWZ1p', 'https://bit.ly/339ul5N', 'https://bit.ly/328OOIx',
-             'https://bit.ly/3ibMqGy', 'https://bit.ly/2F8hd96', 'https://bit.ly/2R5XusZ', 'https://bit.ly/35fRqX7',
-             'https://bit.ly/2F9Ec3B', 'https://bit.ly/3h9T8vI', 'https://bzfd.it/2GzzLzm', 'https://bit.ly/35fyKa7',
-             'https://bit.ly/3lVF24F', 'https://bit.ly/2R2Ccg1', 'https://bit.ly/3haFhVZ', 'https://bit.ly/2DDaWkW',
-             'https://bit.ly/2R893Qx']
-    image = random.choice(links)
-    embed = discord.Embed(title="Here's the pizza you requested:", color=0xD2691e)
-    embed.set_image(url=image)
-    await ctx.send(embed=embed)
-
-
-# 8ball
-@client.command(aliases=['8ball', 'eightball'])
-async def _8ball(ctx, *, question):
-    author = ctx.author
-    user_name = author.nick
-    if user_name is None:
-        user_name = ctx.author.name
-    responses = ["As I see it, yes.", "Ask again later.", "Better not tell you now.", "Cannot predict now.",
-                 "Concentrate and ask again.", "Don’t count on it.", "It is certain.", "It is decidedly so.",
-                 "Most likely", "My reply is no.", "My sources say no.", "Outlook not so good.", "Outlook good.",
-                 "Reply hazy, try again.", "Signs point to yes.", "Very doubtful.", "Without a doubt.", "Yes.",
-                 "Yes – definitely.", "You may rely on it."]
-    embed = discord.Embed(title=f'{random.choice(responses)}', color=0x0ffff)
-    embed.set_author(name=f"{question}")
-    embed.set_footer(text=f'{user_name}')
-    await ctx.send(embed=embed)
-
-@_8ball.error
-async def _8ball_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        embed = discord.Embed(title="You're supposed to ask me a question ._.", description="8ball `question`",
-                              color=0xff0000)
-        await ctx.send(embed=embed)
-
-
 @client.command(aliases=['del'])
 async def delete(ctx):
     try:
@@ -1761,113 +1713,7 @@ async def messagespam(ctx, *, x):
 guild = 'Miscellaneous'
 
 
-@client.command(aliases=['Register', 'reg', 'Reg', 'Verify', 'verify'])
-async def register(ctx, name):
-    try:
-        async with ctx.channel.typing():
-            author = ctx.author
-            if str(ctx.channel) == "register":
-                request = requests.get(f'https://api.mojang.com/users/profiles/minecraft/{name}')
-                if request.status_code != 200:
-                    await ctx.send('Please enter a valid ign!')
-                else:
-                    request = request.json()
-                    ign = request['name']
-                    uuid = request['id']
 
-                    guild_name = hypixel.get_guild(name)
-                    newmember = discord.utils.get(ctx.guild.roles, name="New Member")
-                    awaiting_app = discord.utils.get(ctx.guild.roles, name="Awaiting Approval")
-                    member = discord.utils.get(ctx.guild.roles, name="Member")
-                    guest = discord.utils.get(ctx.guild.roles, name="Guest")
-                    staff = discord.utils.get(ctx.guild.roles, name="Staff")
-                    officer = discord.utils.get(ctx.guild.roles, name="Officer")
-                    tofficer = discord.utils.get(ctx.guild.roles, name="Trial Officer")
-                    xl_ally = discord.utils.get(ctx.guild.roles, name="XL - Ally")
-
-
-                    nick = await author.edit(nick=ign)
-                    if guild_name == "Miscellaneous":
-                        await ctx.author.remove_roles(newmember)
-
-                        await ctx.channel.purge(limit=1)
-                        embed = discord.Embed(title="Registration successfull!")
-                        embed.add_field(name=ign,
-                                        value="Member of Miscellaneous")
-
-                        embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
-                        await ctx.send(embed=embed)
-                        await ctx.author.add_roles(member)
-
-                    elif guild_name == "XL":
-                        await ctx.author.remove_roles(newmember)
-                        await ctx.author.add_roles(guest, xl_ally)
-
-
-                        await ctx.channel.purge(limit=1)
-                        embed = discord.Embed(title="Registration successfull!")
-                        embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
-                        embed.add_field(name=ign, value="Member of XL")
-                        await ctx.send(embed=embed)
-
-                    elif guild_name not in ("Miscellaneous", "XL"):
-                        await ctx.author.remove_roles(newmember)
-                        await ctx.author.add_roles(awaiting_app)
-                        if nick is None:
-                            nick = author.name
-
-                        await ctx.channel.purge(limit=1)
-                        embed = discord.Embed(title="Registration successfull!")
-                        embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
-                        embed.add_field(name=ign, value="New Member")
-                        await ctx.send(embed=embed)
-
-                        category = discord.utils.get(ctx.guild.categories, name="RTickets")
-                        ticket_channel = await ctx.guild.create_text_channel(f"registration-ticket-{nick}",
-                                                                             category=category)
-                        await ticket_channel.set_permissions(ctx.guild.get_role(ctx.guild.id), send_messages=False,
-                                                             read_messages=False)
-                        await ticket_channel.set_permissions(staff, send_messages=True, read_messages=True,
-                                                             add_reactions=True, embed_links=True, attach_files=True,
-                                                             read_message_history=True, external_emojis=True)
-                        await ticket_channel.set_permissions(officer, send_messages=True, read_messages=True,
-                                                             add_reactions=True, embed_links=True, attach_files=True,
-                                                             read_message_history=True, external_emojis=True)
-                        await ticket_channel.set_permissions(tofficer, send_messages=True, read_messages=True,
-                                                             add_reactions=True, embed_links=True, attach_files=True,
-                                                             read_message_history=True, external_emojis=True)
-                        await ticket_channel.set_permissions(author, send_messages=True, read_messages=True,
-                                                             add_reactions=True, embed_links=True, attach_files=True,
-                                                             read_message_history=True, external_emojis=True)
-                        await ticket_channel.set_permissions(newmember, send_messages=False, read_messages=False,
-                                                             add_reactions=True, embed_links=True, attach_files=True,
-                                                             read_message_history=True, external_emojis=True)
-
-                        embed = discord.Embed(title="Miscellaneous Guild Requirements", description="These requirements are subject to change!", color=0x8368ff)
-                        embed.add_field(name="Active",
-                                        value=f"•  {format(active,',d')} Weekly Guild Experience",
-                                        inline=False)
-                        embed.add_field(name="DNKL Eligibility",
-                                        value=f"•  {format(dnkl,',d')} Weekly Guild Experience",
-                                        inline=False)
-                        embed.add_field(name="Resident",
-                                        value=f"•  {format(resident_req,',d')} Weekly Guild Experience",
-                                        inline=False)
-                        embed.add_field(name="Member",
-                                        value=f"•  {format(inactive,',d')} Weekly Guild Experience",
-                                        inline=False)
-                        embed.add_field(name="New Member",
-                                        value=f"•  {format(new_member,',d')} Daily Guild Experience",
-                                        inline=False)
-                        embed.set_footer(text="You are considered a New Member for the first 7 days after joining the guild"
-                                              "\nIf you fail to meet the New Member/Member requirements, you will be kicked!")
-                        await ctx.author.send(embed=embed)
-            else:
-                await ctx.send('This command can only be used in the registration channel!')
-    except Exception as e:
-        error_channel = client.get_channel(523743721443950612)
-        print(e)
-        await error_channel.send(f"Error in {ctx.channel.name} while trying to use `register`\n{e}\n<@!326399363943497728>")
 
 
 @client.command()
@@ -2620,7 +2466,7 @@ async def gactive(ctx):
         async with ctx.channel.typing():
             for i in range(len(g['members'])):
                 expHistory = sum(g['members'][i]['exp_history'].values())
-                if expHistory >= active:
+                if expHistory >= client.active:
                     uuid = g['members'][i]['uuid']
                     a = requests.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}').json()
                     name = a['name'] + f"[{g['members'][i]['rank']}]"
@@ -2673,7 +2519,7 @@ async def ginactive(ctx):
         async with ctx.channel.typing():
             for i in range(len(g['members'])):
                 expHistory = sum(g['members'][i]['exp_history'].values())
-                if expHistory < inactive:
+                if expHistory < client.inactive:
                     uuid = g['members'][i]['uuid']
                     a = requests.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}').json()
                     name = a['name']
@@ -2839,14 +2685,14 @@ async def gmember(ctx, name=None):
                             totalexp = sum(totalexp.values())
 
                             if rank == "Resident":
-                                if totalexp > resident_req:
+                                if totalexp > client.resident_req:
                                     colour, GraphColor, GraphBorder = hypixel.get_color("res_met")
                                 else:
                                     colour, GraphColor, GraphBorder = hypixel.get_color("res_not_met")
                             else:
-                                if totalexp > active:
+                                if totalexp > client.active:
                                     colour, GraphColor, GraphBorder = hypixel.get_color("active")
-                                elif totalexp > inactive:
+                                elif totalexp > client.inactive:
                                     colour, GraphColor, GraphBorder = hypixel.get_color("member")
                                 else:
                                     colour, GraphColor, GraphBorder = hypixel.get_color("inactive")
@@ -2957,7 +2803,7 @@ async def dnklcheck(ctx, name=None):
                         member = member
                         totalexp = member['expHistory']
                         totalexp = int(sum(totalexp.values()))
-                        if totalexp >= dnkl:
+                        if totalexp >= client.dnkl:
                             eligiblity = True
                         else:
                             eligiblity = False
@@ -2969,7 +2815,7 @@ async def dnklcheck(ctx, name=None):
                             embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
                             embed.set_author(name="Do-not-kick-list: Eligibility Check")
                             embed.add_field(name="You are not eligible to apply for the do not kick list.",
-                                            value=f"You need a minimum of {format(dnkl,',d')} weekly guild experience.\n You have {totalexp} weekly guild experience.",
+                                            value=f"You need a minimum of {format(client.dnkl,',d')} weekly guild experience.\n You have {totalexp} weekly guild experience.",
                                             inline=True)
                         else:
                             embed = discord.Embed(title=name,
@@ -2978,7 +2824,7 @@ async def dnklcheck(ctx, name=None):
                             embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
                             embed.set_author(name='Do-not-kick-list: Eligibility Check')
                             embed.add_field(name="You are eligible to apply for the do not kick list.",
-                                            value=f"You meet the minimum of {format(dnkl,',d')} weekly guild experience.\n You have {totalexp} weekly guild experience.",
+                                            value=f"You meet the minimum of {format(client.dnkl,',d')} weekly guild experience.\n You have {totalexp} weekly guild experience.",
                                             inline=True)
                         await ctx.send(embed=embed)
     except Exception as e:
@@ -3356,7 +3202,7 @@ async def staff(ctx):
                 expHistory = sum(g['guild']['members'][i]['expHistory'].values())
                 rank = g['guild']['members'][i]['rank']
                 joined = g['guild']['members'][i]['joined']
-                if expHistory >= active and rank == "Member":
+                if expHistory >= client.active and rank == "Member":
                     uuid = g['guild']['members'][i]['uuid']
                     a = requests.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}').json()
                     name = a['name']
@@ -3369,7 +3215,7 @@ async def staff(ctx):
                     exp += expHistory
                     activearray[name] = exp
                     exp = 0
-                elif expHistory < active and rank == "Active":
+                elif expHistory < client.active and rank == "Active":
                     uuid = g['guild']['members'][i]['uuid']
                     a = requests.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}').json()
                     name = a['name']
@@ -3382,7 +3228,7 @@ async def staff(ctx):
                     exp += expHistory
                     activedemotearray[name] = exp
                     exp = 0
-                elif expHistory < inactive:
+                elif expHistory < client.inactive:
                     if rank == "Member":
                         uuid = g['guild']['members'][i]['uuid']
                         a = requests.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}').json()
@@ -3397,7 +3243,7 @@ async def staff(ctx):
                         inactivearray[name] = exp
                         exp = 0
                     elif rank == "Resident":
-                        if expHistory < resident_req:
+                        if expHistory < client.resident_req:
                             uuid = g['guild']['members'][i]['uuid']
                             a = requests.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}').json()
                             time = str(datetime.fromtimestamp(int(str(joined)[:-3])))
@@ -3654,19 +3500,19 @@ async def rolecheck(ctx):
                                                     totalexp = user['expHistory']
                                                     totalexp = sum(totalexp.values())
 
-                                            if totalexp < inactive:
+                                            if totalexp < client.inactive:
                                                 await member.add_roles(inactive_role)
                                                 await member.remove_roles(active_role)
                                                 await message.edit(
                                                     content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
 
-                                            elif totalexp >= active:  # If the member is active
+                                            elif totalexp >= client.active:  # If the member is active
                                                 await member.remove_roles(inactive_role, new_member)
                                                 await member.add_roles(active_role)
                                                 await message.edit(
                                                     content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
 
-                                            elif totalexp > inactive:
+                                            elif totalexp > client.inactive:
                                                 await member.remove_roles(inactive_role, active_role)
                                                 await message.edit(
                                                     content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
@@ -3679,19 +3525,19 @@ async def rolecheck(ctx):
                                                     totalexp = user['expHistory']
                                                     totalexp = sum(totalexp.values())
 
-                                            if totalexp < inactive:
+                                            if totalexp < client.inactive:
                                                 await member.add_roles(inactive_role)
                                                 await member.remove_roles(active_role)
                                                 await message.edit(
                                                     content=f"{name} ||{member}|| Already Member  **++Inactive \| --Active**")
 
-                                            elif totalexp >= active:  # If the member is active
+                                            elif totalexp >= client.active:  # If the member is active
                                                 await member.remove_roles(inactive_role, new_member)
                                                 await member.add_roles(active_role)
                                                 await message.edit(
                                                     content=f"{name} ||{member}|| Already Member **++Active \| --Inactive**")
 
-                                            elif totalexp > inactive:
+                                            elif totalexp > client.inactive:
                                                 await member.remove_roles(inactive_role)
                                                 await member.remove_roles(active_role)
                                                 await message.edit(
@@ -3711,7 +3557,7 @@ async def rolecheck(ctx):
         inactivity_channel = client.get_channel(848067712156434462)
 
         embed = discord.Embed(title="You do not meet the guild requirements!",
-                              description=f"Member requirement - {format(inactive,',d')} Weekly Guild Experience",
+                              description=f"Member requirement - {format(client.inactive,',d')} Weekly Guild Experience",
                               color = 0xDC143C)
         await inactivity_channel.send(f"<@&848051215287058443>")
         await inactivity_channel.send(embed=embed)
@@ -3829,14 +3675,14 @@ async def newrolecheck(ctx):
 
                 for element in misc_details:
                     if name in element[0]:
-                        if element[1] > active:
+                        if element[1] > client.active:
                             active_members.append(member)
                             active_names = active_names + str(member) + "\n"
-                        elif element[1] > inactive:
+                        elif element[1] > client.inactive:
                             if member_role not in member.roles:
                                 regular_members.append(member)
                                 member_names = member_names + str(member) + "\n"
-                        elif element[1] < inactive:
+                        elif element[1] < client.inactive:
                             inactive_members.append(member)
                             inactive_names = inactive_names + str(member) + "\n"
 
