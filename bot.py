@@ -1135,7 +1135,7 @@ async def on_guild_channel_create(channel):
 
                 elif reply == "Event":
                     await channel.edit(name=f"Event-{name}", category=discord.utils.get(channel.guild.categories, name="EVENT"))
-                    await channel.send("Alright, kindly enter the requested details for registering!")
+                    await channel.send("Please re-register once Hypixel is back online!")
                     break
 
                 elif reply == "Other":
