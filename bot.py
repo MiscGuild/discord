@@ -1187,10 +1187,12 @@ async def on_guild_channel_create(channel):
                             with open('eventparticipants.json','r') as event_participants:
                                 eventparticipants = json.load(event_participants)
                                 if division == 1:
+                                    await channel.edit(category=discord.utils.get(channel.guild.categories, name="Event-Div-1"))
                                     participants_list = eventparticipants.get("div1")
                                     participants_list.append(ign)
                                     eventparticipants["div1"] = participants_list
                                 elif division == 2:
+                                    await channel.edit(category=discord.utils.get(channel.guild.categories, name="Event-Div-2"))
                                     participants_list = eventparticipants.get("div2")
                                     participants_list.append(ign)
                                     eventparticipants["div2"] = participants_list
