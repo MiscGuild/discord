@@ -1446,7 +1446,9 @@ async def pizza(ctx):
              'https://bit.ly/3ibMqGy', 'https://bit.ly/2F8hd96', 'https://bit.ly/2R5XusZ', 'https://bit.ly/35fRqX7',
              'https://bit.ly/2F9Ec3B', 'https://bit.ly/3h9T8vI', 'https://bzfd.it/2GzzLzm', 'https://bit.ly/35fyKa7',
              'https://bit.ly/3lVF24F', 'https://bit.ly/2R2Ccg1', 'https://bit.ly/3haFhVZ', 'https://bit.ly/2DDaWkW',
-             'https://bit.ly/2R893Qx']
+             'https://bit.ly/2R893Qx', 'https://bit.ly/3gHvBVH', 'https://bit.ly/3gJf8AB', 'https://bit.ly/3vJ3mdu',
+             'https://bit.ly/3vCJ6uh', 'https://bit.ly/3zOScaH', 'https://bit.ly/3h2EAjx', 'https://bit.ly/3cXPxRU',
+             'https://bit.ly/3qaI1bM', 'https://bit.ly/3vHyzOn']
     image = random.choice(links)
     embed = discord.Embed(title="Here's the pizza you requested:", color=0xD2691e)
     embed.set_image(url=image)
@@ -1978,9 +1980,15 @@ async def register(ctx, name):
             else:
                 await ctx.send('This command can only be used in the registration channel!')
     except Exception as e:
-        error_channel = client.get_channel(523743721443950612)
-        print(e)
-        await error_channel.send(f"Error in {ctx.channel.name} while trying to use `register`\n{e}\n<@!326399363943497728>")
+        if str(e) == "Expecting value: line 1 column 1 (char 0)":
+            embed = discord.Embed(title="The Hypixel API is down!",
+                                  description="Please try again in a while!", color=0xff0000)
+            await ctx.send(embed=embed)
+            print(e)
+        else:
+            error_channel = client.get_channel(523743721443950612)
+            print(e)
+            await error_channel.send(f"Error in {ctx.channel.name} while trying to use `register`\n{e}\n<@!326399363943497728>")`
 
 
 @client.command()
