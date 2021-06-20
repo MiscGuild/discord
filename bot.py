@@ -1136,6 +1136,75 @@ async def on_guild_channel_create(channel):
                 elif reply == "Event":
                     await channel.edit(name=f"Event-{name}", category=discord.utils.get(channel.guild.categories, name="EVENT"))
                     await channel.send("Please re-register once Hypixel is back online!")
+
+
+                    name_embed = discord.Embed(title="What is your Minecraft Username?",color=0x4b89e4)
+                    await channel.send(embed=name_embed)
+                    name = await client.wait_for('message',
+                                                       check=lambda x: x.channel == channel and x.author == author)
+                    name = name.content
+                    ign = hypixel.get_dispname(name)
+                    if ign is None:
+                        await channel.send('Please enter a valid ign!')
+                        await channel.send(
+                            "I'll restart the process. "
+                            "If you think I made an error, select 'Other' upon restart")
+
+                    else:
+                        await author.edit(nick=ign)
+                        div_embed = discord.Embed(title="Which division would you like to partcipaticate in? Division 1 or Division 2?",
+                                                  description="Please reply with the following:\n"
+                                                              "1 - Division 1\n"
+                                                              "2 - Divison 2",
+                                                  color=0x4b89e4)
+                        await channel.send(embed=div_embed)
+                        division = await client.wait_for('message',
+                                                     check=lambda x: x.channel == channel and x.author == author)
+                        division = division.content
+                        division = division.capitalize()
+                        if str(division) in ("1", "One", 'Div1', 'Division 1', 'Division1', 'Div 1'):
+                            division = 1
+                        elif str(division) in ("2", "Two", 'Div2', 'Division 2', 'Division2', 'Div 2'):
+                            division = 2
+
+
+
+                        rules_embed = discord.Embed(
+                            title="Rules",
+                            description="• The screenshots MUST NOT be cropped. We will only accept screenshots of your entire screen.\n"
+                                        "• Cross-teaming/boosting is disallowed.\n"
+                                        "• Cheating, use of blacklisted modifications is disallowed.\n"
+                                        "• Forging of screenshots is disallowed.\n"
+                                        "Violation of any of these rules (except the first will result) in an immediate blacklist along with a temporary/permanent blacklist.",
+                            color=0x4b89e4)
+                        await channel.send(embed=rules_embed)
+                        await channel.send("**Do you agree to abide by these rules and face the consequences if any of the rules are broken?**\n(Yes/No)")
+                        rules = await client.wait_for('message',
+                                                     check=lambda x: x.channel == channel and x.author == author)
+                        rules = (rules.content).capitalize()
+
+                        if rules in ('Yes', 'Y', 'Yeah', 'Yup', 'Ya', 'Yea', 'Ye'):
+                            with open('eventparticipants.json','r') as event_participants:
+                                eventparticipants = json.load(event_participants)
+                                if division == 1:
+                                    participants_list = eventparticipants.get("div1")
+                                    participants_list.append(ign)
+                                    eventparticipants["div1"] = participants_list
+                                elif division == 2:
+                                    participants_list = eventparticipants.get("div2")
+                                    participants_list.append(ign)
+                                    eventparticipants["div2"] = participants_list
+                            with open('eventparticipants.json','w') as event_participants:
+                                json.dump(eventparticipants, event_participants)
+                            await channel.send(f"**You've been added to the list of participants!**\nIn division {division}, you are participant number: {len(participants_list)}")
+
+                        else:
+                            await channel.send("**In order to participate in the event, you must agree to abide by all the rules."
+                                               "\nIf you have any queries regarding the rules, create a new ticket and select the category as 'other'**"
+                                               "\n*This ticket will be deleted in 1 minute*")
+                            await asyncio.sleep(60)
+                            await discord.TextChannel.delete(channel)
+
                     break
 
                 elif reply == "Other":
@@ -1172,6 +1241,35 @@ async def on_guild_channel_create(channel):
             await error_channel.send(f"Error in {channel}\n{e}\n<@!326399363943497728>")
 
 
+@client.command(aliases=['participant'])
+async def participants(ctx, raw=None):
+    try:
+        div1_name = div2_name = ""
+        count = 0
+        with open('eventparticipants.json') as f:
+            data = json.load(f)
+        if raw is not None:
+            await ctx.author.send(data)
+        else:
+            keys = data.keys()
+            for x in data['div1']:
+                div1_name = div1_name + f"{x}\n"
+                count += 1
+            for x in data['div2']:
+                div2_name = div2_name + f"{x}\n"
+                count += 1
+            embed = discord.Embed(title='The participants of the event are as follows:',
+                                  color=0x8368ff)
+            embed.add_field(name="Division 1", value=div1_name, inline=False)
+            embed.add_field(name="Division 2", value=div2_name, inline=False)
+            embed.set_footer(text=f"Total: {count}")
+            await ctx.send(embed=embed)
+    except Exception as e:
+        error_channel = client.get_channel(523743721443950612)
+        print(e)
+        await error_channel.send(
+            f"Error in {ctx.channel.name} while running dnkllist"
+            f"\n{e}\n<@!326399363943497728>")
 '----------------------------------------------------------------------------------------------------------------GENERAL----------------------------------------------------------------------------------------------------'
 
 
