@@ -1307,21 +1307,14 @@ async def swap(ctx, name):
                 if ign in data['div1']:
                     data['div1'].remove(ign)
                     data['div2'].append(ign)
+                    division = 2
                 else:
                     data['div2'].remove(ign)
                     data['div1'].append(ign)
+                    division = 1
 
-                for x in data['div1']:
-                    div1_name = div1_name + f"{x}\n"
-                    count += 1
-                for x in data['div2']:
-                    div2_name = div2_name + f"{x}\n"
-                    count += 1
-                embed = discord.Embed(title='The participants of the event are as follows:',
+                embed = discord.Embed(title=f'You have been moved to division {division}',
                                       color=0x8368ff)
-                embed.add_field(name="Division 1", value=div1_name, inline=False)
-                embed.add_field(name="Division 2", value=div2_name, inline=False)
-                embed.set_footer(text=f"Total: {count}")
                 await ctx.send(embed=embed)
             with open('eventparticipants.json', 'w') as event_participants:
                 json.dump(data, event_participants)
