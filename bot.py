@@ -1154,9 +1154,12 @@ async def on_guild_channel_create(channel):
                         await author.edit(nick=ign)
                         div_embed = discord.Embed(title="Which division would you like to partcipaticate in? Division 1 or Division 2?",
                                                   description="Please reply with the following:\n"
-                                                              "1 for Division 1\n"
-                                                              "2 for Divison 2",
+                                                              "`Division 1: 3rd July, 8:00 pm UTC/GMT`\n"
+                                                              "`Division 2: 4th July, 7:00 am UTC/GMT`",
                                                   color=0x4b89e4)
+                        embed.set_footer(text="If you have any difficulty interpreting the time, make another ticket and await staff assistance!\n"
+                                              "Reply with 1 for division 1"
+                                              "\nReply with 2 for division 2")
                         await channel.send(embed=div_embed)
                         division = await client.wait_for('message',
                                                      check=lambda x: x.channel == channel and x.author == author)
@@ -1269,8 +1272,49 @@ async def participants(ctx, raw=None):
     except Exception as e:
         error_channel = client.get_channel(523743721443950612)
         print(e)
+        await error_channel.send(f"Error in {ctx.channel.name} while running `participants`"
+                                 f"\n{e}\n<@!326399363943497728>")
+
+@client.command(aliases=['switch','swapper'])
+async def swap(ctx, name):
+    try:
+        staff = discord.utils.get(ctx.guild.roles, name="Staff")
+        if staff in ctx.author.roles:
+            count = 0
+            ign = hypixel.get_dispname(name)
+            with open('eventparticipants.json') as f:
+                data = json.load(f)
+                if ign in data['div1']:
+                    data['div1'].remove(ign)
+                    data['div2'].append(ign)
+                else:
+                    data['div2'].remove(ign)
+                    data['div1'].append(ign)
+
+                for x in data['div1']:
+                    div1_name = div1_name + f"{x}\n"
+                    count += 1
+                for x in data['div2']:
+                    div2_name = div2_name + f"{x}\n"
+                    count += 1
+                embed = discord.Embed(title='The participants of the event are as follows:',
+                                      color=0x8368ff)
+                embed.add_field(name="Division 1", value=div1_name, inline=False)
+                embed.add_field(name="Division 2", value=div2_name, inline=False)
+                embed.set_footer(text=f"Total: {count}")
+                await ctx.send(embed=embed)
+            with open('eventparticipants.json', 'w') as event_participants:
+                json.dump(data, event_participants)
+        else:
+            embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
+                                  description="Your role lacks permissions to swap a user's division!", color=0xff0000)
+            await ctx.channel.purge(limit=1)
+            await ctx.send(embed=embed)
+    except Exception as e:
+        error_channel = client.get_channel(523743721443950612)
+        print(e)
         await error_channel.send(
-            f"Error in {ctx.channel.name} while running dnkllist"
+            f"Error in {ctx.channel.name} while running `swap`"
             f"\n{e}\n<@!326399363943497728>")
 '----------------------------------------------------------------------------------------------------------------GENERAL----------------------------------------------------------------------------------------------------'
 
