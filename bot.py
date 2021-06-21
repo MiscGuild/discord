@@ -527,7 +527,7 @@ async def on_guild_channel_create(channel):
                         if guild_name == "Miscellaneous":
                             await author.remove_roles(guest, awaiting_app)
                             await author.add_roles(member)
-                            embed = discord.Embed(title="Your nick and role was succesfully changed!",
+                            embed = discord.Embed(title="Your nick and role was successfully changed!",
                                                   description="await staff assistance.",
                                                   color=0x8368ff)
                             embed.set_footer(text="Member of Miscellaneous"
@@ -538,7 +538,7 @@ async def on_guild_channel_create(channel):
                         elif guild_name == "XL":
                             await author.remove_roles(member, awaiting_app)
                             await author.add_roles(guest, xl_ally)
-                            embed = discord.Embed(title="Your nick and role was succesfully changed!",
+                            embed = discord.Embed(title="Your nick and role was successfully changed!",
                                                   description="If this wasn't the change you anticipated, "
                                                               "await staff assistance.",
                                                   color=0x8368ff)
@@ -553,7 +553,7 @@ async def on_guild_channel_create(channel):
                             else:
                                 await author.remove_roles(member,awaiting_app)
                                 await author.add_roles(guest)
-                                embed = discord.Embed(title="Your nick and role was succesfully changed!",
+                                embed = discord.Embed(title="Your nick and role was successfully changed!",
                                                       description="If this wasn't the change you anticipated, "
                                                                   "await staff assistance.",
                                                       color=0x8368ff)
@@ -770,7 +770,7 @@ async def on_guild_channel_create(channel):
                                     await author.remove_roles(awaiting_app)
                                     await author.remove_roles(guest)
                                     await author.add_roles(member)
-                                    embed = discord.Embed(title="Your nick and role was succesfully changed!",
+                                    embed = discord.Embed(title="Your nick and role was successfully changed!",
                                                           description="Now let's proceed to your application!",
                                                           color=0x8368ff)
                                     await channel.send(embed=embed)
@@ -778,7 +778,7 @@ async def on_guild_channel_create(channel):
                                 else:
                                     await author.remove_roles(member)
                                     await author.add_roles(guest)
-                                    embed = discord.Embed(title="Your nick and role was succesfully changed!",
+                                    embed = discord.Embed(title="Your nick and role was successfully changed!",
                                                           description="Now let's proceed to your application!",
                                                           color=0x8368ff)
                                     await channel.send(embed=embed)
@@ -2072,7 +2072,7 @@ async def register(ctx, name):
                         await ctx.author.remove_roles(newmember)
 
                         await ctx.channel.purge(limit=1)
-                        embed = discord.Embed(title="Registration successfull!")
+                        embed = discord.Embed(title="Registration successful!")
                         embed.add_field(name=ign,
                                         value="Member of Miscellaneous")
 
@@ -2086,7 +2086,7 @@ async def register(ctx, name):
 
 
                         await ctx.channel.purge(limit=1)
-                        embed = discord.Embed(title="Registration successfull!")
+                        embed = discord.Embed(title="Registration successful!")
                         embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
                         embed.add_field(name=ign, value="Member of XL")
                         await ctx.send(embed=embed)
@@ -2098,7 +2098,7 @@ async def register(ctx, name):
                             nick = author.name
 
                         await ctx.channel.purge(limit=1)
-                        embed = discord.Embed(title="Registration successfull!")
+                        embed = discord.Embed(title="Registration successful!")
                         embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
                         embed.add_field(name=ign, value="New Member")
                         await ctx.send(embed=embed)
@@ -2178,7 +2178,7 @@ async def sync(ctx, name):
             if guild_name == "Miscellaneous":
                 await ctx.author.remove_roles(guest,awaiting_app)
                 await ctx.author.add_roles(member)
-                embed = discord.Embed(title="Your nick and role was succesfully changed!",
+                embed = discord.Embed(title="Your nick and role was successfully changed!",
                                       description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
                                       color=0x8368ff)
                 embed.set_footer(text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
@@ -2188,7 +2188,7 @@ async def sync(ctx, name):
                 await ctx.author.remove_roles(member, awaiting_app)
                 await ctx.author.add_roles(guest, xl_ally)
 
-                embed = discord.Embed(title="Your nick and role was succesfully changed!",
+                embed = discord.Embed(title="Your nick and role was successfully changed!",
                                       description="If this wasn't the change you anticipated, "
                                                   "kindly create a ticket or get in contact with staff!",
                                       color=0x8368ff)
@@ -2209,7 +2209,7 @@ async def sync(ctx, name):
                     await ctx.author.add_roles(guest)
                     if guild_name is None:
                         guild_name = "no guild (Guildless)"
-                    embed = discord.Embed(title="Your nick and role was succesfully changed!",
+                    embed = discord.Embed(title="Your nick and role was successfully changed!",
                                           description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
                                           color=0x8368ff)
                     embed.set_footer(text=f"Member of {guild_name}\n• Nick Changed\n• Member & Awaiting Approval were removed\n• Guest was given")
@@ -2248,7 +2248,7 @@ async def forcesync(ctx, member: discord.Member, name):
                 if guild_name == "Miscellaneous":
                     await member.remove_roles(guest,awaiting_app,newmember)
                     await member.add_roles(member_)
-                    embed = discord.Embed(title=f"{member.name}'s nick and role were succesfully changed!",
+                    embed = discord.Embed(title=f"{member.name}'s nick and role were successfully changed!",
                                           description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
                                           color=0x8368ff)
                     embed.set_footer(text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
@@ -2259,7 +2259,7 @@ async def forcesync(ctx, member: discord.Member, name):
                     await member.remove_roles(member_,awaiting_app)
                     await member.add_roles(guest, xl_ally)
 
-                    embed = discord.Embed(title="Your nick and role was succesfully changed!",
+                    embed = discord.Embed(title="Your nick and role was successfully changed!",
                                           description="If this wasn't the change you anticipated, "
                                                       "kindly create a ticket or get in contact with staff!",
                                           color=0x8368ff)
@@ -2280,7 +2280,7 @@ async def forcesync(ctx, member: discord.Member, name):
                         await member.add_roles(guest)
                         if guild_name is None:
                             guild_name = "no guild (Guildless)"
-                        embed = discord.Embed(title=f"{member.name}'s nick and role were succesfully changed!",
+                        embed = discord.Embed(title=f"{member.name}'s nick and role were successfully changed!",
                                               description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
                                               color=0x8368ff)
                         embed.set_footer(text=f"Member of {guild_name}\n• Nick Changed\n• Member & Awaiting Approval were removed\n• Guest was given")
@@ -4208,7 +4208,7 @@ async def ticketss(ctx):
                                                 "When reporting a player, make sure to explain your situation in maximum detail."
                                                 "Providing the following details is considered the bare minimum:-\n"
                                                 "> Name of user you would like to report\n"
-                                                "> Explaination about the offense\n"
+                                                "> Explanation about the offense\n"
                                                 "> Time of offense\n"
                                                 "> Proof of offense\n"
                                                 "If you would like to report a staff member, DM Rowdies.\n\n"
