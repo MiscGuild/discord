@@ -1281,6 +1281,7 @@ async def swap(ctx, name):
         staff = discord.utils.get(ctx.guild.roles, name="Staff")
         if staff in ctx.author.roles:
             count = 0
+            div1_name = div2_name = ""
             ign = hypixel.get_dispname(name)
             with open('eventparticipants.json') as f:
                 data = json.load(f)
