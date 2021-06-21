@@ -1249,25 +1249,45 @@ async def on_guild_channel_create(channel):
 @client.command(aliases=['participant'])
 async def participants(ctx, raw=None):
     try:
-        div1_name = div2_name = ""
-        count = 0
-        with open('eventparticipants.json') as f:
-            data = json.load(f)
-        if raw is not None:
-            await ctx.author.send(data)
+        staff = discord.utils.get(ctx.guild.roles, name="Staff")
+        if staff in ctx.author.roles:
+            div1_name = div2_name = ""
+            count = 0
+            with open('eventparticipants.json') as f:
+                data = json.load(f)
+            if raw is not None:
+                await ctx.author.send(data)
+            else:
+                for x in data['div1']:
+                    div1_name = div1_name + f"{x}\n"
+                    count += 1
+                for x in data['div2']:
+                    div2_name = div2_name + f"{x}\n"
+                    count += 1
+                embed = discord.Embed(title='The participants of the event are as follows:',
+                                      color=0x8368ff)
+                embed.add_field(name="Division 1", value=div1_name, inline=False)
+                embed.add_field(name="Division 2", value=div2_name, inline=False)
+                embed.set_footer(text=f"Total: {count}")
+                await ctx.send(embed=embed)
         else:
-            for x in data['div1']:
-                div1_name = div1_name + f"{x}\n"
-                count += 1
-            for x in data['div2']:
-                div2_name = div2_name + f"{x}\n"
-                count += 1
-            embed = discord.Embed(title='The participants of the event are as follows:',
-                                  color=0x8368ff)
-            embed.add_field(name="Division 1", value=div1_name, inline=False)
-            embed.add_field(name="Division 2", value=div2_name, inline=False)
-            embed.set_footer(text=f"Total: {count}")
-            await ctx.send(embed=embed)
+            participants = ""
+            count = 0
+            with open('eventparticipants.json') as f:
+                data = json.load(f)
+            if raw is not None:
+                await ctx.author.send(data)
+            else:
+                for x in data['div1']:
+                    participants = participants + f"{x}\n"
+                    count += 1
+                for x in data['div2']:
+                    participants = participants + f"{x}\n"
+                    count += 1
+                embed = discord.Embed(title='The participants of the event are as follows:', description=participants,
+                                      color=0x8368ff)
+                embed.set_footer(text=f"Total: {count}")
+                await ctx.send(embed=embed)
     except Exception as e:
         error_channel = client.get_channel(523743721443950612)
         print(e)
@@ -1280,28 +1300,29 @@ async def swap(ctx, name):
         staff = discord.utils.get(ctx.guild.roles, name="Staff")
         if staff in ctx.author.roles:
             count = 0
-            div1_name = div2_name = ""
             ign = hypixel.get_dispname(name)
             with open('eventparticipants.json') as f:
                 data = json.load(f)
                 if ign in data['div1']:
                     data['div1'].remove(ign)
                     data['div2'].append(ign)
+                    if ctx.channel.category == "Event-Div-1":
+                        await ctx.channel.edit(category=discord.utils.get(ctx.channel.guild.categories, name="Event-Div-2"))
+                    division = 2
                 else:
                     data['div2'].remove(ign)
                     data['div1'].append(ign)
+                    if ctx.channel.category == "Event-Div-2":
+                        await ctx.channel.edit(category=discord.utils.get(ctx.channel.guild.categories, name="Event-Div-1"))
+                    division = 1
 
                 for x in data['div1']:
-                    div1_name = div1_name + f"{x}\n"
                     count += 1
                 for x in data['div2']:
-                    div2_name = div2_name + f"{x}\n"
                     count += 1
-                embed = discord.Embed(title='The participants of the event are as follows:',
+                embed = discord.Embed(title=f'{ign} has been moved to division {division}',
                                       color=0x8368ff)
-                embed.add_field(name="Division 1", value=div1_name, inline=False)
-                embed.add_field(name="Division 2", value=div2_name, inline=False)
-                embed.set_footer(text=f"Total: {count}")
+                embed.set_footer(text=f"Total Participants: {count}")
                 await ctx.send(embed=embed)
             with open('eventparticipants.json', 'w') as event_participants:
                 json.dump(data, event_participants)
