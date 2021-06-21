@@ -1174,7 +1174,8 @@ async def on_guild_channel_create(channel):
 
                         rules_embed = discord.Embed(
                             title="Rules",
-                            description="• The screenshots MUST NOT be cropped. We will only accept screenshots of your entire screen.\n"
+                            description="• The screenshots must be taken in third person mode so that we have proof that it is YOU who has completed the challenges.\n"
+                                        "• The screenshots MUST NOT be cropped. We will only accept screenshots of your entire screen.\n"
                                         "• Cross-teaming/boosting is disallowed.\n"
                                         "• Cheating, use of blacklisted modifications is disallowed.\n"
                                         "• Forging of screenshots is disallowed.\n",
