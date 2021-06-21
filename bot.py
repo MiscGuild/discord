@@ -1313,9 +1313,13 @@ async def swap(ctx, name):
 
                 for x in data['div1']:
                     div1_name = div1_name + f"{x}\n"
+                    if ctx.channel.category == "Event-Div-1":
+                        await ctx.channel.edit(category=discord.utils.get(ctx.channel.guild.categories, name="Event-Div-2"))
                     count += 1
                 for x in data['div2']:
                     div2_name = div2_name + f"{x}\n"
+                    if ctx.channel.category == "Event-Div-2":
+                        await ctx.channel.edit(category=discord.utils.get(ctx.channel.guild.categories, name="Event-Div-1"))
                     count += 1
                 embed = discord.Embed(title='The participants of the event are as follows:',
                                       color=0x8368ff)
