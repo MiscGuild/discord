@@ -1608,16 +1608,18 @@ async def ping(ctx):
 # Pizza
 @client.command()
 async def pizza(ctx):
-    links = ['https://bit.ly/3ibK6PQ', 'https://bit.ly/2EZWZ1p', 'https://bit.ly/339ul5N', 'https://bit.ly/328OOIx',
-             'https://bit.ly/3ibMqGy', 'https://bit.ly/2F8hd96', 'https://bit.ly/2R5XusZ', 'https://bit.ly/35fRqX7',
-             'https://bit.ly/2F9Ec3B', 'https://bit.ly/3h9T8vI', 'https://bzfd.it/2GzzLzm', 'https://bit.ly/35fyKa7',
-             'https://bit.ly/3lVF24F', 'https://bit.ly/2R2Ccg1', 'https://bit.ly/3haFhVZ', 'https://bit.ly/2DDaWkW',
-             'https://bit.ly/2R893Qx', 'https://bit.ly/3gHvBVH', 'https://bit.ly/3gJf8AB', 'https://bit.ly/3vJ3mdu',
-             'https://bit.ly/3vCJ6uh', 'https://bit.ly/3zOScaH', 'https://bit.ly/3h2EAjx', 'https://bit.ly/3cXPxRU',
-             'https://bit.ly/3qaI1bM', 'https://bit.ly/3vHyzOn']
-    image = links[random.randint(0,len(links)+1)]
+    req = requests.get(f"https://foodish-api.herokuapp.com/api/images/pizza")
+    req = req.json()
+    # links = ['https://bit.ly/3ibK6PQ', 'https://bit.ly/2EZWZ1p', 'https://bit.ly/339ul5N', 'https://bit.ly/328OOIx',
+    #          'https://bit.ly/3ibMqGy', 'https://bit.ly/2F8hd96', 'https://bit.ly/2R5XusZ', 'https://bit.ly/35fRqX7',
+    #          'https://bit.ly/2F9Ec3B', 'https://bit.ly/3h9T8vI', 'https://bzfd.it/2GzzLzm', 'https://bit.ly/35fyKa7',
+    #          'https://bit.ly/3lVF24F', 'https://bit.ly/2R2Ccg1', 'https://bit.ly/3haFhVZ', 'https://bit.ly/2DDaWkW',
+    #          'https://bit.ly/2R893Qx', 'https://bit.ly/3gHvBVH', 'https://bit.ly/3gJf8AB', 'https://bit.ly/3vJ3mdu',
+    #          'https://bit.ly/3vCJ6uh', 'https://bit.ly/3zOScaH', 'https://bit.ly/3h2EAjx', 'https://bit.ly/3cXPxRU',
+    #          'https://bit.ly/3qaI1bM', 'https://bit.ly/3vHyzOn']
+    # image = links[random.randint(0,len(links)+1)]
     embed = discord.Embed(title="Here's the pizza you requested:", color=0xD2691e)
-    embed.set_image(url=image)
+    embed.set_image(url=req['image'])
     await ctx.send(embed=embed)
 
 
