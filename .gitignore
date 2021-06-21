@@ -1,4 +1,7 @@
-#Rowdies dont leak anything plz 
+# Project data files
+config.json
+dnkl.json
+eventparticipants.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -134,4 +137,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-

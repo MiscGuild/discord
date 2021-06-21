@@ -20,9 +20,7 @@ The bot used by the Miscellaneous Hypixel guild's discord.
 ## Installation
 
 * Install [Python](https://www.python.org/) version 3.x.x or later. 
-* Fill out the [`TEMPLATE-config.json`](https://github.com/MiscGuild/MiscBot/blob/main/TEMPLATE-config.json) file with your credentials and rename it to `config.json`
-* Rename [`TEMPLATE-dnkl.json`](https://github.com/MiscGuild/MiscBot/blob/main/TEMPLATE-dnkl.json) to `dnkl.json`
-* Rename [`TEMPLATE-eventparticipants.json`](https://github.com/MiscGuild/MiscBot/blob/main/TEMPLATE-dnkl.json) to `eventparticipants.json`
+* Fill out the [`TEMPLATE-config.json`](https://github.com/MiscGuild/MiscBot/blob/main/config.json) file with your credentials
 * Install all the packages
 * Run the following commands in a terminal or command prompt in the bots directory.
 
