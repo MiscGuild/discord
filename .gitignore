@@ -1,4 +1,8 @@
 #Rowdies dont leak anything plz 
+# Project data files
+config.json
+dnkl.json
+eventparticipants.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -109,7 +113,6 @@ celerybeat.pid
 
 # Environments
 .env
-config.json
 .venv
 env/
 venv/
