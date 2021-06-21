@@ -1307,13 +1307,13 @@ async def swap(ctx, name):
                     data['div1'].remove(ign)
                     data['div2'].append(ign)
                     if ctx.channel.category == "Event-Div-1":
-                        await ctx.channel.edit(category=discord.utils.get(ctx.channel.guild.categories, name="Event-Div-2"))
+                        await ctx.channel.edit(category=discord.utils.get(ctx.guild.categories, name="Event-Div-2"))
                     division = 2
                 else:
                     data['div2'].remove(ign)
                     data['div1'].append(ign)
                     if ctx.channel.category == "Event-Div-2":
-                        await ctx.channel.edit(category=discord.utils.get(ctx.channel.guild.categories, name="Event-Div-1"))
+                        await ctx.channel.edit(category=discord.utils.get(ctx.guild.categories, name="Event-Div-1"))
                     division = 1
 
                 for x in data['div1']:
