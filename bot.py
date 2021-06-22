@@ -343,7 +343,8 @@ async def on_guild_channel_create(channel):
                                             f"\n**End:** {end}"
                                             f"\n**Reason:** {reason}"
                                             f"\n*If you made an error, kindly notify staff by typing after this message*"
-                                            f"\n\n||,dnkl {name} {author.mention} {start} {end} {reason}||")
+                                            f"\n\n||,dnkladd {name} {author.mention} {start} {end} {reason}||"
+                                            )
 
                                     else:
                                         embed = discord.Embed(title=name,
@@ -2530,7 +2531,8 @@ async def dnkladd(ctx, name = None, w = None, x = None, y = None, *, z = None):
                 end_date = await client.wait_for('message',
                                                    check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
                 end_date = end_date.content
-
+                
+                await ctx.send("**What is the reason behind their inactivity?**")
                 reason = await client.wait_for('message',
                                                  check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
                 reason = reason.content
@@ -2560,7 +2562,7 @@ async def dnkladd(ctx, name = None, w = None, x = None, y = None, *, z = None):
                     embed.add_field(name="End:", value=f"{p} {end_month} {r}", inline=False)
                     embed.add_field(name="Reason", value=f"{reason}", inline=False)
                     embed.set_author(name="Do not kick list")
-                    dnkl_channel = client.get_channel(523743721443950612)
+                    dnkl_channel = client.get_channel(629564802812870657)
                     message = await dnkl_channel.send(embed=embed)
 
                     dnkl_dict = {ign: message.id}
