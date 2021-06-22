@@ -3941,7 +3941,9 @@ async def rolecheck(ctx):
                                             await member.remove_roles(new_member, guest)
 
                                             for user in req['guild']["members"]:
-                                                if uuid == user["uuid"]:
+                                                if user["rank"]=="Resident":
+                                                    totalexp = 100000
+                                                else: 
                                                     totalexp = user['expHistory']
                                                     totalexp = sum(totalexp.values())
 
