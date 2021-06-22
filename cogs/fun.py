@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import random
 
-class Misc(commands.Cog, name="Misc"):
+class Fun(commands.Cog, name="fun"):
     def __init__(self, client):
         self.client = client
 
@@ -52,4 +52,4 @@ class Misc(commands.Cog, name="Misc"):
             await ctx.send(embed=embed)
 
 def setup(bot):
-    bot.add_cog(Misc(bot))
+    bot.add_cog(Fun(bot))
