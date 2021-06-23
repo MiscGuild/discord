@@ -1,5 +1,5 @@
 # hypixel.py
-import math, datetime, random, asyncio, json, aiohttp, requests, toml
+import math, datetime, random, asyncio, json, aiohttp, toml
 from datetime import datetime
 
 
@@ -11,30 +11,38 @@ def get_api():
     
     api = random.choice(API_KEY)
     return api
-def get_data(name):
+
+async def get_data(name):
     api = get_api()
-    req = requests.get(f"https://api.hypixel.net/player?key={api}&name={name}")
-    req = req.json()
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"https://api.hypixel.net/player?key={api}&name={name}") as resp:
+            req = await resp.json()
     return req
-def get_data1(name):
-    req = requests.get(f"https://api.slothpixel.me/api/players/{name}")
-    req = req.json()
+
+async def get_data1(name):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"https://api.slothpixel.me/api/players/{name}") as resp:
+            req = await resp.json()
     return req
-def get_guild_data(name):
-    req = requests.get(f"https://api.slothpixel.me/api/guilds/{name}")
-    req = req.json()
+
+async def get_guild_data(name):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"https://api.slothpixel.me/api/guilds/{name}") as resp:
+            req = await resp.json()
     return req
-def get_leaderboards():
+
+async def get_leaderboards():
     api = get_api()
-    req = requests.get(f"https://api.hypixel.net/leaderboards?key={api}")
-    req = req.json()
-    if req.json()["success"]:
-        return req.json()
-    elif not req.json()["success"]:
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"https://api.hypixel.net/leaderboards?key={api}") as resp:
+            req = await resp.json()
+    if req["success"]:
+        return req
+    elif not req["success"]:
         return None
 
-def get_level(name):
-    data = get_data(name)
+async def get_level(name):
+    data = await get_data(name)
     if data["player"] is None:
         return None
     exp = int(data["player"]["networkExp"]) # This just gets the player experience from our data
@@ -43,8 +51,8 @@ def get_level(name):
     return round(exp, 2)
 
 
-def get_karma(name):
-    data = get_data(name)
+async def get_karma(name):
+    data = await get_data(name)
     if data["player"] is None:
         return None
     karma = int(data["player"]["karma"])
@@ -52,8 +60,8 @@ def get_karma(name):
     return (f"{karma:,d}")
 
 
-def get_ap(name):
-    request = get_data1(name)
+async def get_ap(name):
+    request = await get_data1(name)
     if "achievement_points" in request:
         ap = int(request["achievement_points"])
         print('AP acquired')
@@ -62,12 +70,14 @@ def get_ap(name):
         return ("-")
 
 
-def get_rank(name):
+async def get_rank(name):
     if len(name) > 20:
         api = get_api()
-        data = requests.get(f"https://api.hypixel.net/player?key={api}&name={name}")
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"https://api.hypixel.net/player?key={api}&name={name}") as resp:
+                data = await resp.json()
     else:
-        data = get_data(name)
+        data = await get_data(name)
     if data["player"] is None:
         return None
     if "prefix" in data["player"]:
@@ -123,16 +133,20 @@ def get_rank(name):
          return ('')
 
 
-def get_guild(name):
-    request= requests.get(f'https://api.mojang.com/users/profiles/minecraft/{name}')
+async def get_guild(name):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
+            request = resp
 
-    if request.status_code != 200:
+    if request.status != 200:
         return None
     else:
-        request = request.json()
+        request = await request.json()
         uuid = request['id']
         api = get_api()
-        req = requests.get(f"https://api.hypixel.net/guild?key={api}&player={uuid}").json()
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"https://api.hypixel.net/guild?key={api}&player={uuid}") as resp:
+                req = await resp.json()
         if req['guild'] is not None:
             gname = req["guild"]['name']
             print(f'Guild name acquired - {gname}')
@@ -142,8 +156,8 @@ def get_guild(name):
             return None
 
 
-def get_gtag(name):
-    req = get_guild_data(name)
+async def get_gtag(name):
+    req = await get_guild_data(name)
     if len(req) < 2:
         return None
     if req["tag"] is None:
@@ -155,15 +169,19 @@ def get_gtag(name):
         return (f"[{gtag}]")
 
 
-def get_dispname(name):
-    request = requests.get(f'https://api.mojang.com/users/profiles/minecraft/{name}').json()
-    ign = request["name"]
-    print(ign)
-    return ign
+async def get_dispname(name):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
+            request = await resp.json
+    if 'error' not in request:
+        ign = request["name"]
+        return ign
+    else:
+        return None
 
 
-def get_flogin(name):
-    data = get_data(name)
+async def get_flogin(name):
+    data = await get_data(name)
     if data["player"] is None:
         return None
     first_login= data["player"]["firstLogin"]
@@ -172,8 +190,8 @@ def get_flogin(name):
     return time
 
 
-def get_llogin(name):
-    data = get_data(name)
+async def get_llogin(name):
+    data = await get_data(name)
     if data["player"] is None:
         return None
     if "lastLogin" in data["player"]:
@@ -185,33 +203,40 @@ def get_llogin(name):
         return('Unknown')
 
 
-def get_guild_level(name):
-    request= requests.get(f'https://api.mojang.com/users/profiles/minecraft/{name}')
-
-    if request.status_code != 200:
+async def get_guild_level(name):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
+            request = resp
+    if request.status != 200:
         return None
     else:
-        uuid= request.json()['id']
+        request = await request.json()
+        uuid= request['id']
         api = get_api()
-        req = requests.get(f'https://api.hypixel.net/findGuild?key={api}&byUuid={uuid}')
-        gid = req.json()['guild']
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f'https://api.hypixel.net/findGuild?key={api}&byUuid={uuid}') as resp:
+                req = resp
+        req_json = await req.json
+        gid = req_json['guild']
 
         if gid is None:
             print('No Guild')
             return None
         else:
-            req2 = get_guild_data(name)
+            req2 = await get_guild_data(name)
             level = req2['level']
             return level
 
 
-def get_guild_desc(name):
-    request= requests.get(f'https://api.mojang.com/users/profiles/minecraft/{name}')
+async def get_guild_desc(name):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
+            request = resp
 
-    if request.status_code != 200:
+    if request.status != 200:
         return None
     else:
-        req2 = get_guild_data(name)
+        req2 = await get_guild_data(name)
         if req2["description"] is None:
             print('No guild description')
             return ('')
@@ -220,8 +245,8 @@ def get_guild_desc(name):
             return (f'{gdesc}')
 
 
-def get_guild_legacyrank(name):
-    req = get_guild_data(name)
+async def get_guild_legacyrank(name):
+    req = await get_guild_data(name)
     if "legacy_ranking" in req:
         glg = req["legacy_ranking"]
         return (f"{glg}")
@@ -230,29 +255,29 @@ def get_guild_legacyrank(name):
         return('-')
 
 
-def get_guild_member_count(name):
-    req = get_guild_data(name)
+async def get_guild_member_count(name):
+    req = await get_guild_data(name)
     mem_amt = len(req["members"])
     return mem_amt
 
 
-def get_guild_joinability(name):
-    req = get_guild_data(name)
+async def get_guild_joinability(name):
+    req = await get_guild_data(name)
     if req["joinable"] is True:
         return ("Yes")
     else:
         return ("No")
 
 
-def get_guild_publiclisting(name):
-    req = get_guild_data(name)
+async def get_guild_publiclisting(name):
+    req = await get_guild_data(name)
     if req["public"] is True:
         return ("Yes")
     else:
         return ("No")
 
 
-def get_guild_onlinerecord(name):
+async def get_guild_onlinerecord(name):
     request= requests.get(f'https://api.mojang.com/users/profiles/minecraft/{name}')
     uuid= request.json()['id']
     api = get_api()
@@ -270,7 +295,7 @@ def get_guild_onlinerecord(name):
 def get_challenges_completed(name):
     request= requests.get(f'https://api.mojang.com/users/profiles/minecraft/{name}')
 
-    if request.status_code != 200:
+    if request.status != 200:
         return None
     else:
         data = get_data(name)
@@ -328,7 +353,7 @@ def fetch(session, individual_uuid):
     with session.get(base_url + individual_uuid) as response:
         data = response.json()
 
-        if response.status_code != 200:
+        if response.status != 200:
             return None
         name = data['name']
         return name
@@ -346,7 +371,7 @@ def discord_member_check(session, member):
     with session.get(base_url + name) as mojang:
         data = mojang.json()
 
-        if mojang.status_code != 200:  # If the IGN is invalid
+        if mojang.status != 200:  # If the IGN is invalid
             invalid_members.append(member)
         print(invalid_members)
         return invalid_members

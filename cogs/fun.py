@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import random
+import aiohttp
 
 class Fun(commands.Cog, name="Fun"):
     def __init__(self, client):
@@ -11,13 +12,24 @@ class Fun(commands.Cog, name="Fun"):
     async def pizza(self, ctx):
         """Gives you a pizza
         """
-        links = ['https://bit.ly/3ibK6PQ', 'https://bit.ly/2EZWZ1p', 'https://bit.ly/339ul5N', 'https://bit.ly/328OOIx',
-                'https://bit.ly/3ibMqGy', 'https://bit.ly/2F8hd96', 'https://bit.ly/2R5XusZ', 'https://bit.ly/35fRqX7',
-                'https://bit.ly/2F9Ec3B', 'https://bit.ly/3h9T8vI', 'https://bzfd.it/2GzzLzm', 'https://bit.ly/35fyKa7',
-                'https://bit.ly/3lVF24F', 'https://bit.ly/2R2Ccg1', 'https://bit.ly/3haFhVZ', 'https://bit.ly/2DDaWkW',
-                'https://bit.ly/2R893Qx']
-        image = random.choice(links)
+        async with aiohttp.ClientSession() as session:
+            async with session.get('https://foodish-api.herokuapp.com/api/images/pizza') as resp:
+                req = await resp.json()
         embed = discord.Embed(title="Here's the pizza you requested:", color=0xD2691e)
+        embed.set_image(url=req['image'])
+        await ctx.send(embed=embed)
+
+    @commands.command()
+    async def chester(self, ctx):
+        """Sends a random image of chester
+        """
+        links = ['https://bit.ly/3zVao27', 'https://bit.ly/3wTpNOK', 'https://bit.ly/3wTpNOK', 'https://bit.ly/2T2gXiX',
+                'https://bit.ly/3qjLS6F', 'https://bit.ly/3h1zJyH', 'https://bit.ly/2SYlQcN', 'https://bit.ly/3xN3vy5',
+                'https://bit.ly/3j3sZDj', 'https://bit.ly/35Lu9v8', 'https://bit.ly/35Lu9v8', 'https://bit.ly/2Usk2Jn',
+                'https://bit.ly/3wSxTXS', 'https://bit.ly/3qnEYNO', 'https://bit.ly/3gOwJa3', 'https://bit.ly/3zVSVXE',
+                'https://bit.ly/3zKYDv8', 'https://bit.ly/3xNHn6U', 'https://bit.ly/35MdUOz', 'https://bit.ly/35MHfIJ']
+        image = links[random.randint(0, len(links) + 1)]
+        embed = discord.Embed(title="Here's the furry you requested:", color=0xD2691e)
         embed.set_image(url=image)
         await ctx.send(embed=embed)
 

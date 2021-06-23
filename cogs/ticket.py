@@ -17,7 +17,7 @@ class Tickets(commands.Cog, name="Tickets"):
                     async with aiohttp.ClientSession() as session:
                         async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
                             request = resp
-                    if request.status_code != 200:
+                    if request.status != 200:
                         await ctx.send('Please enter a valid ign!')
                     else:
                         request = await request.json()
@@ -40,7 +40,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             await ctx.author.remove_roles(newmember)
 
                             await ctx.channel.purge(limit=1)
-                            embed = discord.Embed(title="Registration successfull!")
+                            embed = discord.Embed(title="Registration successful!")
                             embed.add_field(name=ign,
                                             value="Member of Miscellaneous")
 
@@ -54,7 +54,7 @@ class Tickets(commands.Cog, name="Tickets"):
 
 
                             await ctx.channel.purge(limit=1)
-                            embed = discord.Embed(title="Registration successfull!")
+                            embed = discord.Embed(title="Registration successful!")
                             embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
                             embed.add_field(name=ign, value="Member of XL")
                             await ctx.send(embed=embed)
@@ -66,7 +66,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                 nick = author.name
 
                             await ctx.channel.purge(limit=1)
-                            embed = discord.Embed(title="Registration successfull!")
+                            embed = discord.Embed(title="Registration successful!")
                             embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
                             embed.add_field(name=ign, value="New Member")
                             await ctx.send(embed=embed)
@@ -128,9 +128,9 @@ class Tickets(commands.Cog, name="Tickets"):
             if Staff in ctx.author.roles:
                 if ctx.channel.category.name in ('RTickets',  '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL','EVENT'):
                     name = ctx.channel.name
-                    embed = discord.Embed(title='This ticket will be deleted in 5 seconds!', description='', color=0xff0000)
+                    embed = discord.Embed(title='This ticket will be deleted in 10 seconds!', description='', color=0xDE3163)
                     msg = await ctx.send(embed=embed)
-                    await asyncio.sleep(5)
+                    await asyncio.sleep(10)
                     await discord.TextChannel.delete(ctx.channel)
 
                     author = ctx.author
@@ -307,7 +307,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                     "When reporting a player, make sure to explain your situation in maximum detail."
                                                     "Providing the following details is considered the bare minimum:-\n"
                                                     "> Name of user you would like to report\n"
-                                                    "> Explaination about the offense\n"
+                                                    "> Explanation about the offense\n"
                                                     "> Time of offense\n"
                                                     "> Proof of offense\n"
                                                     "If you would like to report a staff member, DM Rowdies.\n\n"
