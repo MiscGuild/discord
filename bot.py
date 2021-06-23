@@ -1158,7 +1158,7 @@ async def on_guild_channel_create(channel):
                                                               "`Division 1: 3rd July, 8:00 pm UTC/GMT`\n"
                                                               "`Division 2: 4th July, 7:00 am UTC/GMT`",
                                                   color=0x4b89e4)
-                        embed.set_footer(text="If you have any difficulty interpreting the time, make another ticket and await staff assistance!\n"
+                        div_embed.set_footer(text="If you have any difficulty interpreting the time, make another ticket and await staff assistance!\n"
                                               "Reply with 1 for division 1"
                                               "\nReply with 2 for division 2")
                         await channel.send(embed=div_embed)
@@ -1166,9 +1166,9 @@ async def on_guild_channel_create(channel):
                                                      check=lambda x: x.channel == channel and x.author == author)
                         division = division.content
                         division = division.capitalize()
-                        if str(division) in ("1", "One", 'Div1', 'Division 1', 'Division1', 'Div 1'):
+                        if str(division) in ("1", "One", 'Div1', 'Division 1', 'Division1', 'Div 1', 'Division 1: 3rd July, 8:00 pm UTC/GMT'):
                             division = 1
-                        elif str(division) in ("2", "Two", 'Div2', 'Division 2', 'Division2', 'Div 2'):
+                        elif str(division) in ("2", "Two", 'Div2', 'Division 2', 'Division2', 'Div 2', 'Division 2: 4th July, 7:00 am UTC/GMT'):
                             division = 2
 
 
@@ -1181,7 +1181,7 @@ async def on_guild_channel_create(channel):
                                         "• Cheating, use of blacklisted modifications is disallowed.\n"
                                         "• Forging of screenshots is disallowed.\n",
                             color=0x4b89e4)
-                        embed.set_footer(text="Violation of any of these rules (except the first will result) in immediate disqualification along with a temporary/permanent blacklist.")
+                        rules_embed.set_footer(text="Violation of any of these rules (except the first will result) in immediate disqualification along with a temporary/permanent blacklist.")
                         await channel.send(embed=rules_embed)
                         await channel.send("**Do you agree to abide by these rules and face the consequences if any of the rules are broken?**\n(Yes/No)")
                         rules = await client.wait_for('message',
@@ -1371,6 +1371,7 @@ async def help(ctx, *, a=None):
         embed.add_field(name="8ball", value="Play with the magic 8ball", inline=False)
         embed.add_field(name="ping", value="Gives the bot's ping", inline=False)
         embed.add_field(name="pizza", value="Gives you a pizza", inline=False)
+        embed.add_field(name="chester", value="Give you a random chester picture", inline=False)
         embed.set_author(name="Help - Fun")
         embed.set_footer(text="Miscellaneous Bot | Coded by Rowdies")
         await ctx.send(embed=embed)
@@ -1501,6 +1502,10 @@ async def help(ctx, *, a=None):
         embed.add_field(name="pizza",
                         value="Gives you a pizza",
                         inline=False)
+        embed.add_field(name="chester",
+                        value="Give you a random chester picture",
+                        inline=False)
+
 
         embed.set_author(name="Help - Fun")
 
@@ -1623,6 +1628,18 @@ async def pizza(ctx):
     embed.set_image(url=req['image'])
     await ctx.send(embed=embed)
 
+
+@client.command()
+async def chester(ctx):
+    links = ['https://bit.ly/3zVao27', 'https://bit.ly/3wTpNOK', 'https://bit.ly/3wTpNOK', 'https://bit.ly/2T2gXiX',
+             'https://bit.ly/3qjLS6F', 'https://bit.ly/3h1zJyH', 'https://bit.ly/2SYlQcN', 'https://bit.ly/3xN3vy5',
+             'https://bit.ly/3j3sZDj', 'https://bit.ly/35Lu9v8', 'https://bit.ly/35Lu9v8', 'https://bit.ly/2Usk2Jn',
+             'https://bit.ly/3wSxTXS', 'https://bit.ly/3qnEYNO', 'https://bit.ly/3gOwJa3', 'https://bit.ly/3zVSVXE',
+             'https://bit.ly/3zKYDv8', 'https://bit.ly/3xNHn6U', 'https://bit.ly/35MdUOz', 'https://bit.ly/35MHfIJ']
+    image = links[random.randint(0, len(links) + 1)]
+    embed = discord.Embed(title="Here's the pizza you requested:", color=0xD2691e)
+    embed.set_image(url=image)
+    await ctx.send(embed=embed)
 
 # 8ball
 @client.command(aliases=['8ball', 'eightball'])
@@ -2019,7 +2036,7 @@ async def challenge(ctx, x):
 @client.command()
 async def messagespam(ctx, *, x):
     try:
-        if ctx.author.id == 326399363943497728:
+        if ctx.author.id in (326399363943497728,266546184301182976):
             y = 0
             while True:
                 if y < 10:
@@ -2029,7 +2046,7 @@ async def messagespam(ctx, *, x):
                 else:
                     break
         else:
-            embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
+            embed = discord.Embed(title='Your soul lacks the strength to utilizze this command!',
                                   description="This command is exclusively for Rowdies", color=0xff0000)
             await ctx.channel.purge(limit=1)
             await ctx.send(embed=embed)
