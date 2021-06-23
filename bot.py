@@ -1,11 +1,14 @@
-import discord, random, math, requests, toml, time, aiohttp, asyncio, json, sys
+import discord, random, math, toml, aiohttp, asyncio, json, sys, requests
 from quickchart import QuickChart
 from discord.ext import commands
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 from cogs.utils import hypixel
+import logging
 
-config = toml.load('config.toml') 
+logging.basicConfig(level=logging.INFO)
+
+config = toml.load('config.toml')
 
 intents = discord.Intents.default()
 intents.reactions = True
@@ -89,75 +92,6 @@ async def on_member_join(member):
     except Exception as e:
         print(e)
 
-
-
-
-@client.command(aliases=['req', 'requirement', 'Req', 'Requirement', 'Requirements'])
-async def requirements(ctx):
-    try:
-        embed = discord.Embed(title="Miscellaneous Guild Requirements",
-                              description="These requirements are subject to change!",
-                              color=0x8368ff)
-        embed.add_field(name="Active", value=f"•  {format(client.active,',d')} Weekly Guild Experience", inline=False)
-        embed.add_field(name="Do Not Kick List Eligibility", value=f"•  {format(client.dnkl,',d')} Weekly Guild Experience", inline=False)
-        embed.add_field(name="Resident", value=f"•  {format(client.resident_req,',d')} Weekly Guild Experience", inline=False)
-        embed.add_field(name="Member", value=f"•  {format(client.inactive,',d')} Weekly Guild Experience", inline=False)
-        embed.add_field(name="New Member", value=f"•  {format(client.new_member,',d')} Daily Guild Experience", inline=False)
-        embed.set_footer(text="You are considered a New Member for the first 7 days after joining the guild"
-                              "\nIf you fail to meet the New Member/Member requirements, you will be kicked!")
-        await ctx.send(embed=embed)
-    except Exception as e:
-        print(e)
-
-
-@client.command(aliases=['Ticket', 'Tickets', 'ticket'])
-async def tickets(ctx):
-    try:
-        embed = discord.Embed(title="How to create a ticket?",
-                              color=0x8368ff)
-        embed.add_field(name="Go to #🎟-tickets-🎟",
-                        value="#🎟-tickets-🎟 is located in the noticeboard category",
-                        inline=False)
-        embed.add_field(name="Tickets can be created for the following reasons",
-                        value="> Discord Nick/Role Change\n"
-                              "> Do not kick list\n"
-                              "> Problems/Queries/Complaint/Suggestion\n"
-                              "> Reporting a player\n"
-                              "> Milestone\n"
-                              "> Staff  Application\n"
-                              "> Other",
-                        inline=False)
-        embed.add_field(name="React to the message sent by @TicketTool",
-                        value="The following image shows you what you need to react to.",
-                        inline=False)
-        embed.set_image(url=f"https://media.discordapp.net/attachments/522930919984726016/775953643991990272/unknown.png?width=1069&height=702")
-        await ctx.send(embed=embed)
-    except Exception as e:
-        print(e)
-
-
-@client.command(aliases=['res', 'Res', 'Resident'])
-async def resident(ctx):
-    try:
-        embed = discord.Embed(title='How to get Resident?',
-                              description='To be eligible for Resident, you must be one of the following',
-                              color=0x8368ff)
-        embed.add_field(name="Veteran", value="Be in the guild for more than 1 year",
-                        inline=False)
-        embed.add_field(name="Server Booster", value="Boost the Discord. You will lose resident once your boost expires.",
-                        inline=False)
-        embed.add_field(name="Youtuber", value="If you're a youtuber with more than 5,000 subscribers, you aren't subject to any guild requirements.",
-                        inline=False)
-        embed.add_field(name="Sugar Daddy", value="Spend Money on the guild by doing giveaways, sponsoring events!",
-                        inline=False)
-        embed.set_footer(text=f"Everyone who has the resident rank must get {format(client.resident_req,',d')} weekly guild experience! (Except YouTubers)")
-        await ctx.send(embed=embed)
-    except Exception as e:
-        print(e)
-
-
-
-
 "------------------------------------------------------------------------------------------------------------------Tickets------------------------------------------------------------------------------------------------------"
 
 
@@ -180,7 +114,7 @@ async def on_guild_channel_create(channel):
                             'Alright. Kindly wait until staff get in contact with you.'
                             '\n`You are recommended to leave your present guild (if any) so that staff can invite you to Miscellaneous ASAP`'
                             '\nIf you get in the guild and want the member role in the discord, use ,sync `Your Minecraft Name` ! ')
-                        time.sleep(3)
+                        await asyncio.sleep(3)
                         embed1 = discord.Embed(title="Miscellaneous Guild Requirements",
                                                description="These requirements are subject to change!",
                                                color=0x8368ff)
@@ -274,7 +208,7 @@ async def on_guild_channel_create(channel):
 
                     break
             elif channel.category.name == '🎫 Ticket Section':
-                time.sleep(3)
+                await asyncio.sleep(3)
                 embed = discord.Embed(title="What's your reason behind creating this ticket?",
                                       description="Please reply with your reason from the list given below!",
                                       color=0x8368ff)
@@ -302,14 +236,19 @@ async def on_guild_channel_create(channel):
                         x = author.name
                         name = x
                     await channel.edit(name=f"DNKL-{name}", category=discord.utils.get(channel.guild.categories, name="DNKL"))
-                    request = requests.get(f'https://api.mojang.com/users/profiles/minecraft/{name}')
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
+                            request = resp
                     if request.status_code != 200:
                         await channel.send('Unknown IGN!')
                     else:
-                        name = request.json()['name']
-                        uuid = request.json()['id']
+                        request = await request.json()
+                        name = request['name']
+                        uuid = request['id']
                         api = hypixel.get_api()
-                        data = requests.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}').json()
+                        async with aiohttp.ClientSession() as session:
+                            async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
+                                data = await resp.json()
                         gname = data['guild']['name']
                         if gname != 'Miscellaneous':
                             await channel.send('You are not in Miscellaneous')
@@ -454,11 +393,14 @@ async def on_guild_channel_create(channel):
                                                     name = name.content
                                                     ign = hypixel.get_dispname(name)
                                                     rank = hypixel.get_rank(name)
-                                                    request = requests.get(f'https://api.mojang.com/users/profiles/minecraft/{ign}')
-                                                    uuid = request.json()['id']
+                                                    async with aiohttp.ClientSession() as session:
+                                                        async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
+                                                            request = resp
+                                                    request_json = await request.json()
+                                                    uuid = request_json['id']
                                                     with open('dnkl.json') as f:
                                                         data = json.load(f)
-                                                    if request.status_code != 200:
+                                                    if request.status != 200:
                                                         await channel.send('Unknown IGN!')
                                                     else:
                                                         await channel.send("**What is the start date?** (DD/MM/YYYY)")
@@ -619,8 +561,10 @@ async def on_guild_channel_create(channel):
                             if name is None:
                                 x = author.name
                                 name = x
-                            request = requests.get(f'https://api.mojang.com/users/profiles/minecraft/{name}')
-                            uuid = request.json()['id']
+                            async with aiohttp.ClientSession() as session:
+                                async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
+                                    request = await resp.json()
+                            uuid = request['id']
                             await channel.edit(name=f"Staff-Application-{name}", category=discord.utils.get(channel.guild.categories, name="OTHER"))
                             '''AGE'''
                             embed = discord.Embed(title="What is your age?",
@@ -652,7 +596,7 @@ async def on_guild_channel_create(channel):
                                                   description="When answering, answer in the form of one message. One question, one message!",
                                                   color=0x4b89e4)
                             await channel.send(embed=embed)
-                            time.sleep(3)
+                            await asyncio.sleep(3)
 
                             '''------------------------------------------------------Questions------------------------------------------------'''
 
@@ -798,8 +742,10 @@ async def on_guild_channel_create(channel):
                                                           color=0x8368ff)
                                     await channel.send(embed=embed)
 
-                                request = requests.get(f'https://api.mojang.com/users/profiles/minecraft/{name}')
-                                uuid = request.json()['id']
+                                async with aiohttp.ClientSession() as session:
+                                    async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
+                                        request = await resp.json()
+                                uuid = request['id']
 
                                 await channel.edit(name=f"Staff-Application-{name}", category=discord.utils.get(channel.guild.categories, name="OTHER"))
                                 '''AGE'''
@@ -833,7 +779,7 @@ async def on_guild_channel_create(channel):
                                                                   "One question, one message!",
                                                       color=0x4b89e4)
                                 await channel.send(embed=embed)
-                                time.sleep(3)
+                                await asyncio.sleep(3)
     #------------------------------------------------------Questions------------------------------------------------
 
                                 #WHY STAFF
@@ -1191,260 +1137,6 @@ async def on_guild_channel_create(channel):
 '----------------------------------------------------------------------------------------------------------------GENERAL----------------------------------------------------------------------------------------------------'
 
 
-# help
-@client.command()
-async def help(ctx, *, a=None):
-
-    if a is None:
-        embed = discord.Embed(title="", description="",
-                              url="https://lh3.googleusercontent.com/6PxnnRn8AIQ9Mu5UXmKtL-j8Eh3ZRqZaHKvCKGShvUZRHOWwiXCBzWa-NuMNEpC9OdrzsTHP7isCIOvkgns_tBha_yQ_r_V2I4hRqWXPnjfkUOfHER_vHCCjWW56qkbhO5vM5rqz",
-                              color=0x8368ff)
-        embed.set_thumbnail(
-            url="https://lh3.googleusercontent.com/6PxnnRn8AIQ9Mu5UXmKtL-j8Eh3ZRqZaHKvCKGShvUZRHOWwiXCBzWa-NuMNEpC9OdrzsTHP7isCIOvkgns_tBha_yQ_r_V2I4hRqWXPnjfkUOfHER_vHCCjWW56qkbhO5vM5rqz")
-        embed.add_field(name="help", value="Prints this help message!", inline=False)
-        embed.add_field(name="help fun", value="Prints all the commands related to fun and games!", inline=False)
-        embed.add_field(name="help moderation", value="Prints all the commands related to moderation!", inline=False)
-        embed.add_field(name="help hypixel", value="Prints all the commands related to Hypixel!", inline=False)
-        embed.add_field(name="help all",
-                        value="Returns a list of all the commands and their functions",
-                        inline=False)
-        embed.set_author(name="General Help")
-        await ctx.channel.purge(limit=1)
-        await ctx.send(embed=embed)
-    if a == 'fun':
-        embed = discord.Embed(title="", description="",
-                              url="https://lh3.googleusercontent.com/6PxnnRn8AIQ9Mu5UXmKtL-j8Eh3ZRqZaHKvCKGShvUZRHOWwiXCBzWa-NuMNEpC9OdrzsTHP7isCIOvkgns_tBha_yQ_r_V2I4hRqWXPnjfkUOfHER_vHCCjWW56qkbhO5vM5rqz",
-                              color=0x8368ff)
-        embed.set_thumbnail(
-            url="https://lh3.googleusercontent.com/6PxnnRn8AIQ9Mu5UXmKtL-j8Eh3ZRqZaHKvCKGShvUZRHOWwiXCBzWa-NuMNEpC9OdrzsTHP7isCIOvkgns_tBha_yQ_r_V2I4hRqWXPnjfkUOfHER_vHCCjWW56qkbhO5vM5rqz")
-        embed.add_field(name="8ball", value="Play with the magic 8ball", inline=False)
-        embed.add_field(name="ping", value="Gives the bot's ping", inline=False)
-        embed.add_field(name="pizza", value="Gives you a pizza", inline=False)
-        embed.set_author(name="Help - Fun")
-        embed.set_footer(text="Miscellaneous Bot | Coded by Rowdies")
-        await ctx.send(embed=embed)
-    if a == 'moderation':
-        embed = discord.Embed(title="", description="",
-                              url="https://lh3.googleusercontent.com/6PxnnRn8AIQ9Mu5UXmKtL-j8Eh3ZRqZaHKvCKGShvUZRHOWwiXCBzWa-NuMNEpC9OdrzsTHP7isCIOvkgns_tBha_yQ_r_V2I4hRqWXPnjfkUOfHER_vHCCjWW56qkbhO5vM5rqz",
-                              color=0x8368ff)
-        embed.set_thumbnail(
-            url="https://lh3.googleusercontent.com/6PxnnRn8AIQ9Mu5UXmKtL-j8Eh3ZRqZaHKvCKGShvUZRHOWwiXCBzWa-NuMNEpC9OdrzsTHP7isCIOvkgns_tBha_yQ_r_V2I4hRqWXPnjfkUOfHER_vHCCjWW56qkbhO5vM5rqz")
-        embed.add_field(name="clear `amount`", value='Clears the chat based on the given amount!', inline=False)
-        embed.add_field(name="mute `user`", value='Mutes the mentioned user indefinately!', inline=False)
-        embed.add_field(name="unmute `user`", value='Mutes the mentioned user', inline=False)
-        embed.add_field(name="kick `Discord @` `Reason`", value='Kicks the mentioned user!', inline=False)
-        embed.add_field(name="ban `Discord @` `Reason`", value='Bans the mentioned user!', inline=False)
-        embed.add_field(name="unban `Name#Discrimitator`", value='Unbans the user!', inline=False)
-        embed.set_author(name="Help - Moderation")
-        embed.set_footer(text="Miscellaneous Bot | Coded by Rowdies")
-        await ctx.send(embed=embed)
-    if a == 'hypixel':
-        embed = discord.Embed(title="", description="",
-                              url="https://lh3.googleusercontent.com/6PxnnRn8AIQ9Mu5UXmKtL-j8Eh3ZRqZaHKvCKGShvUZRHOWwiXCBzWa-NuMNEpC9OdrzsTHP7isCIOvkgns_tBha_yQ_r_V2I4hRqWXPnjfkUOfHER_vHCCjWW56qkbhO5vM5rqz",
-                              color=0x8368ff)
-        embed.set_thumbnail(
-            url="https://lh3.googleusercontent.com/6PxnnRn8AIQ9Mu5UXmKtL-j8Eh3ZRqZaHKvCKGShvUZRHOWwiXCBzWa-NuMNEpC9OdrzsTHP7isCIOvkgns_tBha_yQ_r_V2I4hRqWXPnjfkUOfHER_vHCCjWW56qkbhO5vM5rqz")
-        embed.add_field(name="sync `IGN`",
-                        value="Used to update your discord nick upon changing your minecraft name/leaving Miscellaneous!",
-                        inline=False)
-        embed.add_field(name="info `IGN`", value='Gives the hypixel stats of the requested player', inline=False)
-        embed.add_field(name="dnkl `IGN` `Discord @|Use a random character` `Start Date` `End Date` `Reason`",
-                        value="Adds the user to the do-not-kick-list!", inline=False)
-        embed.add_field(name="bl `IGN` `End Date` `Reason`", value="Adds the user to the guild blacklist", inline=False)
-        embed.add_field(name="ginfo `Username`", value="Gives basic information about the requested guild.",
-                        inline=False)
-        embed.add_field(name="gexp `Guild Name`", value="Lists the guild experience of the requested guild!", inline=False)
-        embed.add_field(name="gmember `IGN`",
-                        value="Gives the guild experience earned by the user over the course of a week.", inline=False)
-        embed.add_field(name="gtop", value="Gives the weekly guild experience leaderboard!", inline=False)
-        embed.add_field(name="dailylb `Number of days ago`",
-                        value="Prints the daily guild leaderboard. The value defaults to the day prior.", inline=False)
-        embed.add_field(name="gactive", value="Lists all the users in the guild who are eligible for active rank.",
-                        inline=False)
-        embed.add_field(name="ginactive",
-                        value="Lists all the users in the guild who don't meet the guild requirements.", inline=False)
-        embed.add_field(name="grank `rank`", value="Lists the guild experience of users with the specified rank.",
-                        inline=False)
-        embed.add_field(name="dnklcheck `IGN`",
-                        value="A command to check whether or not you can apply for the do-not-kick-list.", inline=False)
-        embed.set_author(name="Help - Hypixel")
-        embed.set_footer(text="Miscellaneous Bot | Coded by Rowdies")
-        await ctx.send(embed=embed)
-    if a == 'staff':
-        embed = discord.Embed(title="", description="", color=0x8368ff)
-        embed.set_author(name="Help - Staff")
-        embed.set_thumbnail(
-            url="https://lh3.googleusercontent.com/6PxnnRn8AIQ9Mu5UXmKtL-j8Eh3ZRqZaHKvCKGShvUZRHOWwiXCBzWa-NuMNEpC9OdrzsTHP7isCIOvkgns_tBha_yQ_r_V2I4hRqWXPnjfkUOfHER_vHCCjWW56qkbhO5vM5rqz")
-
-        embed.add_field(name="requirements",
-                        value="Lists the requirements",
-                        inline=False)
-
-        embed.add_field(name="resident",
-                        value="Lists the methods to get the resident rank",
-                        inline=False)
-
-        embed.add_field(name="tickets",
-                        value="Explains the entire ticket system",
-                        inline=False)
-
-        embed.add_field(name="staff",
-                        value="Prints a list of users who need to be promoted, demoted, warned and kicked!",
-                        inline=False)
-
-        embed.add_field(name="dailylb `Number of days ago`",
-                        value="Prints the daily guild leaderboard. The value defaults to the day prior.",
-                        inline=False)
-
-        embed.add_field(name="delete",
-                        value="Deletes the ticket channel the command is used in.",
-                        inline=False)
-
-        embed.add_field(name="gtop",
-                        value="Prints the weekly guild experience leaderboard!",
-                        inline=False)
-
-        embed.add_field(name="bl `IGN` `End Date` `Reason`",
-                        value="Blacklists the user",
-                        inline=False)
-
-        embed.add_field(name="dnkladd `IGN` `Discord @|Use a random character` `Start Date` `End Date` `Reason`",
-                        value="Adds a user to the do not kick list!",
-                        inline=False)
-
-        embed.add_field(name="dnklrmv `IGN`",
-                        value="Removes a user from the do not kick list!",
-                        inline=False)
-
-        embed.add_field(name="rolecheck",
-                        value="Checks the roles of all the users and changes them on the basis of their guild",
-                        inline=False)
-
-        embed.add_field(name="accept `Discord @`",
-                        value="Used to accept staff applications. This command must be typed in the application channel. It doesn't work anywhere else.",
-                        inline=False)
-
-        embed.add_field(name="deny `Discord @` `Discord Channel #`",
-                        value="Used to deny staff applications. This command can be used in any channel, provided, the syntax is met.",
-                        inline=False)
-
-        embed.add_field(name="forcesync `Discord @` `Player's IGN`", value="Used to forcefully sync a player's IGN", inline=False)
-        await ctx.send(embed=embed)
-
-    if a == 'all':
-        # Fun
-        embed = discord.Embed(title="", description="",
-                              url="https://lh3.googleusercontent.com/6PxnnRn8AIQ9Mu5UXmKtL-j8Eh3ZRqZaHKvCKGShvUZRHOWwiXCBzWa-NuMNEpC9OdrzsTHP7isCIOvkgns_tBha_yQ_r_V2I4hRqWXPnjfkUOfHER_vHCCjWW56qkbhO5vM5rqz",
-                              color=0x8368ff)
-        embed.set_thumbnail(
-            url="https://lh3.googleusercontent.com/6PxnnRn8AIQ9Mu5UXmKtL-j8Eh3ZRqZaHKvCKGShvUZRHOWwiXCBzWa-NuMNEpC9OdrzsTHP7isCIOvkgns_tBha_yQ_r_V2I4hRqWXPnjfkUOfHER_vHCCjWW56qkbhO5vM5rqz")
-
-        embed.add_field(name="8ball",
-                        value="Play with the magic 8ball",
-                        inline=False)
-
-        embed.add_field(name="ping",
-                        value="Gives the bot's ping",
-                        inline=False)
-
-        embed.add_field(name="pizza",
-                        value="Gives you a pizza",
-                        inline=False)
-
-        embed.set_author(name="Help - Fun")
-
-        # Moderation
-        embed1 = discord.Embed(title="", description="",
-                               url="https://lh3.googleusercontent.com/6PxnnRn8AIQ9Mu5UXmKtL-j8Eh3ZRqZaHKvCKGShvUZRHOWwiXCBzWa-NuMNEpC9OdrzsTHP7isCIOvkgns_tBha_yQ_r_V2I4hRqWXPnjfkUOfHER_vHCCjWW56qkbhO5vM5rqz",
-                               color=0x8368ff)
-
-        embed1.add_field(name="clear `amount`",
-                         value='Clears the chat based on the given amount!',
-                         inline=False)
-
-        embed1.add_field(name="mute `user`",
-                         value='Mutes the mentioned user indefinately!',
-                         inline=False)
-
-        embed1.add_field(name="unmute `user`",
-                         value='Mutes the mentioned user',
-                         inline=False)
-
-        embed1.add_field(name="kick `Discord @` `Reason`",
-                         value='Kicks the mentioned user!',
-                         inline=False)
-
-        embed1.add_field(name="ban `Discord @` `Reason`",
-                         value='Bans the mentioned user!',
-                         inline=False)
-
-        embed1.add_field(name="unban `Name#Discrimitator`",
-                         value='Unbans the user!',
-                         inline=False)
-
-        embed1.set_author(name="Help - Moderation")
-
-# Hypixel
-        embed2 = discord.Embed(title="", description="",
-                               url="https://lh3.googleusercontent.com/6PxnnRn8AIQ9Mu5UXmKtL-j8Eh3ZRqZaHKvCKGShvUZRHOWwiXCBzWa-NuMNEpC9OdrzsTHP7isCIOvkgns_tBha_yQ_r_V2I4hRqWXPnjfkUOfHER_vHCCjWW56qkbhO5vM5rqz",
-                               color=0x8368ff)
-
-        embed2.add_field(name="sync `IGN`",
-                         value="Used to update your discord nick upon changing your minecraft name/leaving Miscellaneous!",
-                         inline=False)
-
-        embed2.add_field(name="info `IGN`",
-                         value='Gives the hypixel stats of the requested player',
-                         inline=False)
-
-        embed2.add_field(name="dnkl `IGN` `Discord @|Use a random character` `Start Date` `End Date` `Reason`",
-                         value="Adds the user to the do-not-kick-list!",
-                         inline=False)
-
-        embed2.add_field(name="bl `IGN` `End Date` `Reason`",
-                         value="Adds the user to the guild blacklist",
-                         inline=False)
-
-        embed2.add_field(name="ginfo `Username`",
-                         value="Gives basic information about the requested guild.",
-                         inline=False)
-
-        embed2.add_field(name="gexp `Guild Name`",
-                         value="Lists the guild experience of the requested guild!",
-                         inline=False)
-
-        embed2.add_field(name="gmember `IGN`",
-                         value="Gives the guild experience earned by the user over the course of a week.",
-                         inline=False)
-        embed2.add_field(name="gtop",
-                         value="Gives the weekly guild experience leaderboard!",
-                         inline=False)
-        embed.add_field(name="dailylb `Number of days ago`",
-                        value="Prints the daily guild leaderboard. The value defaults to the day prior.",
-                        inline=False)
-
-        embed2.add_field(name="gactive",
-                         value="Lists all the users in the guild who are eligible for active rank.",
-                         inline=False)
-
-        embed2.add_field(name="ginactive",
-                         value="Lists all the users in the guild who don't meet the guild requirements.",
-                         inline=False)
-
-        embed2.add_field(name="grank `rank`",
-                         value="Lists the guild experience of users with the specified rank.",
-                         inline=False)
-
-        embed2.add_field(name="dnklcheck `IGN`",
-                         value="A command to check whether or not you can apply for the do-not-kick-list.",
-                         inline=False)
-
-        embed2.set_author(name="Help - Hypixel")
-
-        await ctx.send(embed=embed)
-        await ctx.send(embed=embed1)
-        await ctx.send(embed=embed2)
-
 @client.command()
 @commands.has_permissions(kick_members=True)
 async def challenge(ctx, x):
@@ -1541,189 +1233,6 @@ async def challenge(ctx, x):
 
 '-------------------------------------------------------------------------------------------------------STAFF COMMANDS----------------------------------------------------------------------------------------------------------'
 
-@client.command(aliases=["Staff"])
-async def staff(ctx):
-    try:
-        msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
-        api = hypixel.get_api()
-        link = f'https://api.hypixel.net/guild?key={api}&name=Miscellaneous'
-        g = requests.get(link).json()
-
-        with open('dnkl.json') as f:
-            data = json.load(f)
-
-        key = data.keys()
-
-        activearray = {}
-        activedemotearray = {}
-        inactivearray = {}
-        veteranarray = {}
-        exp = 0
-        await msg.edit(content=f"**Please wait!**\n `Approximate wait time: 15 seconds`")
-        async with ctx.channel.typing():
-            for i in range(len(g['guild']['members'])):
-                expHistory = sum(g['guild']['members'][i]['expHistory'].values())
-                rank = g['guild']['members'][i]['rank']
-                joined = g['guild']['members'][i]['joined']
-                if expHistory >= client.active and rank == "Member":
-                    uuid = g['guild']['members'][i]['uuid']
-                    a = requests.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}').json()
-                    name = a['name']
-                    time = str(datetime.fromtimestamp(int(str(joined)[:-3])))
-                    dt = (time[0:10])
-                    if name in key:
-                        name = name + f'[DNKL]\n{dt}'
-                    else:
-                        name = name + f'[{rank}]\n{dt}'
-                    exp += expHistory
-                    activearray[name] = exp
-                    exp = 0
-                elif expHistory < client.active and rank == "Active":
-                    uuid = g['guild']['members'][i]['uuid']
-                    a = requests.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}').json()
-                    name = a['name']
-                    time = str(datetime.fromtimestamp(int(str(joined)[:-3])))
-                    dt = (time[0:10])
-                    if name in key:
-                        name = name + f'[DNKL]\n{dt}'
-                    else:
-                        name = name + f'[{rank}]\n{dt}'
-                    exp += expHistory
-                    activedemotearray[name] = exp
-                    exp = 0
-                elif expHistory < client.inactive:
-                    if rank == "Member":
-                        uuid = g['guild']['members'][i]['uuid']
-                        a = requests.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}').json()
-                        time = str(datetime.fromtimestamp(int(str(joined)[:-3])))
-                        name = a['name']
-                        dt = (time[0:10])
-                        if name in key:
-                            name = name + f'[DNKL]\n{dt}'
-                        else:
-                            name = name + f'[{rank}]\n{dt}'
-                        exp += expHistory
-                        inactivearray[name] = exp
-                        exp = 0
-                    elif rank == "Resident":
-                        if expHistory < client.resident_req:
-                            uuid = g['guild']['members'][i]['uuid']
-                            a = requests.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}').json()
-                            time = str(datetime.fromtimestamp(int(str(joined)[:-3])))
-                            name = a['name']
-                            dt = (time[0:10])
-                            if name in key:
-                                name = name + f'[DNKL]\n{dt}'
-                            else:
-                                name = name + f'[{rank}]\n{dt}'
-                            exp += expHistory
-                            veteranarray[name] = exp
-                            exp = 0
-                else:
-                    pass
-            ActivesortedList = sorted(activearray.items(), key=lambda x: x[1], reverse=True)
-            ActiveDemoteSortedList = sorted(activedemotearray.items(), key=lambda x: x[1], reverse=True)
-            VeteransortedList = sorted(veteranarray.items(), key=lambda x: x[1], reverse=True)
-            InactivesortedList = sorted(inactivearray.items(), key=lambda x: x[1], reverse=True)
-
-            await msg.edit(content="**Please wait!**\n `The embeds are being sent!`")
-
-            '---------------------------------------------------------------ACTIVE PROMOTION------------------------------------------------------------------------------'
-            embed = discord.Embed(title=f"The users to be PROMOTED are as follows:",
-                                  description=f"Total: {len(ActivesortedList)}", color=0x43b581)
-            y = 0
-            if len(ActivesortedList) <= 25:
-                for user in ActivesortedList:
-                    embed.add_field(name=f"{user[0]}", value=f"```cs\n{format(user[1], ',d')}```", inline=True)
-                await ctx.send(embed=embed)
-            else:
-                for user in ActivesortedList:
-                    y = y + 1
-                    embed.add_field(name=f"{user[0]}", value=f"```cs\n{format(user[1], ',d')}```", inline=True)
-
-                    if len(embed.fields) >= 25:
-                        await ctx.send(embed=embed)
-                        embed.clear_fields()
-                        embed = discord.Embed(title="", color=0x43b581)
-                    elif y == len(ActivesortedList):
-                        await ctx.send(embed=embed)
-
-            '---------------------------------------------------------------ACTIVE DEMOTION-------------------------------------------------------------------------------'
-            embed = discord.Embed(title=f"The users to be DEMOTED are as follows:",
-                                  description=f"Total: {len(ActiveDemoteSortedList)}", color=0xf04747)
-            z = 0
-            if len(ActiveDemoteSortedList) <= 25:
-                for user in ActiveDemoteSortedList:
-                    embed.add_field(name=f"{user[0]}", value=f"```cs\n{format(user[1], ',d')}```", inline=True)
-                await ctx.send(embed=embed)
-            else:
-                for user in ActiveDemoteSortedList:
-                    z = z + 1
-                    embed.add_field(name=f"{user[0]}", value=f"```cs\n{format(user[1], ',d')}```", inline=True)
-
-                    if len(embed.fields) >= 25:
-                        await ctx.send(embed=embed)
-                        embed.clear_fields()
-                        embed = discord.Embed(title="", color=0xf04747)
-                    elif z == len(ActiveDemoteSortedList):
-                        await ctx.send(embed=embed)
-
-            '---------------------------------------------------------------VETERAN WARNING-------------------------------------------------------------------------------'
-            embed = discord.Embed(
-                title=f"Kindly PM the following veterans on discord and inform them that they don't meet the requirements!",
-                description=f"Total: {len(VeteransortedList)}", color=0xe5ba6c)
-            w = 0
-            if len(VeteransortedList) <= 25:
-                for user in VeteransortedList:
-                    embed.add_field(name=f"{user[0]}", value=f"```\n{format(user[1], ',d')}```", inline=True)
-                await ctx.send(embed=embed)
-            else:
-                for user in VeteransortedList:
-                    w = w + 1
-                    embed.add_field(name=f"{user[0]}", value=f"```\n{format(user[1], ',d')}```", inline=True)
-
-                    if len(embed.fields) >= 25:
-                        await ctx.send(embed=embed)
-                        embed.clear_fields()
-                        embed = discord.Embed(title="", color=0xe5ba6c)
-                    elif w == len(VeteransortedList):
-                        await ctx.send(embed=embed)
-
-            '---------------------------------------------------------------INACTIVE MEMBERS------------------------------------------------------------------------------'
-            embed = discord.Embed(title=f"The users to be kicked are as follows:",
-                                  description=f"Total: {len(InactivesortedList)}", color=0xf04747)
-            x = 0
-            if len(InactivesortedList) <= 25:
-                for user in InactivesortedList:
-                    embed.add_field(name=f"{user[0]}", value=f"```cs\n{format(user[1], ',d')}```", inline=True)
-                await ctx.send(embed=embed)
-            else:
-                for user in InactivesortedList:
-                    x = x + 1
-                    embed.add_field(name=f"{user[0]}", value=f"```cs\n{format(user[1], ',d')}```", inline=True)
-
-                    if len(embed.fields) >= 25:
-                        await ctx.send(embed=embed)
-                        embed.clear_fields()
-                        embed = discord.Embed(title="", color=0xf04747)
-                    elif x == len(InactivesortedList):
-                        await ctx.send(embed=embed)
-
-            await msg.delete()
-            await ctx.send(
-                "**PLEASE CHECK THE DO NOT KICK LIST BEFORE KICKING ANYONE**\nDon't PM the veterans if they're on the do not kick list!")
-
-    except Exception as e:
-        if str(e) == "Expecting value: line 1 column 1 (char 0)":
-            embed = discord.Embed(title="The Hypixel API is down!", description="Please try again in a while!",
-                                  color=0xff0000)
-            await ctx.send(embed=embed)
-            print(e)
-        else:
-            error_channel = client.get_channel(523743721443950612)
-            print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while using `staff`\n{e}\n<@!326399363943497728>")
-
 
 @client.command()
 async def staffreview(ctx):
@@ -1767,186 +1276,6 @@ async def staffreview(ctx):
         error_channel = client.get_channel(523743721443950612)
         print(e)
         await error_channel.send(f"Error in {ctx.channel.name} while using `staffreview`\n{e}\n<@!326399363943497728>")
-
-
-@client.command()
-async def rolecheck(ctx):
-    try:
-        guild_master = discord.utils.get(ctx.guild.roles, name="Guild Master")
-        staff = discord.utils.get(ctx.guild.roles, name="Staff")
-        new_member = discord.utils.get(ctx.guild.roles, name="New Member")
-        guest = discord.utils.get(ctx.guild.roles, name="Guest")
-        member_role = discord.utils.get(ctx.guild.roles, name="Member")
-        active_role = discord.utils.get(ctx.guild.roles, name="Active")
-        inactive_role = discord.utils.get(ctx.guild.roles, name="Inactive")
-        xl_ally = discord.utils.get(ctx.guild.roles, name="XL - Ally")
-
-
-        msg = await ctx.send("**Processing all the prerequisites**")
-
-        misc_uuids, xl_uuids, = hypixel.get_guild_members("Miscellaneous"),hypixel.get_guild_members("XL")
-
-
-        misc_members, calm_members, xl_members= [], [], []
-
-        #Miscellaneous Member Names
-        await msg.edit(content="**Processing** - 1/2")
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            with requests.Session() as session:
-                # Set any session parameters here before calling `fetch`
-                loop = asyncio.get_event_loop()
-                tasks = [
-                    loop.run_in_executor(
-                        executor,
-                        hypixel.fetch,
-                        *(session, individual_uuid)  # Allows us to pass in multiple arguments to `fetch`
-                    )
-                    for individual_uuid in misc_uuids
-                ]
-                for response in await asyncio.gather(*tasks): #Puts the result into a list
-                    misc_members.append(response)
-
-
-        #XL Member Names
-        await msg.edit(content="**Processing** - 2/2")
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            with requests.Session() as session:
-                # Set any session parameters here before calling `fetch`
-                loop = asyncio.get_event_loop()
-                tasks = [
-                    loop.run_in_executor(
-                        executor,
-                        hypixel.fetch,
-                        *(session, individual_uuid)  # Allows us to pass in multiple arguments to `fetch`
-                    )
-                    for individual_uuid in xl_uuids
-                ]
-                for response in await asyncio.gather(*tasks):  # Puts the result into a list
-                    xl_members.append(response)
-
-
-        if staff in ctx.author.roles:  # Making sure that the user is Staff
-            for guild in client.guilds:
-                if str(guild) == "Miscellaneous [MISC]":  # Check if the Discord is Miscellaneous
-                    for member in guild.members:  # For loop for all members in the Discord
-                        if member.id != '326399363943497728' and member.bot is False:
-                            name = member.nick  # Obtaining their nick
-                            if name is None:  # If they don't have a nick, it uses their name.
-                                name = member.name
-
-                            else:
-                                message = await ctx.send(f"Checking {name}")
-
-                                mojang = requests.get(f'https://api.mojang.com/users/profiles/minecraft/{name}')
-                                if mojang.status_code != 200:  # If the IGN is invalid
-                                    await member.remove_roles(member_role, guest)
-                                    await member.add_roles(new_member)
-                                    await message.edit(content=
-                                                       f"{name} ||{member}|| Player doesn't exist. **++New Member | --Member | -- Guest**")
-                                elif guild_master not in member.roles:
-                                    ign = mojang.json()["name"]
-                                    uuid = mojang.json()['id']
-                                    await member.edit(nick=ign)
-
-
-                                    #Miscellaneous
-                                    if ign in misc_members and ign != "Rowdies":
-                                        req = requests.get(f"https://api.hypixel.net/guild?key={hypixel.get_api()}&player={uuid}").json()
-
-
-                                        if member_role not in member.roles:
-                                            await member.add_roles(member)
-                                            await member.remove_roles(new_member, guest)
-
-                                            for user in req['guild']["members"]:
-                                                if uuid == user["uuid"]:
-                                                    totalexp = user['expHistory']
-                                                    totalexp = sum(totalexp.values())
-
-                                            if totalexp < client.inactive:
-                                                await member.add_roles(inactive_role)
-                                                await member.remove_roles(active_role)
-                                                await message.edit(
-                                                    content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
-
-                                            elif totalexp >= client.active:  # If the member is active
-                                                await member.remove_roles(inactive_role, new_member)
-                                                await member.add_roles(active_role)
-                                                await message.edit(
-                                                    content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
-
-                                            elif totalexp > client.inactive:
-                                                await member.remove_roles(inactive_role, active_role)
-                                                await message.edit(
-                                                    content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
-
-                                        elif member_role in member.roles:
-                                            # No change in terms of membership
-
-                                            for user in req['guild']["members"]:
-                                                if uuid == user["uuid"]:
-                                                    totalexp = user['expHistory']
-                                                    totalexp = sum(totalexp.values())
-
-                                            if totalexp < client.inactive:
-                                                await member.add_roles(inactive_role)
-                                                await member.remove_roles(active_role)
-                                                await message.edit(
-                                                    content=f"{name} ||{member}|| Already Member  **++Inactive \| --Active**")
-
-                                            elif totalexp >= client.active:  # If the member is active
-                                                await member.remove_roles(inactive_role, new_member)
-                                                await member.add_roles(active_role)
-                                                await message.edit(
-                                                    content=f"{name} ||{member}|| Already Member **++Active \| --Inactive**")
-
-                                            elif totalexp > client.inactive:
-                                                await member.remove_roles(inactive_role)
-                                                await member.remove_roles(active_role)
-                                                await message.edit(
-                                                    content=f"{name} ||{member}|| Already Member  **--Inactive\| --Active**")
-
-
-                                    elif ign in xl_members:
-                                        await member.add_roles(guest, xl_ally)
-                                        await member.remove_roles(member_role, new_member, active_role)
-                                        await message.edit(content=f"{name} ||{member}|| Member of XL **++XL - Ally \| ++Guest | --Member | --Active**")
-
-                                    else:
-                                        await member.add_roles(guest)
-                                        await member.remove_roles(member_role, new_member, active_role)
-                                        await message.edit(content=f"{name} ||{member}|| Member of an unallied guild **++Guest | --Member | --Active**")
-
-        inactivity_channel = client.get_channel(848067712156434462)
-
-        embed = discord.Embed(title="You do not meet the guild requirements!",
-                              description=f"Member requirement - {format(client.inactive,',d')} Weekly Guild Experience",
-                              color = 0xDC143C)
-        await inactivity_channel.send(f"<@&848051215287058443>")
-        await inactivity_channel.send(embed=embed)
-
-
-
-
-
-
-    except Exception as e:
-        if str(e) == "Expecting value: line 1 column 1 (char 0)":
-            embed = discord.Embed(title="The Hypixel API is down!", description="Please try again in a while!",
-                                  color=0xff0000)
-            await ctx.send(embed=embed)
-            print(e)
-        elif str(e) == "404 Not Found (error code: 10011): Unknown Role":
-            error_channel = client.get_channel(523743721443950612)
-            print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n{ctx.author.mention} please `forcesync` the last user on the list.")
-
-        else:
-            error_channel = client.get_channel(523743721443950612)
-            print(e)
-            await error_channel.send(
-                f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n<@!326399363943497728>")
-
 
 
 @client.command()

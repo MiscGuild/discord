@@ -9,6 +9,8 @@ class Moderation(commands.Cog, name="Moderation"):
     @commands.command()
     @commands.has_permissions(kick_members=True)
     async def mute(self, ctx, member: discord.Member):
+        """Mutes the mentioned user indefinately!
+        """
         role = discord.utils.get(ctx.guild.roles, name="Muted")
         await member.add_roles(role)
         embed = discord.Embed(title="User Muted!",
@@ -28,6 +30,8 @@ class Moderation(commands.Cog, name="Moderation"):
     @commands.command()
     @commands.has_permissions(kick_members=True)
     async def unmute(self, ctx, member: discord.Member):
+        """Mutes the mentioned user
+        """
         role = discord.utils.get(ctx.guild.roles, name="Muted")
         await member.remove_roles(role)
         embed = discord.Embed(title="User unmuted!",
@@ -47,6 +51,8 @@ class Moderation(commands.Cog, name="Moderation"):
     @commands.command(aliases=["purge", "prune"])
     @commands.has_permissions(manage_messages=True)
     async def clear(self, ctx, amount: int):
+        """Clears the chat based on the given amount!
+        """
         await ctx.channel.purge(limit=amount)
 
     @clear.error
@@ -64,6 +70,8 @@ class Moderation(commands.Cog, name="Moderation"):
     @commands.command()
     @commands.has_permissions(kick_members=True)
     async def kick(self, ctx, member: discord.Member, *, reason=None):
+        """Kicks the mentioned user!
+        """
         await member.kick(reason=reason)
         await ctx.send(f"{member} was kicked!")
 
@@ -85,6 +93,8 @@ class Moderation(commands.Cog, name="Moderation"):
     @commands.command()
     @commands.has_permissions(ban_members=True, kick_members=True)
     async def ban(self, ctx, member: discord.Member, *, reason=None):
+        """Bans the mentioned user!
+        """
         try:
             await member.ban(reason=reason)
             await ctx.send(f"{member} was banned!")
@@ -111,6 +121,8 @@ class Moderation(commands.Cog, name="Moderation"):
     @commands.command()
     @commands.has_permissions(ban_members=True, kick_members=True)
     async def unban(self, ctx, *, member):
+        """Unbans the user!
+        """
         banned_users = await ctx.guild.bans()
         member_name, member_discrimitator = member.split('#')
 
