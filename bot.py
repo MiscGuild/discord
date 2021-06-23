@@ -2019,7 +2019,7 @@ async def challenge(ctx, x):
 @client.command()
 async def messagespam(ctx, *, x):
     try:
-        if ctx.author.name == "Amogh":
+        if ctx.author.id == "326399363943497728":
             y = 0
             while True:
                 if y < 10:
