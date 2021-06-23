@@ -1,10 +1,9 @@
 # hypixel.py
-import requests, math, datetime, random, asyncio
+import math, datetime, random, asyncio, json, aiohttp, requests, toml
 from datetime import datetime
-import json
 
-with open('config.json') as config_file:
-    configFile = json.load(config_file)
+
+configFile = toml.load('config.toml')
 
 
 def get_api():

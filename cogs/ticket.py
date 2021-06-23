@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import asyncio
 import aiohttp
-from utils import hypixel
+from cogs.utils import hypixel
 
 class Tickets(commands.Cog, name="Tickets"):
     def __init__(self, bot):
@@ -20,7 +20,7 @@ class Tickets(commands.Cog, name="Tickets"):
                     if request.status_code != 200:
                         await ctx.send('Please enter a valid ign!')
                     else:
-                        request = request.json()
+                        request = await request.json()
                         ign = request['name']
                         uuid = request['id']
 
@@ -120,6 +120,8 @@ class Tickets(commands.Cog, name="Tickets"):
 
     @commands.command(aliases=['del'])
     async def delete(self, ctx):
+        """Deletes the ticket channel the command is used in.
+        """
         try:
             logs = self.client.get_channel(714821811832881222)
             Staff = discord.utils.get(ctx.guild.roles, name="Staff")
@@ -146,6 +148,8 @@ class Tickets(commands.Cog, name="Tickets"):
 
     @commands.command()
     async def accept(self, ctx,  member: discord.Member):
+        """Used to accept staff applications. This command must be typed in the application channel. It doesn't work anywhere else.
+        """
         try:
             if ctx.channel.category.name in ('RTickets', '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL'):
                 admin = discord.utils.get(ctx.guild.roles, name="Admin")
@@ -168,6 +172,8 @@ class Tickets(commands.Cog, name="Tickets"):
 
     @commands.command()
     async def deny(self, ctx, member: discord.Member, channel: discord.TextChannel):
+        """Used to deny staff applications. This command can be used in any channel, provided, the syntax is met.
+        """
         try:
             officer = discord.utils.get(ctx.guild.roles, name="Officer")
             admin = discord.utils.get(ctx.guild.roles, name="Admin")

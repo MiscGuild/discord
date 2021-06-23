@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from utils import hypixel
+import utils.hypixel
 import math
 import aiohttp
 from datetime import datetime
@@ -12,6 +12,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
     @commands.command()
     async def sync(self, ctx, name):
+        """Used to update your discord nick upon changing your minecraft name/leaving Miscellaneous!
+        """
         try:
             author = ctx.author
 
@@ -77,86 +79,11 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
                 await error_channel.send(f"Error in {ctx.channel.name} while trying to use `sync`\n{e}\n<@!326399363943497728>")
 
-    @commands.command(aliases=['ForceSync', 'Forcesync', 'forceSync', 'FORCESYNC', 'fs', 'Fs', 'FS', 'fS'])
-    async def forcesync(self, ctx, member: discord.Member, name):
-        try:
-            officer = discord.utils.get(ctx.guild.roles, name="Officer")
-            admin = discord.utils.get(ctx.guild.roles, name="Admin")
-            if officer or admin in ctx.author.roles:
-                ign = hypixel.get_dispname(name)
-                if ign is None:
-                    await ctx.send('Please enter a valid ign!')
-                else:
-                    guild_name = hypixel.get_guild(name)
-                    newmember = discord.utils.get(ctx.guild.roles, name="New Member")
-                    guest = discord.utils.get(ctx.guild.roles, name="Guest")
-                    member_ = discord.utils.get(ctx.guild.roles, name="Member")
-                    awaiting_app = discord.utils.get(ctx.guild.roles, name="Awaiting Approval")
-                    xl_ally = discord.utils.get(ctx.guild.roles, name="XL - Ally")
-
-
-                    await member.edit(nick=ign)
-
-                    if guild_name == "Miscellaneous":
-                        await member.remove_roles(guest,awaiting_app,newmember)
-                        await member.add_roles(member_)
-                        embed = discord.Embed(title=f"{member.name}'s nick and role were succesfully changed!",
-                                            description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
-                                            color=0x8368ff)
-                        embed.set_footer(text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
-                        await ctx.send(embed=embed)
-
-
-                    elif guild_name == "XL":
-                        await member.remove_roles(member_,awaiting_app)
-                        await member.add_roles(guest, xl_ally)
-
-                        embed = discord.Embed(title="Your nick and role was succesfully changed!",
-                                            description="If this wasn't the change you anticipated, "
-                                                        "kindly create a ticket or get in contact with staff!",
-                                            color=0x8368ff)
-
-                        embed.set_footer(text="Member of XL"
-                                            "\n• Member & Awaiting Approval were removed"
-                                            "\n• Guest & XL - Ally were given")
-                        await ctx.send(embed=embed)
-
-
-                    elif guild_name not in ("Miscellaneous", "XL"):
-                        if str(ctx.channel.category.name) == "RTickets":
-                            await ctx.send("You aren't in Miscellaneous in-game. Kindly await staff assistance")
-                        elif str(ctx.channel.category.name) == "REGISTRATION":
-                            await ctx.send("The person isn't an ally/a member of Miscellaneous. Let them register!")
-                        else:
-                            await member.remove_roles(member_,awaiting_app)
-                            await member.add_roles(guest)
-                            if guild_name is None:
-                                guild_name = "no guild (Guildless)"
-                            embed = discord.Embed(title=f"{member.name}'s nick and role were succesfully changed!",
-                                                description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
-                                                color=0x8368ff)
-                            embed.set_footer(text=f"Member of {guild_name}\n• Nick Changed\n• Member & Awaiting Approval were removed\n• Guest was given")
-                            await ctx.send(embed=embed)
-            else:
-                embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
-                                    description="Your role lacks permissions to force sync a member's nick!", color=0xff0000)
-                await ctx.channel.purge(limit=1)
-                await ctx.send(embed=embed)
-
-        except Exception as e:
-            if str(e) == "Expecting value: line 1 column 1 (char 0)":
-                embed = discord.Embed(title="The Hypixel API is down!",
-                                    description="Please try again in a while!",
-                                    color=0xff0000)
-                await ctx.send(embed=embed)
-                print(e)
-            else:
-                error_channel = self.client.get_channel(523743721443950612)
-                print(e)
-                await error_channel.send(f"Error in {ctx.channel.name} while trying to use `forcesync`\n{e}\n<@!326399363943497728>")
 
     @commands.command(aliases=["i", "I"])
     async def info(self, ctx, name=None):
+        """Gives the hypixel stats of the requested player
+        """
         try:
             async with ctx.channel.typing():
                 if name is None:
@@ -313,6 +240,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
     @commands.command(aliases=["Dnkladd", "DNKLADD", "DnklAdd"])
     @commands.has_permissions(manage_messages=True)
     async def dnkladd(self, ctx, name = None, w = None, x = None, y = None, *, z = None):
+        """Adds the user to the do-not-kick-list!
+        """
         try:
             if name is not None:
                 ign = hypixel.get_dispname(name)
@@ -454,6 +383,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
     @commands.command(aliases=['dnklrmv', 'Dnklrmv', 'DNKLRMV', 'DNKLrmv', 'DnklRmv'])
     @commands.has_permissions(manage_messages=True)
     async def dnklremove(self, ctx, name):
+        """Removes a user from the do not kick list!
+        """
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
@@ -535,6 +466,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
     @commands.command(aliases=["blacklist", "Blacklist", "Bl"])
     @commands.has_permissions(manage_messages=True)
     async def bl(self, ctx, name, x, *, y):
+        """Adds the user to the guild blacklist
+        """
         try:
             rank = hypixel.get_rank(name)
 
@@ -604,6 +537,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
     @commands.command(aliases=["gi", "Gi", "GI"])
     async def ginfo(self, ctx, *, name):
+        """Gives basic information about the requested guild.
+        """
         try:
             async with ctx.channel.typing():
                 req = hypixel.get_guild_data(name)
@@ -687,6 +622,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
     @commands.command(aliases=['ge', "Ge", "Gexp"])
     async def gexp(self, ctx, gname):
+        """Lists the guild experience of the requested guild!
+        """
         try:
             msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
             api = hypixel.get_api()
@@ -753,6 +690,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
     @commands.command(aliases=["Gactive"])
     async def gactive(self, ctx):
+        """Lists all the users in the guild who are eligible for active rank.
+        """
         try:
             msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
             gname = 'Rowdies'
@@ -805,6 +744,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
     @commands.command(aliases=['Ginactive'])
     async def ginactive(self, ctx):
+        """Lists all the users in the guild who don't meet the guild requirements.
+        """
         try:
             msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
             gname = 'Rowdies'
@@ -862,6 +803,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
     @commands.command(aliases=['gr', 'Gr', 'Grank'])
     async def grank(self, ctx, reqrank):
+        """Lists the guild experience of users with the specified rank.
+        """
         try:
             reqrank = reqrank.capitalize()
             msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
@@ -931,6 +874,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
     @commands.command(aliases=['gm', 'Gm', 'Gmember', 'g', 'G'])
     async def gmember(self, ctx, name=None):
+        """Gives the guild experience earned by the user over the course of a week.
+        """
         try:
             if name is None:
                 author = ctx.author
@@ -1070,6 +1015,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
     @commands.command(aliases=['dnklchk', 'Dnklchk', 'DNKLCHK', 'Dnklcheck', 'DNKLCHECK'])
     async def dnklcheck(self, ctx, name=None):
+        """A command to check whether or not you can apply for the do-not-kick-list.
+        """
         try:
             if name is None:
                 author = ctx.author
@@ -1133,6 +1080,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
     @commands.command(aliases=["Gtop", "gt", "Gt"], pass_context=True)
     async def gtop(self, ctx):
+        """Gives the weekly guild experience leaderboard!
+        """
         try:
             msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
             api = hypixel.get_api()
@@ -1300,6 +1249,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
     @commands.command()
     async def dailylb(self, ctx, x=1):
+        """Prints the daily guild leaderboard. The value defaults to the day prior.
+        """
         try:
             await ctx.channel.purge(limit=1)
             msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")

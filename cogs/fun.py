@@ -2,13 +2,15 @@ import discord
 from discord.ext import commands
 import random
 
-class Fun(commands.Cog, name="fun"):
+class Fun(commands.Cog, name="Fun"):
     def __init__(self, client):
         self.client = client
 
     # Pizza
     @commands.command()
     async def pizza(self, ctx):
+        """Gives you a pizza
+        """
         links = ['https://bit.ly/3ibK6PQ', 'https://bit.ly/2EZWZ1p', 'https://bit.ly/339ul5N', 'https://bit.ly/328OOIx',
                 'https://bit.ly/3ibMqGy', 'https://bit.ly/2F8hd96', 'https://bit.ly/2R5XusZ', 'https://bit.ly/35fRqX7',
                 'https://bit.ly/2F9Ec3B', 'https://bit.ly/3h9T8vI', 'https://bzfd.it/2GzzLzm', 'https://bit.ly/35fyKa7',
@@ -22,14 +24,18 @@ class Fun(commands.Cog, name="fun"):
     # Ping
     @commands.command()
     async def ping(self, ctx):
+        """Gives the bot's ping
+        """
         embed = discord.Embed(title='Pong',
                             description=f"{round(self.client.latency * 1000)}ms",
                             color=0x8368ff)
         await ctx.send(embed=embed)
 
     # 8ball
-    @commands.command(aliases=['8ball', 'eightball'])
+    @commands.command(name='8ball', aliases=['eightball'])
     async def _8ball(self, ctx, *, question):
+        """Play with the magic 8ball
+        """
         author = ctx.author
         user_name = author.nick
         if user_name is None:
