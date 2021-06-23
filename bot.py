@@ -2047,7 +2047,7 @@ async def messagespam(ctx, *, x):
                     break
         else:
             embed = discord.Embed(title='Your soul lacks the strength to utilizze this command!',
-                                  description="This command is exclusively for Rowdies", color=0xff0000)
+                                  description="This command is exclusively for Rowdies and PB (Princess Bubblegum)", color=0xff0000)
             await ctx.channel.purge(limit=1)
             await ctx.send(embed=embed)
     except Exception as e:
