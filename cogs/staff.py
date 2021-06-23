@@ -68,7 +68,8 @@ class staff(commands.Cog, name="Staff"):
                                 "> Problems/Queries/Complaint/Suggestion\n"
                                 "> Reporting a player\n"
                                 "> Milestone\n"
-                                "> Staff  Application\n"
+                                "> Staff Application\n"
+                                "> Event\n"
                                 "> Other",
                             inline=False)
             embed.add_field(name="React to the message sent by @TicketTool",
@@ -78,6 +79,93 @@ class staff(commands.Cog, name="Staff"):
             await ctx.send(embed=embed)
         except Exception as e:
             print(e)
+
+    @commands.command(aliases=['participant'])
+    async def participants(self, ctx, raw=None):
+        try:
+            staff = discord.utils.get(ctx.guild.roles, name="Staff")
+            if staff in ctx.author.roles:
+                div1_name = div2_name = ""
+                count = 0
+                with open('eventparticipants.json') as f:
+                    data = json.load(f)
+                if raw is not None:
+                    await ctx.author.send(data)
+                else:
+                    for x in data['div1']:
+                        div1_name = div1_name + f"{x}\n"
+                        count += 1
+                    for x in data['div2']:
+                        div2_name = div2_name + f"{x}\n"
+                        count += 1
+                    embed = discord.Embed(title='The participants of the event are as follows:',
+                                        color=0x8368ff)
+                    embed.add_field(name="Division 1", value=div1_name, inline=False)
+                    embed.add_field(name="Division 2", value=div2_name, inline=False)
+                    embed.set_footer(text=f"Total: {count}")
+                    await ctx.send(embed=embed)
+            else:
+                participants = ""
+                count = 0
+                with open('eventparticipants.json') as f:
+                    data = json.load(f)
+                if raw is not None:
+                    await ctx.author.send(data)
+                else:
+                    for x in data['div1']:
+                        participants = participants + f"{x}\n"
+                        count += 1
+                    for x in data['div2']:
+                        participants = participants + f"{x}\n"
+                        count += 1
+                    embed = discord.Embed(title='The participants of the event are as follows:', description=participants,
+                                        color=0x8368ff)
+                    embed.set_footer(text=f"Total: {count}")
+                    await ctx.send(embed=embed)
+        except Exception as e:
+            error_channel = self.client.get_channel(523743721443950612)
+            print(e)
+            await error_channel.send(f"Error in {ctx.channel.name} while running `participants`"
+                                    f"\n{e}\n<@!326399363943497728>")
+
+    @commands.command(aliases=['switch','swapper'])
+    async def swap(self, ctx, name):
+        """Swaps a users division in an event
+        """
+        try:
+            count = 0
+            div1_name = div2_name = ""
+            ign = hypixel.get_dispname(name)
+            with open('eventparticipants.json') as f:
+                data = json.load(f)
+                if ign in data['div1']:
+                    data['div1'].remove(ign)
+                    data['div2'].append(ign)
+                else:
+                    data['div2'].remove(ign)
+                    data['div1'].append(ign)
+
+                for x in data['div1']:
+                    div1_name = div1_name + f"{x}\n"
+                    count += 1
+                for x in data['div2']:
+                    div2_name = div2_name + f"{x}\n"
+                    count += 1
+                embed = discord.Embed(title='The participants of the event are as follows:',
+                                    color=0x8368ff)
+                embed.add_field(name="Division 1", value=div1_name, inline=False)
+                embed.add_field(name="Division 2", value=div2_name, inline=False)
+                embed.set_footer(text=f"Total: {count}")
+                await ctx.send(embed=embed)
+            with open('eventparticipants.json', 'w') as event_participants:
+                json.dump(data, event_participants)
+        except Exception as e:
+            error_channel = self.client.get_channel(523743721443950612)
+            print(e)
+            await error_channel.send(
+                f"Error in {ctx.channel.name} while running dnkllist"
+                f"Error in {ctx.channel.name} while running `swap`"
+                f"\n{e}\n<@!326399363943497728>")
 
     @commands.command(aliases=["Staff"])
     @commands.has_role(538015368782807040)
@@ -349,7 +437,7 @@ class staff(commands.Cog, name="Staff"):
                                         async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
                                             mojang = resp
                                     
-                                    if mojang.status_code != 200:  # If the IGN is invalid
+                                    if mojang.status != 200:  # If the IGN is invalid
                                         await member.remove_roles(member_role, guest)
                                         await member.add_roles(new_member)
                                         await message.edit(content=
@@ -482,7 +570,7 @@ class staff(commands.Cog, name="Staff"):
                     if guild_name == "Miscellaneous":
                         await member.remove_roles(guest,awaiting_app,newmember)
                         await member.add_roles(member_)
-                        embed = discord.Embed(title=f"{member.name}'s nick and role were succesfully changed!",
+                        embed = discord.Embed(title=f"{member.name}'s nick and role were successfully changed!",
                                             description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
                                             color=0x8368ff)
                         embed.set_footer(text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
@@ -493,7 +581,7 @@ class staff(commands.Cog, name="Staff"):
                         await member.remove_roles(member_,awaiting_app)
                         await member.add_roles(guest, xl_ally)
 
-                        embed = discord.Embed(title="Your nick and role was succesfully changed!",
+                        embed = discord.Embed(title="Your nick and role was successfully changed!",
                                             description="If this wasn't the change you anticipated, "
                                                         "kindly create a ticket or get in contact with staff!",
                                             color=0x8368ff)
@@ -514,7 +602,7 @@ class staff(commands.Cog, name="Staff"):
                             await member.add_roles(guest)
                             if guild_name is None:
                                 guild_name = "no guild (Guildless)"
-                            embed = discord.Embed(title=f"{member.name}'s nick and role were succesfully changed!",
+                            embed = discord.Embed(title=f"{member.name}'s nick and role were successfully changed!",
                                                 description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
                                                 color=0x8368ff)
                             embed.set_footer(text=f"Member of {guild_name}\n• Nick Changed\n• Member & Awaiting Approval were removed\n• Guest was given")
@@ -580,6 +668,230 @@ class staff(commands.Cog, name="Staff"):
             error_channel = self.client.get_channel(523743721443950612)
             print(e)
             await error_channel.send(f"Error in {ctx.channel.name} while using `staffreview`\n{e}\n<@!326399363943497728>")
+
+    @commands.command()
+    @commands.has_role(538015368782807040)
+    async def newrolecheck(self, ctx):
+        try:
+            guild_master = discord.utils.get(ctx.guild.roles, name="Guild Master")
+            staff = discord.utils.get(ctx.guild.roles, name="Staff")
+            new_member = discord.utils.get(ctx.guild.roles, name="New Member")
+            guest = discord.utils.get(ctx.guild.roles, name="Guest")
+            member_role = discord.utils.get(ctx.guild.roles, name="Member")
+            active_role = discord.utils.get(ctx.guild.roles, name="Active")
+            inactive_role = discord.utils.get(ctx.guild.roles, name="Inactive")
+            xl_ally = discord.utils.get(ctx.guild.roles, name="XL - Ally")
+
+            misc_info, xl_members, discord_members,\
+            invalid_members, active_members, regular_members,inactive_members,\
+            xl_discord_members, guest_list = [], [], [], [], [], [], [], [], []
+
+            guild = self.client.get_guild(522586672148381726)
+            memberList = guild.members
+
+            msg = await ctx.send("**Processing all the prerequisites**")
+
+            misc_details, xl_uuids, = hypixel.get_misc_members(
+                "Miscellaneous"), hypixel.get_guild_members("XL")
+
+            count = 0
+            # Miscellaneous Member Names + gexp
+            await msg.edit(content="**Processing** - 1/2")
+            with ThreadPoolExecutor(max_workers=10) as executor:
+                with requests.Session() as session:
+                    # Set any session parameters here before calling `fetch`
+                    loop = asyncio.get_event_loop()
+                    tasks = [
+                        loop.run_in_executor(
+                            executor,
+                            hypixel.fetch,
+                            *(session, individual_uuid[0])  # Allows us to pass in multiple arguments to `fetch`
+                        )
+                        for individual_uuid in misc_details
+                    ]
+                    for response in await asyncio.gather(*tasks):  # Puts the result into a list
+                        misc_details[count][0] = response
+                        count = count + 1
+
+            # XL Member Names
+            await msg.edit(content="**Processing** - 2/2")
+            with ThreadPoolExecutor(max_workers=10) as executor:
+                with requests.Session() as session:
+                    # Set any session parameters here before calling `fetch`
+                    loop = asyncio.get_event_loop()
+                    tasks = [
+                        loop.run_in_executor(
+                            executor,
+                            hypixel.fetch,
+                            *(session, individual_uuid)  # Allows us to pass in multiple arguments to `fetch`
+                        )
+                        for individual_uuid in xl_uuids
+                    ]
+                    for response in await asyncio.gather(*tasks):  # Puts the result into a list
+                        xl_members.append(response)
+
+
+            if staff in ctx.author.roles:  # Making sure that the user is Staff
+                for guild in self.client.guilds:
+                    if str(guild) == "Miscellaneous [MISC]":  # Check if the Discord is Miscellaneous
+                        for member in guild.members:  # For loop for all members in the Discord
+                            if not member.bot:
+                                discord_members.append(member)
+
+                invalid_names = active_names = inactive_names = member_names = xl_names = ""
+                for member in discord_members:
+                    name = member.nick  # Obtaining their nick
+                    if name is None:  # If they don't have a nick, it uses their name.
+                        name = member.name
+
+                    name = '_' + name
+
+                    if name.isidentifier() is False:
+                        await member.remove_roles(member_role, guest)
+                        await member.add_roles(new_member)
+
+                        invalid_names = invalid_names + str(member) + "\n"
+                        discord_members.pop(discord_members.index(member))
+
+                    name = member.nick  # Obtaining their nick
+                    if name is None:  # If they don't have a nick, it uses their name.
+                        name = member.name
+
+                    for element in misc_details:
+                        if name in element[0]:
+                            if element[1] > self.client.active:
+                                active_members.append(member)
+                                active_names = active_names + str(member) + "\n"
+                            elif element[1] > self.client.inactive:
+                                if member_role not in member.roles:
+                                    regular_members.append(member)
+                                    member_names = member_names + str(member) + "\n"
+                            elif element[1] < self.client.inactive:
+                                inactive_members.append(member)
+                                inactive_names = inactive_names + str(member) + "\n"
+
+                    if name in xl_members:
+                        if xl_ally not in member.roles:
+                            xl_discord_members.append(member)
+                            xl_names = xl_names + str(member) + "\n"
+                    else:
+                        guest_list.append(member)
+                invalid_embed = discord.Embed(title="Invalid: Given @New Member", description=invalid_names, color=0x620B06)
+                active_embed = discord.Embed(title="Active: Given @Active", description=active_names, color=0x0073BF)
+                member_embed = discord.Embed(title="Member: Given @Member", description=member_names, color=0x4DFF00)
+                inactive_embed = discord.Embed(title="Inactive: Given @inactive", description=inactive_names, color=0xFF4C6E)
+                xl_embed = discord.Embed(title="XL: Given @xl_ally", description=xl_names, color=0xA05E75)
+                await ctx.send(embed=invalid_embed)
+                await ctx.send(embed=active_embed)
+                await ctx.send(embed=member_embed)
+                await ctx.send(embed=inactive_embed)
+                await ctx.send(embed=xl_embed)
+
+
+
+        except Exception as e:
+            if str(e) == "Expecting value: line 1 column 1 (char 0)":
+                embed = discord.Embed(title="The Hypixel API is down!", description="Please try again in a while!",
+                                    color=0xff0000)
+                await ctx.send(embed=embed)
+                print(e)
+            elif str(e) == "404 Not Found (error code: 10011): Unknown Role":
+                error_channel = self.client.get_channel(523743721443950612)
+                print(e)
+                await error_channel.send(f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n{ctx.author.mention} please `forcesync` the last user on the list.")
+
+            else:
+                error_channel = self.client.get_channel(523743721443950612)
+                print(e)
+                await error_channel.send(
+                    f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n<@!326399363943497728>")
+
+    @commands.command()
+    @commands.has_role(538015368782807040)
+    async def challenge(self, ctx, x):
+        channel = self.client.get_channel(753103243659444286)
+        if x == "e":
+            msg = await ctx.send(content="**What would you like the first challenge under the easy category to be (name)?**")
+            challenge1 = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+            challenge1 = challenge1.content
+
+            await msg.edit(content="**What is the prize for completing this challenge?**")
+            challenge1_prize = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+            challenge1_prize = challenge1_prize.content
+
+            await msg.edit(
+                content="**What would you like the second challenge under the easy category to be?"
+                        "\nIf you don't want one, type None**")
+            challenge2 = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+            challenge2 = challenge2.content
+            if challenge2 == "None":
+                embed = discord.Embed(title="Easy", color=0x90ee90)
+                embed.add_field(name=challenge1, value=challenge1_prize, inline=False)
+            else:
+                await msg.edit(content="What is the prize for completing this challenge?")
+                challenge2_prize = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+                challenge2_prize = challenge2_prize.content
+
+                embed = discord.Embed(title="Easy", color=0x90ee90)
+                embed.add_field(name=challenge1, value=challenge1_prize, inline=False)
+                embed.add_field(name=challenge2, value=challenge2_prize, inline=False)
+            await channel.send(f'*Complete the following challenges to get prizes*\nTo view the store, use `!shop`')
+            await channel.send(embed=embed)
+
+        if x == "m":
+            msg = await ctx.send("**What would you like the first challenge under the medium category to be (name)?**")
+            challenge1 = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+            challenge1 = challenge1.content
+
+            await msg.edit(content="**What is the prize for completing this challenge?**")
+            challenge1_prize = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+            challenge1_prize = challenge1_prize.content
+
+            await msg.edit(
+                content="**What would you like the second challenge under the medium category to be?"
+                        "\nIf you don't want one, type None**")
+            challenge2 = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+            challenge2 = challenge2.content
+            if challenge2 == "None":
+                embed = discord.Embed(title="Medium", color=0xffa500)
+                embed.add_field(name=challenge1, value=challenge1_prize, inline=False)
+            else:
+                await msg.edit(content="**What is the prize for completing this challenge?**")
+                challenge2_prize = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+                challenge2_prize = challenge2_prize.content
+
+                embed = discord.Embed(title="Medium", color=0xffa500)
+                embed.add_field(name=challenge1, value=challenge1_prize, inline=False)
+                embed.add_field(name=challenge2, value=challenge2_prize, inline=False)
+            await channel.send(embed=embed)
+
+        if x == "h":
+            msg = await ctx.send("**What would you like the challenge under the hard category to be (name)?**")
+            challenge1 = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+            challenge1 = challenge1.content
+
+            await msg.edit(content="**What is the prize for completing this challenge?**")
+            challenge1_prize = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+            challenge1_prize = challenge1_prize.content
+
+            await msg.edit(
+                content="**What would you like the second challenge under the hard category to be?"
+                        "\nIf you don't want one, type None**")
+            challenge2 = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+            challenge2 = challenge2.content
+            if challenge2 == "None":
+                embed = discord.Embed(title="Hard", color=0xcd5c5c)
+                embed.add_field(name=challenge1, value=challenge1_prize, inline=False)
+            else:
+                await msg.edit(content="**What is the prize for completing this challenge?**")
+                challenge2_prize = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+                challenge2_prize = challenge2_prize.content
+
+                embed = discord.Embed(title="Hard", color=0xcd5c5c)
+                embed.add_field(name=challenge1, value=challenge1_prize, inline=False)
+                embed.add_field(name=challenge2, value=challenge2_prize, inline=False)
+                embed.set_footer(text="You can only do one challenge once.")
+            await channel.send(embed=embed)
 
 
 def setup(bot):

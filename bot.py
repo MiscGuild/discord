@@ -239,7 +239,7 @@ async def on_guild_channel_create(channel):
                     async with aiohttp.ClientSession() as session:
                         async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
                             request = resp
-                    if request.status_code != 200:
+                    if request.status != 200:
                         await channel.send('Unknown IGN!')
                     else:
                         request = await request.json()
@@ -299,7 +299,8 @@ async def on_guild_channel_create(channel):
                                             f"\n**End:** {end}"
                                             f"\n**Reason:** {reason}"
                                             f"\n*If you made an error, kindly notify staff by typing after this message*"
-                                            f"\n\n||,dnkl {name} {author.mention} {start} {end} {reason}||")
+                                            f"\n\n||,dnkladd {name} {author.mention} {start} {end} {reason}||"
+                                            )
 
                                     else:
                                         embed = discord.Embed(title=name,
@@ -484,7 +485,7 @@ async def on_guild_channel_create(channel):
                         if guild_name == "Miscellaneous":
                             await author.remove_roles(guest, awaiting_app)
                             await author.add_roles(member)
-                            embed = discord.Embed(title="Your nick and role was succesfully changed!",
+                            embed = discord.Embed(title="Your nick and role was successfully changed!",
                                                   description="await staff assistance.",
                                                   color=0x8368ff)
                             embed.set_footer(text="Member of Miscellaneous"
@@ -495,7 +496,7 @@ async def on_guild_channel_create(channel):
                         elif guild_name == "XL":
                             await author.remove_roles(member, awaiting_app)
                             await author.add_roles(guest, xl_ally)
-                            embed = discord.Embed(title="Your nick and role was succesfully changed!",
+                            embed = discord.Embed(title="Your nick and role was successfully changed!",
                                                   description="If this wasn't the change you anticipated, "
                                                               "await staff assistance.",
                                                   color=0x8368ff)
@@ -510,7 +511,7 @@ async def on_guild_channel_create(channel):
                             else:
                                 await author.remove_roles(member,awaiting_app)
                                 await author.add_roles(guest)
-                                embed = discord.Embed(title="Your nick and role was succesfully changed!",
+                                embed = discord.Embed(title="Your nick and role was successfully changed!",
                                                       description="If this wasn't the change you anticipated, "
                                                                   "await staff assistance.",
                                                       color=0x8368ff)
@@ -729,7 +730,7 @@ async def on_guild_channel_create(channel):
                                     await author.remove_roles(awaiting_app)
                                     await author.remove_roles(guest)
                                     await author.add_roles(member)
-                                    embed = discord.Embed(title="Your nick and role was succesfully changed!",
+                                    embed = discord.Embed(title="Your nick and role was successfully changed!",
                                                           description="Now let's proceed to your application!",
                                                           color=0x8368ff)
                                     await channel.send(embed=embed)
@@ -737,7 +738,7 @@ async def on_guild_channel_create(channel):
                                 else:
                                     await author.remove_roles(member)
                                     await author.add_roles(guest)
-                                    embed = discord.Embed(title="Your nick and role was succesfully changed!",
+                                    embed = discord.Embed(title="Your nick and role was successfully changed!",
                                                           description="Now let's proceed to your application!",
                                                           color=0x8368ff)
                                     await channel.send(embed=embed)
@@ -1098,6 +1099,78 @@ async def on_guild_channel_create(channel):
                 elif reply == "Event":
                     await channel.edit(name=f"Event-{name}", category=discord.utils.get(channel.guild.categories, name="EVENT"))
                     await channel.send("Alright, kindly enter the requested details for registering!")
+
+                    name_embed = discord.Embed(title="What is your Minecraft Username?",color=0x4b89e4)
+                    await channel.send(embed=name_embed)
+                    name = await client.wait_for('message',
+                                                       check=lambda x: x.channel == channel and x.author == author)
+                    name = name.content
+                    ign = hypixel.get_dispname(name)
+                    if ign is None:
+                        await channel.send('Please enter a valid ign!')
+                        await channel.send(
+                            "I'll restart the process. "
+                            "If you think I made an error, select 'Other' upon restart")
+
+                    else:
+                        await author.edit(nick=ign)
+                        div_embed = discord.Embed(title="Which division would you like to partcipaticate in? Division 1 or Division 2?",
+                                                  description="Please reply with the following:\n"
+                                                              "`Division 1: 3rd July, 8:00 pm UTC/GMT`\n"
+                                                              "`Division 2: 4th July, 7:00 am UTC/GMT`",
+                                                  color=0x4b89e4)
+                        div_embed.set_footer(text="If you have any difficulty interpreting the time, make another ticket and await staff assistance!\n"
+                                              "Reply with 1 for division 1"
+                                              "\nReply with 2 for division 2")
+                        await channel.send(embed=div_embed)
+                        division = await client.wait_for('message',
+                                                     check=lambda x: x.channel == channel and x.author == author)
+                        division = division.content
+                        division = division.capitalize()
+                        if str(division) in ("1", "One", 'Div1', 'Division 1', 'Division1', 'Div 1', 'Division 1: 3rd July, 8:00 pm UTC/GMT'):
+                            division = 1
+                        elif str(division) in ("2", "Two", 'Div2', 'Division 2', 'Division2', 'Div 2', 'Division 2: 4th July, 7:00 am UTC/GMT'):
+                            division = 2
+
+
+
+                        rules_embed = discord.Embed(
+                            title="Rules",
+                            description="• The screenshots MUST NOT be cropped. We will only accept screenshots of your entire screen.\n"
+                                        "• Cross-teaming/boosting is disallowed.\n"
+                                        "• Cheating, use of blacklisted modifications is disallowed.\n"
+                                        "• Forging of screenshots is disallowed.\n",
+                            color=0x4b89e4)
+                        rules_embed.set_footer(text="Violation of any of these rules (except the first will result) in immediate disqualification along with a temporary/permanent blacklist.")
+                        await channel.send(embed=rules_embed)
+                        await channel.send("**Do you agree to abide by these rules and face the consequences if any of the rules are broken?**\n(Yes/No)")
+                        rules = await client.wait_for('message',
+                                                     check=lambda x: x.channel == channel and x.author == author)
+                        rules = (rules.content).capitalize()
+
+                        if rules in ('Yes', 'Y', 'Yeah', 'Yup', 'Ya', 'Yea', 'Ye'):
+                            with open('eventparticipants.json','r') as event_participants:
+                                eventparticipants = json.load(event_participants)
+                                if division == 1:
+                                    await channel.edit(category=discord.utils.get(channel.guild.categories, name="Event-Div-1"))
+                                    participants_list = eventparticipants.get("div1")
+                                    participants_list.append(ign)
+                                    eventparticipants["div1"] = participants_list
+                                elif division == 2:
+                                    await channel.edit(category=discord.utils.get(channel.guild.categories, name="Event-Div-2"))
+                                    participants_list = eventparticipants.get("div2")
+                                    participants_list.append(ign)
+                                    eventparticipants["div2"] = participants_list
+                            with open('eventparticipants.json','w') as event_participants:
+                                json.dump(eventparticipants, event_participants)
+                            await channel.send(f"**You've been added to the list of participants!**\nIn division {division}, you are participant number: {len(participants_list)}")
+
+                        else:
+                            await channel.send("**In order to participate in the event, you must agree to abide by all the rules."
+                                               "\nIf you have any queries regarding the rules, create a new ticket and select the category as 'other'**"
+                                               "\n*This ticket will be deleted in 1 minute*")
+                            await asyncio.sleep(60)
+                            await discord.TextChannel.delete(channel)
                     break
 
                 elif reply == "Other":
@@ -1132,286 +1205,5 @@ async def on_guild_channel_create(channel):
             error_channel = client.get_channel(523743721443950612)
             print(e)
             await error_channel.send(f"Error in {channel}\n{e}\n<@!326399363943497728>")
-
-
-'----------------------------------------------------------------------------------------------------------------GENERAL----------------------------------------------------------------------------------------------------'
-
-
-@client.command()
-@commands.has_permissions(kick_members=True)
-async def challenge(ctx, x):
-    channel = client.get_channel(753103243659444286)
-    staff = discord.utils.get(ctx.guild.roles, name="Staff")
-    if staff in ctx.author.roles:
-        if x == "e":
-            msg = await ctx.send(content="**What would you like the first challenge under the easy category to be (name)?**")
-            challenge1 = await client.wait_for('message', check=lambda x: x.author == ctx.message.author)
-            challenge1 = challenge1.content
-
-            await msg.edit(content="**What is the prize for completing this challenge?**")
-            challenge1_prize = await client.wait_for('message', check=lambda x: x.author == ctx.message.author)
-            challenge1_prize = challenge1_prize.content
-
-            await msg.edit(
-                content="**What would you like the second challenge under the easy category to be?"
-                        "\nIf you don't want one, type None**")
-            challenge2 = await client.wait_for('message', check=lambda x: x.author == ctx.message.author)
-            challenge2 = challenge2.content
-            if challenge2 == "None":
-                embed = discord.Embed(title="Easy", color=0x90ee90)
-                embed.add_field(name=challenge1, value=challenge1_prize, inline=False)
-            else:
-                await msg.edit(content="What is the prize for completing this challenge?")
-                challenge2_prize = await client.wait_for('message', check=lambda x: x.author == ctx.message.author)
-                challenge2_prize = challenge2_prize.content
-
-                embed = discord.Embed(title="Easy", color=0x90ee90)
-                embed.add_field(name=challenge1, value=challenge1_prize, inline=False)
-                embed.add_field(name=challenge2, value=challenge2_prize, inline=False)
-            await channel.send(f'*Complete the following challenges to get prizes*\nTo view the store, use `!shop`')
-            await channel.send(embed=embed)
-
-        if x == "m":
-            msg = await ctx.send("**What would you like the first challenge under the medium category to be (name)?**")
-            challenge1 = await client.wait_for('message', check=lambda x: x.author == ctx.message.author)
-            challenge1 = challenge1.content
-
-            await msg.edit(content="**What is the prize for completing this challenge?**")
-            challenge1_prize = await client.wait_for('message', check=lambda x: x.author == ctx.message.author)
-            challenge1_prize = challenge1_prize.content
-
-            await msg.edit(
-                content="**What would you like the second challenge under the medium category to be?"
-                        "\nIf you don't want one, type None**")
-            challenge2 = await client.wait_for('message', check=lambda x: x.author == ctx.message.author)
-            challenge2 = challenge2.content
-            if challenge2 == "None":
-                embed = discord.Embed(title="Medium", color=0xffa500)
-                embed.add_field(name=challenge1, value=challenge1_prize, inline=False)
-            else:
-                await msg.edit(content="**What is the prize for completing this challenge?**")
-                challenge2_prize = await client.wait_for('message', check=lambda x: x.author == ctx.message.author)
-                challenge2_prize = challenge2_prize.content
-
-                embed = discord.Embed(title="Medium", color=0xffa500)
-                embed.add_field(name=challenge1, value=challenge1_prize, inline=False)
-                embed.add_field(name=challenge2, value=challenge2_prize, inline=False)
-            await channel.send(embed=embed)
-
-        if x == "h":
-            msg = await ctx.send("**What would you like the challenge under the hard category to be (name)?**")
-            challenge1 = await client.wait_for('message', check=lambda x: x.author == ctx.message.author)
-            challenge1 = challenge1.content
-
-            await msg.edit(content="**What is the prize for completing this challenge?**")
-            challenge1_prize = await client.wait_for('message', check=lambda x: x.author == ctx.message.author)
-            challenge1_prize = challenge1_prize.content
-
-            await msg.edit(
-                content="**What would you like the second challenge under the hard category to be?"
-                        "\nIf you don't want one, type None**")
-            challenge2 = await client.wait_for('message', check=lambda x: x.author == ctx.message.author)
-            challenge2 = challenge2.content
-            if challenge2 == "None":
-                embed = discord.Embed(title="Hard", color=0xcd5c5c)
-                embed.add_field(name=challenge1, value=challenge1_prize, inline=False)
-            else:
-                await msg.edit(content="**What is the prize for completing this challenge?**")
-                challenge2_prize = await client.wait_for('message', check=lambda x: x.author == ctx.message.author)
-                challenge2_prize = challenge2_prize.content
-
-                embed = discord.Embed(title="Hard", color=0xcd5c5c)
-                embed.add_field(name=challenge1, value=challenge1_prize, inline=False)
-                embed.add_field(name=challenge2, value=challenge2_prize, inline=False)
-                embed.set_footer(text="You can only do one challenge once.")
-            await channel.send(embed=embed)
-    else:
-        embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
-                              description="Your role lacks permissions to create a challenge post!", color=0xff0000)
-        await ctx.channel.purge(limit=1)
-        await ctx.send(embed=embed)
-
-'-------------------------------------------------------------------------------------------------------STAFF COMMANDS----------------------------------------------------------------------------------------------------------'
-
-
-@client.command()
-async def staffreview(ctx):
-    try:
-        channel = client.get_channel(523226672980557824)
-        admin = discord.utils.get(ctx.guild.roles, name="Admin")
-        if admin in ctx.author.roles:
-            embed = discord.Embed(title="Staff checkup", color=0x8368ff)
-            while True:
-                await ctx.send('**What is the name of the staff member?**')
-                staff_name = await client.wait_for('message', check=lambda x: x.author == ctx.message.author and x.channel == ctx.channel)
-                staff_name = staff_name.content
-
-                await ctx.send(f"**What are your comments about** *{staff_name}*")
-                staff_comm = await client.wait_for('message', check=lambda x: x.author == ctx.message.author and x.channel == ctx.channel)
-                staff_comm = staff_comm.content
-                embed.add_field(name=staff_name, value=staff_comm, inline=False)
-
-
-                embed1 = discord.Embed(title="Is that it or are there more staff members?", color=0x8368ff)
-                embed1.add_field(name="If yes:", value="Reply with `Yes`")
-                embed1.add_field(name="If not:", value="Reply with `No`")
-                await ctx.send(embed=embed1)
-
-                more = await client.wait_for('message', check=lambda x: x.channel == ctx.channel)
-                more = more.content
-                more = more.capitalize()
-
-                if more in ('Yes', 'Yeah', 'Ye', 'Yea'):
-                    continue
-                else:
-                    await channel.send(embed=embed)
-                    break
-        else:
-            embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
-                                  description="Your role lacks permissions make a post for the staff checkup!", color=0xff0000)
-            await ctx.channel.purge(limit=1)
-            await ctx.send(embed=embed)
-
-    except Exception as e:
-        error_channel = client.get_channel(523743721443950612)
-        print(e)
-        await error_channel.send(f"Error in {ctx.channel.name} while using `staffreview`\n{e}\n<@!326399363943497728>")
-
-
-@client.command()
-async def newrolecheck(ctx):
-    try:
-        guild_master = discord.utils.get(ctx.guild.roles, name="Guild Master")
-        staff = discord.utils.get(ctx.guild.roles, name="Staff")
-        new_member = discord.utils.get(ctx.guild.roles, name="New Member")
-        guest = discord.utils.get(ctx.guild.roles, name="Guest")
-        member_role = discord.utils.get(ctx.guild.roles, name="Member")
-        active_role = discord.utils.get(ctx.guild.roles, name="Active")
-        inactive_role = discord.utils.get(ctx.guild.roles, name="Inactive")
-        xl_ally = discord.utils.get(ctx.guild.roles, name="XL - Ally")
-
-        misc_info, xl_members, discord_members,\
-        invalid_members, active_members, regular_members,inactive_members,\
-        xl_discord_members, guest_list = [], [], [], [], [], [], [], [], []
-
-        guild = client.get_guild(522586672148381726)
-        memberList = guild.members
-
-        msg = await ctx.send("**Processing all the prerequisites**")
-
-        misc_details, xl_uuids, = hypixel.get_misc_members(
-            "Miscellaneous"), hypixel.get_guild_members("XL")
-
-        count = 0
-        # Miscellaneous Member Names + gexp
-        await msg.edit(content="**Processing** - 1/2")
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            with requests.Session() as session:
-                # Set any session parameters here before calling `fetch`
-                loop = asyncio.get_event_loop()
-                tasks = [
-                    loop.run_in_executor(
-                        executor,
-                        hypixel.fetch,
-                        *(session, individual_uuid[0])  # Allows us to pass in multiple arguments to `fetch`
-                    )
-                    for individual_uuid in misc_details
-                ]
-                for response in await asyncio.gather(*tasks):  # Puts the result into a list
-                    misc_details[count][0] = response
-                    count = count + 1
-
-        # XL Member Names
-        await msg.edit(content="**Processing** - 2/2")
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            with requests.Session() as session:
-                # Set any session parameters here before calling `fetch`
-                loop = asyncio.get_event_loop()
-                tasks = [
-                    loop.run_in_executor(
-                        executor,
-                        hypixel.fetch,
-                        *(session, individual_uuid)  # Allows us to pass in multiple arguments to `fetch`
-                    )
-                    for individual_uuid in xl_uuids
-                ]
-                for response in await asyncio.gather(*tasks):  # Puts the result into a list
-                    xl_members.append(response)
-
-
-        if staff in ctx.author.roles:  # Making sure that the user is Staff
-            for guild in client.guilds:
-                if str(guild) == "Miscellaneous [MISC]":  # Check if the Discord is Miscellaneous
-                    for member in guild.members:  # For loop for all members in the Discord
-                        if not member.bot:
-                            discord_members.append(member)
-
-            invalid_names = active_names = inactive_names = member_names = xl_names = ""
-            for member in discord_members:
-                name = member.nick  # Obtaining their nick
-                if name is None:  # If they don't have a nick, it uses their name.
-                    name = member.name
-
-                name = '_' + name
-
-                if name.isidentifier() is False:
-                    await member.remove_roles(member_role, guest)
-                    await member.add_roles(new_member)
-
-                    invalid_names = invalid_names + str(member) + "\n"
-                    discord_members.pop(discord_members.index(member))
-
-                name = member.nick  # Obtaining their nick
-                if name is None:  # If they don't have a nick, it uses their name.
-                    name = member.name
-
-                for element in misc_details:
-                    if name in element[0]:
-                        if element[1] > client.active:
-                            active_members.append(member)
-                            active_names = active_names + str(member) + "\n"
-                        elif element[1] > client.inactive:
-                            if member_role not in member.roles:
-                                regular_members.append(member)
-                                member_names = member_names + str(member) + "\n"
-                        elif element[1] < client.inactive:
-                            inactive_members.append(member)
-                            inactive_names = inactive_names + str(member) + "\n"
-
-                if name in xl_members:
-                    if xl_ally not in member.roles:
-                        xl_discord_members.append(member)
-                        xl_names = xl_names + str(member) + "\n"
-                else:
-                    guest_list.append(member)
-            invalid_embed = discord.Embed(title="Invalid: Given @New Member", description=invalid_names, color=0x620B06)
-            active_embed = discord.Embed(title="Active: Given @Active", description=active_names, color=0x0073BF)
-            member_embed = discord.Embed(title="Member: Given @Member", description=member_names, color=0x4DFF00)
-            inactive_embed = discord.Embed(title="Inactive: Given @inactive", description=inactive_names, color=0xFF4C6E)
-            xl_embed = discord.Embed(title="XL: Given @xl_ally", description=xl_names, color=0xA05E75)
-            await ctx.send(embed=invalid_embed)
-            await ctx.send(embed=active_embed)
-            await ctx.send(embed=member_embed)
-            await ctx.send(embed=inactive_embed)
-            await ctx.send(embed=xl_embed)
-
-
-
-    except Exception as e:
-        if str(e) == "Expecting value: line 1 column 1 (char 0)":
-            embed = discord.Embed(title="The Hypixel API is down!", description="Please try again in a while!",
-                                  color=0xff0000)
-            await ctx.send(embed=embed)
-            print(e)
-        elif str(e) == "404 Not Found (error code: 10011): Unknown Role":
-            error_channel = client.get_channel(523743721443950612)
-            print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n{ctx.author.mention} please `forcesync` the last user on the list.")
-
-        else:
-            error_channel = client.get_channel(523743721443950612)
-            print(e)
-            await error_channel.send(
-                f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n<@!326399363943497728>")
 
 client.run(client.token)

@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-import utils.hypixel
+from cogs.utils import hypixel
 import math
 import aiohttp
 from datetime import datetime
@@ -33,7 +33,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 if guild_name == "Miscellaneous":
                     await ctx.author.remove_roles(guest,awaiting_app)
                     await ctx.author.add_roles(member)
-                    embed = discord.Embed(title="Your nick and role was succesfully changed!",
+                    embed = discord.Embed(title="Your nick and role was successfully changed!",
                                         description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
                                         color=0x8368ff)
                     embed.set_footer(text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
@@ -43,7 +43,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     await ctx.author.remove_roles(member, awaiting_app)
                     await ctx.author.add_roles(guest, xl_ally)
 
-                    embed = discord.Embed(title="Your nick and role was succesfully changed!",
+                    embed = discord.Embed(title="Your nick and role was successfully changed!",
                                         description="If this wasn't the change you anticipated, "
                                                     "kindly create a ticket or get in contact with staff!",
                                         color=0x8368ff)
@@ -64,7 +64,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         await ctx.author.add_roles(guest)
                         if guild_name is None:
                             guild_name = "no guild (Guildless)"
-                        embed = discord.Embed(title="Your nick and role was succesfully changed!",
+                        embed = discord.Embed(title="Your nick and role was successfully changed!",
                                             description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
                                             color=0x8368ff)
                         embed.set_footer(text=f"Member of {guild_name}\n• Nick Changed\n• Member & Awaiting Approval were removed\n• Guest was given")
@@ -252,7 +252,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 uuid = await request.json()['id']
                 with open('dnkl.json') as f:
                     data = json.load(f)
-                if request.status_code != 200:
+                if request.status != 200:
                     await ctx.send('Unknown IGN!')
                 else:
                     a, b, c = x.split('/')
@@ -302,7 +302,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 with open('dnkl.json') as f:
                     data = json.load(f)
 
-                if request.status_code != 200:
+                if request.status != 200:
                     await ctx.send('Unknown IGN!')
                 else:
                     await ctx.send("**What is the start date?** (DD/MM/YYYY)")
@@ -313,6 +313,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     end_date = await self.client.wait_for('message',
                                                     check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
                     end_date = end_date.content
+
+                    await ctx.send("**What is the reason behind their inactivity?**")
 
                     reason = await self.client.wait_for('message',
                                                     check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
@@ -343,7 +345,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         embed.add_field(name="End:", value=f"{p} {end_month} {r}", inline=False)
                         embed.add_field(name="Reason", value=f"{reason}", inline=False)
                         embed.set_author(name="Do not kick list")
-                        dnkl_channel = self.client.get_channel(523743721443950612)
+                        dnkl_channel = self.client.get_channel(629564802812870657)
                         message = await dnkl_channel.send(embed=embed)
 
                         dnkl_dict = {ign: message.id}
@@ -389,7 +391,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
                     request = resp
-            if request.status_code != 200:
+            if request.status != 200:
                 await ctx.send('Unknown IGN!')
             else:
                 ign = request.json()['name']
@@ -474,7 +476,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
                     request = resp
-            if request.status_code != 200:
+            if request.status != 200:
                 await ctx.send('Unknown IGN!')
             else:
                 ign = await request.json()["name"]
@@ -892,7 +894,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.send(embed=embed)
             else:
                 request = requests.get(f'https://api.mojang.com/users/profiles/minecraft/{name}')
-                if request.status_code != 200:
+                if request.status != 200:
                     await ctx.send('Unknown IGN!')
                 else:
                     name = request.json()['name']
@@ -1025,7 +1027,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     x = author.name
                     name = x
             request = requests.get(f'https://api.mojang.com/users/profiles/minecraft/{name}')
-            if request.status_code != 200:
+            if request.status != 200:
                 await ctx.send('Unknown IGN!')
             else:
                 name = request.json()['name']

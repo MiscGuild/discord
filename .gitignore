@@ -11,6 +11,11 @@ __pycache__/
 # VsCode
 .vscode/
 
+#Configs n stuff
+dnkl.json
+eventparticipants.json
+config.toml
+
 # PyCharm
 .idea
 .idea/
