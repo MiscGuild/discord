@@ -1637,7 +1637,7 @@ async def chester(ctx):
              'https://bit.ly/3wSxTXS', 'https://bit.ly/3qnEYNO', 'https://bit.ly/3gOwJa3', 'https://bit.ly/3zVSVXE',
              'https://bit.ly/3zKYDv8', 'https://bit.ly/3xNHn6U', 'https://bit.ly/35MdUOz', 'https://bit.ly/35MHfIJ']
     image = links[random.randint(0, len(links) + 1)]
-    embed = discord.Embed(title="Here's the pizza you requested:", color=0xD2691e)
+    embed = discord.Embed(title="Here's the furry you requested:", color=0xD2691e)
     embed.set_image(url=image)
     await ctx.send(embed=embed)
 
