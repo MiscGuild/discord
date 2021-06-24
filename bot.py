@@ -3185,9 +3185,9 @@ async def gmember(ctx, name=None):
 
                                 else:
                                     break
-                            if ctx.channel.name == "general":
+                            if ctx.channel.name != "bot-channel":
                                 name = name.replace("_",        "\_")
-                                await ctx.send(f"__**{name}**__\n**Guild Experience-** `{totalexp}`")
+                                await ctx.send(f"__**{name}**__\n**Guild Experience -** `{totalexp}`")
                             else:
                                 embed = discord.Embed(title=f"{name}",
                                                       url=f'https://plancke.io/hypixel/player/stats/{name}',
