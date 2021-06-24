@@ -74,7 +74,7 @@ async def on_member_join(member):
 
 
 
-@client.command(aliases=['req', 'requirement', 'Req', 'Requirement', 'Requirements'])
+@client.command(aliases=['req', 'requirement'])
 async def requirements(ctx):
     try:
         embed = discord.Embed(title="Miscellaneous Guild Requirements",
@@ -92,7 +92,7 @@ async def requirements(ctx):
         print(e)
 
 
-@client.command(aliases=['Ticket', 'Tickets', 'ticket'])
+@client.command(aliases=['ticket'])
 async def tickets(ctx):
     try:
         embed = discord.Embed(title="How to create a ticket?",
@@ -119,7 +119,7 @@ async def tickets(ctx):
         print(e)
 
 
-@client.command(aliases=['res', 'Res', 'Resident'])
+@client.command(aliases=['res'])
 async def resident(ctx):
     try:
         embed = discord.Embed(title='How to get Resident?',
