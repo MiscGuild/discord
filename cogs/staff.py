@@ -135,7 +135,7 @@ class staff(commands.Cog, name="Staff"):
         try:
             count = 0
             div1_name = div2_name = ""
-            ign = hypixel.get_dispname(name)
+            ign = await hypixel.get_dispname(name)
             with open('eventparticipants.json') as f:
                 data = json.load(f)
                 if ign in data['div1']:
@@ -174,7 +174,7 @@ class staff(commands.Cog, name="Staff"):
         """
         try:
             msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
-            api = hypixel.get_api()
+            api = await hypixel.get_api()
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'https://api.hypixel.net/guild?key={api}&name=Miscellaneous') as resp:
                     g = await resp.json()
@@ -380,7 +380,7 @@ class staff(commands.Cog, name="Staff"):
 
             msg = await ctx.send("**Processing all the prerequisites**")
 
-            misc_uuids, xl_uuids, = hypixel.get_guild_members("Miscellaneous"),hypixel.get_guild_members("XL")
+            misc_uuids, xl_uuids, = await hypixel.get_guild_members("Miscellaneous"), await hypixel.get_guild_members("XL")
 
 
             misc_members, calm_members, xl_members= [], [], []
@@ -452,7 +452,7 @@ class staff(commands.Cog, name="Staff"):
                                         #Miscellaneous
                                         if ign in misc_members and ign != "Rowdies":
                                             async with aiohttp.ClientSession() as session:
-                                                async with session.get(f"https://api.hypixel.net/guild?key={hypixel.get_api()}&player={uuid}") as resp:
+                                                async with session.get(f"https://api.hypixel.net/guild?key={await hypixel.get_api()}&player={uuid}") as resp:
                                                     req = await resp.json()
 
 
@@ -553,11 +553,11 @@ class staff(commands.Cog, name="Staff"):
             officer = discord.utils.get(ctx.guild.roles, name="Officer")
             admin = discord.utils.get(ctx.guild.roles, name="Admin")
             if officer or admin in ctx.author.roles:
-                ign = hypixel.get_dispname(name)
+                ign = await hypixel.get_dispname(name)
                 if ign is None:
                     await ctx.send('Please enter a valid ign!')
                 else:
-                    guild_name = hypixel.get_guild(name)
+                    guild_name = await hypixel.get_guild(name)
                     newmember = discord.utils.get(ctx.guild.roles, name="New Member")
                     guest = discord.utils.get(ctx.guild.roles, name="Guest")
                     member_ = discord.utils.get(ctx.guild.roles, name="Member")
@@ -691,8 +691,8 @@ class staff(commands.Cog, name="Staff"):
 
             msg = await ctx.send("**Processing all the prerequisites**")
 
-            misc_details, xl_uuids, = hypixel.get_misc_members(
-                "Miscellaneous"), hypixel.get_guild_members("XL")
+            misc_details, xl_uuids, = await hypixel.get_misc_members(
+                "Miscellaneous"), await hypixel.get_guild_members("XL")
 
             count = 0
             # Miscellaneous Member Names + gexp
@@ -894,5 +894,5 @@ class staff(commands.Cog, name="Staff"):
             await channel.send(embed=embed)
 
 
-def setup(bot):
+async def setup(bot):
     bot.add_cog(staff(bot))

@@ -1,8 +1,5 @@
-import discord, random, math, toml, aiohttp, asyncio, json, sys, requests
-from quickchart import QuickChart
+import discord, toml, aiohttp, asyncio, json, sys
 from discord.ext import commands
-from datetime import datetime
-from concurrent.futures import ThreadPoolExecutor
 from cogs.utils import hypixel
 import logging
 
@@ -43,7 +40,7 @@ class HelpCommand(commands.MinimalHelpCommand):
 
 client.help_command = HelpCommand(command_attrs={'hidden': True})
 
-initial_extensions = ['cogs.mod', 'cogs.fun', 'cogs.ticket']
+initial_extensions = ['cogs.fun']
 
 
 if __name__ == '__main__':
@@ -67,14 +64,35 @@ async def on_ready():
         print(e)
 client.loop.create_task(on_ready())
 
+@client.command(hidden=True)
+async def load(ctx, extension):
+    try:
+        client.load_extension(f'cogs.{extension}')
+        await ctx.send(f'{extension} has been loaded')
+    except Exception as e:
+        await ctx.send(e)
+
+@client.command(hidden=True)
+async def unload(ctx, extension):
+    try:
+        client.unload_extension(f'cogs.{extension}')
+        await ctx.send(f'{extension} has been unloaded')
+    except Exception as e:
+        await ctx.send(e)
+
+@client.command(hidden=True)
+async def reload(ctx, extension):
+    try:
+        client.reload_extension(f'cogs.{extension}')
+        await ctx.send(f'{extension} has been reloaded')
+    except Exception as e:
+        await ctx.send(e)
+
 # Error Message
 @client.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
-        embed = discord.Embed(title="Invalid Command!",
-                              description=f"Use `help` for a list of all commands!",
-                              color=0xff0000)
-        await ctx.send(embed=embed)
+        return
 
 @client.event
 async def on_member_join(member):

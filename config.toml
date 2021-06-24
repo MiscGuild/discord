@@ -1,9 +1,9 @@
 [bot]
 prefix = ','
-token = ''
+token = 'ODExNDM1NTQ5ODM1MjY0MDEw.YCyKPg.OP5BZ3uR79TAOpGJ5pV5YasBGIk'
 status = 'with Miscellaneous members!'
 
 [hypixel]
 api_keys = [
-    'xxxx'
+    '459402ff-e49f-4aee-b6e8-344e64707583'
 ]
