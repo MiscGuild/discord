@@ -15,7 +15,7 @@ with open('config.json') as config_file:
 intents = discord.Intents.default()
 intents.reactions = True
 intents.members = True
-client = commands.Bot(command_prefix=[',', '@Miscellaneous#4333'], intents=intents)
+client = commands.Bot(command_prefix=[',', '@Miscellaneous#4333'], intents=intents, case_insensitive=True)
 
 client.remove_command('help')
 
