@@ -2062,7 +2062,7 @@ async def messagespam(ctx, *, x):
 guild = 'Miscellaneous'
 
 
-@client.command(aliases=['Register', 'reg', 'Reg', 'Verify', 'verify'])
+@client.command(aliases=['reg','verify'])
 async def register(ctx, name):
     try:
         async with ctx.channel.typing():
@@ -2245,7 +2245,7 @@ async def sync(ctx, name):
             await error_channel.send(f"Error in {ctx.channel.name} while trying to use `sync`\n{e}\n<@!326399363943497728>")
 
 
-@client.command(aliases=['ForceSync', 'Forcesync', 'forceSync', 'FORCESYNC', 'fs', 'Fs', 'FS', 'fS'])
+@client.command(aliases=['fs'])
 async def forcesync(ctx, member: discord.Member, name):
     try:
         officer = discord.utils.get(ctx.guild.roles, name="Officer")
@@ -2324,7 +2324,7 @@ async def forcesync(ctx, member: discord.Member, name):
             await error_channel.send(f"Error in {ctx.channel.name} while trying to use `forcesync`\n{e}\n<@!326399363943497728>")
 
 
-@client.command(aliases=["i", "I"])
+@client.command(aliases=["i"])
 async def info(ctx, name=None):
     try:
         async with ctx.channel.typing():
@@ -2478,7 +2478,7 @@ async def info(ctx, name=None):
 
 
 # Do-Not-Kick-List
-@client.command(aliases=["Dnkladd", "DNKLADD", "DnklAdd"])
+@client.command()
 @commands.has_permissions(manage_messages=True)
 async def dnkladd(ctx, name = None, w = None, x = None, y = None, *, z = None):
     try:
@@ -2615,7 +2615,7 @@ async def dnkladd_error(ctx, error):
                               color=0xff0000)
         await ctx.channel.purge(limit=1)
         await ctx.send(embed=embed)
-@client.command(aliases=['dnklrmv', 'Dnklrmv', 'DNKLRMV', 'DNKLrmv', 'DnklRmv'])
+@client.command(aliases=['dnklrmv'])
 @commands.has_permissions(manage_messages=True)
 async def dnklremove(ctx, name):
     try:
@@ -2669,7 +2669,7 @@ async def dnklremove_error(ctx, error):
         await ctx.send(embed=embed)
 
 
-@client.command(aliases=['Dnkllist', 'DNKLLIST', 'DnklList'])
+@client.command()
 async def dnkllist(ctx, raw=None):
     try:
         name = ""
@@ -2695,7 +2695,7 @@ async def dnkllist(ctx, raw=None):
             f"\n{e}\n<@!326399363943497728>")
 
 # Blacklist
-@client.command(aliases=["blacklist", "Blacklist", "Bl"])
+@client.command(aliases=["blacklist"])
 @commands.has_permissions(manage_messages=True)
 async def bl(ctx, name, x, *, y):
     try:
@@ -2764,7 +2764,7 @@ async def bl_error(ctx, error):
         await ctx.send(embed=embed)
 
 
-@client.command(aliases=["gi", "Gi", "GI"])
+@client.command(aliases=["gi"])
 async def ginfo(ctx, *, name):
     try:
         async with ctx.channel.typing():
@@ -2848,7 +2848,7 @@ async def ginfo_error(ctx, error):
         await ctx.send(embed=embed)
 
 
-@client.command(aliases=['ge', "Ge", "Gexp"])
+@client.command(aliases=['ge'])
 async def gexp(ctx, gname):
     try:
         msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
@@ -2915,7 +2915,7 @@ async def gexp_error(ctx, error):
         await ctx.send(embed=embed)
 
 
-@client.command(aliases=["Gactive"])
+@client.command()
 async def gactive(ctx):
     try:
         msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
@@ -2968,7 +2968,7 @@ async def gactive(ctx):
             await error_channel.send(f"Error in {ctx.channel.name} while using `gactive`\n{e}\n<@!326399363943497728>")
 
 
-@client.command(aliases=['Ginactive'])
+@client.command()
 async def ginactive(ctx):
     try:
         msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
@@ -3026,7 +3026,7 @@ async def ginactive(ctx):
                                      f"{e}\n<@!326399363943497728>")
 
 
-@client.command(aliases=['gr', 'Gr', 'Grank'])
+@client.command(aliases=['gr'])
 async def grank(ctx, reqrank):
     try:
         reqrank = reqrank.capitalize()
@@ -3096,7 +3096,7 @@ async def grank(ctx, reqrank):
             await error_channel.send(f"Error in {ctx.channel.name} while using `grank`\n{e}\n<@!326399363943497728>")
 
 
-@client.command(aliases=['gm', 'Gm', 'Gmember', 'g', 'G'])
+@client.command(aliases=['gm', 'g'])
 async def gmember(ctx, name=None):
     try:
         if name is None:
@@ -3236,7 +3236,7 @@ async def gmember(ctx, name=None):
             await error_channel.send(f"Error in {ctx.channel.name} while using `g` \n{e}\n<@!326399363943497728>")
 
 
-@client.command(aliases=['dnklchk', 'Dnklchk', 'DNKLCHK', 'Dnklcheck', 'DNKLCHECK'])
+@client.command(aliases=['dnklchk'])
 async def dnklcheck(ctx, name=None):
     try:
         if name is None:
@@ -3300,7 +3300,7 @@ async def dnklcheck(ctx, name=None):
             await error_channel.send(f"Error in {ctx.channel.name} while using `dnklchk`\n{e}\n<@!326399363943497728>")
 
 
-@client.command(aliases=["Gtop", "gt", "Gt"], pass_context=True)
+@client.command(aliases=["gt"], pass_context=True)
 async def gtop(ctx):
     try:
         msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
@@ -3640,7 +3640,7 @@ async def dailylb(ctx, x=1):
 
 '-------------------------------------------------------------------------------------------------------STAFF COMMANDS----------------------------------------------------------------------------------------------------------'
 
-@client.command(aliases=["Staff"])
+@client.command()
 async def staff(ctx):
     try:
         msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
