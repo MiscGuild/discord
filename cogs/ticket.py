@@ -24,7 +24,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         ign = request['name']
                         uuid = request['id']
 
-                        guild_name = hypixel.get_guild(name)
+                        guild_name = await hypixel.get_guild(name)
                         newmember = discord.utils.get(ctx.guild.roles, name="New Member")
                         awaiting_app = discord.utils.get(ctx.guild.roles, name="Awaiting Approval")
                         member = discord.utils.get(ctx.guild.roles, name="Member")
@@ -320,5 +320,5 @@ class Tickets(commands.Cog, name="Tickets"):
         await ctx.send(embed=embed)
         await ctx.send(embed=embed2)
 
-def setup(bot):
+async def setup(bot):
     bot.add_cog(Tickets(bot))
