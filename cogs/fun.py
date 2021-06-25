@@ -69,5 +69,5 @@ class Fun(commands.Cog, name="Fun"):
                                 color=0xff0000)
             await ctx.send(embed=embed)
 
-async def setup(bot):
+def setup(bot):
     bot.add_cog(Fun(bot))

@@ -320,5 +320,5 @@ class Tickets(commands.Cog, name="Tickets"):
         await ctx.send(embed=embed)
         await ctx.send(embed=embed2)
 
-async def setup(bot):
+def setup(bot):
     bot.add_cog(Tickets(bot))

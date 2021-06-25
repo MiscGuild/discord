@@ -894,5 +894,5 @@ class staff(commands.Cog, name="Staff"):
             await channel.send(embed=embed)
 
 
-async def setup(bot):
+def setup(bot):
     bot.add_cog(staff(bot))

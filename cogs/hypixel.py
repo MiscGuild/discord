@@ -6,7 +6,6 @@ import aiohttp
 from datetime import datetime
 import json
 from quickchart import QuickChart
-import requests
 
 class Hypixel(commands.Cog, name="Hypixel"):
     def __init__(self, client):
@@ -103,7 +102,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 else:
                     ign = req["player"]["displayname"]
                     uuid = req["player"]['uuid']
-                    api = await hypixel.get_api()
+                    api = hypixel.get_api()
                     async with aiohttp.ClientSession() as session:
                         async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
                             req2 = await resp.json()
@@ -251,7 +250,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 async with aiohttp.ClientSession() as session:
                         async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{ign}') as resp:
                             request = resp
-                uuid = await request.json()['id']
+                request_json = await request.json()
+                uuid = request_json['id']
                 with open('dnkl.json') as f:
                     data = json.load(f)
                 if request.status != 200:
@@ -469,7 +469,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
     # Blacklist
     @commands.command(aliases=["blacklist", "Blacklist", "Bl"])
     @commands.has_permissions(manage_messages=True)
-    async def bl(self, ctx, name, x, *, y):
+    async def bl(self, ctx, name, time, *, reason):
         """Adds the user to the guild blacklist
         """
         try:
@@ -481,20 +481,21 @@ class Hypixel(commands.Cog, name="Hypixel"):
             if request.status != 200:
                 await ctx.send('Unknown IGN!')
             else:
-                ign = await request.json()["name"]
-                if x in ("None", "Never"):
-                    uuid = await request.json()['id']
+                request_json = await request.json()
+                ign = await request_json["name"]
+                if time in ("None", "Never"):
+                    uuid = await request_json['id']
                     embed = discord.Embed(title=f"{rank} {ign}",
                                         url=f'https://plancke.io/hypixel/player/stats/{ign}', color=0xff0000)
                     embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
                     embed.add_field(name="IGN:", value=f"{ign}", inline=False)
                     embed.add_field(name="End:", value="Never", inline=False)
-                    embed.add_field(name="Reason:", value=f"{y}", inline=False)
+                    embed.add_field(name="Reason:", value=f"{reason}", inline=False)
                     embed.set_author(name="Blacklist")
                     await ctx.channel.purge(limit=1)
                     await ctx.send(embed=embed)
                 else:
-                    t = x.split('/')
+                    t = time.split('/')
                     a = int(t[0])
                     b = int(t[1])
                     c = int(t[2])
@@ -506,14 +507,14 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         dates = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May", 6: "June", 7: "July", 8: "August", 9: "September", 10: "October", 11: "November", 12: "December"}
                         end_month = dates.get(b)
 
-                        uuid = request.json()['id']
+                        uuid = request_json['id']
                         embed = discord.Embed(title=f"{rank} {ign}",
                                             url=f'https://plancke.io/hypixel/player/stats/{ign}',
                                             color=0xff0000)
                         embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
                         embed.add_field(name="IGN:", value=ign, inline=False)
                         embed.add_field(name="End:", value=f"{a} {end_month} {c}", inline=False)
-                        embed.add_field(name="Reason:", value=y, inline=False)
+                        embed.add_field(name="Reason:", value=reason, inline=False)
                         embed.set_author(name="Blacklist")
                         await ctx.channel.purge(limit=1)
                         await ctx.send(embed=embed)
@@ -527,7 +528,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
                 await error_channel.send(f"Error in {ctx.channel.name} while trying  to blacklist a user\n{e}\n<@!326399363943497728>")
     @bl.error
-    async def bl_error(ctx, error):
+    async def bl_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             embed = discord.Embed(title='Please check the command! The syntax is as follows',
                                 description='bl `IGN` `End Date` `Reason`', color=0xff0000)
@@ -617,7 +618,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
                 await error_channel.send(f"Error in {ctx.channel.name} while using `ginfo`\n{e}\n<@!326399363943497728>")
     @ginfo.error
-    async def ginfo_error(ctx, error):
+    async def ginfo_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             embed = discord.Embed(title='Please check the command! The syntax is as follows',
                                 description='ginfo `Minecraft name`', color=0xff0000)
@@ -630,7 +631,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         """
         try:
             msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
-            api = await hypixel.get_api()
+            api = hypixel.get_api()
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'https://api.hypixel.net/guild?key={api}&name={gname}') as req:
                     req = await req.json()
@@ -685,7 +686,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
                 await error_channel.send(f"Error in {ctx.channel.name} while using `gexp`\n{e}\n<@!326399363943497728>")
     @gexp.error
-    async def gexp_error(ctx, error):
+    async def gexp_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             embed = discord.Embed(title='Please check the command! The syntax is as follows',
                                 description='gexp `Guild Name`', color=0xff0000)
@@ -700,7 +701,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
             msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
             gname = 'Rowdies'
             link = f'https://api.slothpixel.me/api/guilds/{gname}'
-            g = requests.get(link).json()
+            async with aiohttp.ClientSession() as session:
+                async with session.get(link) as resp:
+                    g = await resp.json()
             array = {}
             exp = 0
             await msg.edit(content=f"**Please wait!**\n `Approximate wait time: 5 seconds`")
@@ -709,7 +712,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     expHistory = sum(g['members'][i]['exp_history'].values())
                     if expHistory >= self.client.active:
                         uuid = g['members'][i]['uuid']
-                        a = requests.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}').json()
+                        async with aiohttp.ClientSession() as session:
+                            async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
+                                a = await resp.json()
                         name = a['name'] + f"[{g['members'][i]['rank']}]"
                         exp += expHistory
                         array[name] = exp
@@ -754,7 +759,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
             msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
             gname = 'Rowdies'
             link = f'https://api.slothpixel.me/api/guilds/{gname}'
-            g = requests.get(link).json()
+            async with aiohttp.ClientSession() as session:
+                async with session.get(link) as resp:
+                    g = await resp.json()
             array = {}
             exp = 0
             await msg.edit(content=f"**Please wait!**\n `Approximate wait time: 10 seconds!`")
@@ -763,7 +770,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     expHistory = sum(g['members'][i]['exp_history'].values())
                     if expHistory < self.client.inactive:
                         uuid = g['members'][i]['uuid']
-                        a = requests.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}').json()
+                        async with aiohttp.ClientSession() as session:
+                            async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
+                                a = await resp.json()
                         name = a['name']
                         rank = g['members'][i]['rank']
                         name = name + f'[{rank}]'
@@ -814,7 +823,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
             msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
             gname = 'Rowdies'
             link = f'https://api.slothpixel.me/api/guilds/{gname}'
-            g = requests.get(link).json()
+            async with aiohttp.ClientSession() as session:
+                async with session.get(link) as resp:
+                    g = await resp.json()
             array = {}
             exp = 0
             if reqrank == "Member":
@@ -836,7 +847,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     rank = g['members'][i]['rank']
                     if rank == reqrank:
                         uuid = g['members'][i]['uuid']
-                        a = requests.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}').json()
+                        async with aiohttp.ClientSession() as session:
+                            async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
+                                a = await resp.json()
                         name = a['name']
                         expHistory = sum(g['members'][i]['exp_history'].values())
                         name = name
@@ -895,14 +908,19 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                     description="The command you're trying to use is `,gtop`", color=0xff0000)
                 await ctx.send(embed=embed)
             else:
-                request = requests.get(f'https://api.mojang.com/users/profiles/minecraft/{name}')
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
+                        request = resp
                 if request.status != 200:
                     await ctx.send('Unknown IGN!')
                 else:
-                    name = request.json()['name']
-                    uuid = request.json()['id']
-                    api = await hypixel.get_api()
-                    req = requests.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}').json()
+                    request = await request.json()
+                    name = request['name']
+                    uuid = request['id']
+                    api = hypixel.get_api()
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
+                            req = await resp.json()
 
                     if "guild" not in req or req['guild'] is None:
                         embed = discord.Embed(title=f"{name}", url=f'https://plancke.io/hypixel/player/stats/{name}',
@@ -1028,14 +1046,19 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 if name is None:
                     x = author.name
                     name = x
-            request = requests.get(f'https://api.mojang.com/users/profiles/minecraft/{name}')
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
+                    request = resp
             if request.status != 200:
                 await ctx.send('Unknown IGN!')
             else:
-                name = request.json()['name']
-                uuid = request.json()['id']
-                api = await hypixel.get_api()
-                data = requests.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}').json()
+                request = await request.json()
+                name = request['name']
+                uuid = request['id']
+                api = hypixel.get_api()
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
+                        data = await resp.json()
                 gname = data['guild']['name']
                 if gname != 'Miscellaneous':
                     await ctx.send('The user is not in Miscellaneous')
@@ -1088,8 +1111,10 @@ class Hypixel(commands.Cog, name="Hypixel"):
         """
         try:
             msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
-            api = await hypixel.get_api()
-            req = requests.get(f'https://api.hypixel.net/guild?key={api}&name=Miscellaneous').json()
+            api = hypixel.get_api()
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f'https://api.hypixel.net/guild?key={api}&name=Miscellaneous') as resp:
+                    req = await resp.json()
             array = {}
             exp = 0
             await msg.edit(content=f"**Please wait!**\n `Approximate wait time: 15 seconds`")
@@ -1125,11 +1150,14 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
                 for user in sortedList:
                     if iteration_number < 11:
-                        mojang = requests.get(
-                            f'https://sessionserver.mojang.com/session/minecraft/profile/{user[0]}').json()
+                        async with aiohttp.ClientSession() as session:
+                            async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{user[0]}') as resp:
+                                mojang = await resp.json()
                         name = mojang['name']
 
-                        data = requests.get(f"https://api.hypixel.net/player?key={api}&name={name}").json()
+                        async with aiohttp.ClientSession() as session:
+                            async with session.get(f"https://api.hypixel.net/player?key={api}&name={name}") as resp:
+                                data = await resp.json()
 
                         if data["player"] is None:
                             return None
@@ -1234,10 +1262,13 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 weeklygexp = weeklygexp.replace(',', '%2C')
 
                 url = f"https://chat.miscguild.xyz/render.png?m=custom&d={weeklygexp}&t=1"
-                image = requests.get(url)
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url) as resp:
+                        image = resp
+
 
                 with open('temppicture.jpg', 'wb') as f:
-                    f.write(image.content)
+                    f.write(await image.read())
                 await ctx.send(file=discord.File('temppicture.jpg'))
 
         except Exception as e:
@@ -1258,8 +1289,10 @@ class Hypixel(commands.Cog, name="Hypixel"):
         try:
             await ctx.channel.purge(limit=1)
             msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
-            api = await hypixel.get_api()
-            req = requests.get(f'https://api.hypixel.net/guild?key={api}&name=Miscellaneous').json()
+            api = hypixel.get_api()
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f'https://api.hypixel.net/guild?key={api}&name=Miscellaneous') as resp:
+                    req = await resp.json()
             array = {}
             await msg.edit(content=f"**Please wait!**\n `Approximate wait time: 15 seconds`")
             async with ctx.channel.typing():
@@ -1292,10 +1325,14 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await msg.edit(content=f"**Please wait!**\n `Approximate wait time: 10 seconds`")
                 for user in sortedList:
                     if z < 11:
-                        mojang = requests.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{user[0]}').json()
+                        async with aiohttp.ClientSession() as session:
+                            async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{user[0]}') as resp:
+                                mojang = await resp.json()
                         name = mojang['name']
 
-                        data = requests.get(f"https://api.hypixel.net/player?key={api}&name={name}").json()
+                        async with aiohttp.ClientSession() as session:
+                            async with session.get(f"https://api.hypixel.net/player?key={api}&name={name}") as resp:
+                                data = await resp.json()
 
                         print(name)
                         if data["player"] is None:
@@ -1406,10 +1443,13 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
 
                 url = f"https://chat.miscguild.xyz/render.png?m=custom&d={dailygexp}&t=1"
-                image = requests.get(url)
+
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url) as resp:
+                        image = resp
 
                 with open('temppicture.jpg', 'wb') as f:
-                    f.write(image.content)
+                    f.write(await image.read())
                 await ctx.send(file=discord.File('temppicture.jpg'))
 
         except Exception as e:
@@ -1423,5 +1463,5 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
                 await error_channel.send(f"Error in {ctx.channel.name} while using `dailylb`\n{e}\n<@!326399363943497728>")
 
-async def setup(bot):
+def setup(bot):
     bot.add_cog(Hypixel(bot))
