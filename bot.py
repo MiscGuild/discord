@@ -3958,45 +3958,47 @@ async def rolecheck(ctx):
                                             await member.remove_roles(new_member, guest)
                                         
                                         for user in req['guild']["members"]:
-                                                if uuid == user["uuid"]:
-                                                    totalexp = user['expHistory']
-                                                    totalexp = sum(totalexp.values())
-                                                    usergrank = user['rank']
                                             
-                                            if usergrank != 'Resident':
-                                                if totalexp < inactive:
-                                                    await member.add_roles(inactive_role)
-                                                    await member.remove_roles(active_role)
-                                                    await message.edit(
-                                                        content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
+                                            if uuid == user["uuid"]:
+                                                
+                                                totalexp = user['expHistory']
+                                                totalexp = sum(totalexp.values())
+                                                usergrank = user['rank']
+                                            
+                                                if usergrank != 'Resident':
+                                                    if totalexp < inactive:
+                                                        await member.add_roles(inactive_role)
+                                                        await member.remove_roles(active_role)
+                                                        await message.edit(
+                                                            content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
 
-                                                elif totalexp >= active:  # If the member is active
-                                                    await member.remove_roles(inactive_role, new_member)
-                                                    await member.add_roles(active_role)
-                                                    await message.edit(
-                                                        content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
-   
-                                                elif totalexp > inactive:
-                                                    await member.remove_roles(inactive_role, active_role)
-                                                    await message.edit(
-                                                        content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
-                                            else:
-                                                if totalexp < 50000:
-                                                    await member.add_roles(inactive_role)
-                                                    await member.remove_roles(active_role)
-                                                    await message.edit(
-                                                        content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
+                                                    elif totalexp >= active:  # If the member is active
+                                                        await member.remove_roles(inactive_role, new_member)
+                                                        await member.add_roles(active_role)
+                                                        await message.edit(
+                                                            content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
 
-                                                elif totalexp >= active:  # If the member is active
-                                                    await member.remove_roles(inactive_role, new_member)
-                                                    await member.add_roles(active_role)
-                                                    await message.edit(
-                                                        content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
-   
-                                                elif totalexp > 50000:
-                                                    await member.remove_roles(inactive_role, active_role)
-                                                    await message.edit(
-                                                        content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
+                                                    elif totalexp > inactive:
+                                                        await member.remove_roles(inactive_role, active_role)
+                                                        await message.edit(
+                                                            content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
+                                                else:
+                                                    if totalexp < 50000:
+                                                        await member.add_roles(inactive_role)
+                                                        await member.remove_roles(active_role)
+                                                        await message.edit(
+                                                            content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
+
+                                                    elif totalexp >= active:  # If the member is active
+                                                        await member.remove_roles(inactive_role, new_member)
+                                                        await member.add_roles(active_role)
+                                                        await message.edit(
+                                                            content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
+
+                                                    elif totalexp > 50000:
+                                                        await member.remove_roles(inactive_role, active_role)
+                                                        await message.edit(
+                                                            content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
 
 
                                     elif ign in xl_members:
