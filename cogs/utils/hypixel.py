@@ -7,7 +7,7 @@ configFile = toml.load('config.toml')
 
 
 def get_api():
-    API_KEY = configFile['API_KEYS']
+    API_KEY = configFile['hypixel']['api_keys']
     
     api = random.choice(API_KEY)
     return api

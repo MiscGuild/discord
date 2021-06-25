@@ -40,8 +40,7 @@ class HelpCommand(commands.MinimalHelpCommand):
 
 client.help_command = HelpCommand(command_attrs={'hidden': True})
 
-initial_extensions = ['cogs.fun']
-
+initial_extensions = ['cogs.fun', 'cogs.hypixel', 'cogs.mod', 'cogs.staff', 'cogs.ticket']
 
 if __name__ == '__main__':
     for extension in initial_extensions:
