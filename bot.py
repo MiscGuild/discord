@@ -1371,6 +1371,7 @@ async def help(ctx, *, a=None):
         embed.add_field(name="8ball", value="Play with the magic 8ball", inline=False)
         embed.add_field(name="ping", value="Gives the bot's ping", inline=False)
         embed.add_field(name="pizza", value="Gives you a pizza", inline=False)
+        embed.add_field(name="doggo", value="Gives you a doggo", inline=False)
         embed.add_field(name="chester", value="Give you a random chester picture", inline=False)
         embed.set_author(name="Help - Fun")
         embed.set_footer(text="Miscellaneous Bot | Coded by Rowdies")
@@ -1502,6 +1503,9 @@ async def help(ctx, *, a=None):
         embed.add_field(name="pizza",
                         value="Gives you a pizza",
                         inline=False)
+        embed.add_field(name="doggo",
+                        value="Gives you a doggo",
+                        inline=False)
         embed.add_field(name="chester",
                         value="Give you a random chester picture",
                         inline=False)
@@ -1628,6 +1632,14 @@ async def pizza(ctx):
     embed.set_image(url=req['image'])
     await ctx.send(embed=embed)
 
+# Doggo
+@client.command()
+async def doggo(ctx):
+    req = requests.get(f"https://urmw.live/api/doggos/random")
+    req = req.json()
+    embed = discord.Embed(title="DOGGO: ", color=0xD2691e)
+    embed.set_image(url=req['image'])
+    await ctx.send(embed=embed)
 
 @client.command()
 async def chester(ctx):
