@@ -4014,7 +4014,7 @@ async def rolecheck(ctx):
         inactivity_channel = client.get_channel(848067712156434462)
 
         embed = discord.Embed(title="You do not meet the guild requirements!",
-                              description=f"Member requirement - **{format(inactive,',d')}** Weekly Guild Experience\nResident requirement - **{format(resident_req,',d')}** Weekly Guikld Experience",
+                              description=f"Member requirement - **{format(inactive,',d')}** Weekly Guild Experience\nResident requirement - **{format(resident_req,',d')}** Weekly Guild Experience",
                               color = 0xDC143C)
         await inactivity_channel.send(f"<@&848051215287058443>")
         await inactivity_channel.send(embed=embed)
