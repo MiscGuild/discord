@@ -383,7 +383,9 @@ async def on_guild_channel_create(channel):
                                                             f"\nReply with `Approve` to approve the do-not-kick-list request"
                                                             f"\nReply with `Deny` to deny the do-not-kick-list request"
                                                             f"\nReply with `Error` if the user made an error while applying for the do not kick list")
-
+                                        
+                                        staff = discord.utils.get(ctx.guild.roles, name="Staff")
+                                        
                                         while True:
                                             action = await client.wait_for('message', check=lambda
                                                 x: staff in x.author.roles)
