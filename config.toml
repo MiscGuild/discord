@@ -1,6 +1,7 @@
 [bot]
 prefix = ','
 token = 'token'
+ownerID = '326399363943497728'
 status = 'with Miscellaneous members!'
 
 [hypixel]

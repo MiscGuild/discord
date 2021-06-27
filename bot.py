@@ -15,6 +15,7 @@ client = commands.Bot(command_prefix=commands.when_mentioned_or(config['bot']['p
 client.config = config
 client.token = config['bot']['token']
 client.api_tokens = config['hypixel']['api_keys']
+owner_id = 326399363943497728
 client.resident_req = int(50000)
 client.active = int(275000)
 client.inactive = int(100000)
@@ -40,7 +41,7 @@ class HelpCommand(commands.MinimalHelpCommand):
 
 client.help_command = HelpCommand(command_attrs={'hidden': True})
 
-initial_extensions = ['cogs.fun', 'cogs.hypixel', 'cogs.mod', 'cogs.staff', 'cogs.ticket']
+initial_extensions = ['cogs.fun', 'cogs.hypixel', 'cogs.mod', 'cogs.staff', 'cogs.ticket', 'cogs.owner']
 
 if __name__ == '__main__':
     for extension in initial_extensions:
@@ -62,30 +63,6 @@ async def on_ready():
     except Exception as e:
         print(e)
 client.loop.create_task(on_ready())
-
-@client.command(hidden=True)
-async def load(ctx, extension):
-    try:
-        client.load_extension(f'cogs.{extension}')
-        await ctx.send(f'{extension} has been loaded')
-    except Exception as e:
-        await ctx.send(e)
-
-@client.command(hidden=True)
-async def unload(ctx, extension):
-    try:
-        client.unload_extension(f'cogs.{extension}')
-        await ctx.send(f'{extension} has been unloaded')
-    except Exception as e:
-        await ctx.send(e)
-
-@client.command(hidden=True)
-async def reload(ctx, extension):
-    try:
-        client.reload_extension(f'cogs.{extension}')
-        await ctx.send(f'{extension} has been reloaded')
-    except Exception as e:
-        await ctx.send(e)
 
 # Error Message
 @client.event
