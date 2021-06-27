@@ -429,7 +429,7 @@ async def on_guild_channel_create(channel):
                                                         break
 
                                                     elif action == "Deny":
-                                                        await channel.send("**This do not kick list request has been denied!")
+                                                        await channel.send("**This do not kick list request has been denied!**")
 
                                                     elif action == "Error":
                                                         await channel.send(
