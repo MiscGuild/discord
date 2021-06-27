@@ -15,7 +15,7 @@ client = commands.Bot(command_prefix=commands.when_mentioned_or(config['bot']['p
 client.config = config
 client.token = config['bot']['token']
 client.api_tokens = config['hypixel']['api_keys']
-owner_id = 326399363943497728
+owner_id = config['bot']['ownerID']
 client.resident_req = int(50000)
 client.active = int(275000)
 client.inactive = int(100000)
