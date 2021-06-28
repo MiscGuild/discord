@@ -1123,7 +1123,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
                 await error_channel.send(f"Error in {ctx.channel.name} while using `dnklchk`\n{e}\n<@!326399363943497728>")
 
-    @commands.command(aliases=["Gtop", "gt", "Gt"], pass_context=True)
+    @commands.command(aliases=["Gtop", "gt", "Gt"])
     async def gtop(self, ctx):
         """Gives the weekly guild experience leaderboard!
         """
