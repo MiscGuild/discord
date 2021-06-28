@@ -4,7 +4,7 @@ import time
 import aiohttp
 import asyncio
 from quickchart import QuickChart
-from discord.ext import commands
+from discord.ext import commands, tasks
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 
@@ -18,7 +18,7 @@ intents.members = True
 client = commands.Bot(command_prefix=[',', '@Miscellaneous#4333'], intents=intents, case_insensitive=True)
 
 client.remove_command('help')
-
+client.error_channel = None
 
 resident_req = int(50000)
 active = int(275000)
@@ -34,6 +34,7 @@ async def on_ready():
     try:
         statuses = ['with Miscellaneous members!', 'with cool kids of Miscellaneous!']
         print('The Bot is up and running!')
+
         for status in statuses:
             await client.change_presence(status=discord.Status.idle, activity=discord.Game(status))
             await asyncio.sleep(600)
@@ -250,9 +251,8 @@ async def on_guild_channel_create(channel):
                     embed = discord.Embed(title="Alright! Kindly specify why you joined the discord and await staff assistance!",
                                           color=0x8368ff)
                     await channel.send(embed=embed)
-                    error_channel = client.get_channel(523743721443950612)
                     print(e)
-                    await error_channel.send(
+                    await client.error_channel.send(
                         f"Error in {channel.name} while dealing with registration tickets\n{e}\n<@!326399363943497728>")
 
                     break
@@ -1389,9 +1389,8 @@ async def on_guild_channel_create(channel):
             await channel.send(embed=embed)
             print(e)
         else:
-            error_channel = client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {channel}\n{e}\n<@!326399363943497728>")
+            await client.error_channel.send(f"Error in {channel}\n{e}\n<@!326399363943497728>")
 
 
 @client.command(aliases=['participant'])
@@ -1437,9 +1436,8 @@ async def participants(ctx, raw=None):
                 embed.set_footer(text=f"Total: {count}")
                 await ctx.send(embed=embed)
     except Exception as e:
-        error_channel = client.get_channel(523743721443950612)
         print(e)
-        await error_channel.send(f"Error in {ctx.channel.name} while running `participants`"
+        await client.error_channel.send(f"Error in {ctx.channel.name} while running `participants`"
                                  f"\n{e}\n<@!326399363943497728>")
 
 @client.command(aliases=['switch','swapper'])
@@ -1480,9 +1478,8 @@ async def swap(ctx, name):
             await ctx.channel.purge(limit=1)
             await ctx.send(embed=embed)
     except Exception as e:
-        error_channel = client.get_channel(523743721443950612)
         print(e)
-        await error_channel.send(
+        await client.error_channel.send(
             f"Error in {ctx.channel.name} while running `swap`"
             f"\n{e}\n<@!326399363943497728>")
 '----------------------------------------------------------------------------------------------------------------GENERAL----------------------------------------------------------------------------------------------------'
@@ -1895,9 +1892,8 @@ async def ban(ctx, member: discord.Member, *, reason=None):
         await member.ban(reason=reason)
         await ctx.send(f"{member} was banned!")
     except Exception as e:
-        error_channel = client.get_channel(523743721443950612)
         print(e)
-        await error_channel.send(f"Error in {ctx.channel.name} while trying to use `ban`\n{e}\n<@!326399363943497728>")
+        await client.error_channel.send(f"Error in {ctx.channel.name} while trying to use `ban`\n{e}\n<@!326399363943497728>")
 @ban.error
 async def ban_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
@@ -1962,9 +1958,8 @@ async def delete(ctx):
                                       description="", color=0x8368ff)
                 await logs.send(embed=embed)
     except Exception as e:
-        error_channel = client.get_channel(523743721443950612)
         print(e)
-        await error_channel.send(f"Error in {ctx.channel.name}\n{e}\n<@!326399363943497728>")
+        await client.error_channel.send(f"Error in {ctx.channel.name}\n{e}\n<@!326399363943497728>")
 
 
 @client.command()
@@ -1978,9 +1973,8 @@ async def accept(ctx,  member: discord.Member):
                                       "#staff-faq")
                 await ctx.send(embed=embed)
     except Exception as e:
-        error_channel = client.get_channel(523743721443950612)
         print(e)
-        await error_channel.send(f"Error in {ctx.channel.name} while running `deny`\n{e}\n<@!326399363943497728>")
+        await client.error_channel.send(f"Error in {ctx.channel.name} while running `deny`\n{e}\n<@!326399363943497728>")
 @accept.error
 async def accept_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
@@ -2072,9 +2066,8 @@ async def deny(ctx, member: discord.Member, channel: discord.TextChannel):
                     await channel.send(embed=embed)
                     break
     except Exception as e:
-        error_channel = client.get_channel(523743721443950612)
         print(e)
-        await error_channel.send(f"Error in {ctx.channel.name} while running `deny`\n{e}\n<@!326399363943497728>")
+        await client.error_channel.send(f"Error in {ctx.channel.name} while running `deny`\n{e}\n<@!326399363943497728>")
 @deny.error
 async def deny_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
@@ -2197,9 +2190,12 @@ async def messagespam(ctx, *, x):
             await ctx.channel.purge(limit=1)
             await ctx.send(embed=embed)
     except Exception as e:
+        await client.wait_until_ready()
+        global error_channel 
         error_channel = client.get_channel(761227927583981598)
         print(e)
-        await error_channel.send(f"Error in {ctx.channel.name}\n{e}\n<@!326399363943497728>")
+        await client.error_channel.send(f"Error in {ctx.channel.name}\n{e}\n<@!326399363943497728>")
+        get_error_channel.start()
 
 
 
@@ -2318,9 +2314,8 @@ async def register(ctx, name):
             await ctx.send(embed=embed)
             print(e)
         else:
-            error_channel = client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while trying to use `register`\n{e}\n<@!326399363943497728>")
+            await client.error_channel.send(f"Error in {ctx.channel.name} while trying to use `register`\n{e}\n<@!326399363943497728>")
 
 
 @client.command()
@@ -2386,9 +2381,8 @@ async def sync(ctx, name):
             await ctx.send(embed=embed)
             print(e)
         else:
-            error_channel = client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while trying to use `sync`\n{e}\n<@!326399363943497728>")
+            await client.error_channel.send(f"Error in {ctx.channel.name} while trying to use `sync`\n{e}\n<@!326399363943497728>")
 
 
 @client.command(aliases=['fs'])
@@ -2465,9 +2459,8 @@ async def forcesync(ctx, member: discord.Member, name):
             await ctx.send(embed=embed)
             print(e)
         else:
-            error_channel = client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while trying to use `forcesync`\n{e}\n<@!326399363943497728>")
+            await client.error_channel.send(f"Error in {ctx.channel.name} while trying to use `forcesync`\n{e}\n<@!326399363943497728>")
 
 
 @client.command(aliases=["i"])
@@ -2618,9 +2611,8 @@ async def info(ctx, name=None):
             await ctx.send(embed=embed)
             print(e)
         else:
-            error_channel = client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while trying to use `i` \n{e}\n<@!326399363943497728>")
+            await client.error_channel.send(f"Error in {ctx.channel.name} while trying to use `i` \n{e}\n<@!326399363943497728>")
 
 
 # Do-Not-Kick-List
@@ -2744,9 +2736,8 @@ async def dnkladd(ctx, name = None, w = None, x = None, y = None, *, z = None):
             await ctx.send(embed=embed)
             print(e)
         else:
-            error_channel = client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error while trying to add a user to the DNKL\n{e}\n<@!326399363943497728>")
+            await client.error_channel.send(f"Error while trying to add a user to the DNKL\n{e}\n<@!326399363943497728>")
 @dnkladd.error
 async def dnkladd_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
@@ -2834,9 +2825,8 @@ async def dnkllist(ctx, raw=None):
             embed.set_footer(text=f'Total: {len(keys)}')
             await ctx.send(embed=embed)
     except Exception as e:
-        error_channel = client.get_channel(523743721443950612)
         print(e)
-        await error_channel.send(
+        await client.error_channel.send(
             f"Error in {ctx.channel.name} while running dnkllist"
             f"\n{e}\n<@!326399363943497728>")
 
@@ -2893,9 +2883,8 @@ async def bl(ctx, name, x, *, y):
             await ctx.send(embed=embed)
             print(e)
         else:
-            error_channel = client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while trying  to blacklist a user\n{e}\n<@!326399363943497728>")
+            await client.error_channel.send(f"Error in {ctx.channel.name} while trying  to blacklist a user\n{e}\n<@!326399363943497728>")
 @bl.error
 async def bl_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
@@ -2982,9 +2971,8 @@ async def ginfo(ctx, *, name):
             await ctx.send(embed=embed)
             print(e)
         else:
-            error_channel = client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while using `ginfo`\n{e}\n<@!326399363943497728>")
+            await client.error_channel.send(f"Error in {ctx.channel.name} while using `ginfo`\n{e}\n<@!326399363943497728>")
 @ginfo.error
 async def ginfo_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
@@ -3049,9 +3037,8 @@ async def gexp(ctx, gname):
             await ctx.send(embed=embed)
             print(e)
         else:
-            error_channel = client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while using `gexp`\n{e}\n<@!326399363943497728>")
+            await client.error_channel.send(f"Error in {ctx.channel.name} while using `gexp`\n{e}\n<@!326399363943497728>")
 @gexp.error
 async def gexp_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
@@ -3109,9 +3096,8 @@ async def gactive(ctx):
             await ctx.send(embed=embed)
             print(e)
         else:
-            error_channel = client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while using `gactive`\n{e}\n<@!326399363943497728>")
+            await client.error_channel.send(f"Error in {ctx.channel.name} while using `gactive`\n{e}\n<@!326399363943497728>")
 
 
 @client.command()
@@ -3166,9 +3152,8 @@ async def ginactive(ctx):
             await ctx.send(embed=embed)
             print(e)
         else:
-            error_channel = client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while using `ginactive`\n"
+            await client.error_channel.send(f"Error in {ctx.channel.name} while using `ginactive`\n"
                                      f"{e}\n<@!326399363943497728>")
 
 
@@ -3237,9 +3222,8 @@ async def grank(ctx, reqrank):
             await ctx.send(embed=embed)
             print(e)
         else:
-            error_channel = client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while using `grank`\n{e}\n<@!326399363943497728>")
+            await client.error_channel.send(f"Error in {ctx.channel.name} while using `grank`\n{e}\n<@!326399363943497728>")
 
 
 @client.command(aliases=['gm', 'g'])
@@ -3377,9 +3361,8 @@ async def gmember(ctx, name=None):
             await ctx.send(embed=embed)
             print(e)
         else:
-            error_channel = client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while using `g` \n{e}\n<@!326399363943497728>")
+            await client.error_channel.send(f"Error in {ctx.channel.name} while using `g` \n{e}\n<@!326399363943497728>")
 
 
 @client.command(aliases=['dnklchk'])
@@ -3441,9 +3424,8 @@ async def dnklcheck(ctx, name=None):
             await ctx.send(embed=embed)
             print(e)
         else:
-            error_channel = client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while using `dnklchk`\n{e}\n<@!326399363943497728>")
+            await client.error_channel.send(f"Error in {ctx.channel.name} while using `dnklchk`\n{e}\n<@!326399363943497728>")
 
 
 @client.command(aliases=["gt"], pass_context=True)
@@ -3609,9 +3591,8 @@ async def gtop(ctx):
             await ctx.send(embed=embed)
             print(e)
         else:
-            error_channel = client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while using `gtop`\n{e}\n<@!326399363943497728>")
+            await client.error_channel.send(f"Error in {ctx.channel.name} while using `gtop`\n{e}\n<@!326399363943497728>")
 
 
 @client.command()
@@ -3780,9 +3761,8 @@ async def dailylb(ctx, x=1):
             await ctx.send(embed=embed)
             print(e)
         else:
-            error_channel = client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while using `dailylb`\n{e}\n<@!326399363943497728>")
+            await client.error_channel.send(f"Error in {ctx.channel.name} while using `dailylb`\n{e}\n<@!326399363943497728>")
 
 '-------------------------------------------------------------------------------------------------------STAFF COMMANDS----------------------------------------------------------------------------------------------------------'
 
@@ -3965,9 +3945,8 @@ async def staff(ctx):
             await ctx.send(embed=embed)
             print(e)
         else:
-            error_channel = client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while using `staff`\n{e}\n<@!326399363943497728>")
+            await client.error_channel.send(f"Error in {ctx.channel.name} while using `staff`\n{e}\n<@!326399363943497728>")
 
 
 @client.command()
@@ -4009,9 +3988,8 @@ async def staffreview(ctx):
             await ctx.send(embed=embed)
 
     except Exception as e:
-        error_channel = client.get_channel(523743721443950612)
         print(e)
-        await error_channel.send(f"Error in {ctx.channel.name} while using `staffreview`\n{e}\n<@!326399363943497728>")
+        await client.error_channel.send(f"Error in {ctx.channel.name} while using `staffreview`\n{e}\n<@!326399363943497728>")
 
 
 @client.command()
@@ -4177,14 +4155,12 @@ async def rolecheck(ctx):
             await ctx.send(embed=embed)
             print(e)
         elif str(e) == "404 Not Found (error code: 10011): Unknown Role":
-            error_channel = client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n{ctx.author.mention} please `forcesync` the last user on the list.")
+            await client.error_channel.send(f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n{ctx.author.mention} please `forcesync` the last user on the list.")
 
         else:
-            error_channel = client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(
+            await client.error_channel.send(
                 f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n<@!326399363943497728>")
 
 
@@ -4315,14 +4291,12 @@ async def newrolecheck(ctx):
             await ctx.send(embed=embed)
             print(e)
         elif str(e) == "404 Not Found (error code: 10011): Unknown Role":
-            error_channel = client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n{ctx.author.mention} please `forcesync` the last user on the list.")
+            await client.error_channel.send(f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n{ctx.author.mention} please `forcesync` the last user on the list.")
 
         else:
-            error_channel = client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(
+            await client.error_channel.send(
                 f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n<@!326399363943497728>")
 
 # ------------------------------------------------------------------------------------WIP-------------------------------------------------------------------------#
@@ -4384,4 +4358,10 @@ async def ticketss(ctx):
     await ctx.send(embed=embed2)
 
 
+@tasks.loop()
+async def get_error_channel():
+    await client.wait_until_ready()
+    client.error_channel = client.get_channel(523743721443950612)
+
+get_error_channel.start()
 client.run(configFile['Token'])
