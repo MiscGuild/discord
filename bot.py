@@ -18,7 +18,7 @@ intents.members = True
 client = commands.Bot(command_prefix=[',', '@Miscellaneous#4333'], intents=intents, case_insensitive=True)
 
 client.remove_command('help')
-error_channel = client.get_channel(523743721443950612)
+error_channel = None
 
 resident_req = int(50000)
 active = int(275000)
@@ -34,6 +34,11 @@ async def on_ready():
     try:
         statuses = ['with Miscellaneous members!', 'with cool kids of Miscellaneous!']
         print('The Bot is up and running!')
+
+        await client.wait_until_ready()
+        global error_channel 
+        error_channel = client.get_channel(523743721443950612)
+
         for status in statuses:
             await client.change_presence(status=discord.Status.idle, activity=discord.Game(status))
             await asyncio.sleep(600)
@@ -2043,9 +2048,13 @@ async def messagespam(ctx, *, x):
             await ctx.channel.purge(limit=1)
             await ctx.send(embed=embed)
     except Exception as e:
+        await client.wait_until_ready()
+        global error_channel 
         error_channel = client.get_channel(761227927583981598)
         print(e)
         await error_channel.send(f"Error in {ctx.channel.name}\n{e}\n<@!326399363943497728>")
+        await client.wait_until_ready()
+        global error_channel
         error_channel = client.get_channel(523743721443950612)
 
 
