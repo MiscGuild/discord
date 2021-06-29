@@ -78,7 +78,7 @@ class Moderation(commands.Cog, name="Moderation"):
     @kick.error
     async def kick_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            embed = discord.Embed(title='Please specify the player to be banned! The syntax is as follows',
+            embed = discord.Embed(title='Please specify the user to be kicked! The syntax is as follows',
                                 description="kick `Discord @` `reason`", color=0xff0000)
             await ctx.channel.purge(limit=1)
             await ctx.send(embed=embed)
@@ -105,7 +105,7 @@ class Moderation(commands.Cog, name="Moderation"):
     @ban.error
     async def ban_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            embed = discord.Embed(title='Please specify the player to be banned! The syntax is as follows',
+            embed = discord.Embed(title='Please specify the user to be banned! The syntax is as follows',
                                 description="ban `Discord @` `reason`", color=0xff0000)
             await ctx.channel.purge(limit=1)
             await ctx.send(embed=embed)
@@ -136,7 +136,7 @@ class Moderation(commands.Cog, name="Moderation"):
     @unban.error
     async def unban_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            embed = discord.Embed(title='Please specify the player to be banned! The syntax is as follows',
+            embed = discord.Embed(title='Please specify the user to be unbanned! The syntax is as follows',
                                 description="unban `Discord @`", color=0xff0000)
             await ctx.channel.purge(limit=1)
             await ctx.send(embed=embed)
