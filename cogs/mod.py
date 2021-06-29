@@ -99,9 +99,8 @@ class Moderation(commands.Cog, name="Moderation"):
             await member.ban(reason=reason)
             await ctx.send(f"{member} was banned!")
         except Exception as e:
-            error_channel = self.client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while trying to use `ban`\n{e}\n<@!326399363943497728>")
+            await self.client.error_channel.send(f"Error in {ctx.channel.name} while trying to use `ban`\n{e}\n<@!326399363943497728>")
 
     @ban.error
     async def ban_error(self, ctx, error):

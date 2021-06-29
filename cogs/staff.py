@@ -123,9 +123,8 @@ class staff(commands.Cog, name="Staff"):
                     embed.set_footer(text=f"Total: {count}")
                     await ctx.send(embed=embed)
         except Exception as e:
-            error_channel = self.client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while running `participants`"
+            await self.client.error_channel.send(f"Error in {ctx.channel.name} while running `participants`"
                                     f"\n{e}\n<@!326399363943497728>")
 
     @commands.command(aliases=['switch','swapper'])
@@ -160,9 +159,8 @@ class staff(commands.Cog, name="Staff"):
             with open('eventparticipants.json', 'w') as event_participants:
                 json.dump(data, event_participants)
         except Exception as e:
-            error_channel = self.client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(
+            await self.client.error_channel.send(
                 f"Error in {ctx.channel.name} while running dnkllist"
                 f"Error in {ctx.channel.name} while running `swap`"
                 f"\n{e}\n<@!326399363943497728>")
@@ -358,9 +356,8 @@ class staff(commands.Cog, name="Staff"):
                 await ctx.send(embed=embed)
                 print(e)
             else:
-                error_channel = self.client.get_channel(523743721443950612)
                 print(e)
-                await error_channel.send(f"Error in {ctx.channel.name} while using `staff`\n{e}\n<@!326399363943497728>")
+                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `staff`\n{e}\n<@!326399363943497728>")
             
     @commands.command()
     @commands.has_role(538015368782807040)
@@ -534,14 +531,12 @@ class staff(commands.Cog, name="Staff"):
                 await ctx.send(embed=embed)
                 print(e)
             elif str(e) == "404 Not Found (error code: 10011): Unknown Role":
-                error_channel = self.client.get_channel(523743721443950612)
                 print(e)
-                await error_channel.send(f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n{ctx.author.mention} please `forcesync` the last user on the list.")
+                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n{ctx.author.mention} please `forcesync` the last user on the list.")
 
             else:
-                error_channel = self.client.get_channel(523743721443950612)
                 print(e)
-                await error_channel.send(
+                await self.client.error_channel.send(
                     f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n<@!326399363943497728>")
 
     @commands.command(aliases=['ForceSync', 'Forcesync', 'forceSync', 'FORCESYNC', 'fs', 'Fs', 'FS', 'fS'])
@@ -621,9 +616,8 @@ class staff(commands.Cog, name="Staff"):
                 await ctx.send(embed=embed)
                 print(e)
             else:
-                error_channel = self.client.get_channel(523743721443950612)
                 print(e)
-                await error_channel.send(f"Error in {ctx.channel.name} while trying to use `forcesync`\n{e}\n<@!326399363943497728>")
+                await self.client.error_channel.send(f"Error in {ctx.channel.name} while trying to use `forcesync`\n{e}\n<@!326399363943497728>")
 
     @commands.command()
     @commands.has_role(522588118251995147)
@@ -665,9 +659,8 @@ class staff(commands.Cog, name="Staff"):
                 await ctx.send(embed=embed)
 
         except Exception as e:
-            error_channel = self.client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while using `staffreview`\n{e}\n<@!326399363943497728>")
+            await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `staffreview`\n{e}\n<@!326399363943497728>")
 
     @commands.command()
     @commands.has_role(538015368782807040)
@@ -796,14 +789,12 @@ class staff(commands.Cog, name="Staff"):
                 await ctx.send(embed=embed)
                 print(e)
             elif str(e) == "404 Not Found (error code: 10011): Unknown Role":
-                error_channel = self.client.get_channel(523743721443950612)
                 print(e)
-                await error_channel.send(f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n{ctx.author.mention} please `forcesync` the last user on the list.")
+                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n{ctx.author.mention} please `forcesync` the last user on the list.")
 
             else:
-                error_channel = self.client.get_channel(523743721443950612)
                 print(e)
-                await error_channel.send(
+                await self.client.error_channel.send(
                     f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n<@!326399363943497728>")
 
     @commands.command()
