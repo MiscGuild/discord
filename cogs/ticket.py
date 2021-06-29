@@ -114,9 +114,9 @@ class Tickets(commands.Cog, name="Tickets"):
                 else:
                     await ctx.send('This command can only be used in the registration channel!')
         except Exception as e:
-            error_channel = self.client.get_channel(523743721443950612)
+
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while trying to use `register`\n{e}\n<@!326399363943497728>")
+            await self.client.error_channel.send(f"Error in {ctx.channel.name} while trying to use `register`\n{e}\n<@!326399363943497728>")
 
     @commands.command(aliases=['del'])
     async def delete(self, ctx):
@@ -142,9 +142,8 @@ class Tickets(commands.Cog, name="Tickets"):
                                         description="", color=0x8368ff)
                     await logs.send(embed=embed)
         except Exception as e:
-            error_channel = self.client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name}\n{e}\n<@!326399363943497728>")
+            await self.client.error_channel.send(f"Error in {ctx.channel.name}\n{e}\n<@!326399363943497728>")
 
     @commands.command()
     @commands.has_role(522588118251995147)
@@ -158,9 +157,8 @@ class Tickets(commands.Cog, name="Tickets"):
                                     "#staff-faq")
                 await ctx.send(embed=embed)
         except Exception as e:
-            error_channel = self.client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while running `deny`\n{e}\n<@!326399363943497728>")
+            await self.client.error_channel.send(f"Error in {ctx.channel.name} while running `deny`\n{e}\n<@!326399363943497728>")
     @accept.error
     async def accept_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
@@ -251,9 +249,8 @@ class Tickets(commands.Cog, name="Tickets"):
                     await channel.send(embed=embed)
                     break
         except Exception as e:
-            error_channel = self.client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(f"Error in {ctx.channel.name} while running `deny`\n{e}\n<@!326399363943497728>")
+            await self.client.error_channel.send(f"Error in {ctx.channel.name} while running `deny`\n{e}\n<@!326399363943497728>")
     @deny.error
     async def deny_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):

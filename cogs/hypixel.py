@@ -76,9 +76,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.send(embed=embed)
                 print(e)
             else:
-                error_channel = self.client.get_channel(523743721443950612)
                 print(e)
-                await error_channel.send(f"Error in {ctx.channel.name} while trying to use `sync`\n{e}\n<@!326399363943497728>")
+                await self.client.error_channel.send(f"Error in {ctx.channel.name} while trying to use `sync`\n{e}\n<@!326399363943497728>")
 
     @sync.error
     async def sync_error(self, ctx, error):
@@ -241,9 +240,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.send(embed=embed)
                 print(e)
             else:
-                error_channel = self.client.get_channel(523743721443950612)
                 print(e)
-                await error_channel.send(f"Error in {ctx.channel.name} while trying to use `i` \n{e}\n<@!326399363943497728>")
+                await self.client.error_channel.send(f"Error in {ctx.channel.name} while trying to use `i` \n{e}\n<@!326399363943497728>")
 
     # Do-Not-Kick-List
     @commands.command(aliases=["Dnkladd", "DNKLADD", "DnklAdd"])
@@ -377,9 +375,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.send(embed=embed)
                 print(e)
             else:
-                error_channel = self.client.get_channel(523743721443950612)
                 print(e)
-                await error_channel.send(f"Error while trying to add a user to the DNKL\n{e}\n<@!326399363943497728>")
+                await self.client.error_channel.send(f"Error while trying to add a user to the DNKL\n{e}\n<@!326399363943497728>")
     @dnkladd.error
     async def dnkladd_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
@@ -473,9 +470,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 embed.set_footer(text=f'Total: {len(keys)}')
                 await ctx.send(embed=embed)
         except Exception as e:
-            error_channel = self.client.get_channel(523743721443950612)
             print(e)
-            await error_channel.send(
+            await self.client.error_channel.send(
                 f"Error in {ctx.channel.name} while running dnkllist"
                 f"\n{e}\n<@!326399363943497728>")
 
@@ -540,9 +536,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.send(embed=embed)
                 print(e)
             else:
-                error_channel = self.client.get_channel(523743721443950612)
                 print(e)
-                await error_channel.send(f"Error in {ctx.channel.name} while trying  to blacklist a user\n{e}\n<@!326399363943497728>")
+                await self.client.error_channel.send(f"Error in {ctx.channel.name} while trying  to blacklist a user\n{e}\n<@!326399363943497728>")
     @bl.error
     async def bl_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
@@ -630,9 +625,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.send(embed=embed)
                 print(e)
             else:
-                error_channel = self.client.get_channel(523743721443950612)
                 print(e)
-                await error_channel.send(f"Error in {ctx.channel.name} while using `ginfo`\n{e}\n<@!326399363943497728>")
+                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `ginfo`\n{e}\n<@!326399363943497728>")
     @ginfo.error
     async def ginfo_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
@@ -698,9 +692,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.send(embed=embed)
                 print(e)
             else:
-                error_channel = self.client.get_channel(523743721443950612)
                 print(e)
-                await error_channel.send(f"Error in {ctx.channel.name} while using `gexp`\n{e}\n<@!326399363943497728>")
+                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `gexp`\n{e}\n<@!326399363943497728>")
     @gexp.error
     async def gexp_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
@@ -763,9 +756,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.send(embed=embed)
                 print(e)
             else:
-                error_channel = self.client.get_channel(523743721443950612)
                 print(e)
-                await error_channel.send(f"Error in {ctx.channel.name} while using `gactive`\n{e}\n<@!326399363943497728>")
+                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `gactive`\n{e}\n<@!326399363943497728>")
 
     @commands.command(aliases=['Ginactive'])
     async def ginactive(self, ctx):
@@ -825,9 +817,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.send(embed=embed)
                 print(e)
             else:
-                error_channel = self.client.get_channel(523743721443950612)
                 print(e)
-                await error_channel.send(f"Error in {ctx.channel.name} while using `ginactive`\n"
+                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `ginactive`\n"
                                         f"{e}\n<@!326399363943497728>")
 
     @commands.command(aliases=['gr', 'Gr', 'Grank'])
@@ -902,9 +893,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.send(embed=embed)
                 print(e)
             else:
-                error_channel = self.client.get_channel(523743721443950612)
                 print(e)
-                await error_channel.send(f"Error in {ctx.channel.name} while using `grank`\n{e}\n<@!326399363943497728>")
+                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `grank`\n{e}\n<@!326399363943497728>")
 
     @commands.command(aliases=['gm', 'Gm', 'Gmember', 'g', 'G'])
     async def gmember(self, ctx, name=None):
@@ -1048,9 +1038,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.send(embed=embed)
                 print(e)
             else:
-                error_channel = self.client.get_channel(523743721443950612)
                 print(e)
-                await error_channel.send(f"Error in {ctx.channel.name} while using `g` \n{e}\n<@!326399363943497728>")
+                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `g` \n{e}\n<@!326399363943497728>")
 
     @commands.command(aliases=['dnklchk', 'Dnklchk', 'DNKLCHK', 'Dnklcheck', 'DNKLCHECK'])
     async def dnklcheck(self, ctx, name=None):
@@ -1119,9 +1108,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.send(embed=embed)
                 print(e)
             else:
-                error_channel = self.client.get_channel(523743721443950612)
                 print(e)
-                await error_channel.send(f"Error in {ctx.channel.name} while using `dnklchk`\n{e}\n<@!326399363943497728>")
+                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `dnklchk`\n{e}\n<@!326399363943497728>")
 
     @commands.command(aliases=["Gtop", "gt", "Gt"])
     async def gtop(self, ctx):
@@ -1296,9 +1284,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.send(embed=embed)
                 print(e)
             else:
-                error_channel = self.client.get_channel(523743721443950612)
                 print(e)
-                await error_channel.send(f"Error in {ctx.channel.name} while using `gtop`\n{e}\n<@!326399363943497728>")
+                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `gtop`\n{e}\n<@!326399363943497728>")
 
     @commands.command()
     async def dailylb(self, ctx, x=1):
@@ -1478,9 +1465,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.send(embed=embed)
                 print(e)
             else:
-                error_channel = self.client.get_channel(523743721443950612)
                 print(e)
-                await error_channel.send(f"Error in {ctx.channel.name} while using `dailylb`\n{e}\n<@!326399363943497728>")
+                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `dailylb`\n{e}\n<@!326399363943497728>")
 
 def setup(bot):
     bot.add_cog(Hypixel(bot))
