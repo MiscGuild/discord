@@ -18,12 +18,12 @@ class Tickets(commands.Cog, name="Tickets"):
                         async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
                             request = resp
                             if request.status != 200:
+                                error = True
                                 await ctx.send('Unknown IGN!')
                             request = await request.json()
                             await session.close()
-                    if request.status != 200:
-                        await ctx.send('Please enter a valid ign!')
-                    else:
+
+                    if error not True:
                         request = await request.json()
                         ign = request['name']
                         uuid = request['id']
