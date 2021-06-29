@@ -165,7 +165,7 @@ class Tickets(commands.Cog, name="Tickets"):
     @accept.error
     async def accept_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            embed = discord.Embed(title='Please specify the player to be accepted! The syntax is as follows',
+            embed = discord.Embed(title='Please specify the user to be accepted! The syntax is as follows',
                                 description="accept `Discord @`", color=0xff0000)
             await ctx.channel.purge(limit=1)
             await ctx.send(embed=embed)
@@ -260,7 +260,7 @@ class Tickets(commands.Cog, name="Tickets"):
     @deny.error
     async def deny_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            embed = discord.Embed(title='Please specify the player to be denied! The syntax is as follows',
+            embed = discord.Embed(title='Please specify the user to be denied! The syntax is as follows',
                                 description="deny `Discord @` `Discord Channel #`", color=0xff0000)
             await ctx.channel.purge(limit=1)
             await ctx.send(embed=embed)
