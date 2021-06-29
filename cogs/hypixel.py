@@ -244,7 +244,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await self.client.error_channel.send(f"Error in {ctx.channel.name} while trying to use `i` \n{e}\n<@!326399363943497728>")
 
     # Do-Not-Kick-List
-    @commands.command(aliases=["Dnkladd", "DNKLADD", "DnklAdd"])
+    @commands.command()
     @commands.has_permissions(manage_messages=True)
     async def dnkladd(self, ctx, name = None, w = None, x = None, y = None, *, z = None):
         """Adds the user to the do-not-kick-list!
@@ -392,7 +392,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             await ctx.channel.purge(limit=1)
             await ctx.send(embed=embed)
 
-    @commands.command(aliases=['dnklrmv', 'Dnklrmv', 'DNKLRMV', 'DNKLrmv', 'DnklRmv'])
+    @commands.command(aliases=['dnklrmv'])
     @commands.has_permissions(manage_messages=True)
     async def dnklremove(self, ctx, name):
         """Removes a user from the do not kick list!
@@ -451,7 +451,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             await ctx.channel.purge(limit=1)
             await ctx.send(embed=embed)
 
-    @commands.command(aliases=['Dnkllist', 'DNKLLIST', 'DnklList'])
+    @commands.command()
     async def dnkllist(self, ctx, raw=None):
         try:
             name = ""
@@ -476,7 +476,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 f"\n{e}\n<@!326399363943497728>")
 
     # Blacklist
-    @commands.command(aliases=["blacklist", "Blacklist", "Bl"])
+    @commands.command(aliases=["blacklist"])
     @commands.has_permissions(manage_messages=True)
     async def bl(self, ctx, name, time, *, reason):
         """Adds the user to the guild blacklist
@@ -551,7 +551,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             await ctx.channel.purge(limit=1)
             await ctx.send(embed=embed)
 
-    @commands.command(aliases=["gi", "Gi", "GI"])
+    @commands.command(aliases=["gi"])
     async def ginfo(self, ctx, *, name):
         """Gives basic information about the requested guild.
         """
@@ -635,7 +635,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             await ctx.channel.purge(limit=1)
             await ctx.send(embed=embed)
 
-    @commands.command(aliases=['ge', "Ge", "Gexp"])
+    @commands.command(aliases=['ge'])
     async def gexp(self, ctx, gname):
         """Lists the guild experience of the requested guild!
         """
@@ -702,7 +702,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             await ctx.channel.purge(limit=1)
             await ctx.send(embed=embed)
 
-    @commands.command(aliases=["Gactive"])
+    @commands.command()
     async def gactive(self, ctx):
         """Lists all the users in the guild who are eligible for active rank.
         """
@@ -759,7 +759,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
                 await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `gactive`\n{e}\n<@!326399363943497728>")
 
-    @commands.command(aliases=['Ginactive'])
+    @commands.command()
     async def ginactive(self, ctx):
         """Lists all the users in the guild who don't meet the guild requirements.
         """
@@ -821,7 +821,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `ginactive`\n"
                                         f"{e}\n<@!326399363943497728>")
 
-    @commands.command(aliases=['gr', 'Gr', 'Grank'])
+    @commands.command(aliases=['gr'])
     async def grank(self, ctx, reqrank):
         """Lists the guild experience of users with the specified rank.
         """
@@ -896,7 +896,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
                 await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `grank`\n{e}\n<@!326399363943497728>")
 
-    @commands.command(aliases=['gm', 'Gm', 'Gmember', 'g', 'G'])
+    @commands.command(aliases=['gm', 'g'])
     async def gmember(self, ctx, name=None):
         """Gives the guild experience earned by the user over the course of a week.
         """
@@ -992,9 +992,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
                                 else:
                                     break
-                            if ctx.channel.name == "general":
+                            if ctx.channel.name != "bot-channel":
                                 name = name.replace("_",        "\_")
-                                await ctx.send(f"__**{name}**__\n**Guild Experience-** `{totalexp}`")
+                                await ctx.send(f"__**{name}**__\n**Guild Experience -** `{totalexp}`")
                             else:
                                 embed = discord.Embed(title=f"{name}",
                                                     url=f'https://plancke.io/hypixel/player/stats/{name}',
@@ -1041,7 +1041,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
                 await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `g` \n{e}\n<@!326399363943497728>")
 
-    @commands.command(aliases=['dnklchk', 'Dnklchk', 'DNKLCHK', 'Dnklcheck', 'DNKLCHECK'])
+    @commands.command(aliases=['dnklchk'])
     async def dnklcheck(self, ctx, name=None):
         """A command to check whether or not you can apply for the do-not-kick-list.
         """
@@ -1111,7 +1111,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
                 await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `dnklchk`\n{e}\n<@!326399363943497728>")
 
-    @commands.command(aliases=["Gtop", "gt", "Gt"])
+    @commands.command(aliases=["gt"])
     async def gtop(self, ctx):
         """Gives the weekly guild experience leaderboard!
         """
