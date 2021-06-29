@@ -20,7 +20,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             request = await request.json()
                             await session.close()
 
-                    if 'error' in request:
+                    if resp.status != 200:
                         await ctx.send('Please enter a valid ign!')
                     else:
                         ign = request['name']
