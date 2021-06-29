@@ -69,6 +69,10 @@ client.loop.create_task(on_ready())
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
         return
+    elif isinstance(error, commands.NotOwner):
+            embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
+                                    description="You are not the owner of this bot!", color=0xff0000)
+            await ctx.send(embed=embed)
 
 @client.event
 async def on_member_join(member):
