@@ -1,8 +1,4 @@
 #Rowdies dont leak anything plz 
-# Project data files
-config.json
-dnkl.json
-eventparticipants.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -11,6 +7,14 @@ __pycache__/
 
 # C extensions
 *.so
+
+# VsCode
+.vscode/
+
+#Configs n stuff
+dnkl.json
+eventparticipants.json
+config.toml
 
 # PyCharm
 .idea
@@ -113,6 +117,7 @@ celerybeat.pid
 
 # Environments
 .env
+config.json
 .venv
 env/
 venv/
