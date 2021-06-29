@@ -1065,6 +1065,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
                     data = await resp.json()
+                    if data['guild'] == None:
+                        await ctx.send('You are not in a guild!')
+                        return
                     await session.close()
             gname = data['guild']['name']
             if gname != 'Miscellaneous':
