@@ -2,8 +2,8 @@ import discord
 from discord.ext import commands
 
 class Moderation(commands.Cog, name="Moderation"):
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
 
     # Mute
     @commands.command()
@@ -100,7 +100,7 @@ class Moderation(commands.Cog, name="Moderation"):
             await ctx.send(f"{member} was banned!")
         except Exception as e:
             print(e)
-            await self.client.error_channel.send(f"Error in {ctx.channel.name} while trying to use `ban`\n{e}\n<@!326399363943497728>")
+            await self.bot.error_channel.send(f"Error in {ctx.channel.name} while trying to use `ban`\n{e}\n<@!326399363943497728>")
 
     @ban.error
     async def ban_error(self, ctx, error):

@@ -9,8 +9,8 @@ from quickchart import QuickChart
 from io import BytesIO
 
 class Hypixel(commands.Cog, name="Hypixel"):
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
 
     @commands.command()
     async def sync(self, ctx, name):
@@ -77,7 +77,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
             else:
                 print(e)
-                await self.client.error_channel.send(f"Error in {ctx.channel.name} while trying to use `sync`\n{e}\n<@!326399363943497728>")
+                await self.bot.error_channel.send(f"Error in {ctx.channel.name} while trying to use `sync`\n{e}\n<@!326399363943497728>")
 
     @sync.error
     async def sync_error(self, ctx, error):
@@ -241,7 +241,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
             else:
                 print(e)
-                await self.client.error_channel.send(f"Error in {ctx.channel.name} while trying to use `i` \n{e}\n<@!326399363943497728>")
+                await self.bot.error_channel.send(f"Error in {ctx.channel.name} while trying to use `i` \n{e}\n<@!326399363943497728>")
 
     # Do-Not-Kick-List
     @commands.command()
@@ -299,7 +299,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             else:
                 await ctx.send("**What is the name of the user you wish to add to the do not kick list?**")
 
-                name = await self.client.wait_for('message', check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+                name = await self.bot.wait_for('message', check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
                 name = name.content
                 ign = await hypixel.get_dispname(name)
                 rank = await hypixel.get_rank(name)
@@ -317,17 +317,17 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     await ctx.send('Unknown IGN!')
                 else:
                     await ctx.send("**What is the start date?** (DD/MM/YYYY)")
-                    start_date = await self.client.wait_for('message',
+                    start_date = await self.bot.wait_for('message',
                                                 check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
                     start_date = start_date.content
                     await ctx.send("**What is the end date?** (DD/MM/YYYY)")
-                    end_date = await self.client.wait_for('message',
+                    end_date = await self.bot.wait_for('message',
                                                     check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
                     end_date = end_date.content
 
                     await ctx.send("**What is the reason behind their inactivity?**")
 
-                    reason = await self.client.wait_for('message',
+                    reason = await self.bot.wait_for('message',
                                                     check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
                     reason = reason.content
                     a, b, c = start_date.split('/')
@@ -356,7 +356,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         embed.add_field(name="End:", value=f"{p} {end_month} {r}", inline=False)
                         embed.add_field(name="Reason", value=f"{reason}", inline=False)
                         embed.set_author(name="Do not kick list")
-                        dnkl_channel = self.client.get_channel(629564802812870657)
+                        dnkl_channel = self.bot.get_channel(629564802812870657)
                         message = await dnkl_channel.send(embed=embed)
 
                         dnkl_dict = {ign: message.id}
@@ -376,7 +376,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
             else:
                 print(e)
-                await self.client.error_channel.send(f"Error while trying to add a user to the DNKL\n{e}\n<@!326399363943497728>")
+                await self.bot.error_channel.send(f"Error while trying to add a user to the DNKL\n{e}\n<@!326399363943497728>")
     @dnkladd.error
     async def dnkladd_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
@@ -418,7 +418,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             with open('dnkl.json', 'w') as f:
                 json.dump(data, f)
 
-            dnkl_channel = self.client.get_channel(629564802812870657)
+            dnkl_channel = self.bot.get_channel(629564802812870657)
 
             msg = await dnkl_channel.fetch_message(msgid)
             await msg.delete()
@@ -471,7 +471,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.send(embed=embed)
         except Exception as e:
             print(e)
-            await self.client.error_channel.send(
+            await self.bot.error_channel.send(
                 f"Error in {ctx.channel.name} while running dnkllist"
                 f"\n{e}\n<@!326399363943497728>")
 
@@ -537,7 +537,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
             else:
                 print(e)
-                await self.client.error_channel.send(f"Error in {ctx.channel.name} while trying  to blacklist a user\n{e}\n<@!326399363943497728>")
+                await self.bot.error_channel.send(f"Error in {ctx.channel.name} while trying  to blacklist a user\n{e}\n<@!326399363943497728>")
     @bl.error
     async def bl_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
@@ -626,7 +626,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
             else:
                 print(e)
-                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `ginfo`\n{e}\n<@!326399363943497728>")
+                await self.bot.error_channel.send(f"Error in {ctx.channel.name} while using `ginfo`\n{e}\n<@!326399363943497728>")
     @ginfo.error
     async def ginfo_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
@@ -693,7 +693,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
             else:
                 print(e)
-                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `gexp`\n{e}\n<@!326399363943497728>")
+                await self.bot.error_channel.send(f"Error in {ctx.channel.name} while using `gexp`\n{e}\n<@!326399363943497728>")
     @gexp.error
     async def gexp_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
@@ -719,7 +719,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             async with ctx.channel.typing():
                 for i in range(len(g['members'])):
                     expHistory = sum(g['members'][i]['exp_history'].values())
-                    if expHistory >= self.client.active:
+                    if expHistory >= self.bot.active:
                         uuid = g['members'][i]['uuid']
                         async with aiohttp.ClientSession() as session:
                             async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
@@ -757,7 +757,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
             else:
                 print(e)
-                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `gactive`\n{e}\n<@!326399363943497728>")
+                await self.bot.error_channel.send(f"Error in {ctx.channel.name} while using `gactive`\n{e}\n<@!326399363943497728>")
 
     @commands.command()
     async def ginactive(self, ctx):
@@ -776,7 +776,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             async with ctx.channel.typing():
                 for i in range(len(g['members'])):
                     expHistory = sum(g['members'][i]['exp_history'].values())
-                    if expHistory < self.client.inactive:
+                    if expHistory < self.bot.inactive:
                         uuid = g['members'][i]['uuid']
                         async with aiohttp.ClientSession() as session:
                             async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
@@ -818,7 +818,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
             else:
                 print(e)
-                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `ginactive`\n"
+                await self.bot.error_channel.send(f"Error in {ctx.channel.name} while using `ginactive`\n"
                                         f"{e}\n<@!326399363943497728>")
 
     @commands.command(aliases=['gr'])
@@ -894,7 +894,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
             else:
                 print(e)
-                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `grank`\n{e}\n<@!326399363943497728>")
+                await self.bot.error_channel.send(f"Error in {ctx.channel.name} while using `grank`\n{e}\n<@!326399363943497728>")
 
     @commands.command(aliases=['gm', 'g'])
     async def gmember(self, ctx, name=None):
@@ -954,14 +954,14 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             totalexp = sum(totalexp.values())
 
                             if rank == "Resident":
-                                if totalexp > self.client.resident_req:
+                                if totalexp > self.bot.resident_req:
                                     colour, GraphColor, GraphBorder = hypixel.get_color("res_met")
                                 else:
                                     colour, GraphColor, GraphBorder = hypixel.get_color("res_not_met")
                             else:
-                                if totalexp > self.client.active:
+                                if totalexp > self.bot.active:
                                     colour, GraphColor, GraphBorder = hypixel.get_color("active")
-                                elif totalexp > self.client.inactive:
+                                elif totalexp > self.bot.inactive:
                                     colour, GraphColor, GraphBorder = hypixel.get_color("member")
                                 else:
                                     colour, GraphColor, GraphBorder = hypixel.get_color("inactive")
@@ -1039,7 +1039,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
             else:
                 print(e)
-                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `g` \n{e}\n<@!326399363943497728>")
+                await self.bot.error_channel.send(f"Error in {ctx.channel.name} while using `g` \n{e}\n<@!326399363943497728>")
 
     @commands.command(aliases=['dnklchk'])
     async def dnklcheck(self, ctx, name=None):
@@ -1078,7 +1078,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         member = member
                         totalexp = member['expHistory']
                         totalexp = int(sum(totalexp.values()))
-                        if totalexp >= self.client.dnkl:
+                        if totalexp >= self.bot.dnkl:
                             eligiblity = True
                         else:
                             eligiblity = False
@@ -1090,7 +1090,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
                             embed.set_author(name="Do-not-kick-list: Eligibility Check")
                             embed.add_field(name="You are not eligible to apply for the do not kick list.",
-                                            value=f"You need a minimum of {format(self.client.dnkl,',d')} weekly guild experience.\n You have {totalexp} weekly guild experience.",
+                                            value=f"You need a minimum of {format(self.bot.dnkl,',d')} weekly guild experience.\n You have {totalexp} weekly guild experience.",
                                             inline=True)
                         else:
                             embed = discord.Embed(title=name,
@@ -1099,7 +1099,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
                             embed.set_author(name='Do-not-kick-list: Eligibility Check')
                             embed.add_field(name="You are eligible to apply for the do not kick list.",
-                                            value=f"You meet the minimum of {format(self.client.dnkl,',d')} weekly guild experience.\n You have {totalexp} weekly guild experience.",
+                                            value=f"You meet the minimum of {format(self.bot.dnkl,',d')} weekly guild experience.\n You have {totalexp} weekly guild experience.",
                                             inline=True)
                         await ctx.send(embed=embed)
         except Exception as e:
@@ -1109,7 +1109,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
             else:
                 print(e)
-                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `dnklchk`\n{e}\n<@!326399363943497728>")
+                await self.bot.error_channel.send(f"Error in {ctx.channel.name} while using `dnklchk`\n{e}\n<@!326399363943497728>")
 
     @commands.command(aliases=["gt"])
     async def gtop(self, ctx):
@@ -1285,7 +1285,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
             else:
                 print(e)
-                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `gtop`\n{e}\n<@!326399363943497728>")
+                await self.bot.error_channel.send(f"Error in {ctx.channel.name} while using `gtop`\n{e}\n<@!326399363943497728>")
 
     @commands.command()
     async def dailylb(self, ctx, x=1):
@@ -1466,7 +1466,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 print(e)
             else:
                 print(e)
-                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `dailylb`\n{e}\n<@!326399363943497728>")
+                await self.bot.error_channel.send(f"Error in {ctx.channel.name} while using `dailylb`\n{e}\n<@!326399363943497728>")
 
 def setup(bot):
     bot.add_cog(Hypixel(bot))
