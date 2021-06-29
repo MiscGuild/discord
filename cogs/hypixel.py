@@ -992,7 +992,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
                                 else:
                                     break
-                            if ctx.channel.name != "bot-channel":
+                            if "commands" not in ctx.channel.name:
                                 name = name.replace("_",        "\_")
                                 await ctx.send(f"__**{name}**__\n**Guild Experience -** `{totalexp}`")
                             else:
