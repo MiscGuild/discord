@@ -68,7 +68,8 @@ client.loop.create_task(on_ready())
 @client.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
-        return
+        embed = discord.Embed(title='Invalid Command!',
+                                descrption='Use `,help` to view a list of all commands!', color=0xff0000)
     elif isinstance(error, commands.NotOwner):
             embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
                                     description="You are not the owner of this bot!", color=0xff0000)
