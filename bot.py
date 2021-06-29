@@ -11,17 +11,17 @@ intents = discord.Intents.default()
 intents.reactions = True
 intents.members = True
 
-client = commands.Bot(command_prefix=commands.when_mentioned_or(config['bot']['prefix']), intents=intents, status=discord.Status.idle, activity=discord.Game(config['bot']['status']), case_insensitive=True)
-client.config = config
-client.token = config['bot']['token']
-client.api_tokens = config['hypixel']['api_keys']
-client.owner_id = config['bot']['ownerID']
-client.resident_req = int(50000)
-client.active = int(275000)
-client.inactive = int(100000)
-client.dnkl = int(200000)
-client.new_member = int(25000)
-client.error_channel = None
+bot = commands.Bot(command_prefix=commands.when_mentioned_or(config['bot']['prefix']), intents=intents, status=discord.Status.idle, activity=discord.Game(config['bot']['status']), case_insensitive=True)
+bot.config = config
+bot.token = config['bot']['token']
+bot.api_tokens = config['hypixel']['api_keys']
+bot.owner_id = config['bot']['ownerID']
+bot.resident_req = int(50000)
+bot.active = int(275000)
+bot.inactive = int(100000)
+bot.dnkl = int(200000)
+bot.new_member = int(25000)
+bot.error_channel = None
 
 class HelpCommand(commands.MinimalHelpCommand):
     async def send_pages(self):
@@ -40,32 +40,24 @@ class HelpCommand(commands.MinimalHelpCommand):
         channel = self.get_destination()
         await channel.send(embed=embed)
 
-client.help_command = HelpCommand(command_attrs={'hidden': True})
+bot.help_command = HelpCommand(command_attrs={'hidden': True})
 
 initial_extensions = ['cogs.fun', 'cogs.hypixel', 'cogs.mod', 'cogs.staff', 'cogs.ticket', 'cogs.owner']
 
 if __name__ == '__main__':
     for extension in initial_extensions:
         try:
-            client.load_extension(extension)
+            bot.load_extension(extension)
             print(f'{extension} Loaded!')
         except Exception as e:
             print(f'Failed to load extention {extension}', file=sys.stderr)
 
-@client.event
+@bot.event
 async def on_ready():
-    try:
-        print('The Bot is up and running!')
-
-        with open('dnkl.json', 'r') as f:
-            data = str(f.read()).replace("'", '"')
-        with open('dnkl.json', 'w') as f:
-            f.write(data)
-    except Exception as e:
-        print(e)
+    print('The Bot is up and running!')
 
 # Error Message
-@client.event
+@bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
         return
@@ -74,10 +66,10 @@ async def on_command_error(ctx, error):
                                     description="You are not the owner of this bot!", color=0xff0000)
             await ctx.send(embed=embed)
 
-@client.event
+@bot.event
 async def on_member_join(member):
     try:
-        channel = client.get_channel(714882620001091585)
+        channel = bot.get_channel(714882620001091585)
         role = discord.utils.get(member.guild.roles, name="New Member")
         await member.add_roles(role)
 
@@ -94,7 +86,7 @@ async def on_member_join(member):
 
 
 # Ticket Handling
-@client.event
+@bot.event
 async def on_guild_channel_create(channel):
     try:
         while True:
@@ -103,7 +95,7 @@ async def on_guild_channel_create(channel):
                 embed.add_field(name="If you do", value="Type `Yes`")
                 embed.add_field(name="If you don't", value="Type `No`")
                 await channel.send(embed=embed)
-                reply = await client.wait_for('message', check=lambda x: x.channel == channel)
+                reply = await bot.wait_for('message', check=lambda x: x.channel == channel)
                 reply = reply.content
                 reply = reply.capitalize()
                 try:
@@ -118,18 +110,18 @@ async def on_guild_channel_create(channel):
                                                color=0x8368ff)
                         embed1.set_author(name="While you wait, kindly take a look a the guild requirements!")
                         embed1.add_field(name="Active",
-                                         value=f"•  {format(client.active,',d')} Weekly Guild Experience",
+                                         value=f"•  {format(bot.active,',d')} Weekly Guild Experience",
                                          inline=False)
                         embed1.add_field(name="Do Not Kick List Eligibility",
-                                         value=f"•  {format(client.dnkl,',d')} Weekly Guild Experience",
+                                         value=f"•  {format(bot.dnkl,',d')} Weekly Guild Experience",
                                          inline=False)
-                        embed1.add_field(name="Resident", value=f"•  {format(client.resident_req,',d')} Weekly Guild Experience",
+                        embed1.add_field(name="Resident", value=f"•  {format(bot.resident_req,',d')} Weekly Guild Experience",
                                          inline=False)
                         embed1.add_field(name="Member",
-                                         value=f"•  {format(client.inactive,',d')} Weekly Guild Experience",
+                                         value=f"•  {format(bot.inactive,',d')} Weekly Guild Experience",
                                          inline=False)
                         embed1.add_field(name="New Member",
-                                         value=f"•  {format(client.new_member,',d')} Daily Guild Experience",
+                                         value=f"•  {format(bot.new_member,',d')} Daily Guild Experience",
                                          inline=False)
                         embed1.set_footer(text="You are considered a New Member for the first 7 days after joining the guild"
                                                "\nIf you fail to meet the New Member/Member requirements, you will be kicked!")
@@ -141,7 +133,7 @@ async def on_guild_channel_create(channel):
                         embed.add_field(name="If yes", value="Type `Yes`")
                         embed.add_field(name="If not", value="Type `No`")
                         await channel.send(embed=embed)
-                        noreply = await client.wait_for('message', check=lambda x: x.channel == channel)
+                        noreply = await bot.wait_for('message', check=lambda x: x.channel == channel)
                         noreply = noreply.content
                         noreply = noreply.capitalize()
                         if noreply in ('Yes', 'Yeah', 'Ye', 'Yea'):
@@ -165,7 +157,7 @@ async def on_guild_channel_create(channel):
                             embed.add_field(name="If this is true", value="Type `Yes`", inline=False)
                             embed.add_field(name="If this is false", value="Type `No`", inline=False)
                             await channel.send(embed=embed)
-                            errorreply = await client.wait_for('message', check=lambda x: x.channel == channel)
+                            errorreply = await bot.wait_for('message', check=lambda x: x.channel == channel)
                             errorreply = errorreply.content
                             errorreply = errorreply.capitalize()
                             if errorreply in ('Yes', 'Yeah', 'Ye', 'Yea'):
@@ -183,7 +175,7 @@ async def on_guild_channel_create(channel):
                         embed.add_field(name="If this is true", value="Type `Yes`", inline=False)
                         embed.add_field(name="If this is false", value="Type `No`", inline=False)
                         await channel.send(embed=embed)
-                        errorreply = await client.wait_for('message', check=lambda x: x.channel == channel)
+                        errorreply = await bot.wait_for('message', check=lambda x: x.channel == channel)
                         errorreply = errorreply.content
                         errorreply = errorreply.capitalize()
                         if errorreply in ('Yes', 'Yeah', 'Ye', 'Yea'):
@@ -200,7 +192,7 @@ async def on_guild_channel_create(channel):
                                           color=0x8368ff)
                     await channel.send(embed=embed)
                     print(e)
-                    await client.error_channel.send(
+                    await bot.error_channel.send(
                         f"Error in {channel.name} while dealing with registration tickets\n{e}\n<@!326399363943497728>")
 
                     break
@@ -219,7 +211,7 @@ async def on_guild_channel_create(channel):
                 embed.add_field(name="Event", value="Reply with `Event`",inline=False)
                 embed.add_field(name="Other", value="Reply with `Other`", inline=False)
                 await channel.send(embed=embed)
-                reply = await client.wait_for('message', check=lambda x: x.channel == channel)
+                reply = await bot.wait_for('message', check=lambda x: x.channel == channel)
                 author = reply.author
                 name = author.nick
                 if name is None:
@@ -273,7 +265,7 @@ async def on_guild_channel_create(channel):
                                     embed.set_author(name="Do-not-kick-list: Eligibility Check")
                                     embed.set_footer(text="Miscellaneous Bot | Coded by Rowdies")
                                     embed.add_field(name="You are not eligible to apply for the do not kick list.",
-                                                    value=f"You need a minimum of {format(client.dnkl,',d')} weekly guild experience."
+                                                    value=f"You need a minimum of {format(bot.dnkl,',d')} weekly guild experience."
                                                             f"\n You have {totalexp} weekly guild experience.",
                                                     inline=True)
                                     await channel.send(embed=embed)
@@ -282,13 +274,13 @@ async def on_guild_channel_create(channel):
                                         "you might still be accepted so we shall proceed with the application process!")
 
                                     await channel.send("**When will your inactivity begin? (Start date) (DD/MM/YYYY)**")
-                                    start = await client.wait_for('message', check=lambda x: x.author == author and x.channel == channel)
+                                    start = await bot.wait_for('message', check=lambda x: x.author == author and x.channel == channel)
                                     start = start.content
                                     await channel.send('**When will your inactivity end? (End date) (DD/MM/YYYY)**')
-                                    end = await client.wait_for('message', check=lambda x: x.author == author and x.channel == channel)
+                                    end = await bot.wait_for('message', check=lambda x: x.author == author and x.channel == channel)
                                     end = end.content
                                     await channel.send("**What's the reason behind your inactivity?**")
-                                    reason = await client.wait_for('message', check=lambda x: x.author == author and x.channel == channel)
+                                    reason = await bot.wait_for('message', check=lambda x: x.author == author and x.channel == channel)
                                     reason = reason.content
 
                                     await channel.send(
@@ -309,19 +301,19 @@ async def on_guild_channel_create(channel):
                                     embed.set_author(name='Do-not-kick-list: Eligibility Check')
                                     embed.set_footer(text="Miscellaneous Bot | Coded by Rowdies")
                                     embed.add_field(name="You are eligible to apply for the do not kick list.",
-                                                    value=f"You meet the minimum of {format(client.dnkl,',d')} weekly guild experience."
+                                                    value=f"You meet the minimum of {format(bot.dnkl,',d')} weekly guild experience."
                                                             f"\n You have {totalexp} weekly guild experience.",
                                                     inline=True)
                                     await channel.send(embed=embed)
 
                                     await channel.send("**When will your inactivity begin? (Start date) (DD/MM/YYYY)**")
-                                    start = await client.wait_for('message', check=lambda x: x.author == author and x.channel == channel)
+                                    start = await bot.wait_for('message', check=lambda x: x.author == author and x.channel == channel)
                                     start = start.content
                                     await channel.send('**When will your inactivity end? (End date) (DD/MM/YYYY)**')
-                                    end = await client.wait_for('message', check=lambda x: x.author == author and x.channel == channel)
+                                    end = await bot.wait_for('message', check=lambda x: x.author == author and x.channel == channel)
                                     end = end.content
                                     await channel.send("**What's the reason behind your inactivity?**")
-                                    reason = await client.wait_for('message', check=lambda x: x.author == author and x.channel == channel)
+                                    reason = await bot.wait_for('message', check=lambda x: x.author == author and x.channel == channel)
                                     reason = reason.content
 
                                     await channel.send(
@@ -341,7 +333,7 @@ async def on_guild_channel_create(channel):
                                     staff = discord.utils.get(channel.guild.roles, name="Staff")
 
                                     while True:
-                                        action = await client.wait_for('message', check=lambda x: x.channel == channel)
+                                        action = await bot.wait_for('message', check=lambda x: x.channel == channel)
                                         member = channel.guild.get_member(action.author.id)
                                         if staff in member.roles:
                                             action = (action.content).capitalize()
@@ -370,7 +362,7 @@ async def on_guild_channel_create(channel):
                                                                     inline=False)
                                                     embed.add_field(name="Reason", value=f"{reason}", inline=False)
                                                     embed.set_author(name="Do not kick list")
-                                                    dnkl_channel = client.get_channel(629564802812870657)
+                                                    dnkl_channel = bot.get_channel(629564802812870657)
                                                     message = await dnkl_channel.send(embed=embed)
 
                                                     with open('dnkl.json') as f:
@@ -389,7 +381,7 @@ async def on_guild_channel_create(channel):
                                                     await channel.send(
                                                         "**What is the name of the user you wish to add to the do not kick list?**")
 
-                                                    name = await client.wait_for('message', check=lambda
+                                                    name = await bot.wait_for('message', check=lambda
                                                         x: x.channel == channel.channel)
                                                     name = name.content
                                                     ign = await hypixel.get_dispname(name)
@@ -404,12 +396,12 @@ async def on_guild_channel_create(channel):
                                                                 await channel.send('Unknown IGN!')
                                                             else:
                                                                 await channel.send("**What is the start date?** (DD/MM/YYYY)")
-                                                                start_date = await client.wait_for('message',
+                                                                start_date = await bot.wait_for('message',
                                                                                                     check=lambda
                                                                                                         x: x.channel == channel.channel)
                                                                 start_date = start_date.content
                                                                 await channel.send("**What is the end date?** (DD/MM/YYYY)")
-                                                                end_date = await client.wait_for('message',
+                                                                end_date = await bot.wait_for('message',
                                                                                                     check=lambda
                                                                                                         x: x.channel == channel.channel)
                                                                 end_date = end_date.content
@@ -417,7 +409,7 @@ async def on_guild_channel_create(channel):
                                                                 p, q, r = end_date.split('/')
 
                                                                 await channel.send("**What's the reason for inactivity?**")
-                                                                reason = await client.wait_for('message',
+                                                                reason = await bot.wait_for('message',
                                                                                                     check=lambda
                                                                                                         x: x.channel == channel.channel)
                                                                 reason = reason.content
@@ -450,7 +442,7 @@ async def on_guild_channel_create(channel):
                                                                     embed.add_field(name="Reason", value=f"{reason}", inline=False)
                                                                     embed.set_author(name="Do not kick list")
                                                                     await channel.channel.purge(limit=1)
-                                                                    dnkl_channel = client.get_channel(629564802812870657)
+                                                                    dnkl_channel = bot.get_channel(629564802812870657)
                                                                     message = await dnkl_channel.send(embed=embed)
 
 
@@ -472,7 +464,7 @@ async def on_guild_channel_create(channel):
                 elif reply in ("Role", "Username", "Name"):
                     await channel.edit(name=f"Role/NameChange-{name}",category=discord.utils.get(channel.guild.categories, name="OTHER"))
                     await channel.send('What is your minecraft username?')
-                    role_reply = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                    role_reply = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                     name = role_reply.content
                     ign = hypixel.get_dispname(name)
                     if ign is None:
@@ -549,7 +541,7 @@ async def on_guild_channel_create(channel):
                     await channel.send(embed=embed)
                     await channel.send("**Do you meet these requirements? (Yes/No)**")
 
-                    reqs = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                    reqs = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                     reqs = reqs.content
                     reqs = reqs.capitalize()
 
@@ -558,7 +550,7 @@ async def on_guild_channel_create(channel):
                                               description="Kindly reply with a Yes or No",
                                               color=0x4b89e4)
                         await channel.send(embed=embed)
-                        nickmatching = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                        nickmatching = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                         nickmatching = nickmatching.content
                         nickmatching = nickmatching.capitalize()
                         if nickmatching in ('Yes', 'Ye', 'Yup', 'Y', 'Yeah', 'Yus'):
@@ -576,7 +568,7 @@ async def on_guild_channel_create(channel):
                                                   description="Kindly reply with a number",
                                                   color=0x4b89e4)
                             await channel.send(embed=embed)
-                            age = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                            age = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             age = age.content
 
                             '''VETERENCY'''
@@ -584,7 +576,7 @@ async def on_guild_channel_create(channel):
                                                   description="You can check this through \"/g menu\" ingame",
                                                   color=0x4b89e4)
                             await channel.send(embed=embed)
-                            veterency = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                            veterency = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             veterency = veterency.content
 
                             '''PAST INFRACTIONS'''
@@ -592,7 +584,7 @@ async def on_guild_channel_create(channel):
                                                   description="Kindly reply with a Yes or No",
                                                   color=0x4b89e4)
                             await channel.send(embed=embed)
-                            infractions = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                            infractions = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             infractions = infractions.content
                             infractions = infractions.capitalize()
 
@@ -610,7 +602,7 @@ async def on_guild_channel_create(channel):
                                                   description="Please make sure that you respond in one message",
                                                   color=0x4b89e4)
                             await channel.send(embed=embed)
-                            whystaff = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                            whystaff = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             whystaff = whystaff.content
 
                             '''WHY MISC'''
@@ -618,7 +610,7 @@ async def on_guild_channel_create(channel):
                                                   description="Please make sure that you respond in one message",
                                                   color=0x4b89e4)
                             await channel.send(embed=embed)
-                            whymisc = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                            whymisc = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             whymisc = whymisc.content
 
                             '''Suggest'''
@@ -626,7 +618,7 @@ async def on_guild_channel_create(channel):
                                                   description="Please make sure that you respond in one message",
                                                   color=0x4b89e4)
                             await channel.send(embed=embed)
-                            suggestion = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                            suggestion = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             suggestion = suggestion.content
 
                             '''SCENARIO 1'''
@@ -635,7 +627,7 @@ async def on_guild_channel_create(channel):
                                                   description="Make your answer as detailed as possible!",
                                                   color=0x4b89e4)
                             await channel.send(embed=embed)
-                            scen1 = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                            scen1 = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             scen1 = scen1.content
 
                             '''SCENARIO 2'''
@@ -645,7 +637,7 @@ async def on_guild_channel_create(channel):
                                                   description="Make your answer as detailed as possible!",
                                                   color=0x4b89e4)
                             await channel.send(embed=embed)
-                            scen2 = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                            scen2 = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             scen2 = scen2.content
 
                             '''SCENARIO 3'''
@@ -654,7 +646,7 @@ async def on_guild_channel_create(channel):
                                                   description="Please make sure that you respond in one message",
                                                   color=0x4b89e4)
                             await channel.send(embed=embed)
-                            scen3 = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                            scen3 = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             scen3 = scen3.content
 
                             '''STAFF'''
@@ -663,7 +655,7 @@ async def on_guild_channel_create(channel):
                                                   description="Please make sure that you respond in one message",
                                                   color=0x4b89e4)
                             await channel.send(embed=embed)
-                            staff = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                            staff = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             staff = staff.content
 
                             '''TIME'''
@@ -671,7 +663,7 @@ async def on_guild_channel_create(channel):
                                                   description="Please make sure that you respond in one message",
                                                   color=0x4b89e4)
                             await channel.send(embed=embed)
-                            time_ = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                            time_ = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             time_ = time_.content
 
                             '''GENERAL QUESTION'''
@@ -680,14 +672,14 @@ async def on_guild_channel_create(channel):
                                                   escription="Make your answer as detailed as possible!",
                                                   color=0x4b89e4)
                             await channel.send(embed=embed)
-                            question = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                            question = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             question = question.content
 
                             '''ANYTHING ELSE'''
                             embed = discord.Embed(title="Anything else you would like us to know?",
                                                   color=0x4b89e4)
                             await channel.send(embed=embed)
-                            random = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                            random = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             random = random.content
 
                             await channel.send("Great! You're done with the application!"
@@ -714,7 +706,7 @@ async def on_guild_channel_create(channel):
 
                         else:
                             await channel.send('What is your minecraft username?')
-                            role_reply = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                            role_reply = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             name = role_reply.content
                             ign = hypixel.get_dispname(name)
                             if ign is None:
@@ -759,7 +751,7 @@ async def on_guild_channel_create(channel):
                                                       description="Kindly reply with a number",
                                                       color=0x4b89e4)
                                 await channel.send(embed=embed)
-                                age = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                                age = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                                 age = age.content
 
                                 '''VETERENCY'''
@@ -767,7 +759,7 @@ async def on_guild_channel_create(channel):
                                                       description="You can check this through \"/g menu\" ingame",
                                                       color=0x4b89e4)
                                 await channel.send(embed=embed)
-                                veterency = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                                veterency = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                                 veterency = veterency.content
 
                                 '''PAST INFRACTIONS'''
@@ -775,7 +767,7 @@ async def on_guild_channel_create(channel):
                                                       description="Kindly reply with a Yes or No",
                                                       color=0x4b89e4)
                                 await channel.send(embed=embed)
-                                infractions = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                                infractions = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                                 infractions = infractions.content
                                 infractions = infractions.capitalize()
 
@@ -793,7 +785,7 @@ async def on_guild_channel_create(channel):
                                                       description="Please make sure that you respond in one message",
                                                       color=0x4b89e4)
                                 await channel.send(embed=embed)
-                                whystaff = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                                whystaff = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                                 whystaff = whystaff.content
 
 
@@ -803,7 +795,7 @@ async def on_guild_channel_create(channel):
                                                       description="Please make sure that you respond in one message",
                                                       color=0x4b89e4)
                                 await channel.send(embed=embed)
-                                whymisc = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                                whymisc = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                                 whymisc = whymisc.content
 
 
@@ -812,7 +804,7 @@ async def on_guild_channel_create(channel):
                                                       description="Please make sure that you respond in one message",
                                                       color=0x4b89e4)
                                 await channel.send(embed=embed)
-                                suggestion = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                                suggestion = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                                 suggestion = suggestion.content
 
 
@@ -822,7 +814,7 @@ async def on_guild_channel_create(channel):
                                                       description="Make your answer as detailed as possible!",
                                                       color=0x4b89e4)
                                 await channel.send(embed=embed)
-                                scen1 = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                                scen1 = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                                 scen1 = scen1.content
 
 
@@ -833,7 +825,7 @@ async def on_guild_channel_create(channel):
                                                       description="Make your answer as detailed as possible!",
                                                       color=0x4b89e4)
                                 await channel.send(embed=embed)
-                                scen2 = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                                scen2 = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                                 scen2 = scen2.content
 
 
@@ -843,34 +835,34 @@ async def on_guild_channel_create(channel):
                                                       description="Please make sure that you respond in one message",
                                                       color=0x4b89e4)
                                 await channel.send(embed=embed)
-                                scen3 = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                                scen3 = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                                 scen3 = scen3.content
 
 
                                 #STAFF
                                 embed = discord.Embed(title="Have you been staff in any other guild or on any server? If yes, which one?", description="Please make sure that you respond in one message", color=0x4b89e4)
                                 await channel.send(embed=embed)
-                                staff = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                                staff = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                                 staff = staff.content
 
 
                                 #TIME
                                 embed = discord.Embed(title="How much time do you have to contribute to the role? (Per day)", description="Please make sure that you respond in one message", color=0x4b89e4)
                                 await channel.send(embed=embed)
-                                time_ = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                                time_ = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                                 time_ = time_.content
 
 
                                 #GENERAL QUESTION
                                 embed = discord.Embed(title="Tell us about a time you made a mistake within the last year. How did you deal with it? What did you learn?", description="Make your answer as detailed as possible!", color=0x4b89e4)
                                 await channel.send(embed=embed)
-                                question = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                                question = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                                 question = question.content
 
                                 #ANYTHING ELSE
                                 embed = discord.Embed(title="Anything else you would like us to know?", color=0x4b89e4)
                                 await channel.send(embed=embed)
-                                random = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                                random = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                                 random = random.content
 
 
@@ -1063,7 +1055,7 @@ async def on_guild_channel_create(channel):
                         await channel.purge(limit=10)
                         embed = discord.Embed(title="Who would you like to demote?", description="Kindly mention them", color=0x00FFFF)
                         await channel.send(embed=embed)
-                        user = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                        user = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                         user = user.mentions[0]
 
                         username = user.nick
@@ -1074,7 +1066,7 @@ async def on_guild_channel_create(channel):
 
                         embed = discord.Embed(title=f"What's the reason behind {username}'s demotion?", color=0x00FFFF)
                         await channel.send(embed=embed)
-                        reason = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                        reason = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                         reason = reason.content
 
                         await channel.set_permissions(user, send_messages=True, read_messages=True,
@@ -1091,7 +1083,7 @@ async def on_guild_channel_create(channel):
                         embed.add_field(name="If this is true", value="Type `Yes`", inline=False)
                         embed.add_field(name="If this is false", value="Type `No`", inline=False)
                         await channel.send(embed=embed)
-                        mistake = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                        mistake = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                         mistake = mistake.content
                         mistake = mistake.capitalize()
                         if mistake == "Yes":
@@ -1107,7 +1099,7 @@ async def on_guild_channel_create(channel):
 
                     name_embed = discord.Embed(title="What is your Minecraft Username?",color=0x4b89e4)
                     await channel.send(embed=name_embed)
-                    name = await client.wait_for('message',
+                    name = await bot.wait_for('message',
                                                        check=lambda x: x.channel == channel and x.author == author)
                     name = name.content
                     ign = hypixel.get_dispname(name)
@@ -1128,7 +1120,7 @@ async def on_guild_channel_create(channel):
                                               "Reply with 1 for division 1"
                                               "\nReply with 2 for division 2")
                         await channel.send(embed=div_embed)
-                        division = await client.wait_for('message',
+                        division = await bot.wait_for('message',
                                                      check=lambda x: x.channel == channel and x.author == author)
                         division = division.content
                         division = division.capitalize()
@@ -1149,7 +1141,7 @@ async def on_guild_channel_create(channel):
                         rules_embed.set_footer(text="Violation of any of these rules (except the first will result) in immediate disqualification along with a temporary/permanent blacklist.")
                         await channel.send(embed=rules_embed)
                         await channel.send("**Do you agree to abide by these rules and face the consequences if any of the rules are broken?**\n(Yes/No)")
-                        rules = await client.wait_for('message',
+                        rules = await bot.wait_for('message',
                                                      check=lambda x: x.channel == channel and x.author == author)
                         rules = (rules.content).capitalize()
 
@@ -1188,7 +1180,7 @@ async def on_guild_channel_create(channel):
                     embed.add_field(name="If this is true", value="Type `Yes`", inline=False)
                     embed.add_field(name="If this is false", value="Type `No`", inline=False)
                     await channel.send(embed=embed)
-                    mistake = await client.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                    mistake = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                     mistake = mistake.content
                     mistake = mistake.capitalize()
                     if mistake == "Yes":
@@ -1208,12 +1200,16 @@ async def on_guild_channel_create(channel):
             print(e)
         else:
             print(e)
-            await client.error_channel.send(f"Error in {channel}\n{e}\n<@!326399363943497728>")
+            await bot.error_channel.send(f"Error in {channel}\n{e}\n<@!326399363943497728>")
 
 @tasks.loop()
-async def get_error_channel():
-    await client.wait_until_ready()
-    client.error_channel = client.get_channel(523743721443950612)
+async def after_cache_ready():
+    await bot.wait_until_ready()
+    bot.error_channel = bot.get_channel(523743721443950612)
+    with open('dnkl.json', 'r') as f:
+        data = str(f.read()).replace("'", '"')
+    with open('dnkl.json', 'w') as f:
+        f.write(data)
 
-get_error_channel.start()
-client.run(client.token)
+after_cache_ready.start()
+bot.run(bot.token)

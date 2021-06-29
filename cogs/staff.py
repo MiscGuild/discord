@@ -9,8 +9,8 @@ import asyncio
 import requests
 
 class staff(commands.Cog, name="Staff"):
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
 
     @commands.command(aliases=['req', 'requirement'])
     async def requirements(self, ctx):
@@ -20,11 +20,11 @@ class staff(commands.Cog, name="Staff"):
             embed = discord.Embed(title="Miscellaneous Guild Requirements",
                                 description="These requirements are subject to change!",
                                 color=0x8368ff)
-            embed.add_field(name="Active", value=f"•  {format(self.client.active,',d')} Weekly Guild Experience", inline=False)
-            embed.add_field(name="Do Not Kick List Eligibility", value=f"•  {format(self.client.dnkl,',d')} Weekly Guild Experience", inline=False)
-            embed.add_field(name="Resident", value=f"•  {format(self.client.resident_req,',d')} Weekly Guild Experience", inline=False)
-            embed.add_field(name="Member", value=f"•  {format(self.client.inactive,',d')} Weekly Guild Experience", inline=False)
-            embed.add_field(name="New Member", value=f"•  {format(self.client.new_member,',d')} Daily Guild Experience", inline=False)
+            embed.add_field(name="Active", value=f"•  {format(self.bot.active,',d')} Weekly Guild Experience", inline=False)
+            embed.add_field(name="Do Not Kick List Eligibility", value=f"•  {format(self.bot.dnkl,',d')} Weekly Guild Experience", inline=False)
+            embed.add_field(name="Resident", value=f"•  {format(self.bot.resident_req,',d')} Weekly Guild Experience", inline=False)
+            embed.add_field(name="Member", value=f"•  {format(self.bot.inactive,',d')} Weekly Guild Experience", inline=False)
+            embed.add_field(name="New Member", value=f"•  {format(self.bot.new_member,',d')} Daily Guild Experience", inline=False)
             embed.set_footer(text="You are considered a New Member for the first 7 days after joining the guild"
                                 "\nIf you fail to meet the New Member/Member requirements, you will be kicked!")
             await ctx.send(embed=embed)
@@ -47,7 +47,7 @@ class staff(commands.Cog, name="Staff"):
                             inline=False)
             embed.add_field(name="Sugar Daddy", value="Spend Money on the guild by doing giveaways, sponsoring events!",
                             inline=False)
-            embed.set_footer(text=f"Everyone who has the resident rank must get {format(self.client.resident_req,',d')} weekly guild experience! (Except YouTubers)")
+            embed.set_footer(text=f"Everyone who has the resident rank must get {format(self.bot.resident_req,',d')} weekly guild experience! (Except YouTubers)")
             await ctx.send(embed=embed)
         except Exception as e:
             print(e)
@@ -124,7 +124,7 @@ class staff(commands.Cog, name="Staff"):
                     await ctx.send(embed=embed)
         except Exception as e:
             print(e)
-            await self.client.error_channel.send(f"Error in {ctx.channel.name} while running `participants`"
+            await self.bot.error_channel.send(f"Error in {ctx.channel.name} while running `participants`"
                                     f"\n{e}\n<@!326399363943497728>")
 
     @commands.command(aliases=['switch','swapper'])
@@ -160,7 +160,7 @@ class staff(commands.Cog, name="Staff"):
                 json.dump(data, event_participants)
         except Exception as e:
             print(e)
-            await self.client.error_channel.send(
+            await self.bot.error_channel.send(
                 f"Error in {ctx.channel.name} while running dnkllist"
                 f"Error in {ctx.channel.name} while running `swap`"
                 f"\n{e}\n<@!326399363943497728>")
@@ -193,7 +193,7 @@ class staff(commands.Cog, name="Staff"):
                     expHistory = sum(g['guild']['members'][i]['expHistory'].values())
                     rank = g['guild']['members'][i]['rank']
                     joined = g['guild']['members'][i]['joined']
-                    if expHistory >= self.client.active and rank == "Member":
+                    if expHistory >= self.bot.active and rank == "Member":
                         uuid = g['guild']['members'][i]['uuid']
                         async with aiohttp.ClientSession() as session:
                             async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
@@ -208,7 +208,7 @@ class staff(commands.Cog, name="Staff"):
                         exp += expHistory
                         activearray[name] = exp
                         exp = 0
-                    elif expHistory < self.client.active and rank == "Active":
+                    elif expHistory < self.bot.active and rank == "Active":
                         uuid = g['guild']['members'][i]['uuid']
                         async with aiohttp.ClientSession() as session:
                             async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
@@ -223,7 +223,7 @@ class staff(commands.Cog, name="Staff"):
                         exp += expHistory
                         activedemotearray[name] = exp
                         exp = 0
-                    elif expHistory < self.client.inactive:
+                    elif expHistory < self.bot.inactive:
                         if rank == "Member":
                             uuid = g['guild']['members'][i]['uuid']
                             async with aiohttp.ClientSession() as session:
@@ -240,7 +240,7 @@ class staff(commands.Cog, name="Staff"):
                             inactivearray[name] = exp
                             exp = 0
                         elif rank == "Resident":
-                            if expHistory < self.client.resident_req:
+                            if expHistory < self.bot.resident_req:
                                 uuid = g['guild']['members'][i]['uuid']
                                 async with aiohttp.ClientSession() as session:
                                     async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
@@ -357,7 +357,7 @@ class staff(commands.Cog, name="Staff"):
                 print(e)
             else:
                 print(e)
-                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `staff`\n{e}\n<@!326399363943497728>")
+                await self.bot.error_channel.send(f"Error in {ctx.channel.name} while using `staff`\n{e}\n<@!326399363943497728>")
             
     @commands.command()
     @commands.has_role(538015368782807040)
@@ -419,7 +419,7 @@ class staff(commands.Cog, name="Staff"):
 
 
             if staff in ctx.author.roles:  # Making sure that the user is Staff
-                for guild in self.client.guilds:
+                for guild in self.bot.guilds:
                     if str(guild) == "Miscellaneous [MISC]":  # Check if the Discord is Miscellaneous
                         for member in guild.members:  # For loop for all members in the Discord
                             if member.id != '326399363943497728' and member.bot is False:
@@ -464,19 +464,19 @@ class staff(commands.Cog, name="Staff"):
                                                     usergrank = user['rank']
 
                                                 if usergrank != 'Resident':
-                                                    if totalexp < self.client.inactive:
+                                                    if totalexp < self.bot.inactive:
                                                         await member.add_roles(inactive_role)
                                                         await member.remove_roles(active_role)
                                                         await message.edit(
                                                             content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
 
-                                                    elif totalexp >= self.client.active:  # If the member is active
+                                                    elif totalexp >= self.bot.active:  # If the member is active
                                                         await member.remove_roles(inactive_role, new_member)
                                                         await member.add_roles(active_role)
                                                         await message.edit(
                                                             content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
 
-                                                    elif totalexp > self.client.inactive:
+                                                    elif totalexp > self.bot.inactive:
                                                         await member.remove_roles(inactive_role, active_role)
                                                         await message.edit(
                                                             content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
@@ -487,7 +487,7 @@ class staff(commands.Cog, name="Staff"):
                                                         await message.edit(
                                                             content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
 
-                                                    elif totalexp >= self.client.active:  # If the member is active
+                                                    elif totalexp >= self.bot.active:  # If the member is active
                                                         await member.remove_roles(inactive_role, new_member)
                                                         await member.add_roles(active_role)
                                                         await message.edit(
@@ -511,10 +511,10 @@ class staff(commands.Cog, name="Staff"):
                                             await member.remove_roles(member_role, new_member, active_role)
                                             await message.edit(content=f"{name} ||{member}|| Member of an unallied guild **++Guest | --Member | --Active**")
 
-            inactivity_channel = self.client.get_channel(848067712156434462)
+            inactivity_channel = self.bot.get_channel(848067712156434462)
 
             embed = discord.Embed(title="You do not meet the guild requirements!",
-                                description=f"Member requirement - **{format(self.client.inactive,',d')}** Weekly Guild Experience\nResident requirement - **{format(self.client.resident_req,',d')}** Weekly Guild Experience",
+                                description=f"Member requirement - **{format(self.bot.inactive,',d')}** Weekly Guild Experience\nResident requirement - **{format(self.bot.resident_req,',d')}** Weekly Guild Experience",
                                 color = 0xDC143C)
             await inactivity_channel.send(f"<@&848051215287058443>")
             await inactivity_channel.send(embed=embed)
@@ -527,11 +527,11 @@ class staff(commands.Cog, name="Staff"):
                 print(e)
             elif str(e) == "404 Not Found (error code: 10011): Unknown Role":
                 print(e)
-                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n{ctx.author.mention} please `forcesync` the last user on the list.")
+                await self.bot.error_channel.send(f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n{ctx.author.mention} please `forcesync` the last user on the list.")
 
             else:
                 print(e)
-                await self.client.error_channel.send(
+                await self.bot.error_channel.send(
                     f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n<@!326399363943497728>")
 
     @commands.command(aliases=['fs'])
@@ -612,23 +612,23 @@ class staff(commands.Cog, name="Staff"):
                 print(e)
             else:
                 print(e)
-                await self.client.error_channel.send(f"Error in {ctx.channel.name} while trying to use `forcesync`\n{e}\n<@!326399363943497728>")
+                await self.bot.error_channel.send(f"Error in {ctx.channel.name} while trying to use `forcesync`\n{e}\n<@!326399363943497728>")
 
     @commands.command()
     @commands.has_role(522588118251995147)
     async def staffreview(self, ctx):
         try:
-            channel = self.client.get_channel(523226672980557824)
+            channel = self.bot.get_channel(523226672980557824)
             admin = discord.utils.get(ctx.guild.roles, name="Admin")
             if admin in ctx.author.roles:
                 embed = discord.Embed(title="Staff checkup", color=0x8368ff)
                 while True:
                     await ctx.send('**What is the name of the staff member?**')
-                    staff_name = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author and x.channel == ctx.channel)
+                    staff_name = await self.bot.wait_for('message', check=lambda x: x.author == ctx.message.author and x.channel == ctx.channel)
                     staff_name = staff_name.content
 
                     await ctx.send(f"**What are your comments about** *{staff_name}*")
-                    staff_comm = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author and x.channel == ctx.channel)
+                    staff_comm = await self.bot.wait_for('message', check=lambda x: x.author == ctx.message.author and x.channel == ctx.channel)
                     staff_comm = staff_comm.content
                     embed.add_field(name=staff_name, value=staff_comm, inline=False)
 
@@ -638,7 +638,7 @@ class staff(commands.Cog, name="Staff"):
                     embed1.add_field(name="If not:", value="Reply with `No`")
                     await ctx.send(embed=embed1)
 
-                    more = await self.client.wait_for('message', check=lambda x: x.channel == ctx.channel)
+                    more = await self.bot.wait_for('message', check=lambda x: x.channel == ctx.channel)
                     more = more.content
                     more = more.capitalize()
 
@@ -655,7 +655,7 @@ class staff(commands.Cog, name="Staff"):
 
         except Exception as e:
             print(e)
-            await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `staffreview`\n{e}\n<@!326399363943497728>")
+            await self.bot.error_channel.send(f"Error in {ctx.channel.name} while using `staffreview`\n{e}\n<@!326399363943497728>")
 
     @commands.command()
     @commands.has_role(538015368782807040)
@@ -674,7 +674,7 @@ class staff(commands.Cog, name="Staff"):
             invalid_members, active_members, regular_members,inactive_members,\
             xl_discord_members, guest_list = [], [], [], [], [], [], [], [], []
 
-            guild = self.client.get_guild(522586672148381726)
+            guild = self.bot.get_guild(522586672148381726)
             memberList = guild.members
 
             msg = await ctx.send("**Processing all the prerequisites**")
@@ -720,7 +720,7 @@ class staff(commands.Cog, name="Staff"):
 
 
             if staff in ctx.author.roles:  # Making sure that the user is Staff
-                for guild in self.client.guilds:
+                for guild in self.bot.guilds:
                     if str(guild) == "Miscellaneous [MISC]":  # Check if the Discord is Miscellaneous
                         for member in guild.members:  # For loop for all members in the Discord
                             if not member.bot:
@@ -747,14 +747,14 @@ class staff(commands.Cog, name="Staff"):
 
                     for element in misc_details:
                         if name in element[0]:
-                            if element[1] > self.client.active:
+                            if element[1] > self.bot.active:
                                 active_members.append(member)
                                 active_names = active_names + str(member) + "\n"
-                            elif element[1] > self.client.inactive:
+                            elif element[1] > self.bot.inactive:
                                 if member_role not in member.roles:
                                     regular_members.append(member)
                                     member_names = member_names + str(member) + "\n"
-                            elif element[1] < self.client.inactive:
+                            elif element[1] < self.bot.inactive:
                                 inactive_members.append(member)
                                 inactive_names = inactive_names + str(member) + "\n"
 
@@ -785,37 +785,37 @@ class staff(commands.Cog, name="Staff"):
                 print(e)
             elif str(e) == "404 Not Found (error code: 10011): Unknown Role":
                 print(e)
-                await self.client.error_channel.send(f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n{ctx.author.mention} please `forcesync` the last user on the list.")
+                await self.bot.error_channel.send(f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n{ctx.author.mention} please `forcesync` the last user on the list.")
 
             else:
                 print(e)
-                await self.client.error_channel.send(
+                await self.bot.error_channel.send(
                     f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n<@!326399363943497728>")
 
     @commands.command()
     @commands.has_role(538015368782807040)
     async def challenge(self, ctx, x):
-        channel = self.client.get_channel(753103243659444286)
+        channel = self.bot.get_channel(753103243659444286)
         if x == "e":
             msg = await ctx.send(content="**What would you like the first challenge under the easy category to be (name)?**")
-            challenge1 = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+            challenge1 = await self.bot.wait_for('message', check=lambda x: x.author == ctx.message.author)
             challenge1 = challenge1.content
 
             await msg.edit(content="**What is the prize for completing this challenge?**")
-            challenge1_prize = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+            challenge1_prize = await self.bot.wait_for('message', check=lambda x: x.author == ctx.message.author)
             challenge1_prize = challenge1_prize.content
 
             await msg.edit(
                 content="**What would you like the second challenge under the easy category to be?"
                         "\nIf you don't want one, type None**")
-            challenge2 = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+            challenge2 = await self.bot.wait_for('message', check=lambda x: x.author == ctx.message.author)
             challenge2 = challenge2.content
             if challenge2 == "None":
                 embed = discord.Embed(title="Easy", color=0x90ee90)
                 embed.add_field(name=challenge1, value=challenge1_prize, inline=False)
             else:
                 await msg.edit(content="What is the prize for completing this challenge?")
-                challenge2_prize = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+                challenge2_prize = await self.bot.wait_for('message', check=lambda x: x.author == ctx.message.author)
                 challenge2_prize = challenge2_prize.content
 
                 embed = discord.Embed(title="Easy", color=0x90ee90)
@@ -826,24 +826,24 @@ class staff(commands.Cog, name="Staff"):
 
         if x == "m":
             msg = await ctx.send("**What would you like the first challenge under the medium category to be (name)?**")
-            challenge1 = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+            challenge1 = await self.bot.wait_for('message', check=lambda x: x.author == ctx.message.author)
             challenge1 = challenge1.content
 
             await msg.edit(content="**What is the prize for completing this challenge?**")
-            challenge1_prize = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+            challenge1_prize = await self.bot.wait_for('message', check=lambda x: x.author == ctx.message.author)
             challenge1_prize = challenge1_prize.content
 
             await msg.edit(
                 content="**What would you like the second challenge under the medium category to be?"
                         "\nIf you don't want one, type None**")
-            challenge2 = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+            challenge2 = await self.bot.wait_for('message', check=lambda x: x.author == ctx.message.author)
             challenge2 = challenge2.content
             if challenge2 == "None":
                 embed = discord.Embed(title="Medium", color=0xffa500)
                 embed.add_field(name=challenge1, value=challenge1_prize, inline=False)
             else:
                 await msg.edit(content="**What is the prize for completing this challenge?**")
-                challenge2_prize = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+                challenge2_prize = await self.bot.wait_for('message', check=lambda x: x.author == ctx.message.author)
                 challenge2_prize = challenge2_prize.content
 
                 embed = discord.Embed(title="Medium", color=0xffa500)
@@ -853,24 +853,24 @@ class staff(commands.Cog, name="Staff"):
 
         if x == "h":
             msg = await ctx.send("**What would you like the challenge under the hard category to be (name)?**")
-            challenge1 = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+            challenge1 = await self.bot.wait_for('message', check=lambda x: x.author == ctx.message.author)
             challenge1 = challenge1.content
 
             await msg.edit(content="**What is the prize for completing this challenge?**")
-            challenge1_prize = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+            challenge1_prize = await self.bot.wait_for('message', check=lambda x: x.author == ctx.message.author)
             challenge1_prize = challenge1_prize.content
 
             await msg.edit(
                 content="**What would you like the second challenge under the hard category to be?"
                         "\nIf you don't want one, type None**")
-            challenge2 = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+            challenge2 = await self.bot.wait_for('message', check=lambda x: x.author == ctx.message.author)
             challenge2 = challenge2.content
             if challenge2 == "None":
                 embed = discord.Embed(title="Hard", color=0xcd5c5c)
                 embed.add_field(name=challenge1, value=challenge1_prize, inline=False)
             else:
                 await msg.edit(content="**What is the prize for completing this challenge?**")
-                challenge2_prize = await self.client.wait_for('message', check=lambda x: x.author == ctx.message.author)
+                challenge2_prize = await self.bot.wait_for('message', check=lambda x: x.author == ctx.message.author)
                 challenge2_prize = challenge2_prize.content
 
                 embed = discord.Embed(title="Hard", color=0xcd5c5c)

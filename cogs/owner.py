@@ -2,15 +2,15 @@ import discord
 from discord.ext import commands
 
 class Owner(commands.Cog, command_attrs=dict(hidden=True)):
-    def __init__(self, client):
-        self.client=client
+    def __init__(self, bot):
+        self.bot=bot
 
     #load extension
     @commands.command()
     @commands.is_owner()
     async def load(self, ctx, extension):
         try:
-            self.client.load_extension(f'cogs.{extension}')
+            self.bot.load_extension(f'cogs.{extension}')
             await ctx.send(f'{extension} has been loaded')
         except Exception as e:
             await ctx.send(e)
@@ -20,7 +20,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.is_owner()
     async def unload(self, ctx, extension):
         try:
-            self.client.unload_extension(f'cogs.{extension}')
+            self.bot.unload_extension(f'cogs.{extension}')
             await ctx.send(f'{extension} has been unloaded')
         except Exception as e:
             await ctx.send(e)
@@ -30,11 +30,11 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.is_owner()
     async def reload(self, ctx, extension):
         try:
-            self.client.reload_extension(f'cogs.{extension}')
+            self.bot.reload_extension(f'cogs.{extension}')
             await ctx.send(f'{extension} has been reloaded')
         except Exception as e:
             await ctx.send(e)
 
-#Add cog to main client
-def setup(client):
-    client.add_cog(Owner(client))
+#Add cog to main bot
+def setup(bot):
+    bot.add_cog(Owner(bot))

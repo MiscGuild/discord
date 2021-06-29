@@ -4,8 +4,8 @@ import random
 import aiohttp
 
 class Fun(commands.Cog, name="Fun"):
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
 
     # Pizza
     @commands.command()
@@ -39,7 +39,7 @@ class Fun(commands.Cog, name="Fun"):
         """Gives the bot's ping
         """
         embed = discord.Embed(title='Pong',
-                            description=f"{round(self.client.latency * 1000)}ms",
+                            description=f"{round(self.bot.latency * 1000)}ms",
                             color=0x8368ff)
         await ctx.send(embed=embed)
 

@@ -94,19 +94,19 @@ class Tickets(commands.Cog, name="Tickets"):
 
                             embed = discord.Embed(title="Miscellaneous Guild Requirements", description="These requirements are subject to change!", color=0x8368ff)
                             embed.add_field(name="Active",
-                                            value=f"•  {format(self.client.active,',d')} Weekly Guild Experience",
+                                            value=f"•  {format(self.bot.active,',d')} Weekly Guild Experience",
                                             inline=False)
                             embed.add_field(name="DNKL Eligibility",
-                                            value=f"•  {format(self.client.dnkl,',d')} Weekly Guild Experience",
+                                            value=f"•  {format(self.bot.dnkl,',d')} Weekly Guild Experience",
                                             inline=False)
                             embed.add_field(name="Resident",
-                                            value=f"•  {format(self.client.resident_req,',d')} Weekly Guild Experience",
+                                            value=f"•  {format(self.bot.resident_req,',d')} Weekly Guild Experience",
                                             inline=False)
                             embed.add_field(name="Member",
-                                            value=f"•  {format(self.client.inactive,',d')} Weekly Guild Experience",
+                                            value=f"•  {format(self.bot.inactive,',d')} Weekly Guild Experience",
                                             inline=False)
                             embed.add_field(name="New Member",
-                                            value=f"•  {format(self.client.new_member,',d')} Daily Guild Experience",
+                                            value=f"•  {format(self.bot.new_member,',d')} Daily Guild Experience",
                                             inline=False)
                             embed.set_footer(text="You are considered a New Member for the first 7 days after joining the guild"
                                                 "\nIf you fail to meet the New Member/Member requirements, you will be kicked!")
@@ -116,14 +116,14 @@ class Tickets(commands.Cog, name="Tickets"):
         except Exception as e:
 
             print(e)
-            await self.client.error_channel.send(f"Error in {ctx.channel.name} while trying to use `register`\n{e}\n<@!326399363943497728>")
+            await self.bot.error_channel.send(f"Error in {ctx.channel.name} while trying to use `register`\n{e}\n<@!326399363943497728>")
 
     @commands.command(aliases=['del'])
     async def delete(self, ctx):
         """Deletes the ticket channel the command is used in.
         """
         try:
-            logs = self.client.get_channel(714821811832881222)
+            logs = self.bot.get_channel(714821811832881222)
             Staff = discord.utils.get(ctx.guild.roles, name="Staff")
             if Staff in ctx.author.roles:
                 if ctx.channel.category.name in ('RTickets',  '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL','EVENT'):
@@ -143,7 +143,7 @@ class Tickets(commands.Cog, name="Tickets"):
                     await logs.send(embed=embed)
         except Exception as e:
             print(e)
-            await self.client.error_channel.send(f"Error in {ctx.channel.name}\n{e}\n<@!326399363943497728>")
+            await self.bot.error_channel.send(f"Error in {ctx.channel.name}\n{e}\n<@!326399363943497728>")
 
     @commands.command()
     @commands.has_role(522588118251995147)
@@ -158,7 +158,7 @@ class Tickets(commands.Cog, name="Tickets"):
                 await ctx.send(embed=embed)
         except Exception as e:
             print(e)
-            await self.client.error_channel.send(f"Error in {ctx.channel.name} while running `deny`\n{e}\n<@!326399363943497728>")
+            await self.bot.error_channel.send(f"Error in {ctx.channel.name} while running `deny`\n{e}\n<@!326399363943497728>")
     @accept.error
     async def accept_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
@@ -213,7 +213,7 @@ class Tickets(commands.Cog, name="Tickets"):
                     await ctx.send("What is the question number of the reply that you would like to critique?"
                                 "\n**Please just give the question number!**"
                                 "If you would like to critique something in general, reply with `14`")
-                    question = await self.client.wait_for('message', check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+                    question = await self.bot.wait_for('message', check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
                     question = question.content
                     if str(question) in ("1","2","3","4","5","6","7","8","9","10","11","12","13","14"):
                         question = question_number.get(int(question), 'None')
@@ -223,7 +223,7 @@ class Tickets(commands.Cog, name="Tickets"):
 
                 await ctx.send(f"`{question}`"
                             "\n**What was the issue that you found with their reply?**")
-                critique = await self.client.wait_for('message', check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+                critique = await self.bot.wait_for('message', check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
                 critique = critique.content
 
                 embed.add_field(name=question,
@@ -239,7 +239,7 @@ class Tickets(commands.Cog, name="Tickets"):
                 await ctx.send(embed=embed1)
 
 
-                more = await self.client.wait_for('message', check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+                more = await self.bot.wait_for('message', check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
                 more = more.content
                 more = more.capitalize()
 
@@ -250,7 +250,7 @@ class Tickets(commands.Cog, name="Tickets"):
                     break
         except Exception as e:
             print(e)
-            await self.client.error_channel.send(f"Error in {ctx.channel.name} while running `deny`\n{e}\n<@!326399363943497728>")
+            await self.bot.error_channel.send(f"Error in {ctx.channel.name} while running `deny`\n{e}\n<@!326399363943497728>")
     @deny.error
     async def deny_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
