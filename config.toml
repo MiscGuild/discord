@@ -1,0 +1,11 @@
+[bot]
+prefix = ','
+token = ''
+ownerID = 326399363943497728
+status = 'with Miscellaneous members!'
+
+[hypixel]
+api_keys = [
+    'xxx',
+    'xxx'
+]
