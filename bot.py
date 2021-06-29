@@ -73,6 +73,10 @@ async def on_command_error(ctx, error):
             embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
                                     description="You are not the owner of this bot!", color=0xff0000)
             await ctx.send(embed=embed)
+    elif isinstance(error, commands.MissingRole):
+            embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
+                                    description="You do not have the required roles to access this restricted command!", color=0xff0000)
+            await ctx.send(embed=embed)
 
 @client.event
 async def on_member_join(member):
