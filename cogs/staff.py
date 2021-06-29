@@ -172,10 +172,11 @@ class staff(commands.Cog, name="Staff"):
         """
         try:
             msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
-            api = await hypixel.get_api()
+            api = hypixel.get_api()
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'https://api.hypixel.net/guild?key={api}&name=Miscellaneous') as resp:
                     g = await resp.json()
+                    await session.close()
 
             with open('dnkl.json') as f:
                 data = json.load(f)
@@ -198,6 +199,7 @@ class staff(commands.Cog, name="Staff"):
                         async with aiohttp.ClientSession() as session:
                             async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
                                 a = await resp.json()
+                                await session.close()
                         name = a['name']
                         time = str(datetime.fromtimestamp(int(str(joined)[:-3])))
                         dt = (time[0:10])
@@ -213,6 +215,7 @@ class staff(commands.Cog, name="Staff"):
                         async with aiohttp.ClientSession() as session:
                             async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
                                 a = await resp.json()
+                                await session.close()
                         name = a['name']
                         time = str(datetime.fromtimestamp(int(str(joined)[:-3])))
                         dt = (time[0:10])
