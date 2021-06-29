@@ -8,7 +8,7 @@ class Tickets(commands.Cog, name="Tickets"):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=['Register', 'reg', 'Reg', 'Verify', 'verify'])
+    @commands.command(aliases=['reg', 'verify'])
     async def register(self, ctx, name):
         try:
             async with ctx.channel.typing():

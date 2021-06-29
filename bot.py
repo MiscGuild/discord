@@ -11,7 +11,7 @@ intents = discord.Intents.default()
 intents.reactions = True
 intents.members = True
 
-client = commands.Bot(command_prefix=commands.when_mentioned_or(config['bot']['prefix']), intents=intents, status=discord.Status.idle, activity=discord.Game(config['bot']['status']))
+client = commands.Bot(command_prefix=commands.when_mentioned_or(config['bot']['prefix']), intents=intents, status=discord.Status.idle, activity=discord.Game(config['bot']['status']), case_insensitive=True)
 client.config = config
 client.token = config['bot']['token']
 client.api_tokens = config['hypixel']['api_keys']
@@ -338,126 +338,131 @@ async def on_guild_channel_create(channel):
                                                         f"\nReply with `Deny` to deny the do-not-kick-list request"
                                                         f"\nReply with `Error` if the user made an error while applying for the do not kick list")
 
+                                    staff = discord.utils.get(channel.guild.roles, name="Staff")
+
                                     while True:
-                                        action = await client.wait_for('message', check=lambda
-                                            x: staff in x.author.roles)
-                                        action = (action.content).capitalize()
-                                        if action in ('Approve','Deny','Error'):
-                                            if action == "Approve":
-                                                a, b, c = start.split('/')
-                                                p, q, r = end.split('/')
-                                                ign = hypixel.get_dispname(name)
-                                                rank = hypixel.get_rank(name)
-                                                dates = {1: "January", 2: "February", 3: "March", 4: "April",
-                                                            5: "May",
-                                                            6: "June", 7: "July", 8: "August", 9: "September",
-                                                            10: "October", 11: "November", 12: "December"}
-                                                start_month = dates.get(int(b))
-                                                end_month = dates.get(int(q))
+                                        action = await client.wait_for('message', check=lambda x: x.channel == channel)
+                                        member = channel.guild.get_member(action.author.id)
+                                        if staff in member.roles:
+                                            action = (action.content).capitalize()
+                                            if action in ('Approve', 'Deny', 'Error'):
+                                                if action == "Approve":
+                                                    a, b, c = start.split('/')
+                                                    p, q, r = end.split('/')
+                                                    ign = await hypixel.get_dispname(name)
+                                                    rank = await hypixel.get_rank(name)
+                                                    dates = {1: "January", 2: "February", 3: "March", 4: "April",
+                                                                5: "May",
+                                                                6: "June", 7: "July", 8: "August", 9: "September",
+                                                                10: "October", 11: "November", 12: "December"}
+                                                    start_month = dates.get(int(b))
+                                                    end_month = dates.get(int(q))
 
-                                                embed = discord.Embed(title=f"{rank} {ign}",
-                                                                        url=f'https://plancke.io/hypixel/player/stats/{ign}',
-                                                                        color=0x0ffff)
-                                                embed.set_thumbnail(
-                                                    url=f'https://visage.surgeplay.com/full/832/{uuid}')
-                                                embed.add_field(name="IGN:", value=f"{ign}", inline=False)
-                                                embed.add_field(name="Start:", value=f"{a} {start_month} {c}",
-                                                                inline=False)
-                                                embed.add_field(name="End:", value=f"{p} {end_month} {r}",
-                                                                inline=False)
-                                                embed.add_field(name="Reason", value=f"{reason}", inline=False)
-                                                embed.set_author(name="Do not kick list")
-                                                await channel.channel.purge(limit=1)
-                                                dnkl_channel = client.get_channel(629564802812870657)
-                                                message = await dnkl_channel.send(embed=embed)
+                                                    embed = discord.Embed(title=f"{rank} {ign}",
+                                                                            url=f'https://plancke.io/hypixel/player/stats/{ign}',
+                                                                            color=0x0ffff)
+                                                    embed.set_thumbnail(
+                                                        url=f'https://visage.surgeplay.com/full/832/{uuid}')
+                                                    embed.add_field(name="IGN:", value=f"{ign}", inline=False)
+                                                    embed.add_field(name="Start:", value=f"{a} {start_month} {c}",
+                                                                    inline=False)
+                                                    embed.add_field(name="End:", value=f"{p} {end_month} {r}",
+                                                                    inline=False)
+                                                    embed.add_field(name="Reason", value=f"{reason}", inline=False)
+                                                    embed.set_author(name="Do not kick list")
+                                                    dnkl_channel = client.get_channel(629564802812870657)
+                                                    message = await dnkl_channel.send(embed=embed)
 
-                                                with open('dnkl.json') as f:
-                                                    data = json.load(f)
-                                                dnkl_dict = {ign: message.id}
+                                                    with open('dnkl.json') as f:
+                                                        data = json.load(f)
+                                                    dnkl_dict = {ign: message.id}
 
-                                                data.update(dnkl_dict)
-                                                with open('dnkl.json', 'w') as f:
-                                                    json.dump(data, f)
-                                                break
+                                                    data.update(dnkl_dict)
+                                                    with open('dnkl.json', 'w') as f:
+                                                        json.dump(data, f)
+                                                    break
 
-                                            elif action == "Deny":
-                                                await channel.send("**This do not kick list request has been denied!")
+                                                elif action == "Deny":
+                                                    await channel.send("**This do not kick list request has been denied!")
 
-                                            elif action == "Error":
-                                                await channel.send(
-                                                    "**What is the name of the user you wish to add to the do not kick list?**")
+                                                elif action == "Error":
+                                                    await channel.send(
+                                                        "**What is the name of the user you wish to add to the do not kick list?**")
 
-                                                name = await client.wait_for('message', check=lambda
-                                                    x: x.channel == channel.channel)
-                                                name = name.content
-                                                ign = hypixel.get_dispname(name)
-                                                rank = hypixel.get_rank(name)
-                                                async with aiohttp.ClientSession() as session:
-                                                    async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
-                                                        request = await resp.json()
-                                                        uuid = request['id']
-                                                        with open('dnkl.json') as f:
-                                                            data = json.load(f)
-                                                        if resp.status != 200:
-                                                            await channel.send('Unknown IGN!')
-                                                        else:
-                                                            await channel.send("**What is the start date?** (DD/MM/YYYY)")
-                                                            start_date = await client.wait_for('message',
-                                                                                                check=lambda
-                                                                                                    x: x.channel == channel.channel)
-                                                            start_date = start_date.content
-                                                            await channel.send("**What is the end date?** (DD/MM/YYYY)")
-                                                            end_date = await client.wait_for('message',
-                                                                                                check=lambda
-                                                                                                    x: x.channel == channel.channel)
-                                                            end_date = end_date.content
-                                                            a, b, c = start_date.split('/')
-                                                            p, q, r = end_date.split('/')
+                                                    name = await client.wait_for('message', check=lambda
+                                                        x: x.channel == channel.channel)
+                                                    name = name.content
+                                                    ign = await hypixel.get_dispname(name)
+                                                    rank = await hypixel.get_rank(name)
+                                                    async with aiohttp.ClientSession() as session:
+                                                        async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{ign}') as resp:
+                                                            request = await resp.json()
+                                                            uuid = request['id']
+                                                            with open('dnkl.json') as f:
+                                                                data = json.load(f)
+                                                            if resp.status_code != 200:
+                                                                await channel.send('Unknown IGN!')
+                                                            else:
+                                                                await channel.send("**What is the start date?** (DD/MM/YYYY)")
+                                                                start_date = await client.wait_for('message',
+                                                                                                    check=lambda
+                                                                                                        x: x.channel == channel.channel)
+                                                                start_date = start_date.content
+                                                                await channel.send("**What is the end date?** (DD/MM/YYYY)")
+                                                                end_date = await client.wait_for('message',
+                                                                                                    check=lambda
+                                                                                                        x: x.channel == channel.channel)
+                                                                end_date = end_date.content
+                                                                a, b, c = start_date.split('/')
+                                                                p, q, r = end_date.split('/')
 
-                                                            await channel.send("**What's the reason for inactivity?**")
-                                                            reason = await client.wait_for('message',
-                                                                                                check=lambda
-                                                                                                    x: x.channel == channel.channel)
-                                                            reason = reason.content
+                                                                await channel.send("**What's the reason for inactivity?**")
+                                                                reason = await client.wait_for('message',
+                                                                                                    check=lambda
+                                                                                                        x: x.channel == channel.channel)
+                                                                reason = reason.content
 
-                                                            if int(b) > 12:
-                                                                embed = discord.Embed(title='Please enter a valid date!',
-                                                                                        description="`DD/MM/YYYY`",
-                                                                                        color=0xff0000)
-                                                                await channel.send(embed=embed)
-                                                            if int(q) > 12:
-                                                                embed = discord.Embed(title='Please enter a valid date!',
-                                                                                        description="`DD/MM/YYYY`",
-                                                                                        color=0xff0000)
-                                                                await channel.send(embed=embed)
-                                                            if int(b) & int(q) <= 12:
-                                                                dates = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May",
-                                                                            6: "June", 7: "July", 8: "August", 9: "September",
-                                                                            10: "October", 11: "November", 12: "December"}
-                                                                start_month = dates.get(int(b))
-                                                                end_month = dates.get(int(q))
+                                                                if int(b) > 12:
+                                                                    embed = discord.Embed(title='Please enter a valid date!',
+                                                                                            description="`DD/MM/YYYY`",
+                                                                                            color=0xff0000)
+                                                                    await channel.send(embed=embed)
+                                                                if int(q) > 12:
+                                                                    embed = discord.Embed(title='Please enter a valid date!',
+                                                                                            description="`DD/MM/YYYY`",
+                                                                                            color=0xff0000)
+                                                                    await channel.send(embed=embed)
+                                                                if int(b) & int(q) <= 12:
+                                                                    dates = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May",
+                                                                                6: "June", 7: "July", 8: "August", 9: "September",
+                                                                                10: "October", 11: "November", 12: "December"}
+                                                                    start_month = dates.get(int(b))
+                                                                    end_month = dates.get(int(q))
 
-                                                                embed = discord.Embed(title=f"{rank} {ign}",
-                                                                                        url=f'https://plancke.io/hypixel/player/stats/{ign}',
-                                                                                        color=0x0ffff)
-                                                                embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
-                                                                embed.add_field(name="IGN:", value=f"{ign}", inline=False)
-                                                                embed.add_field(name="Start:", value=f"{a} {start_month} {c}",
-                                                                                inline=False)
-                                                                embed.add_field(name="End:", value=f"{p} {end_month} {r}", inline=False)
-                                                                embed.add_field(name="Reason", value=f"{reason}", inline=False)
-                                                                embed.set_author(name="Do not kick list")
-                                                                await channel.channel.purge(limit=1)
-                                                                dnkl_channel = client.get_channel(629564802812870657)
-                                                                message = await dnkl_channel.send(embed=embed)
+                                                                    embed = discord.Embed(title=f"{rank} {ign}",
+                                                                                            url=f'https://plancke.io/hypixel/player/stats/{ign}',
+                                                                                            color=0x0ffff)
+                                                                    embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
+                                                                    embed.add_field(name="IGN:", value=f"{ign}", inline=False)
+                                                                    embed.add_field(name="Start:", value=f"{a} {start_month} {c}",
+                                                                                    inline=False)
+                                                                    embed.add_field(name="End:", value=f"{p} {end_month} {r}", inline=False)
+                                                                    embed.add_field(name="Reason", value=f"{reason}", inline=False)
+                                                                    embed.set_author(name="Do not kick list")
+                                                                    await channel.channel.purge(limit=1)
+                                                                    dnkl_channel = client.get_channel(629564802812870657)
+                                                                    message = await dnkl_channel.send(embed=embed)
 
 
-                                                                dnkl_dict = {ign: message.id}
+                                                                    dnkl_dict = {ign: message.id}
 
-                                                                data.update(dnkl_dict)
-                                                                with open('dnkl.json', 'w') as f:
-                                                                    json.dump(data, f)
-                                                        await session.close()
+                                                                    data.update(dnkl_dict)
+                                                                    with open('dnkl.json', 'w') as f:
+                                                                        json.dump(data, f)
+
+                                                                    await session.close()
+                                            else:
+                                                continue
                                         else:
                                             continue
 

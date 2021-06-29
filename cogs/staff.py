@@ -12,7 +12,7 @@ class staff(commands.Cog, name="Staff"):
     def __init__(self, client):
         self.client = client
 
-    @commands.command(aliases=['req', 'requirement', 'Req', 'Requirement', 'Requirements'])
+    @commands.command(aliases=['req', 'requirement'])
     async def requirements(self, ctx):
         """Lists the requirements
         """
@@ -31,7 +31,7 @@ class staff(commands.Cog, name="Staff"):
         except Exception as e:
             print(e)
 
-    @commands.command(aliases=['res', 'Res', 'Resident'])
+    @commands.command(aliases=['res'])
     async def resident(self, ctx):
         """Lists the methods to get the resident rank
         """
@@ -52,7 +52,7 @@ class staff(commands.Cog, name="Staff"):
         except Exception as e:
             print(e)
 
-    @commands.command(aliases=['Ticket', 'Tickets', 'ticket'])
+    @commands.command(aliases=['ticket'])
     async def tickets(self, ctx):
         """Explains the entire ticket system
         """
@@ -165,7 +165,7 @@ class staff(commands.Cog, name="Staff"):
                 f"Error in {ctx.channel.name} while running `swap`"
                 f"\n{e}\n<@!326399363943497728>")
 
-    @commands.command(aliases=["Staff"])
+    @commands.command()
     @commands.has_role(538015368782807040)
     async def staff(self, ctx):
         """Prints a list of users who need to be promoted, demoted, warned and kicked!
@@ -457,53 +457,48 @@ class staff(commands.Cog, name="Staff"):
                                                 await member.add_roles(member)
                                                 await member.remove_roles(new_member, guest)
 
-                                                for user in req['guild']["members"]:
-                                                    if uuid == user["uuid"]:
-                                                        totalexp = user['expHistory']
-                                                        totalexp = sum(totalexp.values())
+                                            for user in req['guild']["members"]:
+                                                if uuid == user["uuid"]:
+                                                    totalexp = user['expHistory']
+                                                    totalexp = sum(totalexp.values())
+                                                    usergrank = user['rank']
 
-                                                if totalexp < self.client.inactive:
-                                                    await member.add_roles(inactive_role)
-                                                    await member.remove_roles(active_role)
-                                                    await message.edit(
-                                                        content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
+                                                if usergrank != 'Resident':
+                                                    if totalexp < self.client.inactive:
+                                                        await member.add_roles(inactive_role)
+                                                        await member.remove_roles(active_role)
+                                                        await message.edit(
+                                                            content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
 
-                                                elif totalexp >= self.client.active:  # If the member is active
-                                                    await member.remove_roles(inactive_role, new_member)
-                                                    await member.add_roles(active_role)
-                                                    await message.edit(
-                                                        content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
+                                                    elif totalexp >= self.client.active:  # If the member is active
+                                                        await member.remove_roles(inactive_role, new_member)
+                                                        await member.add_roles(active_role)
+                                                        await message.edit(
+                                                            content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
 
-                                                elif totalexp > self.client.inactive:
-                                                    await member.remove_roles(inactive_role, active_role)
-                                                    await message.edit(
-                                                        content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
+                                                    elif totalexp > self.client.inactive:
+                                                        await member.remove_roles(inactive_role, active_role)
+                                                        await message.edit(
+                                                            content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
+                                                else:
+                                                    if totalexp < 50000:
+                                                        await member.add_roles(inactive_role)
+                                                        await member.remove_roles(active_role)
+                                                        await message.edit(
+                                                            content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
 
-                                            elif member_role in member.roles:
-                                                # No change in terms of membership
+                                                    elif totalexp >= self.client.active:  # If the member is active
+                                                        await member.remove_roles(inactive_role, new_member)
+                                                        await member.add_roles(active_role)
+                                                        await message.edit(
+                                                            content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
 
-                                                for user in req['guild']["members"]:
-                                                    if uuid == user["uuid"]:
-                                                        totalexp = user['expHistory']
-                                                        totalexp = sum(totalexp.values())
+                                                    elif totalexp > 50000:
+                                                        await member.remove_roles(inactive_role, active_role)
+                                                        await message.edit(
+                                                            content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
 
-                                                if totalexp < self.client.inactive:
-                                                    await member.add_roles(inactive_role)
-                                                    await member.remove_roles(active_role)
-                                                    await message.edit(
-                                                        content=f"{name} ||{member}|| Already Member  **++Inactive \| --Active**")
-
-                                                elif totalexp >= self.client.active:  # If the member is active
-                                                    await member.remove_roles(inactive_role, new_member)
-                                                    await member.add_roles(active_role)
-                                                    await message.edit(
-                                                        content=f"{name} ||{member}|| Already Member **++Active \| --Inactive**")
-
-                                                elif totalexp > self.client.inactive:
-                                                    await member.remove_roles(inactive_role)
-                                                    await member.remove_roles(active_role)
-                                                    await message.edit(
-                                                        content=f"{name} ||{member}|| Already Member  **--Inactive\| --Active**")
+                                                
 
 
                                         elif ign in xl_members:
@@ -519,7 +514,7 @@ class staff(commands.Cog, name="Staff"):
             inactivity_channel = self.client.get_channel(848067712156434462)
 
             embed = discord.Embed(title="You do not meet the guild requirements!",
-                                description=f"Member requirement - {format(self.client.inactive,',d')} Weekly Guild Experience",
+                                description=f"Member requirement - **{format(self.client.inactive,',d')}** Weekly Guild Experience\nResident requirement - **{format(self.client.resident_req,',d')}** Weekly Guild Experience",
                                 color = 0xDC143C)
             await inactivity_channel.send(f"<@&848051215287058443>")
             await inactivity_channel.send(embed=embed)
@@ -539,7 +534,7 @@ class staff(commands.Cog, name="Staff"):
                 await self.client.error_channel.send(
                     f"Error in {ctx.channel.name} while using `rolecheck`\n{e}\n<@!326399363943497728>")
 
-    @commands.command(aliases=['ForceSync', 'Forcesync', 'forceSync', 'FORCESYNC', 'fs', 'Fs', 'FS', 'fS'])
+    @commands.command(aliases=['fs'])
     @commands.has_role(538015368782807040)
     async def forcesync(self, ctx, member: discord.Member, name):
         """Used to forcefully sync a player's IGN
