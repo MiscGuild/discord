@@ -147,5 +147,34 @@ class Moderation(commands.Cog, name="Moderation"):
             await ctx.channel.purge(limit=1)
             await ctx.send(embed=embed)
 
+    @commands.command()
+    @commands.has_permissions(ban_members=True)
+    async def softban(self, ctx, user: discord.Member, *, reason = None):
+        """Softbans a user!
+
+        Bans and then unbans a user to remove all of their messages
+        """
+        if reason is None:
+            reason = f'Softbanned by: {ctx.author.name}'
+
+        await ctx.guild.ban(user, reason=reason)
+        await ctx.guild.unban(user, reason=reason)
+        await ctx.send(f'{user.name} has been softbanned.')
+
+    @softban.error
+    async def softban_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            embed = discord.Embed(title='Please specify the player to be softbanned! The syntax is as follows',
+                                description="softban `user`", color=0xff0000)
+            await ctx.channel.purge(limit=1)
+            await ctx.send(embed=embed)
+
+        elif isinstance(error, commands.MissingPermissions):
+            embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
+                                description="Your role lacks permissions to softban a user", color=0xff0000)
+            await ctx.channel.purge(limit=1)
+            await ctx.send(embed=embed)
+
+
 def setup(bot):
     bot.add_cog(Moderation(bot))
