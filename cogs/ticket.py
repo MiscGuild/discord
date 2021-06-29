@@ -17,16 +17,12 @@ class Tickets(commands.Cog, name="Tickets"):
                     async with aiohttp.ClientSession() as session:
                         async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
                             request = resp
-                            if request.status != 200:
-                                pass
-                            else:
-                                request = await request.json()
-                                await session.close()
+                            request = await request.json()
+                            await session.close()
 
-                    if request.status != 200:
-                                await ctx.send('Unknown IGN!')
+                    if error in request:
+                        await ctx.send('Unknown IGN!')
                     else:
-                        request = await request.json()
                         ign = request['name']
                         uuid = request['id']
 
