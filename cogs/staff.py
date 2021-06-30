@@ -167,7 +167,7 @@ class staff(commands.Cog, name="Staff"):
 
     @commands.command()
     @commands.has_role(538015368782807040)
-    async def staff(self, ctx):
+    async def inactive(self, ctx):
         """Prints a list of users who need to be promoted, demoted, warned and kicked!
         """
         try:
@@ -360,7 +360,7 @@ class staff(commands.Cog, name="Staff"):
                 print(e)
             else:
                 print(e)
-                await self.bot.error_channel.send(f"Error in {ctx.channel.name} while using `staff`\n{e}\n<@!326399363943497728>")
+                await self.bot.error_channel.send(f"Error in {ctx.channel.name} while using `inactive`\n{e}\n<@!326399363943497728>")
             
     @commands.command()
     @commands.has_role(538015368782807040)
