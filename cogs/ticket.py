@@ -112,6 +112,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                     "\nIf you fail to meet the New Member/Member requirements, you will be kicked!")
                                 await ctx.author.send(embed=embed)
                         await session.close()
+
                 else:
                     await ctx.send('This command can only be used in the registration channel!')
         except Exception as e:
