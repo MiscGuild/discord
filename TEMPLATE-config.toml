@@ -1,0 +1,15 @@
+[bot]
+prefix = ''
+token = ""
+ownerID = 
+status = ''
+
+[hypixel]
+api_keys = [
+"",
+"",
+"",
+"",
+"",
+"",
+]
