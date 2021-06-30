@@ -16,9 +16,9 @@ class Tickets(commands.Cog, name="Tickets"):
                 if str(ctx.channel) == "register":
                     async with aiohttp.ClientSession() as session:
                         async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-                            request = await resp.json()
+                            request = await resp.json(content_type=None)
 
-                        if request.status != 200:
+                        if resp.status != 200:
                             await ctx.send('Please enter a valid ign!')
                         else:
                             ign = request['name']

@@ -257,7 +257,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{ign}') as resp:
                         request = await resp.json()
                 
-                if request.status != 200:
+                if resp.status != 200:
                     await ctx.send('Unknown IGN!')
                 else:
                     uuid = request['id']
@@ -307,9 +307,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 rank = await hypixel.get_rank(name)
                 async with aiohttp.ClientSession() as session:
                     async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{ign}') as resp:
-                        request = await resp.json()
+                        request = await resp.json(content_type=None)
                 
-                if request.status != 200:
+                if resp.status != 200:
                     await ctx.send('Unknown IGN!')
                 else:
                     uuid = request['id']
@@ -400,8 +400,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-                    request = await resp.json()
-            if request.status != 200:
+                    request = await resp.json(content_type=None)
+            if resp.status != 200:
                 await ctx.send('Unknown IGN!')
             else:
                 ign = request['name']
@@ -914,8 +914,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
             else:
                 async with aiohttp.ClientSession() as session:
                     async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-                        request = await resp.json()
-                if request.status != 200:
+                        request = await resp.json(content_type=None)
+                if resp.status != 200:
                     await ctx.send('Unknown IGN!')
                 else:
                     name = request['name']
@@ -1052,9 +1052,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     name = x
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-                    request = await resp.json()  
+                    request = await resp.json(content_type=None)  
 
-            if request.status != 200:
+            if resp.status != 200:
                 await ctx.send('Unknown IGN!')
             else:      
                 name = request['name']
