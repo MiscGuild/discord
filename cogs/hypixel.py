@@ -296,6 +296,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         data.update(dnkl_dict)
                         with open('dnkl.json', 'w') as f:
                             json.dump(data, f)
+                await session.close()
             else:
                 await ctx.send("**What is the name of the user you wish to add to the do not kick list?**")
 
@@ -364,7 +365,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         data.update(dnkl_dict)
                         with open('dnkl.json', 'w') as f:
                             json.dump(data, f)
-
+                await session.close()
 
 
         except Exception as e:
@@ -487,7 +488,6 @@ class Hypixel(commands.Cog, name="Hypixel"):
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
                     request = await resp.json()
-
                     if resp.status != 200:
                         await ctx.send('Unknown IGN!')
                         await session.close()
@@ -1054,6 +1054,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     name = x
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
+
                     request = resp
                     if request.status != 200:
                         await ctx.send('Unknown IGN!')

@@ -15,6 +15,7 @@ class Fun(commands.Cog, name="Fun"):
         async with aiohttp.ClientSession() as session:
             async with session.get('https://foodish-api.herokuapp.com/api/images/pizza') as resp:
                 req = await resp.json()
+                await session.close()
         embed = discord.Embed(title="Here's the pizza you requested:", color=0xD2691e)
         embed.set_image(url=req['image'])
         await ctx.send(embed=embed)
@@ -68,6 +69,84 @@ class Fun(commands.Cog, name="Fun"):
             embed = discord.Embed(title="You're supposed to ask me a question ._.", description="8ball `question`",
                                 color=0xff0000)
             await ctx.send(embed=embed)
+
+    @commands.command()
+    async def dog(self, ctx):
+        """Sends an image of a dog
+        """
+        async with aiohttp.ClientSession() as session:
+            async with session.get('https://some-random-api.ml/img/dog') as resp:
+                req = await resp.json()
+                await session.close()
+        embed = discord.Embed(title="Here's the dog you requested:", color=0xD2691e)
+        embed.set_image(url=req['link'])
+        await ctx.send(embed=embed)
+
+    @commands.command()
+    async def cat(self, ctx):
+        """Sends an image of a cat
+        """
+        async with aiohttp.ClientSession() as session:
+            async with session.get('https://some-random-api.ml/img/cat') as resp:
+                req = await resp.json()
+                await session.close()
+        embed = discord.Embed(title="Here's the cat you requested:", color=0xD2691e)
+        embed.set_image(url=req['link'])
+        await ctx.send(embed=embed)
+
+    @commands.command(aliases=['bird'])
+    async def birb(self, ctx):
+        """Sends an image of a birb
+        """
+        async with aiohttp.ClientSession() as session:
+            async with session.get('https://some-random-api.ml/img/birb') as resp:
+                req = await resp.json()
+                await session.close()
+        embed = discord.Embed(title="Here's the birb you requested:", color=0xD2691e)
+        embed.set_image(url=req['link'])
+        await ctx.send(embed=embed)
+
+    @commands.command()
+    async def panda(self, ctx):
+        """Sends an image of a panda
+        """
+        async with aiohttp.ClientSession() as session:
+            async with session.get('https://some-random-api.ml/img/panda') as resp:
+                req = await resp.json()
+                await session.close()
+        embed = discord.Embed(title="Here's the panda you requested:", color=0xD2691e)
+        embed.set_image(url=req['link'])
+        await ctx.send(embed=embed)
+
+    @commands.command()
+    async def pat(self, ctx, user: discord.User = None):
+        """Pat the specified user!
+        """
+        async with aiohttp.ClientSession() as session:
+            async with session.get('https://some-random-api.ml/animu/pat') as resp:
+                req = await resp.json()
+                await session.close()
+        if user is None or ctx.author == user:
+            embed = discord.Embed(title=f"{ctx.author.display_name} pats themselves.", color=0xD2691e)
+        else:
+            embed = discord.Embed(title=f"{ctx.author.display_name} pats {user.display_name}.", color=0xD2691e)
+        embed.set_image(url=req['link'])
+        await ctx.send(embed=embed)
+
+    @commands.command()
+    async def hug(self, ctx, user: discord.User = None):
+        """hug the specified user!
+        """
+        async with aiohttp.ClientSession() as session:
+            async with session.get('https://some-random-api.ml/animu/hug') as resp:
+                req = await resp.json()
+                await session.close()
+        if user is None or ctx.author == user:
+            embed = discord.Embed(title=f"{ctx.author.display_name} hugs themselves.", color=0xD2691e)
+        else:
+            embed = discord.Embed(title=f"{ctx.author.display_name} hugs {user.display_name}.", color=0xD2691e)
+        embed.set_image(url=req['link'])
+        await ctx.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(Fun(bot))

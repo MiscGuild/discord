@@ -167,15 +167,16 @@ class staff(commands.Cog, name="Staff"):
 
     @commands.command()
     @commands.has_role(538015368782807040)
-    async def staff(self, ctx):
+    async def inactive(self, ctx):
         """Prints a list of users who need to be promoted, demoted, warned and kicked!
         """
         try:
             msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
-            api = await hypixel.get_api()
+            api = hypixel.get_api()
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'https://api.hypixel.net/guild?key={api}&name=Miscellaneous') as resp:
                     g = await resp.json()
+                    await session.close()
 
             with open('dnkl.json') as f:
                 data = json.load(f)
@@ -198,6 +199,7 @@ class staff(commands.Cog, name="Staff"):
                         async with aiohttp.ClientSession() as session:
                             async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
                                 a = await resp.json()
+                                await session.close()
                         name = a['name']
                         time = str(datetime.fromtimestamp(int(str(joined)[:-3])))
                         dt = (time[0:10])
@@ -213,6 +215,7 @@ class staff(commands.Cog, name="Staff"):
                         async with aiohttp.ClientSession() as session:
                             async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
                                 a = await resp.json()
+                                await session.close()
                         name = a['name']
                         time = str(datetime.fromtimestamp(int(str(joined)[:-3])))
                         dt = (time[0:10])
@@ -357,7 +360,7 @@ class staff(commands.Cog, name="Staff"):
                 print(e)
             else:
                 print(e)
-                await self.bot.error_channel.send(f"Error in {ctx.channel.name} while using `staff`\n{e}\n<@!326399363943497728>")
+                await self.bot.error_channel.send(f"Error in {ctx.channel.name} while using `inactive`\n{e}\n<@!326399363943497728>")
             
     @commands.command()
     @commands.has_role(538015368782807040)
@@ -417,99 +420,99 @@ class staff(commands.Cog, name="Staff"):
                     for response in await asyncio.gather(*tasks):  # Puts the result into a list
                         xl_members.append(response)
 
+            for guild in self.bot.guilds:
+                if str(guild) == "Miscellaneous [MISC]":  # Check if the Discord is Miscellaneous
+                    for member in guild.members:  # For loop for all members in the Discord
+                        if member.id != '326399363943497728' and member.bot is False:
+                            name = member.nick  # Obtaining their nick
+                            if name is None:  # If they don't have a nick, it uses their name.
+                                name = member.name
 
-            if staff in ctx.author.roles:  # Making sure that the user is Staff
-                for guild in self.bot.guilds:
-                    if str(guild) == "Miscellaneous [MISC]":  # Check if the Discord is Miscellaneous
-                        for member in guild.members:  # For loop for all members in the Discord
-                            if member.id != '326399363943497728' and member.bot is False:
-                                name = member.nick  # Obtaining their nick
-                                if name is None:  # If they don't have a nick, it uses their name.
-                                    name = member.name
+                            else:
+                                message = await ctx.send(f"Checking {name}")
+
+                                async with aiohttp.ClientSession() as session:
+                                    async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
+                                        mojang = resp
+                                
+                                        if mojang.status != 200:  # If the IGN is invalid
+                                            await member.remove_roles(member_role, guest)
+                                            await member.add_roles(new_member)
+                                            await message.edit(content=
+                                                            f"{name} ||{member}|| Player doesn't exist. **++New Member | --Member | -- Guest**")
+                                        elif guild_master not in member.roles:
+                                            mojang_json = await mojang.json()
+                                            ign = mojang_json["name"]
+                                            uuid = mojang_json['id']
+                                            await member.edit(nick=ign)
+                                        await session.close()
+
+
+                                    #Miscellaneous
+                                if ign in misc_members and ign != "Rowdies":
+                                    async with aiohttp.ClientSession() as session:
+                                        async with session.get(f"https://api.hypixel.net/guild?key={await hypixel.get_api()}&player={uuid}") as resp:
+                                            req = await resp.json()
+                                            await session.close()
+
+
+                                    if member_role not in member.roles:
+                                        await member.add_roles(member)
+                                        await member.remove_roles(new_member, guest)
+
+                                    for user in req['guild']["members"]:
+                                        if uuid == user["uuid"]:
+                                            totalexp = user['expHistory']
+                                            totalexp = sum(totalexp.values())
+                                            usergrank = user['rank']
+
+                                        if usergrank != 'Resident':
+                                            if totalexp < self.bot.inactive:
+                                                await member.add_roles(inactive_role)
+                                                await member.remove_roles(active_role)
+                                                await message.edit(
+                                                    content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
+
+                                            elif totalexp >= self.bot.active:  # If the member is active
+                                                await member.remove_roles(inactive_role, new_member)
+                                                await member.add_roles(active_role)
+                                                await message.edit(
+                                                    content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
+
+                                            elif totalexp > self.bot.inactive:
+                                                await member.remove_roles(inactive_role, active_role)
+                                                await message.edit(
+                                                    content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
+                                        else:
+                                            if totalexp < 50000:
+                                                await member.add_roles(inactive_role)
+                                                await member.remove_roles(active_role)
+                                                await message.edit(
+                                                    content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
+
+                                            elif totalexp >= self.bot.active:  # If the member is active
+                                                await member.remove_roles(inactive_role, new_member)
+                                                await member.add_roles(active_role)
+                                                await message.edit(
+                                                    content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
+
+                                            elif totalexp > 50000:
+                                                await member.remove_roles(inactive_role, active_role)
+                                                await message.edit(
+                                                    content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
+
+
+
+
+                                elif ign in xl_members:
+                                    await member.add_roles(guest, xl_ally)
+                                    await member.remove_roles(member_role, new_member, active_role)
+                                    await message.edit(content=f"{name} ||{member}|| Member of XL **++XL - Ally \| ++Guest | --Member | --Active**")
 
                                 else:
-                                    message = await ctx.send(f"Checking {name}")
-
-                                    async with aiohttp.ClientSession() as session:
-                                        async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-                                            mojang = resp
-                                    
-                                    if mojang.status != 200:  # If the IGN is invalid
-                                        await member.remove_roles(member_role, guest)
-                                        await member.add_roles(new_member)
-                                        await message.edit(content=
-                                                        f"{name} ||{member}|| Player doesn't exist. **++New Member | --Member | -- Guest**")
-                                    elif guild_master not in member.roles:
-                                        mojang_json = await mojang.json()
-                                        ign = mojang_json["name"]
-                                        uuid = mojang_json['id']
-                                        await member.edit(nick=ign)
-
-
-                                        #Miscellaneous
-                                        if ign in misc_members and ign != "Rowdies":
-                                            async with aiohttp.ClientSession() as session:
-                                                async with session.get(f"https://api.hypixel.net/guild?key={await hypixel.get_api()}&player={uuid}") as resp:
-                                                    req = await resp.json()
-
-
-                                            if member_role not in member.roles:
-                                                await member.add_roles(member)
-                                                await member.remove_roles(new_member, guest)
-
-                                            for user in req['guild']["members"]:
-                                                if uuid == user["uuid"]:
-                                                    totalexp = user['expHistory']
-                                                    totalexp = sum(totalexp.values())
-                                                    usergrank = user['rank']
-
-                                                if usergrank != 'Resident':
-                                                    if totalexp < self.bot.inactive:
-                                                        await member.add_roles(inactive_role)
-                                                        await member.remove_roles(active_role)
-                                                        await message.edit(
-                                                            content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
-
-                                                    elif totalexp >= self.bot.active:  # If the member is active
-                                                        await member.remove_roles(inactive_role, new_member)
-                                                        await member.add_roles(active_role)
-                                                        await message.edit(
-                                                            content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
-
-                                                    elif totalexp > self.bot.inactive:
-                                                        await member.remove_roles(inactive_role, active_role)
-                                                        await message.edit(
-                                                            content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
-                                                else:
-                                                    if totalexp < 50000:
-                                                        await member.add_roles(inactive_role)
-                                                        await member.remove_roles(active_role)
-                                                        await message.edit(
-                                                            content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
-
-                                                    elif totalexp >= self.bot.active:  # If the member is active
-                                                        await member.remove_roles(inactive_role, new_member)
-                                                        await member.add_roles(active_role)
-                                                        await message.edit(
-                                                            content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
-
-                                                    elif totalexp > 50000:
-                                                        await member.remove_roles(inactive_role, active_role)
-                                                        await message.edit(
-                                                            content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
-
-                                                
-
-
-                                        elif ign in xl_members:
-                                            await member.add_roles(guest, xl_ally)
-                                            await member.remove_roles(member_role, new_member, active_role)
-                                            await message.edit(content=f"{name} ||{member}|| Member of XL **++XL - Ally \| ++Guest | --Member | --Active**")
-
-                                        else:
-                                            await member.add_roles(guest)
-                                            await member.remove_roles(member_role, new_member, active_role)
-                                            await message.edit(content=f"{name} ||{member}|| Member of an unallied guild **++Guest | --Member | --Active**")
+                                    await member.add_roles(guest)
+                                    await member.remove_roles(member_role, new_member, active_role)
+                                    await message.edit(content=f"{name} ||{member}|| Member of an unallied guild **++Guest | --Member | --Active**")
 
             inactivity_channel = self.bot.get_channel(848067712156434462)
 
@@ -718,62 +721,60 @@ class staff(commands.Cog, name="Staff"):
                     for response in await asyncio.gather(*tasks):  # Puts the result into a list
                         xl_members.append(response)
 
+            for guild in self.bot.guilds:
+                if str(guild) == "Miscellaneous [MISC]":  # Check if the Discord is Miscellaneous
+                    for member in guild.members:  # For loop for all members in the Discord
+                        if not member.bot:
+                            discord_members.append(member)
 
-            if staff in ctx.author.roles:  # Making sure that the user is Staff
-                for guild in self.bot.guilds:
-                    if str(guild) == "Miscellaneous [MISC]":  # Check if the Discord is Miscellaneous
-                        for member in guild.members:  # For loop for all members in the Discord
-                            if not member.bot:
-                                discord_members.append(member)
+            invalid_names = active_names = inactive_names = member_names = xl_names = ""
+            for member in discord_members:
+                name = member.nick  # Obtaining their nick
+                if name is None:  # If they don't have a nick, it uses their name.
+                    name = member.name
 
-                invalid_names = active_names = inactive_names = member_names = xl_names = ""
-                for member in discord_members:
-                    name = member.nick  # Obtaining their nick
-                    if name is None:  # If they don't have a nick, it uses their name.
-                        name = member.name
+                name = '_' + name
 
-                    name = '_' + name
+                if name.isidentifier() is False:
+                    await member.remove_roles(member_role, guest)
+                    await member.add_roles(new_member)
 
-                    if name.isidentifier() is False:
-                        await member.remove_roles(member_role, guest)
-                        await member.add_roles(new_member)
+                    invalid_names = invalid_names + str(member) + "\n"
+                    discord_members.pop(discord_members.index(member))
 
-                        invalid_names = invalid_names + str(member) + "\n"
-                        discord_members.pop(discord_members.index(member))
+                name = member.nick  # Obtaining their nick
+                if name is None:  # If they don't have a nick, it uses their name.
+                    name = member.name
 
-                    name = member.nick  # Obtaining their nick
-                    if name is None:  # If they don't have a nick, it uses their name.
-                        name = member.name
+                for element in misc_details:
+                    if name in element[0]:
+                        if element[1] > self.bot.active:
+                            active_members.append(member)
+                            active_names = active_names + str(member) + "\n"
+                        elif element[1] > self.bot.inactive:
+                            if member_role not in member.roles:
+                                regular_members.append(member)
+                                member_names = member_names + str(member) + "\n"
+                        elif element[1] < self.bot.inactive:
+                            inactive_members.append(member)
+                            inactive_names = inactive_names + str(member) + "\n"
 
-                    for element in misc_details:
-                        if name in element[0]:
-                            if element[1] > self.bot.active:
-                                active_members.append(member)
-                                active_names = active_names + str(member) + "\n"
-                            elif element[1] > self.bot.inactive:
-                                if member_role not in member.roles:
-                                    regular_members.append(member)
-                                    member_names = member_names + str(member) + "\n"
-                            elif element[1] < self.bot.inactive:
-                                inactive_members.append(member)
-                                inactive_names = inactive_names + str(member) + "\n"
-
-                    if name in xl_members:
-                        if xl_ally not in member.roles:
-                            xl_discord_members.append(member)
-                            xl_names = xl_names + str(member) + "\n"
-                    else:
-                        guest_list.append(member)
-                invalid_embed = discord.Embed(title="Invalid: Given @New Member", description=invalid_names, color=0x620B06)
-                active_embed = discord.Embed(title="Active: Given @Active", description=active_names, color=0x0073BF)
-                member_embed = discord.Embed(title="Member: Given @Member", description=member_names, color=0x4DFF00)
-                inactive_embed = discord.Embed(title="Inactive: Given @inactive", description=inactive_names, color=0xFF4C6E)
-                xl_embed = discord.Embed(title="XL: Given @xl_ally", description=xl_names, color=0xA05E75)
-                await ctx.send(embed=invalid_embed)
-                await ctx.send(embed=active_embed)
-                await ctx.send(embed=member_embed)
-                await ctx.send(embed=inactive_embed)
-                await ctx.send(embed=xl_embed)
+                if name in xl_members:
+                    if xl_ally not in member.roles:
+                        xl_discord_members.append(member)
+                        xl_names = xl_names + str(member) + "\n"
+                else:
+                    guest_list.append(member)
+            invalid_embed = discord.Embed(title="Invalid: Given @New Member", description=invalid_names, color=0x620B06)
+            active_embed = discord.Embed(title="Active: Given @Active", description=active_names, color=0x0073BF)
+            member_embed = discord.Embed(title="Member: Given @Member", description=member_names, color=0x4DFF00)
+            inactive_embed = discord.Embed(title="Inactive: Given @inactive", description=inactive_names, color=0xFF4C6E)
+            xl_embed = discord.Embed(title="XL: Given @xl_ally", description=xl_names, color=0xA05E75)
+            await ctx.send(embed=invalid_embed)
+            await ctx.send(embed=active_embed)
+            await ctx.send(embed=member_embed)
+            await ctx.send(embed=inactive_embed)
+            await ctx.send(embed=xl_embed)
 
 
 
