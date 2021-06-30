@@ -175,6 +175,5 @@ class Moderation(commands.Cog, name="Moderation"):
             await ctx.channel.purge(limit=1)
             await ctx.send(embed=embed)
 
-
 def setup(bot):
     bot.add_cog(Moderation(bot))

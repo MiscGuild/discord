@@ -60,10 +60,16 @@ async def on_ready():
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
-        return
+        embed = discord.Embed(title='Invalid Command!',
+                                descrption='Use `,help` to view a list of all commands!', color=0xff0000)
+        await ctx.send(embed=embed)
     elif isinstance(error, commands.NotOwner):
             embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
                                     description="You are not the owner of this bot!", color=0xff0000)
+            await ctx.send(embed=embed)
+    elif isinstance(error, commands.MissingRole):
+            embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
+                                    description="You do not have the required roles to access this restricted command!", color=0xff0000)
             await ctx.send(embed=embed)
 
 @bot.event
