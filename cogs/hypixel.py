@@ -1037,6 +1037,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                     description="Please try again in a while!", color=0xff0000)
                 await ctx.send(embed=embed)
                 print(e)
+            if "0, message='Attempt to decode JSON with unexpected mimetype:" in e:
+                await ctx.send('Please enter a valid ign!')
             else:
                 print(e)
                 await self.bot.error_channel.send(f"Error in {ctx.channel.name} while using `g` \n{e}\n<@!326399363943497728>")
