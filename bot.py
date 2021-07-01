@@ -1354,6 +1354,8 @@ async def on_guild_channel_create(channel):
 async def after_cache_ready():
     await bot.wait_until_ready()
     bot.error_channel = bot.get_channel(523743721443950612)
+    await bot.wait_until_ready()
+    bot.dnkl_channel = bot.get_channel(629564802812870657)
     with open('dnkl.json', 'r') as f:
         data = str(f.read()).replace("'", '"')
     with open('dnkl.json', 'w') as f:

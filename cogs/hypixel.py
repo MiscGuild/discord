@@ -255,7 +255,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 rank = await hypixel.get_rank(name)
                 async with aiohttp.ClientSession() as session:
                     async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{ign}') as resp:
-                        request = await resp.json()
+                        request = await resp.json(content_type=None)
                 
                 if resp.status != 200:
                     await ctx.send('Unknown IGN!')
@@ -417,9 +417,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 with open('dnkl.json', 'w') as f:
                     json.dump(data, f)
 
-                dnkl_channel = self.bot.get_channel(629564802812870657)
-
-                msg = await dnkl_channel.fetch_message(msgid)
+                msg = await self.bot.dnkl_channel.fetch_message(msgid)
                 await msg.delete()
 
                 await ctx.send(f'{ign} has been removed from the do-not-kick-list!')
