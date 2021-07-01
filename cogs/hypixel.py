@@ -255,15 +255,15 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 rank = await hypixel.get_rank(name)
                 async with aiohttp.ClientSession() as session:
                     async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{ign}') as resp:
-                        request = await resp.json()
+                        request = await resp.json(content_type=None)
                 
                 if resp.status != 200:
                     await ctx.send('Unknown IGN!')
                 else:
                     uuid = request['id']
                     with open('dnkl.json') as f:
-                      data = json.load(f)
-                    
+                        data = json.load(f)
+
                     a, b, c = x.split('/')
                     p, q, r = y.split('/')
 
@@ -297,6 +297,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         with open('dnkl.json', 'w') as f:
                             json.dump(data, f)
                 await session.close()
+
             else:
                 await ctx.send("**What is the name of the user you wish to add to the do not kick list?**")
 
@@ -305,7 +306,6 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 ign = await hypixel.get_dispname(name)
                 rank = await hypixel.get_rank(name)
                 async with aiohttp.ClientSession() as session:
-
                     async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{ign}') as resp:
                         request = await resp.json(content_type=None)
                 
@@ -356,8 +356,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         embed.add_field(name="End:", value=f"{p} {end_month} {r}", inline=False)
                         embed.add_field(name="Reason", value=f"{reason}", inline=False)
                         embed.set_author(name="Do not kick list")
-                        dnkl_channel = self.bot.get_channel(629564802812870657)
-                        message = await dnkl_channel.send(embed=embed)
+                        
+                        message = await self.bot.dnkl_channel.send(embed=embed)
 
                         dnkl_dict = {ign: message.id}
 
@@ -401,7 +401,6 @@ class Hypixel(commands.Cog, name="Hypixel"):
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
                     request = await resp.json(content_type=None)
-                    
             if resp.status != 200:
                 await ctx.send('Unknown IGN!')
             else:
@@ -418,9 +417,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 with open('dnkl.json', 'w') as f:
                     json.dump(data, f)
 
-                dnkl_channel = self.bot.get_channel(629564802812870657)
-
-                msg = await dnkl_channel.fetch_message(msgid)
+                msg = await self.bot.dnkl_channel.fetch_message(msgid)
                 await msg.delete()
 
                 await ctx.send(f'{ign} has been removed from the do-not-kick-list!')
@@ -476,80 +473,6 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 f"Error in {ctx.channel.name} while running dnkllist"
                 f"\n{e}\n<@!326399363943497728>")
 
-    # Blacklist
-    @commands.command(aliases=["blacklist"])
-    @commands.has_permissions(manage_messages=True)
-    async def bl(self, ctx, name, time, *, reason):
-        """Adds the user to the guild blacklist
-        """
-        try:
-            rank = await hypixel.get_rank(name)
-
-            async with aiohttp.ClientSession() as session:
-                async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-                    request = await resp.json()
-                    if resp.status != 200:
-                        await ctx.send('Unknown IGN!')
-                        await session.close()
-                        return
-                    await session.close()
-
-            ign = request["name"]
-            if time in ("None", "Never"):
-                uuid = request['id']
-                embed = discord.Embed(title=f"{rank} {ign}",
-                                    url=f'https://plancke.io/hypixel/player/stats/{ign}', color=0xff0000)
-                embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
-                embed.add_field(name="IGN:", value=f"{ign}", inline=False)
-                embed.add_field(name="End:", value="Never", inline=False)
-                embed.add_field(name="Reason:", value=f"{reason}", inline=False)
-                embed.set_author(name="Blacklist")
-                await ctx.channel.purge(limit=1)
-                await ctx.send(embed=embed)
-            else:
-                t = time.split('/')
-                a = int(t[0])
-                b = int(t[1])
-                c = int(t[2])
-                if b > 12:
-                    embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`",
-                                        color=0xff0000)
-                    await ctx.send(embed=embed)
-                if b <= 12:
-                    dates = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May", 6: "June", 7: "July", 8: "August", 9: "September", 10: "October", 11: "November", 12: "December"}
-                    end_month = dates.get(b)
-
-                    uuid = request['id']
-                    embed = discord.Embed(title=f"{rank} {ign}",
-                                        url=f'https://plancke.io/hypixel/player/stats/{ign}',
-                                        color=0xff0000)
-                    embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
-                    embed.add_field(name="IGN:", value=ign, inline=False)
-                    embed.add_field(name="End:", value=f"{a} {end_month} {c}", inline=False)
-                    embed.add_field(name="Reason:", value=reason, inline=False)
-                    embed.set_author(name="Blacklist")
-                    await ctx.channel.purge(limit=1)
-                    await ctx.send(embed=embed)
-        except Exception as e:
-            if str(e) == "Expecting value: line 1 column 1 (char 0)":
-                embed = discord.Embed(title="The Hypixel API is down!", description="Please try again in a while!", color=0xff0000)
-                await ctx.send(embed=embed)
-                print(e)
-            else:
-                print(e)
-                await self.bot.error_channel.send(f"Error in {ctx.channel.name} while trying  to blacklist a user\n{e}\n<@!326399363943497728>")
-    @bl.error
-    async def bl_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            embed = discord.Embed(title='Please check the command! The syntax is as follows',
-                                description='bl `IGN` `End Date` `Reason`', color=0xff0000)
-            await ctx.channel.purge(limit=1)
-            await ctx.send(embed=embed)
-        elif isinstance(error, commands.MissingPermissions):
-            embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
-                                description="Your role lacks permissions to blacklist a user", color=0xff0000)
-            await ctx.channel.purge(limit=1)
-            await ctx.send(embed=embed)
 
     @commands.command(aliases=["gi"])
     async def ginfo(self, ctx, *, name):
@@ -916,7 +839,6 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 async with aiohttp.ClientSession() as session:
                     async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
                         request = await resp.json(content_type=None)
-                        
                 if resp.status != 200:
                     await ctx.send('Unknown IGN!')
                 else:
@@ -1030,7 +952,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                     embed.set_image(url=chart_url)
                                     await ctx.send(embed=embed)
                 await session.close()
-                
+
         except Exception as e:
             if str(e) == "Expecting value: line 1 column 1 (char 0)":
                 embed = discord.Embed(title="The Hypixel API is down!",
@@ -1065,6 +987,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 async with aiohttp.ClientSession() as session:
                     async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
                         data = await resp.json()
+                        if data['guild'] == None:
+                            await ctx.send('You are not in a guild!')
+                            return
                         await session.close()
                 gname = data['guild']['name']
                 if gname != 'Miscellaneous':
@@ -1104,7 +1029,14 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             await ctx.send(embed=embed)
             await session.close()
 
-            
+        except Exception as e:
+            if str(e) == "Expecting value: line 1 column 1 (char 0)":
+                embed = discord.Embed(title="The Hypixel API is down!", description="Please try again in a while!", color=0xff0000)
+                await ctx.send(embed=embed)
+                print(e)
+            else:
+                print(e)
+                await self.bot.error_channel.send(f"Error in {ctx.channel.name} while using `dnklchk`\n{e}\n<@!326399363943497728>")
 
     @commands.command(aliases=["gt"])
     async def gtop(self, ctx):
