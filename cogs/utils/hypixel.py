@@ -371,7 +371,7 @@ def fetch(session, individual_uuid):
     with session.get(base_url + individual_uuid) as response:
         data = response.json()
 
-        if response.status != 200:
+        if response.status_code != 200:
             return None
         name = data['name']
         return name
