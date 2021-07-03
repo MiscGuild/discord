@@ -246,7 +246,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
     # Do-Not-Kick-List
     @commands.command()
     @commands.has_permissions(manage_messages=True)
-    async def dnkladd(self, ctx, name = None, w = None, x = None, y = None, *, z = None):
+    async def dnkladd(self, ctx, name = None, x = None, y = None, *, z = None):
         """Adds the user to the do-not-kick-list!
         """
         try:
@@ -282,7 +282,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
                         embed = discord.Embed(title=f"{rank} {ign}", url=f'https://plancke.io/hypixel/player/stats/{ign}',
                                             color=0x0ffff)
-                        embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
+                        embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}?size=512&default=MHF_Steve&overlay')
                         embed.add_field(name="IGN:", value=f"{ign}", inline=False)
                         embed.add_field(name="Start:", value=f"{a} {start_month} {c}", inline=False)
                         embed.add_field(name="End:", value=f"{p} {end_month} {r}", inline=False)
@@ -350,7 +350,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
                         embed = discord.Embed(title=f"{rank} {ign}", url=f'https://plancke.io/hypixel/player/stats/{ign}',
                                             color=0x0ffff)
-                        embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
+                        embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}?size=512&default=MHF_Steve&overlay')
                         embed.add_field(name="IGN:", value=f"{ign}", inline=False)
                         embed.add_field(name="Start:", value=f"{a} {start_month} {c}", inline=False)
                         embed.add_field(name="End:", value=f"{p} {end_month} {r}", inline=False)
