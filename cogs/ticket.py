@@ -9,7 +9,7 @@ class Tickets(commands.Cog, name="Tickets"):
         self.bot = bot
 
     @commands.command(aliases=['reg', 'verify'])
-    async def register(self, ctx, name, n=None):
+    async def register(self, ctx, name):
         async with ctx.channel.typing():
             author = ctx.author
             if str(ctx.channel) == "register":
