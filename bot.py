@@ -635,7 +635,7 @@ async def on_guild_channel_create(channel):
                 await channel.send('What is your minecraft username?')
                 role_reply = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                 name = role_reply.content
-                ign, uuid = hypixel.get_dispnameID(name)
+                ign, uuid = await hypixel.get_dispnameID(name)
                 if ign is None:
                     await channel.send('Please enter a valid ign!')
                     await channel.send("I'll restart the process. If you think I made an error, select 'Other' upon restart")
@@ -877,14 +877,14 @@ async def on_guild_channel_create(channel):
                         await channel.send('What is your minecraft username?')
                         role_reply = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                         name = role_reply.content
-                        ign, uuid = hypixel.get_dispnameID(name)
+                        ign, uuid = await hypixel.get_dispnameID(name)
                         if ign is None:
                             await channel.send('Please enter a valid ign!')
                             await channel.send(
                                 "I'll restart the process. "
                                 "If you think I made an error, select 'Other' upon restart")
                         else:
-                            guild_name = hypixel.get_guild(name)
+                            guild_name = await hypixel.get_guild(name)
 
                             guest = discord.utils.get(channel.guild.roles, name="Guest")
                             member = discord.utils.get(channel.guild.roles, name="Member")
@@ -1067,12 +1067,12 @@ async def on_guild_channel_create(channel):
                 embed.add_field(name="Polyvalent (All gamemodes)", value="Must fulfill all requirements", inline=False)
                 await channel.send(embed=embed)
 
-                req = hypixel.get_data(name)
+                req = await hypixel.get_data(name)
                 if req["player"] is None:
                     embed = discord.Embed(title='Unknown IGN', description='Kindly create a new ticket to sync your name and then create another ticket for the GvG Application!', color=0xff0000)
                     await channel.send(embed=embed)
                 else:
-                    req = hypixel.get_data(name)
+                    req = await hypixel.get_data(name)
                     uuid = req['player']['uuid']
 
                     x=0
