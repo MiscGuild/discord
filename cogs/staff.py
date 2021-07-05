@@ -71,78 +71,6 @@ class staff(commands.Cog, name="Staff"):
         embed.set_image(url=f"https://media.discordapp.net/attachments/522930919984726016/775953643991990272/unknown.png?width=1069&height=702")
         await ctx.send(embed=embed)
 
-    @commands.command(aliases=['participant'])
-    async def participants(self, ctx, raw=None):
-        staff = discord.utils.get(ctx.guild.roles, name="Staff")
-        if staff in ctx.author.roles:
-            div1_name = div2_name = ""
-            count = 0
-            with open('eventparticipants.json') as f:
-                data = json.load(f)
-            if raw is not None:
-                await ctx.author.send(data)
-            else:
-                for x in data['div1']:
-                    div1_name = div1_name + f"{x}\n"
-                    count += 1
-                for x in data['div2']:
-                    div2_name = div2_name + f"{x}\n"
-                    count += 1
-                embed = discord.Embed(title='The participants of the event are as follows:',
-                                    color=0x8368ff)
-                embed.add_field(name="Division 1", value=div1_name, inline=False)
-                embed.add_field(name="Division 2", value=div2_name, inline=False)
-                embed.set_footer(text=f"Total: {count}")
-                await ctx.send(embed=embed)
-        else:
-            participants = ""
-            count = 0
-            with open('eventparticipants.json') as f:
-                data = json.load(f)
-            if raw is not None:
-                await ctx.author.send(data)
-            else:
-                for x in data['div1']:
-                    participants = participants + f"{x}\n"
-                    count += 1
-                for x in data['div2']:
-                    participants = participants + f"{x}\n"
-                    count += 1
-                embed = discord.Embed(title='The participants of the event are as follows:', description=participants,
-                                    color=0x8368ff)
-                embed.set_footer(text=f"Total: {count}")
-                await ctx.send(embed=embed)
-
-    @commands.command(aliases=['switch','swapper'])
-    async def swap(self, ctx, name):
-        """Swaps a users division in an event
-        """
-        count = 0
-        div1_name = div2_name = ""
-        ign = await hypixel.get_dispname(name)
-        with open('eventparticipants.json') as f:
-            data = json.load(f)
-            if ign in data['div1']:
-                data['div1'].remove(ign)
-                data['div2'].append(ign)
-            else:
-                data['div2'].remove(ign)
-                data['div1'].append(ign)
-
-            for x in data['div1']:
-                div1_name = div1_name + f"{x}\n"
-                count += 1
-            for x in data['div2']:
-                div2_name = div2_name + f"{x}\n"
-                count += 1
-            embed = discord.Embed(title='The participants of the event are as follows:',
-                                color=0x8368ff)
-            embed.add_field(name="Division 1", value=div1_name, inline=False)
-            embed.add_field(name="Division 2", value=div2_name, inline=False)
-            embed.set_footer(text=f"Total: {count}")
-            await ctx.send(embed=embed)
-        with open('eventparticipants.json', 'w') as event_participants:
-            json.dump(data, event_participants)
 
     @commands.command()
     @commands.has_role(538015368782807040)
@@ -433,40 +361,40 @@ class staff(commands.Cog, name="Staff"):
                                         totalexp = sum(totalexp.values())
                                         usergrank = user['rank']
 
-                                    if usergrank != 'Resident':
-                                        if totalexp < self.bot.inactive:
-                                            await member.add_roles(inactive_role)
-                                            await member.remove_roles(active_role)
-                                            await message.edit(
-                                                content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
+                                        if usergrank != 'Resident':
+                                            if totalexp < self.bot.inactive:
+                                                await member.add_roles(inactive_role)
+                                                await member.remove_roles(active_role)
+                                                await message.edit(
+                                                    content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
 
-                                        elif totalexp >= self.bot.active:  # If the member is active
-                                            await member.remove_roles(inactive_role, new_member)
-                                            await member.add_roles(active_role)
-                                            await message.edit(
-                                                content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
+                                            elif totalexp >= self.bot.active:  # If the member is active
+                                                await member.remove_roles(inactive_role, new_member)
+                                                await member.add_roles(active_role)
+                                                await message.edit(
+                                                    content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
 
-                                        elif totalexp > self.bot.inactive:
-                                            await member.remove_roles(inactive_role, active_role)
-                                            await message.edit(
-                                                content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
-                                    else:
-                                        if totalexp < 50000:
-                                            await member.add_roles(inactive_role)
-                                            await member.remove_roles(active_role)
-                                            await message.edit(
-                                                content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
+                                            elif totalexp > self.bot.inactive:
+                                                await member.remove_roles(inactive_role, active_role)
+                                                await message.edit(
+                                                    content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
+                                        else:
+                                            if totalexp < 50000:
+                                                await member.add_roles(inactive_role)
+                                                await member.remove_roles(active_role)
+                                                await message.edit(
+                                                    content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
 
-                                        elif totalexp >= self.bot.active:  # If the member is active
-                                            await member.remove_roles(inactive_role, new_member)
-                                            await member.add_roles(active_role)
-                                            await message.edit(
-                                                content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
+                                            elif totalexp >= self.bot.active:  # If the member is active
+                                                await member.remove_roles(inactive_role, new_member)
+                                                await member.add_roles(active_role)
+                                                await message.edit(
+                                                    content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
 
-                                        elif totalexp > 50000:
-                                            await member.remove_roles(inactive_role, active_role)
-                                            await message.edit(
-                                                content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
+                                            elif totalexp > 50000:
+                                                await member.remove_roles(inactive_role, active_role)
+                                                await message.edit(
+                                                    content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
 
 
 
@@ -498,7 +426,7 @@ class staff(commands.Cog, name="Staff"):
         officer = discord.utils.get(ctx.guild.roles, name="Officer")
         admin = discord.utils.get(ctx.guild.roles, name="Admin")
         if officer or admin in ctx.author.roles:
-            ign = await hypixel.get_dispname(name)
+            ign, uuid = await hypixel.get_dispnameID(name)
             if ign is None:
                 await ctx.send('Please enter a valid ign!')
             else:
