@@ -5,7 +5,7 @@ import math
 import aiohttp
 from datetime import datetime
 import json
-from quickchart import QuickChart
+from quickchart import QuickChart, QuickChartFunction
 from io import BytesIO
 
 class Hypixel(commands.Cog, name="Hypixel"):
@@ -722,7 +722,10 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             totalexp = member['expHistory']
                             totalexp = sum(totalexp.values())
 
-                            if rank == "Resident":
+                            if name.title() in ("Rowdies", "Polarpowah"):
+                                rainbow = QuickChartFunction("getGradientFillHelper('horizontal',['rgba(250, 0, 0,0.4)','rgba(255, 127, 0,0.4)','rgba(255, 255, 0,0.4)','rgba(0, 255, 0,0.4)','rgba(0, 0, 255,0.4)','rgba(139, 0, 255,0.4)'])")
+                                colour, GraphColor, GraphBorder = 0x808080, rainbow, rainbow
+                            elif rank == "Resident":
                                 if totalexp > self.bot.resident_req:
                                     colour, GraphColor, GraphBorder = hypixel.get_color("res_met")
                                 else:
