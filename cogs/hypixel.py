@@ -723,8 +723,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             totalexp = sum(totalexp.values())
 
                             if name.title() in ("Rowdies", "Polarpowah"):
-                                rainbow = QuickChartFunction("getGradientFillHelper('horizontal',['rgba(250, 0, 0,0.4)','rgba(250, 70, 0,0.4)','rgba(255, 130, 0,0.4)','rgba(252, 187, 0,0.4)','rgba(255, 200, 0,0.4)','rgba(255, 255, 0,0.4)','rgba(179, 255, 0,0.4)','rgba(85, 255, 0,0.4)','rgba(0, 255, 0,0.4)','rgba(0, 255, 100,0.4)','rgba(0, 255, 200,0.4)','rgba(0, 100, 255,0.4)','rgba(0, 0, 255,0.4)','rgba(100, 0, 255,0.4)','rgba(255, 0, 255,0.4)'])")
-                                colour, GraphColor, GraphBorder = 0x808080, rainbow, rainbow
+                                rainbow_bg = QuickChartFunction("getGradientFillHelper('horizontal',['rgba(250, 0, 0,0.3)','rgba(250, 70, 0,0.3)','rgba(255, 130, 0,0.3)','rgba(252, 187, 0,0.3)','rgba(255, 200, 0,0.3)','rgba(255, 255, 0,0.3)','rgba(179, 255, 0,0.3)','rgba(85, 255, 0,0.3)','rgba(0, 255, 0,0.3)','rgba(0, 255, 100,0.3)','rgba(0, 255, 200,0.3)','rgba(0, 100, 255,0.3)','rgba(0, 0, 255,0.3)','rgba(100, 0, 255,0.3)','rgba(255, 0, 255,0.3)'])")
+                                rainbow_border = QuickChartFunction("getGradientFillHelper('horizontal',['rgba(250, 0, 0,0.4)','rgba(250, 70, 0,0.4)','rgba(255, 130, 0,0.4)','rgba(252, 187, 0,0.4)','rgba(255, 200, 0,0.4)','rgba(255, 255, 0,0.4)','rgba(179, 255, 0,0.4)','rgba(85, 255, 0,0.4)','rgba(0, 255, 0,0.4)','rgba(0, 255, 100,0.4)','rgba(0, 255, 200,0.4)','rgba(0, 100, 255,0.4)','rgba(0, 0, 255,0.4)','rgba(100, 0, 255,0.4)','rgba(255, 0, 255,0.4)'])")
+                                colour, GraphColor, GraphBorder = 0x808080, rainbow_bg, rainbow_border
                             elif rank == "Resident":
                                 if totalexp > self.bot.resident_req:
                                     colour, GraphColor, GraphBorder = hypixel.get_color("res_met")
@@ -795,7 +796,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                             "data": weeklyexp,
                                             "lineTension": 0.4,
                                             "backgroundColor": GraphColor,
-                                            "borderColor": GraphBorder
+                                            "borderColor": GraphBorder,
+                                            "pointRadius": 0,
                                         }]
                                     }
                                 }
