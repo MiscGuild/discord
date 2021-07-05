@@ -8,9 +8,12 @@ class Moderation(commands.Cog, name="Moderation"):
     # Mute
     @commands.command()
     @commands.has_permissions(kick_members=True)
-    async def mute(self, ctx, member: discord.Member):
+    async def mute(self, ctx, member: discord.Member, *, reason=None):
         """Mutes the mentioned user indefinately!
         """
+        if reason is None:
+            reason = f'Muted by: {ctx.author.name}'
+
         role = discord.utils.get(ctx.guild.roles, name="Muted")
         await member.add_roles(role)
         embed = discord.Embed(title="User Muted!",
@@ -18,20 +21,16 @@ class Moderation(commands.Cog, name="Moderation"):
                             color=0xff00f6)
         await ctx.send(embed=embed)
 
-    @mute.error
-    async def mute_error(self, ctx, error):
-        if isinstance(error, commands.MissingPermissions):
-            embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
-                                description="Your role lacks permissions to mute a user", color=0xff0000)
-            await ctx.channel.purge(limit=1)
-            await ctx.send(embed=embed)
 
     # Unmute
     @commands.command()
     @commands.has_permissions(kick_members=True)
-    async def unmute(self, ctx, member: discord.Member):
+    async def unmute(self, ctx, member: discord.Member, *, reason=None):
         """Mutes the mentioned user
         """
+        if reason is None:
+            reason = f'Unmuted by: {ctx.author.name}'
+
         role = discord.utils.get(ctx.guild.roles, name="Muted")
         await member.remove_roles(role)
         embed = discord.Embed(title="User unmuted!",
@@ -39,32 +38,18 @@ class Moderation(commands.Cog, name="Moderation"):
                             color=0xff00f6)
         await ctx.send(embed=embed)
 
-    @unmute.error
-    async def unmute_error(self, ctx, error):
-        if isinstance(error, commands.MissingPermissions):
-            embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
-                                description="Your role lacks permissions to unmute a user", color=0xff0000)
-            await ctx.channel.purge(limit=1)
-            await ctx.send(embed=embed)
 
     # Clear
     @commands.command(aliases=["purge", "prune"])
     @commands.has_permissions(manage_messages=True)
-    async def clear(self, ctx, amount: int):
+    async def clear(self, ctx, amount: int, *, reason=None):
         """Clears the chat based on the given amount!
         """
+        if reason is None:
+            reason = f'Cleared by: {ctx.author.name}'
+
         await ctx.channel.purge(limit=amount)
 
-    @clear.error
-    async def clear_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            embed = discord.Embed(title='Please specify the number of messages to be deleted',
-                                description='clear `amount of messages`', color=0xff0000)
-            await ctx.send(embed=embed)
-        elif isinstance(error, commands.MissingPermissions):
-            embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
-                                description="Your role lacks permissions to clear chat", color=0xff0000)
-            await ctx.send(embed=embed)
 
     # Kick
     @commands.command()
@@ -72,80 +57,35 @@ class Moderation(commands.Cog, name="Moderation"):
     async def kick(self, ctx, member: discord.Member, *, reason=None):
         """Kicks the mentioned user!
         """
+        if reason is None:
+            reason = f'Kicked by: {ctx.author.name}'
+
         await member.kick(reason=reason)
         await ctx.send(f"{member} was kicked!")
 
-    @kick.error
-    async def kick_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            embed = discord.Embed(title='Please specify the player to be banned! The syntax is as follows',
-                                description="kick `Discord @` `reason`", color=0xff0000)
-            await ctx.channel.purge(limit=1)
-            await ctx.send(embed=embed)
-
-        elif isinstance(error, commands.MissingPermissions):
-            embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
-                                description="Your role lacks permissions to kick a user", color=0xff0000)
-            await ctx.channel.purge(limit=1)
-            await ctx.send(embed=embed)
-
     # Ban
     @commands.command()
-    @commands.has_permissions(ban_members=True, kick_members=True)
+    @commands.has_permissions(ban_members=True)
     async def ban(self, ctx, member: discord.Member, *, reason=None):
         """Bans the mentioned user!
         """
-        try:
-            await member.ban(reason=reason)
-            await ctx.send(f"{member} was banned!")
-        except Exception as e:
-            print(e)
-            await self.bot.error_channel.send(f"Error in {ctx.channel.name} while trying to use `ban`\n{e}\n<@!326399363943497728>")
+        if reason is None:
+            reason = f'Banned by: {ctx.author.name}'
 
-    @ban.error
-    async def ban_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            embed = discord.Embed(title='Please specify the player to be banned! The syntax is as follows',
-                                description="ban `Discord @` `reason`", color=0xff0000)
-            await ctx.channel.purge(limit=1)
-            await ctx.send(embed=embed)
-
-        elif isinstance(error, commands.MissingPermissions):
-            embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
-                                description="Your role lacks permissions to ban a user", color=0xff0000)
-            await ctx.channel.purge(limit=1)
-            await ctx.send(embed=embed)
+        await member.ban(reason=reason)
+        await ctx.send(f"{member} was banned!")
 
     # unban
     @commands.command()
-    @commands.has_permissions(ban_members=True, kick_members=True)
-    async def unban(self, ctx, *, member):
+    @commands.has_permissions(ban_members=True)
+    async def unban(self, ctx, user: discord.User, *, reason=None):
         """Unbans the user!
         """
-        banned_users = await ctx.guild.bans()
-        member_name, member_discrimitator = member.split('#')
+        if reason is None:
+            reason = f'Unbanned by: {ctx.author.name}'
 
-        for ban_entry in banned_users:
-            user = ban_entry.user
-
-            if (user.name, user.member_discrimitator) == (member_name, member_discrimitator):
-                await ctx.guild.unban(user)
-                await ctx.send(f'{user.mention} has been unbanned')
-                return
-                
-    @unban.error
-    async def unban_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            embed = discord.Embed(title='Please specify the player to be banned! The syntax is as follows',
-                                description="unban `Discord @`", color=0xff0000)
-            await ctx.channel.purge(limit=1)
-            await ctx.send(embed=embed)
-
-        elif isinstance(error, commands.MissingPermissions):
-            embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
-                                description="Your role lacks permissions to unban a user", color=0xff0000)
-            await ctx.channel.purge(limit=1)
-            await ctx.send(embed=embed)
+        await ctx.guild.unban(user)
+        await ctx.send(f'{user.mention} has been unbanned')
 
     @commands.command()
     @commands.has_permissions(ban_members=True)
@@ -160,20 +100,6 @@ class Moderation(commands.Cog, name="Moderation"):
         await ctx.guild.ban(user, reason=reason)
         await ctx.guild.unban(user, reason=reason)
         await ctx.send(f'{user.name} has been softbanned.')
-
-    @softban.error
-    async def softban_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            embed = discord.Embed(title='Please specify the player to be softbanned! The syntax is as follows',
-                                description="softban `user`", color=0xff0000)
-            await ctx.channel.purge(limit=1)
-            await ctx.send(embed=embed)
-
-        elif isinstance(error, commands.MissingPermissions):
-            embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
-                                description="Your role lacks permissions to softban a user", color=0xff0000)
-            await ctx.channel.purge(limit=1)
-            await ctx.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(Moderation(bot))
