@@ -1,5 +1,5 @@
 # hypixel.py
-import math, datetime, random, asyncio, json, aiohttp, toml
+import math, datetime, random, aiohttp, toml
 from datetime import datetime
 
 
@@ -151,11 +151,9 @@ async def get_guild(name):
                 await session.close()
     if req['guild'] is not None:
         gname = req["guild"]['name']
-        print(f'Guild name acquired - {gname}')
         return (f"{gname}")
     else:
-        print("The user is not in any guild!")
-        return None
+       return None
 
 
 async def get_gtag(name):
@@ -171,14 +169,15 @@ async def get_gtag(name):
         return (f"[{gtag}]")
 
 
-async def get_dispname(name):
+async def get_dispnameID(name):
     async with aiohttp.ClientSession() as session:
         async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
             request = await resp.json()
             await session.close()
     if 'error' not in request:
         ign = request["name"]
-        return ign
+        id = request["id"]
+        return ign, id
     else:
         return None
 
@@ -206,103 +205,35 @@ async def get_llogin(name):
         return('Unknown')
 
 
-async def get_guild_level(name):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-            request = resp
-        if request.status != 200:
-            return None
+async def get_guild_level(exp):
+    EXP_NEEDED = [
+        100000,
+        150000,
+        250000,
+        500000,
+        750000,
+        1000000,
+        1250000,
+        1500000,
+        2000000,
+        2500000,
+        2500000,
+        2500000,
+        2500000,
+        2500000,
+        3000000,
+    ]
+    level = 0
 
-        request = await request.json()
-        await session.close()
+    for i in range(0,1000):
+        need = 0
+        if i >= len(EXP_NEEDED):
+            need = EXP_NEEDED[len(EXP_NEEDED) - 1]
+        else:
+            need = EXP_NEEDED[i]
 
-    uuid= request['id']
-    api = get_api()
-    async with aiohttp.ClientSession() as session:
-        async with session.get(f'https://api.hypixel.net/findGuild?key={api}&byUuid={uuid}') as resp:
-            req_json = await resp.json()
-            await session.close()
-    gid = req_json['guild']
-
-    if gid is None:
-        print('No Guild')
-        return None
-    else:
-        req2 = await get_guild_data(name)
-        level = req2['level']
-        return level
-
-
-async def get_guild_desc(name):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-            request = resp
-
-            if request.status != 200:
-                return None
-    req2 = await get_guild_data(name)
-    if req2["description"] is None:
-        print('No guild description')
-        return ('')
-    else:
-        gdesc = req2['description']
-        return (f'{gdesc}')
-
-
-async def get_guild_legacyrank(name):
-    req = await get_guild_data(name)
-    if "legacy_ranking" in req:
-        glg = req["legacy_ranking"]
-        return (f"{glg}")
-    else:
-        print('Not a legacy guild!')
-        return('-')
-
-
-async def get_guild_member_count(name):
-    req = await get_guild_data(name)
-    mem_amt = len(req["members"])
-    return mem_amt
-
-
-async def get_guild_joinability(name):
-    req = await get_guild_data(name)
-    if req["joinable"] is True:
-        return ("Yes")
-    else:
-        return ("No")
-
-
-async def get_guild_publiclisting(name):
-    req = await get_guild_data(name)
-    if req["public"] is True:
-        return ("Yes")
-    else:
-        return ("No")
-
-
-async def get_guild_onlinerecord(name):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-            request = await resp.json()
-            await session.close()
-    uuid= request['id']
-    api = get_api()
-    async with aiohttp.ClientSession() as session:
-        async with session.get(f'https://api.hypixel.net/findGuild?key={api}&byUuid={uuid}') as resp:
-            req = await resp.json()
-            await session.close()
-    gid = req['guild']
-    if gid is None:
-        return None
-    else:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(f'https://api.hypixel.net/guild?key={api}&id={gid}') as resp:
-                req2 = await resp.json()
-                await session.close()
-        guild = req2
-        record = req2["guild"]["achievements"]["ONLINE_PLAYERS"]
-        return record
+        if ((exp - need) < 0):
+            return round((((level + (exp / need)) *100)/100), 2)
 
 
 async def get_challenges_completed(name):

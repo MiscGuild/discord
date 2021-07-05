@@ -1,4 +1,3 @@
-import discord
 from discord.ext import commands
 
 class Owner(commands.Cog, command_attrs=dict(hidden=True)):

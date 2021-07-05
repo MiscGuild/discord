@@ -14,10 +14,10 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
     @commands.command()
     async def sync(self, ctx, name):
-        """Used to update your discord nick upon changing your minecraft name/leaving Miscellaneous!
+        """Used to update your discord nick and roles upon changing your minecraft name/leaving/joining Miscellaneous!
         """
         author = ctx.author
-        ign = await hypixel.get_dispname(name)
+        ign, uuid = await hypixel.get_dispnameID(name)
 
         if ign is None:
             await ctx.send('Please enter a valid ign!')
@@ -219,11 +219,11 @@ class Hypixel(commands.Cog, name="Hypixel"):
     # Do-Not-Kick-List
     @commands.command()
     @commands.has_permissions(manage_messages=True)
-    async def dnkladd(self, ctx, name = None, x = None, y = None, *, z = None):
+    async def dnkladd(self, ctx, name=None, x=None, y=None, *, z=None):
         """Adds the user to the do-not-kick-list!
         """
         if name is not None:
-            ign = await hypixel.get_dispname(name)
+            ign, uuid = await hypixel.get_dispnameID(name)
             rank = await hypixel.get_rank(name)
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{ign}') as resp:
@@ -275,7 +275,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
             name = await self.bot.wait_for('message', check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
             name = name.content
-            ign = await hypixel.get_dispname(name)
+            ign, uuid = await hypixel.get_dispnameID(name)
             rank = await hypixel.get_rank(name)
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{ign}') as resp:
@@ -392,68 +392,65 @@ class Hypixel(commands.Cog, name="Hypixel"):
     async def ginfo(self, ctx, *, name):
         """Gives basic information about the requested guild.
         """
+        ign, uuid = await hypixel.get_dispnameID(name)
         async with ctx.channel.typing():
-            req = await hypixel.get_guild_data(name)
-
-            'GUILD NAME'
-            if len(req) > 2:
-                gname = req["name"]
-                print(f'Guild name acquired - {gname}')
-                guild = f"{gname}"
+            api = hypixel.get_api()
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as req:
+                    req = await req.json()
+                    await session.close()
+            if req['guild'] is None:
+                await ctx.send("Invalid Guild Name!")
             else:
-                print("The user is not in any guild!")
-                await ctx.send('The user is not in any guild')
-            'GUILD TAG'
-            gtag = req["tag"]
-            print("Gtag acquired")
-            gtag = f"[{gtag}]"
+                if len(req) > 2:
+                    guild = str(req["guild"]["name"])
+                else:
+                    await ctx.send('The user is not in any guild')
 
-            'GUILD LEVEL'
-            glvl = req['level']
+                if req["guild"]["tag"] is None:
+                    gtag = ""
+                else:
+                    gtag = f'[{req["guild"]["tag"]}]'
 
-            'GUILD DESCRIPTION'
-            gdesc = req['description']
-            if gdesc is None:
-                gdesc = 'No guild description.'
+                glvl = await hypixel.get_guild_level(req["guild"]['exp'])
 
-            'GUILD LEGACY RANK'
-            if "legacy_ranking" in req:
-                glg = req["legacy_ranking"]
+                gdesc = req["guild"]['description']
 
-                glg = f"{glg}"
-            else:
-                print('Not a legacy guild!')
-                glg = '-'
+                if gdesc is None:
+                    gdesc = 'No guild description.'
 
-            'JOINABILITY'
-            if req["joinable"] is True:
-                joinable = "Yes"
-            else:
-                joinable = "No"
+                if "legacy_ranking" in req:
+                    glg = str(req["guild"]["legacyRanking"])
+                else:
+                    glg = '-'
 
-            'PUBLICLY LISTED'
-            if req["public"] is True:
-                publiclisting = "Yes"
-            else:
-                publiclisting = "No"
+                if req["guild"]["joinable"] is True:
+                    joinable = "Yes"
+                else:
+                    joinable = "No"
 
-            'ONLINE RECORD'
-            onlinerecord = await hypixel.get_guild_onlinerecord(name)
+                if req["guild"]["publiclyListed"] is True:
+                    publiclisting = "Yes"
+                else:
+                    publiclisting = "No"
 
-            'TOTAL MEMBERS'
-            gmembers = len(req["members"])
+                'ONLINE RECORD'
+                onlinerecord = req['guild']['achievements']['ONLINE_PLAYERS']
 
-            # EMBED
-            embed = discord.Embed(title=f"{guild} {gtag}", url=f"https://plancke.io/hypixel/guild/name/{name}",
-                                description=f"{gdesc}", color=0x9900ff)
-            embed.add_field(name="Level:", value=f"`{glvl}`", inline=True)
-            embed.add_field(name="Members:", value=f"`{gmembers}/125`", inline=True)
-            embed.add_field(name="Legacy Rank:", value=f"`{glg}`", inline=True)
-            embed.add_field(name="Joinable:", value=f"`{joinable}`", inline=True)
-            embed.add_field(name="Publicly Listed:", value=f"`{publiclisting}`", inline=True)
-            embed.add_field(name="Online players record:", value=f"`{onlinerecord}`", inline=True)
-            embed.set_author(name="Guild Stats")
-            await ctx.send(embed=embed)
+                'TOTAL MEMBERS'
+                gmembers = f'{len(req["guild"]["members"])}/125'
+
+                # EMBED
+                embed = discord.Embed(title=f"{guild} {gtag}", url=f"https://plancke.io/hypixel/guild/name/{name}",
+                                    description=f"{gdesc}", color=0x9900ff)
+                embed.add_field(name="Level:", value=f"`{glvl}`", inline=True)
+                embed.add_field(name="Members:", value=f"`{gmembers}`", inline=True)
+                embed.add_field(name="Legacy Rank:", value=f"`{glg}`", inline=True)
+                embed.add_field(name="Joinable:", value=f"`{joinable}`", inline=True)
+                embed.add_field(name="Publicly Listed:", value=f"`{publiclisting}`", inline=True)
+                embed.add_field(name="Online players record:", value=f"`{onlinerecord}`", inline=True)
+                embed.set_author(name="Guild Stats")
+                await ctx.send(embed=embed)
 
     @commands.command(aliases=['ge'])
     async def gexp(self, ctx, gname):
@@ -465,45 +462,48 @@ class Hypixel(commands.Cog, name="Hypixel"):
             async with session.get(f'https://api.hypixel.net/guild?key={api}&name={gname}') as req:
                 req = await req.json()
                 await session.close()
-        array = {}
-        exp = 0
-        async with ctx.channel.typing():
-            for i in range(len(req['guild']['members'])):
-                uuid = req['guild']['members'][i]['uuid']
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as names:
-                        names = await names.json()
+        if req['guild'] is None:
+            await ctx.send("Invalid Guild Name!")
+        else:
+            array = {}
+            exp = 0
+            async with ctx.channel.typing():
+                for i in range(len(req['guild']['members'])):
+                    uuid = req['guild']['members'][i]['uuid']
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as names:
+                            names = await names.json()
 
-                name = names['name'] + f" [{req['guild']['members'][i]['rank']}]"
-                expHistory = sum(req['guild']['members'][i]['expHistory'].values())
-                exp += expHistory
-                array[name] = exp
-                exp = 0
+                    name = names['name'] + f" [{req['guild']['members'][i]['rank']}]"
+                    expHistory = sum(req['guild']['members'][i]['expHistory'].values())
+                    exp += expHistory
+                    array[name] = exp
+                    exp = 0
 
 
-            await msg.edit(content="**Please wait!**\n `SENDING!`")
-            sortedList = sorted(array.items(), key=lambda x: x[1], reverse=True)
+                await msg.edit(content="**Please wait!**\n `SENDING!`")
+                sortedList = sorted(array.items(), key=lambda x: x[1], reverse=True)
 
-            x = 0
-            embed = discord.Embed(title=f"Here's the guild experience of all users!",
-                                description=f"Total: {len(sortedList)}",
-                                color=0x8368ff)
-            if len(sortedList) <= 25:
-                for user in sortedList:
-                    embed.add_field(name=f"{user[0]}", value=(format(user[1], ',d')), inline=True)
-                await ctx.send(embed=embed)
-            else:
-                for user in sortedList:
-                    x = x + 1
-                    embed.add_field(name=f"{user[0]}", value=(format(user[1], ',d')), inline=True)
+                x = 0
+                embed = discord.Embed(title=f"Here's the guild experience of all users!",
+                                    description=f"Total: {len(sortedList)}",
+                                    color=0x8368ff)
+                if len(sortedList) <= 25:
+                    for user in sortedList:
+                        embed.add_field(name=f"{user[0]}", value=(format(user[1], ',d')), inline=True)
+                    await ctx.send(embed=embed)
+                else:
+                    for user in sortedList:
+                        x = x + 1
+                        embed.add_field(name=f"{user[0]}", value=(format(user[1], ',d')), inline=True)
 
-                    if len(embed.fields) >= 25:
-                        await ctx.send(embed=embed)
-                        embed.clear_fields()
-                        embed = discord.Embed(title="", color=0x8368ff)
-                    elif x == len(sortedList):
-                        await ctx.send(embed=embed)
-            await msg.delete()
+                        if len(embed.fields) >= 25:
+                            await ctx.send(embed=embed)
+                            embed.clear_fields()
+                            embed = discord.Embed(title="", color=0x8368ff)
+                        elif x == len(sortedList):
+                            await ctx.send(embed=embed)
+                await msg.delete()
 
     @commands.command()
     async def gactive(self, ctx):

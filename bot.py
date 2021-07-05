@@ -329,7 +329,7 @@ async def on_guild_channel_create(channel):
                                             if action == "Approve":
                                                 a, b, c = start.split('/')
                                                 p, q, r = end.split('/')
-                                                ign = await hypixel.get_dispname(name)
+                                                ign, uuid = await hypixel.get_dispnameID(name)
                                                 rank = await hypixel.get_rank(name)
                                                 dates = {1: "January", 2: "February", 3: "March", 4: "April",
                                                             5: "May",
@@ -373,13 +373,13 @@ async def on_guild_channel_create(channel):
                                                 name = await bot.wait_for('message', check=lambda
                                                     x: x.channel == channel.channel)
                                                 name = name.content
-                                                ign = await hypixel.get_dispname(name)
-                                                rank = await hypixel.get_rank(name)
                                                 async with aiohttp.ClientSession() as session:
                                                     async with session.get(
-                                                            f'https://api.mojang.com/users/profiles/minecraft/{ign}') as resp:
+                                                            f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
                                                         request = await resp.json()
+                                                        ign = request['name']
                                                         uuid = request['id']
+                                                        rank = await hypixel.get_rank(name)
                                                         with open('dnkl.json') as f:
                                                             data = json.load(f)
                                                         if resp.status_code != 200:
@@ -511,7 +511,7 @@ async def on_guild_channel_create(channel):
                                             if action == "Approve":
                                                 a, b, c = start.split('/')
                                                 p, q, r = end.split('/')
-                                                ign = await hypixel.get_dispname(name)
+                                                ign, uuid = await hypixel.get_dispnameID(name)
                                                 rank = await hypixel.get_rank(name)
                                                 dates = {1: "January", 2: "February", 3: "March", 4: "April",
                                                             5: "May",
@@ -554,12 +554,12 @@ async def on_guild_channel_create(channel):
                                                 name = await bot.wait_for('message', check=lambda
                                                     x: x.channel == channel.channel)
                                                 name = name.content
-                                                ign = await hypixel.get_dispname(name)
-                                                rank = await hypixel.get_rank(name)
                                                 async with aiohttp.ClientSession() as session:
-                                                    async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{ign}') as resp:
+                                                    async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
                                                         request = await resp.json()
+                                                        ign = request['name']
                                                         uuid = request['id']
+                                                        rank = await hypixel.get_rank(name)
                                                         with open('dnkl.json') as f:
                                                             data = json.load(f)
                                                         if resp.status_code != 200:
@@ -636,7 +636,7 @@ async def on_guild_channel_create(channel):
                 await channel.send('What is your minecraft username?')
                 role_reply = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                 name = role_reply.content
-                ign = hypixel.get_dispname(name)
+                ign, uuid = hypixel.get_dispnameID(name)
                 if ign is None:
                     await channel.send('Please enter a valid ign!')
                     await channel.send("I'll restart the process. If you think I made an error, select 'Other' upon restart")
@@ -878,7 +878,7 @@ async def on_guild_channel_create(channel):
                         await channel.send('What is your minecraft username?')
                         role_reply = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                         name = role_reply.content
-                        ign = hypixel.get_dispname(name)
+                        ign, uuid = hypixel.get_dispnameID(name)
                         if ign is None:
                             await channel.send('Please enter a valid ign!')
                             await channel.send(
@@ -1266,7 +1266,7 @@ async def on_guild_channel_create(channel):
                 name = await bot.wait_for('message',
                                                     check=lambda x: x.channel == channel and x.author == author)
                 name = name.content
-                ign = hypixel.get_dispname(name)
+                ign, uuid = hypixel.get_dispnameID(name)
                 if ign is None:
                     await channel.send('Please enter a valid ign!')
                     await channel.send(
