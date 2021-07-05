@@ -179,7 +179,7 @@ async def get_dispnameID(name):
         id = request["id"]
         return ign, id
     else:
-        return None
+        return None, None
 
 
 async def get_flogin(name):
