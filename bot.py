@@ -1256,67 +1256,6 @@ async def on_guild_channel_create(channel):
                             "Hmm, seems like I'm dumb.\nKindly specify your reason behind creating this ticket and await staff assistance!")
                         break
 
-                else:
-                    await author.edit(nick=ign)
-                    div_embed = discord.Embed(title="Which division would you like to partcipaticate in? Division 1 or Division 2?",
-                                                description="Please reply with the following:\n"
-                                                            "`Division 1: 3rd July, 8:00 pm UTC/GMT`\n"
-                                                            "`Division 2: 4th July, 7:00 am UTC/GMT`",
-                                                color=0x4b89e4)
-                    div_embed.set_footer(text="If you have any difficulty interpreting the time, make another ticket and await staff assistance!\n"
-                                            "Reply with 1 for division 1"
-                                            "\nReply with 2 for division 2")
-                    await channel.send(embed=div_embed)
-                    division = await bot.wait_for('message',
-                                                    check=lambda x: x.channel == channel and x.author == author)
-                    division = division.content
-                    division = division.capitalize()
-                    if str(division) in ("1", "One", 'Div1', 'Division 1', 'Division1', 'Div 1', 'Division 1: 3rd July, 8:00 pm UTC/GMT'):
-                        division = 1
-                    elif str(division) in ("2", "Two", 'Div2', 'Division 2', 'Division2', 'Div 2', 'Division 2: 4th July, 7:00 am UTC/GMT'):
-                        division = 2
-
-
-
-                    rules_embed = discord.Embed(
-                        title="Rules",
-                        description="• The screenshots MUST NOT be cropped. We will only accept screenshots of your entire screen.\n"
-                                    "• Cross-teaming/boosting is disallowed.\n"
-                                    "• Cheating, use of blacklisted modifications is disallowed.\n"
-                                    "• Forging of screenshots is disallowed.\n",
-                        color=0x4b89e4)
-                    rules_embed.set_footer(text="Violation of any of these rules (except the first will result) in immediate disqualification along with a temporary/permanent blacklist.")
-                    await channel.send(embed=rules_embed)
-                    await channel.send("**Do you agree to abide by these rules and face the consequences if any of the rules are broken?**\n(Yes/No)")
-                    rules = await bot.wait_for('message',
-                                                    check=lambda x: x.channel == channel and x.author == author)
-                    rules = (rules.content).capitalize()
-
-                    if rules in ('Yes', 'Y', 'Yeah', 'Yup', 'Ya', 'Yea', 'Ye'):
-                        with open('eventparticipants.json','r') as event_participants:
-                            eventparticipants = json.load(event_participants)
-                            if division == 1:
-                                await channel.edit(category=discord.utils.get(channel.guild.categories, name="Event-Div-1"))
-                                participants_list = eventparticipants.get("div1")
-                                participants_list.append(ign)
-                                eventparticipants["div1"] = participants_list
-                            elif division == 2:
-                                await channel.edit(category=discord.utils.get(channel.guild.categories, name="Event-Div-2"))
-                                participants_list = eventparticipants.get("div2")
-                                participants_list.append(ign)
-                                eventparticipants["div2"] = participants_list
-                        with open('eventparticipants.json','w') as event_participants:
-                            json.dump(eventparticipants, event_participants)
-                        await channel.send(f"**You've been added to the list of participants!**\nIn division {division}, you are participant number: {len(participants_list)}")
-
-                    else:
-                        await channel.send("**In order to participate in the event, you must agree to abide by all the rules."
-                                            "\nIf you have any queries regarding the rules, create a new ticket and select the category as 'other'**"
-                                            "\n*This ticket will be deleted in 1 minute*")
-                        await asyncio.sleep(60)
-                        await discord.TextChannel.delete(channel)
-                break
-
             elif reply == "Other":
                     await channel.edit(name=f"Unknown-{name}", category=discord.utils.get(channel.guild.categories, name="OTHER"))
                     await channel.send(
