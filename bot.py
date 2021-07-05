@@ -230,7 +230,6 @@ async def on_guild_channel_create(channel):
             embed.add_field(name="Milestone", value="Reply with `Milestone`", inline=False)
             embed.add_field(name="Staff Application", value="Reply with `Staff`", inline=False)
             embed.add_field(name="GvG Application", value="Reply with `GvG`", inline=False)
-            embed.add_field(name="Event", value="Reply with `Event`",inline=False)
             embed.add_field(name="Other", value="Reply with `Other`", inline=False)
             await channel.send(embed=embed)
             reply = await bot.wait_for('message', check=lambda x: x.channel == channel)
@@ -1256,22 +1255,6 @@ async def on_guild_channel_create(channel):
                         await channel.send(
                             "Hmm, seems like I'm dumb.\nKindly specify your reason behind creating this ticket and await staff assistance!")
                         break
-
-            elif reply == "Event":
-                await channel.edit(name=f"Event-{name}", category=discord.utils.get(channel.guild.categories, name="EVENT"))
-                await channel.send("Alright, kindly enter the requested details for registering!")
-
-                name_embed = discord.Embed(title="What is your Minecraft Username?",color=0x4b89e4)
-                await channel.send(embed=name_embed)
-                name = await bot.wait_for('message',
-                                                    check=lambda x: x.channel == channel and x.author == author)
-                name = name.content
-                ign, uuid = hypixel.get_dispnameID(name)
-                if ign is None:
-                    await channel.send('Please enter a valid ign!')
-                    await channel.send(
-                        "I'll restart the process. "
-                        "If you think I made an error, select 'Other' upon restart")
 
                 else:
                     await author.edit(nick=ign)
