@@ -390,67 +390,67 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
     @commands.command(aliases=["gi"])
     async def ginfo(self, ctx, *, name):
-        """Gives basic information about the requested guild.
+        """Gives the information of the requested user's guild.
         """
         ign, uuid = await hypixel.get_dispnameID(name)
-        async with ctx.channel.typing():
-            api = hypixel.get_api()
-            async with aiohttp.ClientSession() as session:
-                async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as req:
-                    req = await req.json()
-                    await session.close()
-            if req['guild'] is None:
-                await ctx.send("Invalid Guild Name!")
-            else:
-                if len(req) > 2:
+        if ign is None:
+            await ctx.send('Invalid IGN')
+        else:
+            async with ctx.channel.typing():
+                api = hypixel.get_api()
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as req:
+                        req = await req.json()
+                        await session.close()
+                if req['guild'] is None:
+                    await ctx.send("The user is not in any guild!")
+                else:
                     guild = str(req["guild"]["name"])
-                else:
-                    await ctx.send('The user is not in any guild')
 
-                if req["guild"]["tag"] is None:
-                    gtag = ""
-                else:
-                    gtag = f'[{req["guild"]["tag"]}]'
+                    if req["guild"]["tag"] is None:
+                        gtag = ""
+                    else:
+                        gtag = f'[{req["guild"]["tag"]}]'
 
-                glvl = await hypixel.get_guild_level(req["guild"]['exp'])
+                    glvl = await hypixel.get_guild_level(req["guild"]['exp'])
 
-                gdesc = req["guild"]['description']
+                    gdesc = req["guild"]['description']
 
-                if gdesc is None:
-                    gdesc = 'No guild description.'
+                    if gdesc is None:
+                        gdesc = 'No guild description.'
 
-                if "legacy_ranking" in req:
-                    glg = str(req["guild"]["legacyRanking"])
-                else:
-                    glg = '-'
+                    if "legacy_ranking" in req:
+                        glg = str(req["guild"]["legacyRanking"])
+                    else:
+                        glg = '-'
 
-                if req["guild"]["joinable"] is True:
-                    joinable = "Yes"
-                else:
-                    joinable = "No"
+                    if req["guild"]["joinable"] is True:
+                        joinable = "Yes"
+                    else:
+                        joinable = "No"
 
-                if req["guild"]["publiclyListed"] is True:
-                    publiclisting = "Yes"
-                else:
-                    publiclisting = "No"
+                    if req["guild"]["publiclyListed"] is True:
+                        publiclisting = "Yes"
+                    else:
+                        publiclisting = "No"
 
-                'ONLINE RECORD'
-                onlinerecord = req['guild']['achievements']['ONLINE_PLAYERS']
+                    'ONLINE RECORD'
+                    onlinerecord = req['guild']['achievements']['ONLINE_PLAYERS']
 
-                'TOTAL MEMBERS'
-                gmembers = f'{len(req["guild"]["members"])}/125'
+                    'TOTAL MEMBERS'
+                    gmembers = f'{len(req["guild"]["members"])}/125'
 
-                # EMBED
-                embed = discord.Embed(title=f"{guild} {gtag}", url=f"https://plancke.io/hypixel/guild/name/{name}",
-                                    description=f"{gdesc}", color=0x9900ff)
-                embed.add_field(name="Level:", value=f"`{glvl}`", inline=True)
-                embed.add_field(name="Members:", value=f"`{gmembers}`", inline=True)
-                embed.add_field(name="Legacy Rank:", value=f"`{glg}`", inline=True)
-                embed.add_field(name="Joinable:", value=f"`{joinable}`", inline=True)
-                embed.add_field(name="Publicly Listed:", value=f"`{publiclisting}`", inline=True)
-                embed.add_field(name="Online players record:", value=f"`{onlinerecord}`", inline=True)
-                embed.set_author(name="Guild Stats")
-                await ctx.send(embed=embed)
+                    # EMBED
+                    embed = discord.Embed(title=f"{guild} {gtag}", url=f"https://plancke.io/hypixel/guild/name/{name}",
+                                        description=f"{gdesc}", color=0x9900ff)
+                    embed.add_field(name="Level:", value=f"`{glvl}`", inline=True)
+                    embed.add_field(name="Members:", value=f"`{gmembers}`", inline=True)
+                    embed.add_field(name="Legacy Rank:", value=f"`{glg}`", inline=True)
+                    embed.add_field(name="Joinable:", value=f"`{joinable}`", inline=True)
+                    embed.add_field(name="Publicly Listed:", value=f"`{publiclisting}`", inline=True)
+                    embed.add_field(name="Online players record:", value=f"`{onlinerecord}`", inline=True)
+                    embed.set_author(name="Guild Stats")
+                    await ctx.send(embed=embed)
 
     @commands.command(aliases=['ge'])
     async def gexp(self, ctx, gname):
