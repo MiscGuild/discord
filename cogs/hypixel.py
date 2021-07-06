@@ -345,6 +345,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         data.update(dnkl_dict)
                         with open('dnkl.json', 'w') as f:
                             json.dump(data, f)
+                else:
+                    embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`", color=0xff0000)
+                    await ctx.send(embed=embed)
             await session.close()
 
     @commands.command(aliases=['dnklrmv'])
