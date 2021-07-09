@@ -219,10 +219,13 @@ class Hypixel(commands.Cog, name="Hypixel"):
     # Do-Not-Kick-List
     @commands.command()
     @commands.has_permissions(manage_messages=True)
-    async def dnkladd(self, ctx, name=None, x=None, y=None, *, z=None):
+    async def dnkladd(self, ctx, name=None, start=None, end=None, *, reason=None):
         """Adds the user to the do-not-kick-list!
         """
         if name is not None:
+            if len(name) < 3 or len(name) > 16:
+                await ctx.send('Unkown IGN!')
+                return
             ign, uuid = await hypixel.get_dispnameID(name)
             rank = await hypixel.get_rank(name)
             async with aiohttp.ClientSession() as session:
@@ -236,38 +239,42 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 with open('dnkl.json') as f:
                     data = json.load(f)
 
-                a, b, c = x.split('/')
-                p, q, r = y.split('/')
+                if start != None and "/" in start and end != None and "/" in end:
+                    sd, sm, sy = start.split('/')
+                    ed, em, ey = end.split('/')
 
-                if int(b) > 12:
+                    if int(sm) > 12:
+                        embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`", color=0xff0000)
+                        await ctx.send(embed=embed)
+                    if int(em) > 12:
+                        embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`", color=0xff0000)
+                        await ctx.send(embed=embed)
+                    if int(sm) & int(em) <= 12:
+                        dates = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May",
+                                6: "June", 7: "July", 8: "August", 9: "September",
+                                10: "October", 11: "November", 12: "December"}
+                        start_month = dates.get(int(sm))
+                        end_month = dates.get(int(em))
+
+                        embed = discord.Embed(title=f"{rank} {ign}", url=f'https://plancke.io/hypixel/player/stats/{ign}',
+                                            color=0x0ffff)
+                        embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}?size=512&default=MHF_Steve&overlay')
+                        embed.add_field(name="IGN:", value=f"{ign}", inline=False)
+                        embed.add_field(name="Start:", value=f"{sd} {start_month} {sy}", inline=False)
+                        embed.add_field(name="End:", value=f"{ed} {end_month} {ey}", inline=False)
+                        embed.add_field(name="Reason", value=f"{reason}", inline=False)
+                        embed.set_author(name="Do not kick list")
+                        await ctx.channel.purge(limit=1)
+                        message = await ctx.send(embed=embed)
+
+                        dnkl_dict = {ign: message.id}
+
+                        data.update(dnkl_dict)
+                        with open('dnkl.json', 'w') as f:
+                            json.dump(data, f)
+                else:
                     embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`", color=0xff0000)
                     await ctx.send(embed=embed)
-                if int(q) > 12:
-                    embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`", color=0xff0000)
-                    await ctx.send(embed=embed)
-                if int(b) & int(q) <= 12:
-                    dates = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May",
-                            6: "June", 7: "July", 8: "August", 9: "September",
-                            10: "October", 11: "November", 12: "December"}
-                    start_month = dates.get(int(b))
-                    end_month = dates.get(int(q))
-
-                    embed = discord.Embed(title=f"{rank} {ign}", url=f'https://plancke.io/hypixel/player/stats/{ign}',
-                                        color=0x0ffff)
-                    embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}?size=512&default=MHF_Steve&overlay')
-                    embed.add_field(name="IGN:", value=f"{ign}", inline=False)
-                    embed.add_field(name="Start:", value=f"{a} {start_month} {c}", inline=False)
-                    embed.add_field(name="End:", value=f"{p} {end_month} {r}", inline=False)
-                    embed.add_field(name="Reason", value=f"{z}", inline=False)
-                    embed.set_author(name="Do not kick list")
-                    await ctx.channel.purge(limit=1)
-                    message = await ctx.send(embed=embed)
-
-                    dnkl_dict = {ign: message.id}
-
-                    data.update(dnkl_dict)
-                    with open('dnkl.json', 'w') as f:
-                        json.dump(data, f)
             await session.close()
 
         else:
@@ -302,40 +309,45 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 reason = await self.bot.wait_for('message',
                                                 check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
                 reason = reason.content
-                a, b, c = start_date.split('/')
-                p, q, r = end_date.split('/')
 
-                if int(b) > 12:
-                    embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`",
-                                        color=0xff0000)
+                if start != None and "/" in start and end != None and "/" in end:
+                    sd, sm, sy = start_date.split('/')
+                    ed, em, ey = end_date.split('/')
+
+                    if int(sm) > 12:
+                        embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`",
+                                            color=0xff0000)
+                        await ctx.send(embed=embed)
+                    if int(em) > 12:
+                        embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`",
+                                            color=0xff0000)
+                        await ctx.send(embed=embed)
+                    if int(sm) & int(em) <= 12:
+                        dates = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May",
+                                6: "June", 7: "July", 8: "August", 9: "September",
+                                10: "October", 11: "November", 12: "December"}
+                        start_month = dates.get(int(sm))
+                        end_month = dates.get(int(em))
+
+                        embed = discord.Embed(title=f"{rank} {ign}", url=f'https://plancke.io/hypixel/player/stats/{ign}',
+                                            color=0x0ffff)
+                        embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}?size=512&default=MHF_Steve&overlay')
+                        embed.add_field(name="IGN:", value=f"{ign}", inline=False)
+                        embed.add_field(name="Start:", value=f"{sd} {start_month} {sy}", inline=False)
+                        embed.add_field(name="End:", value=f"{ed} {end_month} {ey}", inline=False)
+                        embed.add_field(name="Reason", value=f"{reason}", inline=False)
+                        embed.set_author(name="Do not kick list")
+                        
+                        message = await self.bot.dnkl_channel.send(embed=embed)
+
+                        dnkl_dict = {ign: message.id}
+
+                        data.update(dnkl_dict)
+                        with open('dnkl.json', 'w') as f:
+                            json.dump(data, f)
+                else:
+                    embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`", color=0xff0000)
                     await ctx.send(embed=embed)
-                if int(q) > 12:
-                    embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`",
-                                        color=0xff0000)
-                    await ctx.send(embed=embed)
-                if int(b) & int(q) <= 12:
-                    dates = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May",
-                            6: "June", 7: "July", 8: "August", 9: "September",
-                            10: "October", 11: "November", 12: "December"}
-                    start_month = dates.get(int(b))
-                    end_month = dates.get(int(q))
-
-                    embed = discord.Embed(title=f"{rank} {ign}", url=f'https://plancke.io/hypixel/player/stats/{ign}',
-                                        color=0x0ffff)
-                    embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}?size=512&default=MHF_Steve&overlay')
-                    embed.add_field(name="IGN:", value=f"{ign}", inline=False)
-                    embed.add_field(name="Start:", value=f"{a} {start_month} {c}", inline=False)
-                    embed.add_field(name="End:", value=f"{p} {end_month} {r}", inline=False)
-                    embed.add_field(name="Reason", value=f"{reason}", inline=False)
-                    embed.set_author(name="Do not kick list")
-                    
-                    message = await self.bot.dnkl_channel.send(embed=embed)
-
-                    dnkl_dict = {ign: message.id}
-
-                    data.update(dnkl_dict)
-                    with open('dnkl.json', 'w') as f:
-                        json.dump(data, f)
             await session.close()
 
     @commands.command(aliases=['dnklrmv'])
