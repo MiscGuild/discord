@@ -59,17 +59,18 @@ async def on_ready():
 @bot.event
 async def on_command_error(ctx, error):
     # Prevents commands with local handlers or cogs with overwrritten on_command_errors being handled here
-    if ctx.command.has_error_handler() or ctx.cog.has_error_handler():
+    if isinstance(error, commands.CommandNotFound):
+        embed = discord.Embed(title='Invalid Command!',
+            descrption='Use `,help` to view a list of all commands!', color=0xff0000)
+        await ctx.send(embed=embed)
+        return
+    elif ctx.command.has_error_handler() or ctx.cog.has_error_handler():
         return
 
     #Checks for the original exception raised and send to CommandInvokeError
     error = getattr(error, 'original', error)
 
-    if isinstance(error, commands.CommandNotFound):
-        embed = discord.Embed(title='Invalid Command!',
-            descrption='Use `,help` to view a list of all commands!', color=0xff0000)
-        await ctx.send(embed=embed)
-    elif isinstance(error, commands.NotOwner):
+    if isinstance(error, commands.NotOwner):
         embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
             description="You are not the owner of this bot!", color=0xff0000)
         await ctx.send(embed=embed)
