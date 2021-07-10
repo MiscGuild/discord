@@ -346,7 +346,7 @@ class staff(commands.Cog, name="Staff"):
                                 #Miscellaneous
                             if ign in misc_members and ign != "Rowdies":
                                 async with aiohttp.ClientSession() as session:
-                                    async with session.get(f"https://api.hypixel.net/guild?key={await hypixel.get_api()}&player={uuid}") as resp:
+                                    async with session.get(f"https://api.hypixel.net/guild?key={hypixel.get_api()}&player={uuid}") as resp:
                                         req = await resp.json()
                                         await session.close()
 
