@@ -65,10 +65,10 @@ class staff(commands.Cog, name="Staff"):
                             "> Event\n"
                             "> Other",
                         inline=False)
-        embed.add_field(name="React to the message sent by @TicketTool",
-                        value="The following image shows you what you need to react to.",
+        embed.add_field(name="Click the button under the message sent by @TicketTool",
+                        value="The following image shows you what you need to click.",
                         inline=False)
-        embed.set_image(url=f"https://media.discordapp.net/attachments/522930919984726016/775953643991990272/unknown.png?width=1069&height=702")
+        embed.set_image(url=f"https://media.discordapp.net/attachments/476604067427254272/864568243729465344/whatsup_developers.png?width=927&height=681")
         await ctx.send(embed=embed)
 
 
