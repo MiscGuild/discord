@@ -68,7 +68,7 @@ class staff(commands.Cog, name="Staff"):
         embed.add_field(name="Click the button under the message sent by @TicketTool",
                         value="The following image shows you what you need to click.",
                         inline=False)
-        embed.set_image(url=f"https://media.discordapp.net/attachments/476604067427254272/864568243729465344/whatsup_developers.png?width=927&height=681")
+        embed.set_image(url=f"https://media.discordapp.net/attachments/420572640172834816/864894505509847070/unknown.png?width=1229&height=670")
         await ctx.send(embed=embed)
 
 
