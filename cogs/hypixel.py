@@ -243,12 +243,6 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     sd, sm, sy = start.split('/')
                     ed, em, ey = end.split('/')
 
-                    if int(sm) > 12:
-                        embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`", color=0xff0000)
-                        await ctx.send(embed=embed)
-                    if int(em) > 12:
-                        embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`", color=0xff0000)
-                        await ctx.send(embed=embed)
                     if int(sm) & int(em) <= 12:
                         dates = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May",
                                 6: "June", 7: "July", 8: "August", 9: "September",
@@ -272,6 +266,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         data.update(dnkl_dict)
                         with open('dnkl.json', 'w') as f:
                             json.dump(data, f)
+                    else:
+                        embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`", color=0xff0000)
+                        await ctx.send(embed=embed)
                 else:
                     embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`", color=0xff0000)
                     await ctx.send(embed=embed)
@@ -310,18 +307,10 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                                 check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
                 reason = reason.content
 
-                if start != None and "/" in start and end != None and "/" in end:
+                if start_date != None and "/" in start_date and end_date != None and "/" in end_date:
                     sd, sm, sy = start_date.split('/')
                     ed, em, ey = end_date.split('/')
 
-                    if int(sm) > 12:
-                        embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`",
-                                            color=0xff0000)
-                        await ctx.send(embed=embed)
-                    if int(em) > 12:
-                        embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`",
-                                            color=0xff0000)
-                        await ctx.send(embed=embed)
                     if int(sm) & int(em) <= 12:
                         dates = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May",
                                 6: "June", 7: "July", 8: "August", 9: "September",
@@ -345,6 +334,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         data.update(dnkl_dict)
                         with open('dnkl.json', 'w') as f:
                             json.dump(data, f)
+                    else:
+                        embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`", color=0xff0000)
+                        await ctx.send(embed=embed)
                 else:
                     embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`", color=0xff0000)
                     await ctx.send(embed=embed)
