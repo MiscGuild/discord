@@ -249,11 +249,11 @@ async def on_guild_channel_create(channel):
                 await channel.edit(name=f"DNKL-{name}", category=discord.utils.get(channel.guild.categories, name="DNKL"))
                 async with aiohttp.ClientSession() as session:
                     async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-                        request = resp
-                    if request.status != 200:
+                        request = await resp.json(content_type=None)
+                    if resp.status != 200:
                         await channel.send('Unknown IGN!')
-                    request = await request.json()
                     await session.close()
+
                 name = request['name']
                 uuid = request['id']
                 api = hypixel.get_api()
@@ -311,7 +311,7 @@ async def on_guild_channel_create(channel):
                                     f"\n**End:** {end}"
                                     f"\n**Reason:** {reason}"
                                     f"\n*If you made an error, kindly notify staff by typing after this message*"
-                                    f"\n\n||,dnkladd {name} {author.mention} {start} {end} {reason}||"
+                                    f"\n\n||,dnkladd {name} {start} {end} {reason}||"
                                     )
                                 await channel.send("**Staff, what do you wish to do with this dnkl request?**"
                                                     f"\nReply with `Approve` to approve the do-not-kick-list request"
