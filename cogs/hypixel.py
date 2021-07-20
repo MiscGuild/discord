@@ -769,7 +769,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
                                 else:
                                     break
-                            if "commands" not in ctx.channel.name or ctx.channel.category.name not in ('🎫 Ticket Section','DNKL','MILESTONES','REPORTS','EVENT','OTHER','RTickets'):
+                            if "commands" not in ctx.channel.name and ctx.channel.category.name not in ('🎫 Ticket Section','DNKL','MILESTONES','REPORTS','EVENT','OTHER','RTickets'):
                                 name = name.replace("_",        "\_")
                                 await ctx.send(f"__**{name}**__\n**Guild Experience -** `{totalexp}`")
                             else:
