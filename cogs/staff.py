@@ -271,7 +271,7 @@ class staff(commands.Cog, name="Staff"):
         active_role = discord.utils.get(ctx.guild.roles, name="Active")
         inactive_role = discord.utils.get(ctx.guild.roles, name="Inactive")
         ally = discord.utils.get(ctx.guild.roles, name="Ally")
-        adminids = ('326399363943497728','266546184301182976','333146404673290241','711235929880133636','307402461734240257','484411714637529088')
+        adminids = ('326399363943497728', '266546184301182976', '333146404673290241', '711235929880133636', '307402461734240257', '484411714637529088')
 
         msg = await ctx.send("**Processing all the prerequisites**")
 
@@ -340,7 +340,7 @@ class staff(commands.Cog, name="Staff"):
                                 await session.close()
 
                             # Miscellaneous
-                        if ign in misc_members and ign not in ("Rowdies","PolarPowah","LBROz","Fantastic_Doge","ElijahRus","BotTyler"):
+                        if ign in misc_members and ign not in ("Rowdies", "PolarPowah", "LBROz", "Fantastic_Doge", "ElijahRus", "BotTyler"):
                             async with aiohttp.ClientSession() as session:
                                 async with session.get(
                                         f"https://api.hypixel.net/guild?key={hypixel.get_api()}&player={uuid}") as resp:
