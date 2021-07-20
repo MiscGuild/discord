@@ -37,8 +37,6 @@ class staff(commands.Cog, name="Staff"):
                             color=0x8368ff)
         embed.add_field(name="Veteran", value="Be in the guild for more than 1 year",
                         inline=False)
-        embed.add_field(name="Server Booster", value="Boost the Discord. You will lose resident once your boost expires.",
-                        inline=False)
         embed.add_field(name="Youtuber", value="If you're a youtuber with more than 5,000 subscribers, you aren't subject to any guild requirements.",
                         inline=False)
         embed.add_field(name="Sugar Daddy", value="Spend Money on the guild by doing giveaways, sponsoring events!",
