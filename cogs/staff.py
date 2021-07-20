@@ -325,14 +325,14 @@ class staff(commands.Cog, name="Staff"):
                             message = await ctx.send(f"Checking {name}")
 
                             async with aiohttp.ClientSession() as session:
-                                async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-                                    mojang = resp
+                                async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as mojang:
                             
                                     if mojang.status != 200:  # If the IGN is invalid
                                         await member.remove_roles(member_role, guest)
                                         await member.add_roles(new_member)
                                         await message.edit(content=
                                                         f"{name} ||{member}|| Player doesn't exist. **++New Member | --Member | -- Guest**")
+
                                     elif guild_master not in member.roles:
                                         mojang_json = await mojang.json()
                                         ign = mojang_json["name"]
@@ -350,7 +350,7 @@ class staff(commands.Cog, name="Staff"):
 
 
                                 if member_role not in member.roles:
-                                    await member.add_roles(member)
+                                    await member.add_roles(member_role)
                                     await member.remove_roles(new_member, guest)
 
                                 for user in req['guild']["members"]:
@@ -442,7 +442,6 @@ class staff(commands.Cog, name="Staff"):
                     await member.remove_roles(guest,awaiting_app,newmember)
                     await member.add_roles(member_)
                     embed = discord.Embed(title=f"{member.name}'s nick and role were successfully changed!",
-                                        description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
                                         color=0x8368ff)
                     embed.set_footer(text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
                     await ctx.send(embed=embed)
@@ -452,9 +451,7 @@ class staff(commands.Cog, name="Staff"):
                     await member.remove_roles(member_,awaiting_app)
                     await member.add_roles(guest, xl_ally)
 
-                    embed = discord.Embed(title="Your nick and role was successfully changed!",
-                                        description="If this wasn't the change you anticipated, "
-                                                    "kindly create a ticket or get in contact with staff!",
+                    embed = discord.Embed(title=f"{member.name}'s nick and role were successfully changed!",
                                         color=0x8368ff)
 
                     embed.set_footer(text="Member of XL"
@@ -462,22 +459,28 @@ class staff(commands.Cog, name="Staff"):
                                         "\n• Guest & XL - Ally were given")
                     await ctx.send(embed=embed)
 
+                elif guild_name is None:
+                    await member.remove_roles(member_, awaiting_app, newmember)
+                    await member.add_roles(guest)
+                    guild_name = "Guildless (No Guild)"
+                    embed = discord.Embed(title=f"{member.name}'s nick and role were successfully changed!",
+                                          color=0x8368ff)
+                    embed.set_footer(
+                        text=f"Member of {guild_name}\n• Nick Changed\n• Member & Awaiting Approval were removed\n• Guest was given")
+                    await ctx.send(embed=embed)
 
                 elif guild_name not in ("Miscellaneous", "XL"):
-                    if str(ctx.channel.category.name) == "RTickets":
-                        await ctx.send("You aren't in Miscellaneous in-game. Kindly await staff assistance")
-                    elif str(ctx.channel.category.name) == "REGISTRATION":
-                        await ctx.send("The person isn't an ally/a member of Miscellaneous. Let them register!")
-                    else:
-                        await member.remove_roles(member_,awaiting_app)
-                        await member.add_roles(guest)
-                        if guild_name is None:
-                            guild_name = "no guild (Guildless)"
-                        embed = discord.Embed(title=f"{member.name}'s nick and role were successfully changed!",
-                                            description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
-                                            color=0x8368ff)
-                        embed.set_footer(text=f"Member of {guild_name}\n• Nick Changed\n• Member & Awaiting Approval were removed\n• Guest was given")
-                        await ctx.send(embed=embed)
+                    await member.remove_roles(member_, awaiting_app, newmember)
+                    await member.add_roles(guest, xl_ally)
+
+                    embed = discord.Embed(title=f"{member.name}'s nick and role were successfully changed!",
+                                          color=0x8368ff)
+
+                    embed.set_footer(text=f"Member of {guild_name}"
+                                          "\n• Member & Awaiting Approval were removed"
+                                          "\n• Guest was given")
+                    await ctx.send(embed=embed)
+
         else:
             embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
                                 description="Your role lacks permissions to force sync a member's nick!", color=0xff0000)
