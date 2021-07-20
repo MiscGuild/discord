@@ -41,6 +41,8 @@ class staff(commands.Cog, name="Staff"):
                         inline=False)
         embed.add_field(name="Sugar Daddy", value="Spend Money on the guild by doing giveaways, sponsoring events!",
                         inline=False)
+        embed.add_field(name="GvG Team", value="Be an exceptional GvG player.",
+                        inline=False)
         embed.set_footer(text=f"Everyone who has the resident rank must get {format(self.bot.resident_req,',d')} weekly guild experience! (Except YouTubers)")
         await ctx.send(embed=embed)
 
