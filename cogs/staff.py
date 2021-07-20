@@ -271,7 +271,7 @@ class staff(commands.Cog, name="Staff"):
         active_role = discord.utils.get(ctx.guild.roles, name="Active")
         inactive_role = discord.utils.get(ctx.guild.roles, name="Inactive")
         ally = discord.utils.get(ctx.guild.roles, name="Ally")
-
+        adminids = ('326399363943497728','266546184301182976','333146404673290241','711235929880133636','307402461734240257','484411714637529088')
 
         msg = await ctx.send("**Processing all the prerequisites**")
 
@@ -318,7 +318,7 @@ class staff(commands.Cog, name="Staff"):
         for guild in self.bot.guilds:
             if str(guild) == "Miscellaneous [MISC]":  # Check if the Discord is Miscellaneous
                 for member in guild.members:  # For loop for all members in the Discord
-                    if member.id != '326399363943497728' and member.bot is False:
+                    if member.id not in adminids and member.bot is False:
                         name = await hypixel.name_grabber(member)
 
                         message = await ctx.send(f"Checking {name}")
@@ -406,7 +406,7 @@ class staff(commands.Cog, name="Staff"):
 
                         else:
                             await member.add_roles(guest)
-                            await member.remove_roles(member_role, new_member, active_role)
+                            await member.remove_roles(member_role, new_member, active_role, ally)
                             await message.edit(
                                 content=f"{name} ||{member}|| Member of an unallied guild **++Guest | --Member | --Active**")
 
@@ -477,8 +477,8 @@ class staff(commands.Cog, name="Staff"):
                     await ctx.send(embed=embed)
 
                 elif guild_name not in ("Miscellaneous", "XL"):
-                    await member.remove_roles(member_, awaiting_app, newmember)
-                    await member.add_roles(guest, xl_ally)
+                    await member.remove_roles(member_, awaiting_app, newmember, ally)
+                    await member.add_roles(guest)
 
                     embed = discord.Embed(title=f"{member.name}'s nick and role were successfully changed!",
                                           color=0x8368ff)
