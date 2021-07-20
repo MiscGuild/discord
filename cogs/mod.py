@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from cogs.utils import hypixel
 
 class Moderation(commands.Cog, name="Moderation"):
     def __init__(self, bot):
@@ -11,13 +12,14 @@ class Moderation(commands.Cog, name="Moderation"):
     async def mute(self, ctx, member: discord.Member, *, reason=None):
         """Mutes the mentioned user indefinately!
         """
+        name = await hypixel.name_grabber(ctx.author)
         if reason is None:
-            reason = f'Muted by: {ctx.author.name}'
+            reason = f'Muted by: {name}'
 
         role = discord.utils.get(ctx.guild.roles, name="Muted")
         await member.add_roles(role)
         embed = discord.Embed(title="User Muted!",
-                            description=f"**{member}** was muted by **{ctx.message.author}**!",
+                            description=f"**{member}** was muted by **{name}**!",
                             color=0xff00f6)
         await ctx.send(embed=embed)
 
@@ -28,13 +30,14 @@ class Moderation(commands.Cog, name="Moderation"):
     async def unmute(self, ctx, member: discord.Member, *, reason=None):
         """Mutes the mentioned user
         """
+        name = await hypixel.name_grabber(ctx.author)
         if reason is None:
-            reason = f'Unmuted by: {ctx.author.name}'
+            reason = f'Unmuted by: {name}'
 
         role = discord.utils.get(ctx.guild.roles, name="Muted")
         await member.remove_roles(role)
         embed = discord.Embed(title="User unmuted!",
-                            description="**{0}** was unmuted by **{1}**!".format(member, ctx.message.author),
+                            description=f"**{member}** was unmuted by **{name}**!",
                             color=0xff00f6)
         await ctx.send(embed=embed)
 
@@ -45,8 +48,7 @@ class Moderation(commands.Cog, name="Moderation"):
     async def clear(self, ctx, amount: int, *, reason=None):
         """Clears the chat based on the given amount!
         """
-        if reason is None:
-            reason = f'Cleared by: {ctx.author.name}'
+        name = await hypixel.name_grabber(ctx.author)
 
         await ctx.channel.purge(limit=amount)
 
@@ -57,8 +59,9 @@ class Moderation(commands.Cog, name="Moderation"):
     async def kick(self, ctx, member: discord.Member, *, reason=None):
         """Kicks the mentioned user!
         """
+        name = await hypixel.name_grabber(ctx.author)
         if reason is None:
-            reason = f'Kicked by: {ctx.author.name}'
+            reason = f'Kicked by: {name}'
 
         await member.kick(reason=reason)
         await ctx.send(f"{member} was kicked!")
@@ -69,8 +72,9 @@ class Moderation(commands.Cog, name="Moderation"):
     async def ban(self, ctx, member: discord.Member, *, reason=None):
         """Bans the mentioned user!
         """
+        name = await hypixel.name_grabber(ctx.author)
         if reason is None:
-            reason = f'Banned by: {ctx.author.name}'
+            reason = f'Banned by: {name}'
 
         await member.ban(reason=reason)
         await ctx.send(f"{member} was banned!")
@@ -81,8 +85,9 @@ class Moderation(commands.Cog, name="Moderation"):
     async def unban(self, ctx, user: discord.User, *, reason=None):
         """Unbans the user!
         """
+        name = await hypixel.name_grabber(ctx.author)
         if reason is None:
-            reason = f'Unbanned by: {ctx.author.name}'
+            reason = f'Unbanned by: {name}'
 
         await ctx.guild.unban(user)
         await ctx.send(f'{user.mention} has been unbanned')
@@ -94,8 +99,9 @@ class Moderation(commands.Cog, name="Moderation"):
 
         Bans and then unbans a user to remove all of their messages
         """
+        name = await hypixel.name_grabber(ctx.author)
         if reason is None:
-            reason = f'Softbanned by: {ctx.author.name}'
+            reason = f'Softbanned by: {name}'
 
         await ctx.guild.ban(user, reason=reason)
         await ctx.guild.unban(user, reason=reason)

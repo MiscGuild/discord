@@ -77,11 +77,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         """
         async with ctx.channel.typing():
             if name is None:
-                author = ctx.author
-                name = author.nick
-                if name is None:
-                    x = author.name
-                    name = x
+                name = await hypixel.name_grabber(ctx.author)
             req = await hypixel.get_data(name)
             if req["player"] is None:
                 embed = discord.Embed(title="Your discord nick doesn't match your minecraft name",
@@ -224,7 +220,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         """
         if name is not None:
             if len(name) < 3 or len(name) > 16:
-                await ctx.send('Unkown IGN!')
+                await ctx.send('Unknown IGN!')
                 return
             ign, uuid = await hypixel.get_dispnameID(name)
             rank = await hypixel.get_rank(name)
@@ -428,7 +424,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     else:
                         glg = '-'
 
-                    if req["guild"]["joinable"] is True:
+                    if 'joinable' in req['guild'] and req['guild']['joinable'] is True:
                         joinable = "Yes"
                     else:
                         joinable = "No"
@@ -677,9 +673,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         """Gives the guild experience earned by the user over the course of a week.
         """
         if name is None:
-            name = ctx.author.nick
-            if name is None:
-                name = ctx.author.name
+            name = await hypixel.name_grabber(ctx.author)
         results = []
         dates = []
         weeklyexp = []
@@ -815,11 +809,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         """A command to check whether or not you can apply for the do-not-kick-list.
         """
         if name is None:
-            author = ctx.author
-            name = author.nick
-            if name is None:
-                x = author.name
-                name = x
+            name = await hypixel.name_grabber(ctx.author)
         async with aiohttp.ClientSession() as session:
             async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
                 request = await resp.json(content_type=None)  

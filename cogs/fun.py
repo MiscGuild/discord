@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
-import random
-import aiohttp
+from cogs.utils import hypixel
+import random, aiohttp
 
 class Fun(commands.Cog, name="Fun"):
     def __init__(self, bot):
@@ -49,10 +49,8 @@ class Fun(commands.Cog, name="Fun"):
     async def _8ball(self, ctx, *, question):
         """Play with the magic 8ball
         """
-        author = ctx.author
-        user_name = author.nick
-        if user_name is None:
-            user_name = ctx.author.name
+        user_name = await hypixel.name_grabber(ctx.author)
+
         responses = ["As I see it, yes.", "Ask again later.", "Better not tell you now.", "Cannot predict now.",
                     "Concentrate and ask again.", "Don’t count on it.", "It is certain.", "It is decidedly so.",
                     "Most likely", "My reply is no.", "My sources say no.", "Outlook not so good.", "Outlook good.",
@@ -122,14 +120,16 @@ class Fun(commands.Cog, name="Fun"):
     async def pat(self, ctx, user: discord.User = None):
         """Pat the specified user!
         """
+        author = await hypixel.name_grabber(ctx.author)
         async with aiohttp.ClientSession() as session:
             async with session.get('https://some-random-api.ml/animu/pat') as resp:
                 req = await resp.json()
                 await session.close()
         if user is None or ctx.author == user:
-            embed = discord.Embed(title=f"{ctx.author.display_name} pats themselves.", color=0xD2691e)
+            embed = discord.Embed(title=f"{author} pats themselves.", color=0xD2691e)
         else:
-            embed = discord.Embed(title=f"{ctx.author.display_name} pats {user.display_name}.", color=0xD2691e)
+            user = await hypixel.name_grabber(user)
+            embed = discord.Embed(title=f"{author} pats {user}.", color=0xD2691e)
         embed.set_image(url=req['link'])
         await ctx.send(embed=embed)
 
@@ -137,14 +137,16 @@ class Fun(commands.Cog, name="Fun"):
     async def hug(self, ctx, user: discord.User = None):
         """hug the specified user!
         """
+        author = await hypixel.name_grabber(ctx.author)
         async with aiohttp.ClientSession() as session:
             async with session.get('https://some-random-api.ml/animu/hug') as resp:
                 req = await resp.json()
                 await session.close()
         if user is None or ctx.author == user:
-            embed = discord.Embed(title=f"{ctx.author.display_name} hugs themselves.", color=0xD2691e)
+            embed = discord.Embed(title=f"{author} hugs themselves.", color=0xD2691e)
         else:
-            embed = discord.Embed(title=f"{ctx.author.display_name} hugs {user.display_name}.", color=0xD2691e)
+            user = await hypixel.name_grabber(user)
+            embed = discord.Embed(title=f"{author} hugs {user}.", color=0xD2691e)
         embed.set_image(url=req['link'])
         await ctx.send(embed=embed)
 

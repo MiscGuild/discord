@@ -31,7 +31,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         staff = discord.utils.get(ctx.guild.roles, name="Staff")
                         officer = discord.utils.get(ctx.guild.roles, name="Officer")
                         tofficer = discord.utils.get(ctx.guild.roles, name="Trial Officer")
-                        xl_ally = discord.utils.get(ctx.guild.roles, name="XL - Ally")
+                        ally = discord.utils.get(ctx.guild.roles, name="Ally")
 
 
                         nick = await author.edit(nick=ign)
@@ -48,8 +48,11 @@ class Tickets(commands.Cog, name="Tickets"):
                             await ctx.author.add_roles(member)
 
                         elif guild_name == "XL":
+                            if "[✧XL✧]" not in ctx.author.nick:
+                                ign = ign + " [✧XL✧]"
+                            nick = await author.edit(nick=ign)
                             await ctx.author.remove_roles(newmember)
-                            await ctx.author.add_roles(guest, xl_ally)
+                            await ctx.author.add_roles(guest, ally)
 
 
                             await ctx.channel.purge(limit=1)
@@ -130,10 +133,7 @@ class Tickets(commands.Cog, name="Tickets"):
                 await discord.TextChannel.delete(ctx.channel)
 
                 author = ctx.author
-                name = author.nick
-                if name is None:
-                    x = author.name
-                    name = x
+                name = await hypixel.name_grabber(author)
                 embed = discord.Embed(title=f'{ctx.channel.name} was deleted by {name}',
                                     description="", color=0x8368ff)
                 await logs.send(embed=embed)
@@ -154,10 +154,7 @@ class Tickets(commands.Cog, name="Tickets"):
     async def deny(self, ctx, member: discord.Member, channel: discord.TextChannel):
         """Used to deny staff applications. This command can be used in any channel, provided, the syntax is met.
         """
-        name = member.nick
-        if name is None:
-            x = member.name
-            name = x
+        name = await hypixel.name_grabber(member)
 
         embed = discord.Embed(title=f"{name}, your application has been denied!",
                             description="The reasons are listed below",
