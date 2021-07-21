@@ -1,6 +1,7 @@
 import discord, toml, aiohttp, asyncio, json, sys
 from discord.ext import commands, tasks
 from cogs.utils import hypixel
+from profanity_filter import ProfanityFilter
 import logging
 import traceback
 
@@ -644,8 +645,35 @@ async def on_guild_channel_create(channel):
                     member = discord.utils.get(channel.guild.roles, name="Member")
                     awaiting_app = discord.utils.get(channel.guild.roles, name="Awaiting Approval")
                     ally = discord.utils.get(channel.guild.roles, name="Ally")
+                    active_role = discord.utils.get(channel.guild.roles, name="Active")
+                    pf = ProfanityFilter()
                     await reply.author.edit(nick=ign)
                     if guild_name == "Miscellaneous":
+                        if active_role in reply.author.roles:
+                            while True:
+                                embed = discord.Embed(title="What would you like your tag to be? ",
+                                                      url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png",
+                                                      description="**Rules:**\n• Tags can have a maximum length of 6 characters. \n• Tags cannot include special characters. \n• Tags cannot include profane language. ")
+                                embed.set_thumbnail(
+                                    url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png")
+                                embed.set_footer(text="If you don't want a tag, type: None")
+                                await reply.send(embed=embed)
+                                tag = await bot.wait_for('message',
+                                                              check=lambda
+                                                                  x: x.channel == reply.channel and x.author == reply.author)
+                                tag = name.content
+                                if tag.isacii() is False:
+                                    await reply.send(
+                                        "The tag may not include special characters unless it's the tag of an ally guild.")
+                                elif len(tag) > 6:
+                                    await reply.send("The tag may not be longer than 6 characters.")
+                                elif pf.is_profane(tag) is True:
+                                    await reply.send("The tag may not include profane language")
+                                else:
+                                    if tag is not None:
+                                        ign = ign + f' [{tag}]'
+                                    await reply.author.edit(nick=ign)
+                                    break
                         await reply.author.remove_roles(guest, awaiting_app)
                         await reply.author.add_roles(member)
                         embed = discord.Embed(title="Your nick and role was successfully changed!",

@@ -7,69 +7,176 @@ from datetime import datetime
 import json
 from quickchart import QuickChart, QuickChartFunction
 from io import BytesIO
+from profanity_filter import ProfanityFilter
+
+pf = ProfanityFilter()
 
 class Hypixel(commands.Cog, name="Hypixel"):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command()
-    async def sync(self, ctx, name):
+    async def sync(self, ctx, name=None, tag=None):
         """Used to update your discord nick and roles upon changing your minecraft name/leaving/joining Miscellaneous!
         """
+        guest = discord.utils.get(ctx.guild.roles, name="Guest")
+        member = discord.utils.get(ctx.guild.roles, name="Member")
+        awaiting_app = discord.utils.get(ctx.guild.roles, name="Awaiting Approval")
+        ally = discord.utils.get(ctx.guild.roles, name="Ally")
+        active_role = discord.utils.get(ctx.guild.roles, name="Active")
         author = ctx.author
-        ign, uuid = await hypixel.get_dispnameID(name)
+        if name is not None:
 
-        if ign is None:
-            await ctx.send('Please enter a valid ign!')
-        else:
-            guild_name = await hypixel.get_guild(name)
-            guest = discord.utils.get(ctx.guild.roles, name="Guest")
-            member = discord.utils.get(ctx.guild.roles, name="Member")
-            awaiting_app = discord.utils.get(ctx.guild.roles, name="Awaiting Approval")
-            xl_ally = discord.utils.get(ctx.guild.roles, name="XL - Ally")
+            ign, uuid = await hypixel.get_dispnameID(name)
 
+            if ign is None:
+                await ctx.send('Please enter a valid ign!')
+            else:
+                guild_name = await hypixel.get_guild(name)
 
-            await author.edit(nick=ign)
-            if guild_name == "Miscellaneous":
-                await ctx.author.remove_roles(guest,awaiting_app)
-                await ctx.author.add_roles(member)
-                embed = discord.Embed(title="Your nick and role was successfully changed!",
-                                    description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
-                                    color=0x8368ff)
-                embed.set_footer(text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
-                await ctx.send(embed=embed)
-
-            elif guild_name == "XL":
-                await ctx.author.remove_roles(member, awaiting_app)
-                await ctx.author.add_roles(guest, xl_ally)
-
-                embed = discord.Embed(title="Your nick and role was successfully changed!",
-                                    description="If this wasn't the change you anticipated, "
-                                                "kindly create a ticket or get in contact with staff!",
-                                    color=0x8368ff)
-
-                embed.set_footer(text="Member of XL"
-                                    "\n• Member & Awaiting Approval were removed"
-                                    "\n• Guest & XL - Ally were given")
-                await ctx.send(embed=embed)
+                if guild_name != "Miscellaneous" and tag is not None:
+                    await ctx.send("Guild tags are exclusively for active members, staff members and allies!")
 
 
+                await author.edit(nick=ign)
+                if guild_name == "Miscellaneous":
+                    if tag is not None and active_role in ctx.author.roles:
+                        if tag.isacii() is False:
+                            await ctx.send(
+                                "The tag may not include special characters unless it's the tag of an ally guild. Re-run the command if you wish to add a tag!")
+                        elif len(tag) > 6:
+                            await ctx.send("The tag may not be longer than 6 characters. Re-run the command if you wish to add a tag!")
+                        elif pf.is_profane(tag) is True:
+                            await ctx.send("The tag may not include profane language. Re-run the command if you wish to add a tag!")
+                        else:
+                            if tag is not None:
+                                ign = ign + f' [{tag}]'
+                            await ctx.author.edit(nick=ign)
+                    elif tag is not None and active_role not in ctx.author.roles:
+                        await ctx.send("Your tag will not be updated since you do not have the active role!")
 
-            elif guild_name not in ("Miscellaneous", "XL"):
-                if str(ctx.channel.category.name) == "RTickets":
-                    await ctx.send("You aren't in Miscellaneous in-game. Kindly await staff assistance!")
-                else:
-                    await ctx.author.remove_roles(member)
-                    await ctx.author.remove_roles(awaiting_app)
-                    await ctx.author.add_roles(guest)
-                    if guild_name is None:
-                        guild_name = "no guild (Guildless)"
+
+                    await ctx.author.remove_roles(guest, awaiting_app)
+                    await ctx.author.add_roles(member)
                     embed = discord.Embed(title="Your nick and role was successfully changed!",
                                         description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
                                         color=0x8368ff)
-                    embed.set_footer(text=f"Member of {guild_name}\n• Nick Changed\n• Member & Awaiting Approval were removed\n• Guest was given")
+                    embed.set_footer(text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
                     await ctx.send(embed=embed)
 
+                elif guild_name == "XL":
+                    if author.nick is None or "[✧XL✧]" not in author.nick:
+                        ign = ign + " [✧XL✧]"
+                        await author.edit(nick=ign)
+                    await ctx.author.remove_roles(member, awaiting_app)
+                    await ctx.author.add_roles(guest, ally)
+
+                    embed = discord.Embed(title="Your nick and role was successfully changed!",
+                                        description="If this wasn't the change you anticipated, "
+                                                    "kindly create a ticket or get in contact with staff!",
+                                        color=0x8368ff)
+
+                    embed.set_footer(text="Member of XL"
+                                        "\n• Member & Awaiting Approval were removed"
+                                        "\n• Guest & XL - Ally were given")
+                    await ctx.send(embed=embed)
+
+
+
+                elif guild_name not in ("Miscellaneous", "XL"):
+                    if str(ctx.channel.category.name) == "RTickets":
+                        await ctx.send("You aren't in Miscellaneous in-game. Kindly await staff assistance!")
+                    else:
+                        await ctx.author.remove_roles(member, awaiting_app)
+                        await ctx.author.add_roles(guest)
+                        if guild_name is None:
+                            guild_name = "no guild (Guildless)"
+                        embed = discord.Embed(title="Your nick and role was successfully changed!",
+                                            description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
+                                            color=0x8368ff)
+                        embed.set_footer(text=f"Member of {guild_name}\n• Nick Changed\n• Member & Awaiting Approval were removed\n• Guest was given")
+                        await ctx.send(embed=embed)
+        else:
+            await ctx.send('**What is your Minecraft username?**')
+            name = await self.bot.wait_for('message',
+                                               check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+            name = name.content
+            ign, uuid = await hypixel.get_dispnameID(name)
+
+            if ign is None:
+                await ctx.send('Please enter a valid ign!')
+            else:
+                await ctx.author.edit(nick=ign)
+                guild_name = await hypixel.get_guild(name)
+                if guild_name == "Miscellaneous":
+                    if active_role in ctx.author.roles:
+                        while True:
+                            embed = discord.Embed(title="What would you like your tag to be? ",
+                                                  url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png",
+                                                  description="**Rules:**\n• Tags can have a maximum length of 6 characters. \n• Tags cannot include special characters. \n• Tags cannot include profane language. ")
+                            embed.set_thumbnail(
+                                url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png")
+                            embed.set_footer(text="If you don't want a tag, type: None")
+                            await ctx.send(embed=embed)
+                            tag = await self.bot.wait_for('message',
+                                                          check=lambda
+                                                              x: x.channel == ctx.channel and x.author == ctx.author)
+                            tag = name.content
+                            if tag.isacii() is False:
+                                await ctx.send("The tag may not include special characters unless it's the tag of an ally guild.")
+                            elif len(tag) > 6:
+                                await ctx.send("The tag may not be longer than 6 characters.")
+                            elif pf.is_profane(tag) is True:
+                                await ctx.send("The tag may not include profane language")
+                            else:
+                                if tag is not None:
+                                    ign = ign + f' [{tag}]'
+                                await ctx.author.edit(nick=ign)
+                                break
+
+                    else:
+                        await ctx.author.remove_roles(guest, awaiting_app)
+                        await ctx.author.add_roles(member)
+                        embed = discord.Embed(title="Your nick and role was successfully changed!",
+                                              description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
+                                              color=0x8368ff)
+                        embed.set_footer(
+                            text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
+                        await ctx.send(embed=embed)
+
+                elif guild_name == "XL":
+                    if author.nick is None or "[✧XL✧]" not in author.nick:
+                        ign = ign + " [✧XL✧]"
+                        await author.edit(nick=ign)
+                    await ctx.author.remove_roles(member, awaiting_app)
+                    await ctx.author.add_roles(guest, ally)
+
+                    embed = discord.Embed(title="Your nick and role was successfully changed!",
+                                          description="If this wasn't the change you anticipated, "
+                                                      "kindly create a ticket or get in contact with staff!",
+                                          color=0x8368ff)
+
+                    embed.set_footer(text="Member of XL"
+                                          "\n• Member & Awaiting Approval were removed"
+                                          "\n• Guest & XL - Ally were given")
+                    await ctx.send(embed=embed)
+
+
+
+                elif guild_name not in ("Miscellaneous", "XL"):
+                    if str(ctx.channel.category.name) == "RTickets":
+                        await ctx.send("You aren't in Miscellaneous in-game. Kindly await staff assistance!")
+                    else:
+                        await ctx.author.remove_roles(member, awaiting_app)
+                        await ctx.author.add_roles(guest)
+                        if guild_name is None:
+                            guild_name = "no guild (Guildless)"
+                        embed = discord.Embed(title="Your nick and role was successfully changed!",
+                                              description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
+                                              color=0x8368ff)
+                        embed.set_footer(
+                            text=f"Member of {guild_name}\n• Nick Changed\n• Member & Awaiting Approval were removed\n• Guest was given")
+                        await ctx.send(embed=embed)
 
     @commands.command(aliases=["i"])
     async def info(self, ctx, name=None):
@@ -406,17 +513,21 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     await ctx.send("The user is not in any guild!")
                 else:
                     guild = str(req["guild"]["name"])
-
-                    if req["guild"]["tag"] is None:
-                        gtag = ""
+                    if 'tag' in req["guild"]:
+                        if req["guild"]["tag"] is None:
+                            gtag = ""
+                        else:
+                            gtag = f'[{req["guild"]["tag"]}]'
                     else:
-                        gtag = f'[{req["guild"]["tag"]}]'
+                        gtag = ""
 
                     glvl = await hypixel.get_guild_level(req["guild"]['exp'])
 
-                    gdesc = req["guild"]['description']
-
-                    if gdesc is None:
+                    if 'description' in req["guild"]:
+                        gdesc = req["guild"]['description']
+                        if gdesc is None:
+                            gdesc = 'No guild description.'
+                    else:
                         gdesc = 'No guild description.'
 
                     if "legacy_ranking" in req:
