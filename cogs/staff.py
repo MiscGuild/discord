@@ -264,6 +264,7 @@ class staff(commands.Cog, name="Staff"):
         """Checks the roles of all the users and changes them on the basis of their guild
         """
         guild_master = discord.utils.get(ctx.guild.roles, name="Guild Master")
+        admin = ctx.guild.get_role(522588118251995147)
         staff = discord.utils.get(ctx.guild.roles, name="Staff")
         new_member = discord.utils.get(ctx.guild.roles, name="New Member")
         guest = discord.utils.get(ctx.guild.roles, name="Guest")
@@ -271,7 +272,7 @@ class staff(commands.Cog, name="Staff"):
         active_role = discord.utils.get(ctx.guild.roles, name="Active")
         inactive_role = discord.utils.get(ctx.guild.roles, name="Inactive")
         ally = discord.utils.get(ctx.guild.roles, name="Ally")
-        adminids = ('326399363943497728', '266546184301182976', '333146404673290241', '711235929880133636', '307402461734240257', '484411714637529088')
+        adminids = [x.id for x in admin.members]
 
         msg = await ctx.send("**Processing all the prerequisites**")
 
