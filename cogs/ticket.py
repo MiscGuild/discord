@@ -91,25 +91,28 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                 add_reactions=True, embed_links=True, attach_files=True,
                                                                 read_message_history=True, external_emojis=True)
 
-                            embed = discord.Embed(title="Miscellaneous Guild Requirements", description="These requirements are subject to change!", color=0x8368ff)
-                            embed.add_field(name="Active",
-                                            value=f"•  {format(self.bot.active,',d')} Weekly Guild Experience",
-                                            inline=False)
-                            embed.add_field(name="DNKL Eligibility",
-                                            value=f"•  {format(self.bot.dnkl,',d')} Weekly Guild Experience",
-                                            inline=False)
-                            embed.add_field(name="Resident",
-                                            value=f"•  {format(self.bot.resident_req,',d')} Weekly Guild Experience",
-                                            inline=False)
-                            embed.add_field(name="Member",
-                                            value=f"•  {format(self.bot.inactive,',d')} Weekly Guild Experience",
-                                            inline=False)
-                            embed.add_field(name="New Member",
-                                            value=f"•  {format(self.bot.new_member,',d')} Daily Guild Experience",
-                                            inline=False)
-                            embed.set_footer(text="You are considered a New Member for the first 7 days after joining the guild"
-                                                "\nIf you fail to meet the New Member/Member requirements, you will be kicked!")
-                            await ctx.author.send(embed=embed)
+                            try:
+                                embed = discord.Embed(title="Miscellaneous Guild Requirements", description="These requirements are subject to change!", color=0x8368ff)
+                                embed.add_field(name="Active",
+                                                value=f"•  {format(self.bot.active,',d')} Weekly Guild Experience",
+                                                inline=False)
+                                embed.add_field(name="DNKL Eligibility",
+                                                value=f"•  {format(self.bot.dnkl,',d')} Weekly Guild Experience",
+                                                inline=False)
+                                embed.add_field(name="Resident",
+                                                value=f"•  {format(self.bot.resident_req,',d')} Weekly Guild Experience",
+                                                inline=False)
+                                embed.add_field(name="Member",
+                                                value=f"•  {format(self.bot.inactive,',d')} Weekly Guild Experience",
+                                                inline=False)
+                                embed.add_field(name="New Member",
+                                                value=f"•  {format(self.bot.new_member,',d')} Daily Guild Experience",
+                                                inline=False)
+                                embed.set_footer(text="You are considered a New Member for the first 7 days after joining the guild"
+                                                    "\nIf you fail to meet the New Member/Member requirements, you will be kicked!")
+                                await ctx.author.send(embed=embed)
+                            except Exception:
+                                pass
                     await session.close()
 
             else:
