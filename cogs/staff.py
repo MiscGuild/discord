@@ -337,7 +337,6 @@ class staff(commands.Cog, name="Staff"):
                                     mojang_json = await mojang.json()
                                     ign = mojang_json["name"]
                                     uuid = mojang_json['id']
-                                    await member.edit(nick=ign)
                                 await session.close()
 
                             # Miscellaneous
@@ -360,6 +359,8 @@ class staff(commands.Cog, name="Staff"):
 
                                     if usergrank != 'Resident':
                                         if totalexp < self.bot.inactive:
+                                            username = hypixel.name_grabber(member)
+                                            await member.edit(nick=username)
                                             await member.add_roles(inactive_role)
                                             await member.remove_roles(active_role)
                                             await message.edit(
@@ -372,11 +373,15 @@ class staff(commands.Cog, name="Staff"):
                                                 content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
 
                                         elif totalexp > self.bot.inactive:
+                                            username = hypixel.name_grabber(member)
+                                            await member.edit(nick=username)
                                             await member.remove_roles(inactive_role, active_role)
                                             await message.edit(
                                                 content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
-                                    else:
-                                        if totalexp < 50000:
+                                    else: # For residents
+                                        if totalexp < self.bot.resident_req:
+                                            username = hypixel.name_grabber(member)
+                                            await member.edit(nick=username)
                                             await member.add_roles(inactive_role)
                                             await member.remove_roles(active_role)
                                             await message.edit(
@@ -388,7 +393,9 @@ class staff(commands.Cog, name="Staff"):
                                             await message.edit(
                                                 content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
 
-                                        elif totalexp > 50000:
+                                        elif totalexp > self.bot.resident_req:
+                                            username = hypixel.name_grabber(member)
+                                            await member.edit(nick=username)
                                             await member.remove_roles(inactive_role, active_role)
                                             await message.edit(
                                                 content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
@@ -401,13 +408,13 @@ class staff(commands.Cog, name="Staff"):
                                 ign = ign + " [✧XL✧]"
                             await member.edit(nick=ign)
                             await member.add_roles(guest, ally)
-                            await member.remove_roles(member_role, new_member, active_role)
+                            await member.remove_roles(member_role, new_member, active_role, inactive_role)
                             await message.edit(
                                 content=f"{name} ||{member}|| Member of XL **++XL - Ally \| ++Guest | --Member | --Active**")
 
                         else:
                             await member.add_roles(guest)
-                            await member.remove_roles(member_role, new_member, active_role, ally)
+                            await member.remove_roles(member_role, new_member, active_role, ally, inactive_role)
                             await message.edit(
                                 content=f"{name} ||{member}|| Member of an unallied guild **++Guest | --Member | --Active**")
 
