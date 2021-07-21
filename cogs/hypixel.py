@@ -259,7 +259,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         embed.add_field(name="Reason", value=f"{reason}", inline=False)
                         embed.set_author(name="Do not kick list")
                         await ctx.channel.purge(limit=1)
-                        message = await ctx.send(embed=embed)
+                        message = await self.bot.dnkl_channel.send(embed=embed)
 
                         dnkl_dict = {ign: message.id}
 

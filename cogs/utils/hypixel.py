@@ -172,7 +172,7 @@ async def get_gtag(name):
 async def get_dispnameID(name):
     async with aiohttp.ClientSession() as session:
         async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-            request = await resp.json()
+            request = await resp.json(content_type=None)
             await session.close()
     if 'error' not in request:
         ign = request["name"]
