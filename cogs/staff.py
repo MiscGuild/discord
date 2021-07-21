@@ -279,7 +279,7 @@ class staff(commands.Cog, name="Staff"):
         misc_uuids, xl_uuids, = await hypixel.get_guild_members("Miscellaneous"), await hypixel.get_guild_members("XL")
 
 
-        misc_members, calm_members, xl_members= [], [], []
+        misc_members, xl_members= [], []
 
         #Miscellaneous Member Names
         await msg.edit(content="**Processing** - 1/2")
