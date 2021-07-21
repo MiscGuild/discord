@@ -397,7 +397,7 @@ class staff(commands.Cog, name="Staff"):
 
 
                         elif ign in xl_members:
-                            if "[✧XL✧]" not in member.nick:
+                            if member.nick is None or "[✧XL✧]" not in member.nick:
                                 ign = ign + " [✧XL✧]"
                             await member.edit(nick=ign)
                             await member.add_roles(guest, ally)
