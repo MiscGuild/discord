@@ -1,9 +1,9 @@
 import discord, toml, aiohttp, asyncio, json, sys
 from discord.ext import commands, tasks
 from cogs.utils import hypixel
-from profanity_filter import ProfanityFilter
 import logging
 import traceback
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -130,6 +130,7 @@ async def on_guild_channel_create(channel):
             embed.add_field(name="If you don't", value="Type `No`")
             await channel.send(embed=embed)
             reply = await bot.wait_for('message', check=lambda x: x.channel == channel)
+            author = reply.author
             reply = reply.content
             reply = reply.capitalize()
             if reply in ('Yes', 'Yeah', 'Ye', 'Yea'):
@@ -234,14 +235,18 @@ async def on_guild_channel_create(channel):
             embed.add_field(name="GvG Application", value="Reply with `GvG`", inline=False)
             embed.add_field(name="Other", value="Reply with `Other`", inline=False)
             await channel.send(embed=embed)
+            await asyncio.sleep(0.5)
             reply = await bot.wait_for('message', check=lambda x: x.channel == channel)
-            name = await hypixel.name_grabber(reply.author)
+
+            author = reply.author
+            name = await hypixel.name_grabber(author)
+
             reply = reply.content
             reply = reply.capitalize()
 
             if reply in ("Dnkl", "Do not kick list", "Do-Not-Kick-List"):
 
-                name = await hypixel.name_grabber(reply.author)
+                name = await hypixel.name_grabber(author)
 
                 await channel.edit(name=f"DNKL-{name}", category=discord.utils.get(channel.guild.categories, name="DNKL"))
                 async with aiohttp.ClientSession() as session:
@@ -293,13 +298,13 @@ async def on_guild_channel_create(channel):
                                     "you might still be accepted so we shall proceed with the application process!")
 
                                 await channel.send("**When will your inactivity begin? (Start date) (DD/MM/YYYY)**")
-                                start = await bot.wait_for('message', check=lambda x: x.author == reply.author and x.channel == channel)
+                                start = await bot.wait_for('message', check=lambda x: x.author == author and x.channel == channel)
                                 start = start.content
                                 await channel.send('**When will your inactivity end? (End date) (DD/MM/YYYY)**')
-                                end = await bot.wait_for('message', check=lambda x: x.author == reply.author and x.channel == channel)
+                                end = await bot.wait_for('message', check=lambda x: x.author == author and x.channel == channel)
                                 end = end.content
                                 await channel.send("**What's the reason behind your inactivity?**")
-                                reason = await bot.wait_for('message', check=lambda x: x.author == reply.author and x.channel == channel)
+                                reason = await bot.wait_for('message', check=lambda x: x.author == author and x.channel == channel)
                                 reason = reason.content
 
                                 await channel.send(
@@ -476,13 +481,13 @@ async def on_guild_channel_create(channel):
                                 await channel.send(embed=embed)
 
                                 await channel.send("**When will your inactivity begin? (Start date) (DD/MM/YYYY)**")
-                                start = await bot.wait_for('message', check=lambda x: x.author == reply.author and x.channel == channel)
+                                start = await bot.wait_for('message', check=lambda x: x.author == author and x.channel == channel)
                                 start = start.content
                                 await channel.send('**When will your inactivity end? (End date) (DD/MM/YYYY)**')
-                                end = await bot.wait_for('message', check=lambda x: x.author == reply.author and x.channel == channel)
+                                end = await bot.wait_for('message', check=lambda x: x.author == author and x.channel == channel)
                                 end = end.content
                                 await channel.send("**What's the reason behind your inactivity?**")
-                                reason = await bot.wait_for('message', check=lambda x: x.author == reply.author and x.channel == channel)
+                                reason = await bot.wait_for('message', check=lambda x: x.author == author and x.channel == channel)
                                 reason = reason.content
 
                                 await channel.send(
@@ -491,7 +496,7 @@ async def on_guild_channel_create(channel):
                                     f"\n**End:** {end}"
                                     f"\n**Reason:** {reason}"
                                     f"\n*If you made an error, kindly notify staff by typing after this message*"
-                                    f"\n\n||,dnkladd {name} {reply.author.mention} {start} {end} {reason}||"
+                                    f"\n\n||,dnkladd {name} {author.mention} {start} {end} {reason}||"
                                     )
 
                                 await channel.send("**Staff, what do you wish to do with this dnkl request?**"
@@ -632,24 +637,25 @@ async def on_guild_channel_create(channel):
 
             elif reply in ("Role", "Username", "Name"):
                 await channel.edit(name=f"Role/NameChange-{name}",category=discord.utils.get(channel.guild.categories, name="OTHER"))
-                await channel.send('What is your minecraft username?')
-                role_reply = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                embed = discord.Embed(title="What is your Minecraft username?",
+                                      color=0x8368ff)
+                await channel.send(embed=embed)
+                role_reply = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                 name = role_reply.content
                 ign, uuid = await hypixel.get_dispnameID(name)
                 if ign is None:
                     await channel.send('Please enter a valid ign!')
                     await channel.send("I'll restart the process. If you think I made an error, select 'Other' upon restart")
                 else:
-                    guild_name = hypixel.get_guild(ign)
+                    guild_name = await hypixel.get_guild(ign)
                     guest = discord.utils.get(channel.guild.roles, name="Guest")
                     member = discord.utils.get(channel.guild.roles, name="Member")
                     awaiting_app = discord.utils.get(channel.guild.roles, name="Awaiting Approval")
                     ally = discord.utils.get(channel.guild.roles, name="Ally")
                     active_role = discord.utils.get(channel.guild.roles, name="Active")
-                    pf = ProfanityFilter()
-                    await reply.author.edit(nick=ign)
+                    await author.edit(nick=ign)
                     if guild_name == "Miscellaneous":
-                        if active_role in reply.author.roles:
+                        if active_role in author.roles:
                             while True:
                                 embed = discord.Embed(title="What would you like your tag to be? ",
                                                       url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png",
@@ -657,25 +663,28 @@ async def on_guild_channel_create(channel):
                                 embed.set_thumbnail(
                                     url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png")
                                 embed.set_footer(text="If you don't want a tag, type: None")
-                                await reply.send(embed=embed)
+                                await channel.send(embed=embed)
                                 tag = await bot.wait_for('message',
                                                               check=lambda
-                                                                  x: x.channel == reply.channel and x.author == reply.author)
-                                tag = name.content
-                                if tag.isacii() is False:
-                                    await reply.send(
+                                                                  x: x.channel == channel and x.author == author)
+                                tag = tag.content
+                                with open('badwords.txt', 'r') as f:
+                                    badwords = f.read()
+                                if tag.isascii() is False:
+                                    await channel.send(
                                         "The tag may not include special characters unless it's the tag of an ally guild.")
                                 elif len(tag) > 6:
-                                    await reply.send("The tag may not be longer than 6 characters.")
-                                elif pf.is_profane(tag) is True:
-                                    await reply.send("The tag may not include profane language")
+                                    await channel.send("The tag may not be longer than 6 characters.")
+                                elif tag in badwords:
+                                    await channel.send("The tag may not include profane language")
                                 else:
                                     if tag is not None:
                                         ign = ign + f' [{tag}]'
-                                    await reply.author.edit(nick=ign)
+                                    await author.edit(nick=ign)
                                     break
-                        await reply.author.remove_roles(guest, awaiting_app)
-                        await reply.author.add_roles(member)
+
+
+                        await author.add_roles(member)
                         embed = discord.Embed(title="Your nick and role was successfully changed!",
                                                 description="await staff assistance.",
                                                 color=0x8368ff)
@@ -685,11 +694,11 @@ async def on_guild_channel_create(channel):
                         await channel.send(embed=embed)
 
                     elif guild_name == "XL":
-                        if "[✧XL✧]" not in reply.author.nick:
+                        if "[✧XL✧]" not in author.nick:
                             ign = ign + " [✧XL✧]"
-                        await reply.author.edit(nick=ign)
-                        await reply.author.remove_roles(member, awaiting_app)
-                        await reply.author.add_roles(guest, ally)
+                        await author.edit(nick=ign)
+                        await author.remove_roles(member, awaiting_app)
+                        await author.add_roles(guest, ally)
                         embed = discord.Embed(title="Your nick and role was successfully changed!",
                                                 description="If this wasn't the change you anticipated, "
                                                             "await staff assistance.",
@@ -703,8 +712,8 @@ async def on_guild_channel_create(channel):
                         if str(channel.channel.category.name) == "RTickets":
                             await channel.send("You aren't in Miscellaneous in-game. Kindly await staff assistance!")
                         else:
-                            await reply.author.remove_roles(member,awaiting_app)
-                            await reply.author.add_roles(guest)
+                            await author.remove_roles(member,awaiting_app)
+                            await author.add_roles(guest)
                             embed = discord.Embed(title="Your nick and role was successfully changed!",
                                                     description="If this wasn't the change you anticipated, "
                                                                 "await staff assistance.",
@@ -740,7 +749,7 @@ async def on_guild_channel_create(channel):
                 await channel.send(embed=embed)
                 await channel.send("**Do you meet these requirements? (Yes/No)**")
 
-                reqs = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                reqs = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                 reqs = reqs.content
                 reqs = reqs.capitalize()
 
@@ -749,11 +758,11 @@ async def on_guild_channel_create(channel):
                                             description="Kindly reply with a Yes or No",
                                             color=0x4b89e4)
                     await channel.send(embed=embed)
-                    nickmatching = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                    nickmatching = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                     nickmatching = nickmatching.content
                     nickmatching = nickmatching.capitalize()
                     if nickmatching in ('Yes', 'Ye', 'Yup', 'Y', 'Yeah', 'Yus'):
-                        name = await hypixel.name_grabber(reply.author)
+                        name = await hypixel.name_grabber(author)
 
                         async with aiohttp.ClientSession() as session:
                             async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
@@ -766,7 +775,7 @@ async def on_guild_channel_create(channel):
                                                 description="Kindly reply with a number",
                                                 color=0x4b89e4)
                         await channel.send(embed=embed)
-                        age = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                        age = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                         age = age.content
 
                         '''VETERENCY'''
@@ -774,7 +783,7 @@ async def on_guild_channel_create(channel):
                                                 description="You can check this through \"/g menu\" ingame",
                                                 color=0x4b89e4)
                         await channel.send(embed=embed)
-                        veterency = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                        veterency = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                         veterency = veterency.content
 
                         '''PAST INFRACTIONS'''
@@ -782,7 +791,7 @@ async def on_guild_channel_create(channel):
                                                 description="Kindly reply with a Yes or No",
                                                 color=0x4b89e4)
                         await channel.send(embed=embed)
-                        infractions = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                        infractions = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                         infractions = infractions.content
                         infractions = infractions.capitalize()
 
@@ -800,7 +809,7 @@ async def on_guild_channel_create(channel):
                                                 description="Please make sure that you respond in one message",
                                                 color=0x4b89e4)
                         await channel.send(embed=embed)
-                        whystaff = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                        whystaff = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                         whystaff = whystaff.content
 
                         '''WHY MISC'''
@@ -808,7 +817,7 @@ async def on_guild_channel_create(channel):
                                                 description="Please make sure that you respond in one message",
                                                 color=0x4b89e4)
                         await channel.send(embed=embed)
-                        whymisc = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                        whymisc = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                         whymisc = whymisc.content
 
                         '''Suggest'''
@@ -816,7 +825,7 @@ async def on_guild_channel_create(channel):
                                                 description="Please make sure that you respond in one message",
                                                 color=0x4b89e4)
                         await channel.send(embed=embed)
-                        suggestion = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                        suggestion = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                         suggestion = suggestion.content
 
                         '''SCENARIO 1'''
@@ -825,7 +834,7 @@ async def on_guild_channel_create(channel):
                                                 description="Make your answer as detailed as possible!",
                                                 color=0x4b89e4)
                         await channel.send(embed=embed)
-                        scen1 = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                        scen1 = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                         scen1 = scen1.content
 
                         '''SCENARIO 2'''
@@ -835,7 +844,7 @@ async def on_guild_channel_create(channel):
                                                 description="Make your answer as detailed as possible!",
                                                 color=0x4b89e4)
                         await channel.send(embed=embed)
-                        scen2 = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                        scen2 = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                         scen2 = scen2.content
 
                         '''SCENARIO 3'''
@@ -844,7 +853,7 @@ async def on_guild_channel_create(channel):
                                                 description="Please make sure that you respond in one message",
                                                 color=0x4b89e4)
                         await channel.send(embed=embed)
-                        scen3 = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                        scen3 = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                         scen3 = scen3.content
 
                         '''STAFF'''
@@ -853,7 +862,7 @@ async def on_guild_channel_create(channel):
                                                 description="Please make sure that you respond in one message",
                                                 color=0x4b89e4)
                         await channel.send(embed=embed)
-                        staff = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                        staff = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                         staff = staff.content
 
                         '''TIME'''
@@ -861,7 +870,7 @@ async def on_guild_channel_create(channel):
                                                 description="Please make sure that you respond in one message",
                                                 color=0x4b89e4)
                         await channel.send(embed=embed)
-                        time_ = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                        time_ = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                         time_ = time_.content
 
                         '''GENERAL QUESTION'''
@@ -870,14 +879,14 @@ async def on_guild_channel_create(channel):
                                                 escription="Make your answer as detailed as possible!",
                                                 color=0x4b89e4)
                         await channel.send(embed=embed)
-                        question = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                        question = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                         question = question.content
 
                         '''ANYTHING ELSE'''
                         embed = discord.Embed(title="Anything else you would like us to know?",
                                                 color=0x4b89e4)
                         await channel.send(embed=embed)
-                        random = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                        random = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                         random = random.content
 
                         await channel.send("Great! You're done with the application!"
@@ -904,7 +913,7 @@ async def on_guild_channel_create(channel):
 
                     else:
                         await channel.send('What is your minecraft username?')
-                        role_reply = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                        role_reply = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                         name = role_reply.content
                         ign, uuid = await hypixel.get_dispnameID(name)
                         if ign is None:
@@ -919,19 +928,19 @@ async def on_guild_channel_create(channel):
                             member = discord.utils.get(channel.guild.roles, name="Member")
                             awaiting_app = discord.utils.get(channel.guild.roles, name="Awaiting Approval")
 
-                            await reply.author.edit(nick=ign)
+                            await author.edit(nick=ign)
                             if guild_name == "Miscellaneous":
-                                await reply.author.remove_roles(awaiting_app)
-                                await reply.author.remove_roles(guest)
-                                await reply.author.add_roles(member)
+                                await author.remove_roles(awaiting_app)
+                                await author.remove_roles(guest)
+                                await author.add_roles(member)
                                 embed = discord.Embed(title="Your nick and role was successfully changed!",
                                                         description="Now let's proceed to your application!",
                                                         color=0x8368ff)
                                 await channel.send(embed=embed)
 
                             else:
-                                await reply.author.remove_roles(member)
-                                await reply.author.add_roles(guest)
+                                await author.remove_roles(member)
+                                await author.add_roles(guest)
                                 embed = discord.Embed(title="Your nick and role was successfully changed!",
                                                         description="Now let's proceed to your application!",
                                                         color=0x8368ff)
@@ -949,7 +958,7 @@ async def on_guild_channel_create(channel):
                                                     description="Kindly reply with a number",
                                                     color=0x4b89e4)
                             await channel.send(embed=embed)
-                            age = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                            age = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             age = age.content
 
                             '''VETERENCY'''
@@ -957,7 +966,7 @@ async def on_guild_channel_create(channel):
                                                     description="You can check this through \"/g menu\" ingame",
                                                     color=0x4b89e4)
                             await channel.send(embed=embed)
-                            veterency = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                            veterency = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             veterency = veterency.content
 
                             '''PAST INFRACTIONS'''
@@ -965,7 +974,7 @@ async def on_guild_channel_create(channel):
                                                     description="Kindly reply with a Yes or No",
                                                     color=0x4b89e4)
                             await channel.send(embed=embed)
-                            infractions = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                            infractions = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             infractions = infractions.content
                             infractions = infractions.capitalize()
 
@@ -983,7 +992,7 @@ async def on_guild_channel_create(channel):
                                                     description="Please make sure that you respond in one message",
                                                     color=0x4b89e4)
                             await channel.send(embed=embed)
-                            whystaff = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                            whystaff = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             whystaff = whystaff.content
 
 
@@ -993,7 +1002,7 @@ async def on_guild_channel_create(channel):
                                                     description="Please make sure that you respond in one message",
                                                     color=0x4b89e4)
                             await channel.send(embed=embed)
-                            whymisc = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                            whymisc = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             whymisc = whymisc.content
 
 
@@ -1002,7 +1011,7 @@ async def on_guild_channel_create(channel):
                                                     description="Please make sure that you respond in one message",
                                                     color=0x4b89e4)
                             await channel.send(embed=embed)
-                            suggestion = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                            suggestion = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             suggestion = suggestion.content
 
 
@@ -1012,7 +1021,7 @@ async def on_guild_channel_create(channel):
                                                     description="Make your answer as detailed as possible!",
                                                     color=0x4b89e4)
                             await channel.send(embed=embed)
-                            scen1 = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                            scen1 = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             scen1 = scen1.content
 
 
@@ -1023,7 +1032,7 @@ async def on_guild_channel_create(channel):
                                                     description="Make your answer as detailed as possible!",
                                                     color=0x4b89e4)
                             await channel.send(embed=embed)
-                            scen2 = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                            scen2 = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             scen2 = scen2.content
 
 
@@ -1033,34 +1042,34 @@ async def on_guild_channel_create(channel):
                                                     description="Please make sure that you respond in one message",
                                                     color=0x4b89e4)
                             await channel.send(embed=embed)
-                            scen3 = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                            scen3 = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             scen3 = scen3.content
 
 
                             #STAFF
                             embed = discord.Embed(title="Have you been staff in any other guild or on any server? If yes, which one?", description="Please make sure that you respond in one message", color=0x4b89e4)
                             await channel.send(embed=embed)
-                            staff = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                            staff = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             staff = staff.content
 
 
                             #TIME
                             embed = discord.Embed(title="How much time do you have to contribute to the role? (Per day)", description="Please make sure that you respond in one message", color=0x4b89e4)
                             await channel.send(embed=embed)
-                            time_ = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                            time_ = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             time_ = time_.content
 
 
                             #GENERAL QUESTION
                             embed = discord.Embed(title="Tell us about a time you made a mistake within the last year. How did you deal with it? What did you learn?", description="Make your answer as detailed as possible!", color=0x4b89e4)
                             await channel.send(embed=embed)
-                            question = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                            question = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             question = question.content
 
                             #ANYTHING ELSE
                             embed = discord.Embed(title="Anything else you would like us to know?", color=0x4b89e4)
                             await channel.send(embed=embed)
-                            random = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                            random = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                             random = random.content
 
 
@@ -1243,11 +1252,11 @@ async def on_guild_channel_create(channel):
             elif reply == "Demotion":
 
                 admin = discord.utils.get(channel.guild.roles, name="Admin")
-                if admin in reply.author.roles:
+                if admin in author.roles:
                     await channel.purge(limit=10)
                     embed = discord.Embed(title="Who would you like to demote?", description="Kindly mention them", color=0x00FFFF)
                     await channel.send(embed=embed)
-                    user = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                    user = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                     user = user.mentions[0]
 
                     username = user.nick
@@ -1258,7 +1267,7 @@ async def on_guild_channel_create(channel):
 
                     embed = discord.Embed(title=f"What's the reason behind {username}'s demotion?", color=0x00FFFF)
                     await channel.send(embed=embed)
-                    reason = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                    reason = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                     reason = reason.content
 
                     await channel.set_permissions(user, send_messages=True, read_messages=True,
@@ -1275,7 +1284,7 @@ async def on_guild_channel_create(channel):
                     embed.add_field(name="If this is true", value="Type `Yes`", inline=False)
                     embed.add_field(name="If this is false", value="Type `No`", inline=False)
                     await channel.send(embed=embed)
-                    mistake = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                    mistake = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                     mistake = mistake.content
                     mistake = mistake.capitalize()
                     if mistake == "Yes":
@@ -1295,7 +1304,7 @@ async def on_guild_channel_create(channel):
                 embed.add_field(name="If this is true", value="Type `Yes`", inline=False)
                 embed.add_field(name="If this is false", value="Type `No`", inline=False)
                 await channel.send(embed=embed)
-                mistake = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == reply.author)
+                mistake = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                 mistake = mistake.content
                 mistake = mistake.capitalize()
                 if mistake == "Yes":
@@ -1309,8 +1318,8 @@ async def on_guild_channel_create(channel):
 
 @tasks.loop(count=1)
 async def after_cache_ready():
-    bot.error_channel = bot.get_channel(523743721443950612)
-    bot.dnkl_channel = bot.get_channel(629564802812870657)
+    bot.error_channel = bot.get_channel(859916798111907875)
+    bot.dnkl_channel = bot.get_channel(8599167981119078715)
     with open('dnkl.json', 'r') as f:
         data = str(f.read()).replace("'", '"')
     with open('dnkl.json', 'w') as f:
