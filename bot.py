@@ -1318,8 +1318,8 @@ async def on_guild_channel_create(channel):
 
 @tasks.loop(count=1)
 async def after_cache_ready():
-    bot.error_channel = bot.get_channel(859916798111907875)
-    bot.dnkl_channel = bot.get_channel(8599167981119078715)
+    bot.error_channel = bot.get_channel(523743721443950612)
+    bot.dnkl_channel = bot.get_channel(629564802812870657)
     with open('dnkl.json', 'r') as f:
         data = str(f.read()).replace("'", '"')
     with open('dnkl.json', 'w') as f:
