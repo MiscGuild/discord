@@ -20,6 +20,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         guest = discord.utils.get(ctx.guild.roles, name="Guest")
         member = discord.utils.get(ctx.guild.roles, name="Member")
         awaiting_app = discord.utils.get(ctx.guild.roles, name="Awaiting Approval")
+        staff = discord.utils.get(ctx.guild.roles, name="Staff")
         ally = discord.utils.get(ctx.guild.roles, name="Ally")
         active_role = discord.utils.get(ctx.guild.roles, name="Active")
         author = ctx.author
@@ -38,7 +39,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
                 await author.edit(nick=ign)
                 if guild_name == "Miscellaneous":
-                    if tag is not None and active_role in ctx.author.roles:
+                    if tag is not None and active_role or staff in ctx.author.roles:
                         with open('badwords.txt', 'r') as f:
                             badwords = f.read()
                         if tag.isascii() is False:
@@ -53,7 +54,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                 ign = ign + f' [{tag}]'
                             await author.edit(nick=ign)
                             await ctx.author.edit(nick=ign)
-                    elif tag is not None and active_role not in ctx.author.roles:
+                    elif tag is not None and active_role or staff not in ctx.author.roles:
                         await ctx.send("Your tag will not be updated since you do not have the active role!")
 
 
