@@ -7,9 +7,7 @@ from datetime import datetime
 import json
 from quickchart import QuickChart, QuickChartFunction
 from io import BytesIO
-from profanity_filter import ProfanityFilter
 
-pf = ProfanityFilter()
 
 class Hypixel(commands.Cog, name="Hypixel"):
     def __init__(self, bot):
@@ -41,16 +39,19 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await author.edit(nick=ign)
                 if guild_name == "Miscellaneous":
                     if tag is not None and active_role in ctx.author.roles:
-                        if tag.isacii() is False:
+                        with open('badwords.txt', 'r') as f:
+                            badwords = f.read()
+                        if tag.isascii() is False:
                             await ctx.send(
                                 "The tag may not include special characters unless it's the tag of an ally guild. Re-run the command if you wish to add a tag!")
                         elif len(tag) > 6:
                             await ctx.send("The tag may not be longer than 6 characters. Re-run the command if you wish to add a tag!")
-                        elif pf.is_profane(tag) is True:
+                        elif tag in badwords:
                             await ctx.send("The tag may not include profane language. Re-run the command if you wish to add a tag!")
                         else:
                             if tag is not None:
                                 ign = ign + f' [{tag}]'
+                            await author.edit(nick=ign)
                             await ctx.author.edit(nick=ign)
                     elif tag is not None and active_role not in ctx.author.roles:
                         await ctx.send("Your tag will not be updated since you do not have the active role!")
@@ -58,7 +59,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
                     await ctx.author.remove_roles(guest, awaiting_app)
                     await ctx.author.add_roles(member)
-                    embed = discord.Embed(title="Your nick and role was successfully changed!",
+                    embed = discord.Embed(title="Your nick, role and tag were successfully changed!",
                                         description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
                                         color=0x8368ff)
                     embed.set_footer(text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
@@ -97,7 +98,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         embed.set_footer(text=f"Member of {guild_name}\n• Nick Changed\n• Member & Awaiting Approval were removed\n• Guest was given")
                         await ctx.send(embed=embed)
         else:
-            await ctx.send('**What is your Minecraft username?**')
+            embed = discord.Embed(title="What is your Minecraft username?",
+                                  color=0x8368ff)
+            await ctx.send(embed=embed)
             name = await self.bot.wait_for('message',
                                                check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
             name = name.content
@@ -109,29 +112,36 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.author.edit(nick=ign)
                 guild_name = await hypixel.get_guild(name)
                 if guild_name == "Miscellaneous":
-                    if active_role in ctx.author.roles:
+                    if active_role in author.roles:
                         while True:
                             embed = discord.Embed(title="What would you like your tag to be? ",
                                                   url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png",
-                                                  description="**Rules:**\n• Tags can have a maximum length of 6 characters. \n• Tags cannot include special characters. \n• Tags cannot include profane language. ")
+                                                  description="**Rules:**"
+                                                              "\n• Tags can have a maximum length of 6 characters."
+                                                              " \n• Tags cannot include special characters."
+                                                              " \n• Tags cannot include profane language. ",
+                                                  color=0x8368ff)
                             embed.set_thumbnail(
                                 url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png")
                             embed.set_footer(text="If you don't want a tag, type: None")
                             await ctx.send(embed=embed)
                             tag = await self.bot.wait_for('message',
-                                                          check=lambda
-                                                              x: x.channel == ctx.channel and x.author == ctx.author)
-                            tag = name.content
-                            if tag.isacii() is False:
-                                await ctx.send("The tag may not include special characters unless it's the tag of an ally guild.")
+                                                     check=lambda
+                                                         x: x.channel == ctx.channel and x.author == author)
+                            tag = tag.content
+                            with open('badwords.txt', 'r') as f:
+                                badwords = f.read()
+                            if tag.isascii() is False:
+                                await ctx.send(
+                                    "The tag may not include special characters unless it's the tag of an ally guild.")
                             elif len(tag) > 6:
                                 await ctx.send("The tag may not be longer than 6 characters.")
-                            elif pf.is_profane(tag) is True:
+                            elif tag in badwords:
                                 await ctx.send("The tag may not include profane language")
                             else:
                                 if tag is not None:
                                     ign = ign + f' [{tag}]'
-                                await ctx.author.edit(nick=ign)
+                                await author.edit(nick=ign)
                                 break
 
                     else:
