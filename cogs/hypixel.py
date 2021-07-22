@@ -113,7 +113,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.author.edit(nick=ign)
                 guild_name = await hypixel.get_guild(name)
                 if guild_name == "Miscellaneous":
-                    if active_role in author.roles:
+                    if active_role or staff in author.roles:
                         while True:
                             embed = discord.Embed(title="What would you like your tag to be? ",
                                                   url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png",
