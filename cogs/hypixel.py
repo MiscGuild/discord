@@ -56,7 +56,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             await ctx.author.edit(nick=ign)
                     elif tag is not None and active_role or staff not in ctx.author.roles:
                         await ctx.send("Your tag will not be updated since you do not have the active role!")
-
+                    elif tag is None:
+                        pass
 
                     await ctx.author.remove_roles(guest, awaiting_app)
                     await ctx.author.add_roles(member)
