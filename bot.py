@@ -651,11 +651,12 @@ async def on_guild_channel_create(channel):
                     guest = discord.utils.get(channel.guild.roles, name="Guest")
                     member = discord.utils.get(channel.guild.roles, name="Member")
                     awaiting_app = discord.utils.get(channel.guild.roles, name="Awaiting Approval")
+                    staff = discord.utils.get(channel.guild.roles, name="Staff")
                     ally = discord.utils.get(channel.guild.roles, name="Ally")
                     active_role = discord.utils.get(channel.guild.roles, name="Active")
                     await author.edit(nick=ign)
                     if guild_name == "Miscellaneous":
-                        if active_role in author.roles:
+                        if active_role or staff in author.roles:
                             while True:
                                 embed = discord.Embed(title="What would you like your tag to be? ",
                                                       url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png",
