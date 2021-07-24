@@ -359,7 +359,7 @@ class staff(commands.Cog, name="Staff"):
 
                                     if usergrank != 'Resident':
                                         if totalexp < self.bot.inactive:
-                                            username = hypixel.name_grabber(member)
+                                            username = await hypixel.name_grabber(member)
                                             await member.edit(nick=username)
                                             await member.add_roles(inactive_role)
                                             await member.remove_roles(active_role)
@@ -373,7 +373,7 @@ class staff(commands.Cog, name="Staff"):
                                                 content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
 
                                         elif totalexp > self.bot.inactive:
-                                            username = hypixel.name_grabber(member)
+                                            username = await hypixel.name_grabber(member)
                                             await member.edit(nick=username)
                                             await member.remove_roles(inactive_role, active_role)
                                             await message.edit(
@@ -394,7 +394,7 @@ class staff(commands.Cog, name="Staff"):
                                                 content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
 
                                         elif totalexp > self.bot.resident_req:
-                                            username = hypixel.name_grabber(member)
+                                            username = await hypixel.name_grabber(member)
                                             await member.edit(nick=username)
                                             await member.remove_roles(inactive_role, active_role)
                                             await message.edit(
