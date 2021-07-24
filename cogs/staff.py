@@ -380,7 +380,7 @@ class staff(commands.Cog, name="Staff"):
                                                 content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
                                     else: # For residents
                                         if totalexp < self.bot.resident_req:
-                                            username = hypixel.name_grabber(member)
+                                            username = await hypixel.name_grabber(member)
                                             await member.edit(nick=username)
                                             await member.add_roles(inactive_role)
                                             await member.remove_roles(active_role)

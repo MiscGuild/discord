@@ -39,25 +39,24 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
                 await author.edit(nick=ign)
                 if guild_name == "Miscellaneous":
-                    if tag != None and active_role or staff in ctx.author.roles:
-                        with open('badwords.txt', 'r') as f:
-                            badwords = f.read()
-                        if tag.isascii() is False:
-                            await ctx.send(
-                                "The tag may not include special characters unless it's the tag of an ally guild. Re-run the command if you wish to add a tag!")
-                        elif len(tag) > 6:
-                            await ctx.send("The tag may not be longer than 6 characters. Re-run the command if you wish to add a tag!")
-                        elif tag in badwords:
-                            await ctx.send("The tag may not include profane language. Re-run the command if you wish to add a tag!")
+                    if tag != None:
+                        if active_role or staff in ctx.author.roles:
+                            with open('badwords.txt', 'r') as f:
+                                badwords = f.read()
+                            if tag.isascii() is False:
+                                await ctx.send(
+                                    "The tag may not include special characters unless it's the tag of an ally guild. Re-run the command if you wish to add a tag!")
+                            elif len(tag) > 6:
+                                await ctx.send("The tag may not be longer than 6 characters. Re-run the command if you wish to add a tag!")
+                            elif tag in badwords:
+                                await ctx.send("The tag may not include profane language. Re-run the command if you wish to add a tag!")
+                            else:
+                                if tag is not None:
+                                    ign = ign + f' [{tag}]'
+                                await author.edit(nick=ign)
+                                await ctx.author.edit(nick=ign)
                         else:
-                            if tag is not None:
-                                ign = ign + f' [{tag}]'
-                            await author.edit(nick=ign)
-                            await ctx.author.edit(nick=ign)
-                    elif tag != None and active_role or staff not in ctx.author.roles:
-                        await ctx.send("Your tag will not be updated since you do not have the active role!")
-                    elif tag == None:
-                        pass
+                            await ctx.send("Your tag will not be updated since you do not have the active/staff role!")
 
                     await ctx.author.remove_roles(guest, awaiting_app)
                     await ctx.author.add_roles(member)
