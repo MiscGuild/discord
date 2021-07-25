@@ -360,7 +360,8 @@ class staff(commands.Cog, name="Staff"):
                                     if usergrank != 'Resident':
                                         if totalexp < self.bot.inactive:
                                             username = await hypixel.name_grabber(member)
-                                            await member.edit(nick=username)
+                                            if staff not in member.roles:
+                                                await member.edit(nick=username)
                                             await member.add_roles(inactive_role)
                                             await member.remove_roles(active_role)
                                             await message.edit(
@@ -374,14 +375,16 @@ class staff(commands.Cog, name="Staff"):
 
                                         elif totalexp > self.bot.inactive:
                                             username = await hypixel.name_grabber(member)
-                                            await member.edit(nick=username)
+                                            if staff not in member.roles:
+                                                await member.edit(nick=username)
                                             await member.remove_roles(inactive_role, active_role)
                                             await message.edit(
                                                 content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
                                     else: # For residents
                                         if totalexp < self.bot.resident_req:
                                             username = await hypixel.name_grabber(member)
-                                            await member.edit(nick=username)
+                                            if staff not in member.roles:
+                                                await member.edit(nick=username)
                                             await member.add_roles(inactive_role)
                                             await member.remove_roles(active_role)
                                             await message.edit(
@@ -395,7 +398,8 @@ class staff(commands.Cog, name="Staff"):
 
                                         elif totalexp > self.bot.resident_req:
                                             username = await hypixel.name_grabber(member)
-                                            await member.edit(nick=username)
+                                            if staff not in member.roles:
+                                                await member.edit(nick=username)
                                             await member.remove_roles(inactive_role, active_role)
                                             await message.edit(
                                                 content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
