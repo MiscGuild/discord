@@ -43,15 +43,13 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             await ctx.send("The tag may not be longer than 6 characters. Re-run the command if you wish to add a tag!")
                         elif tag in badwords.split('\n'):
                             await ctx.send("The tag may not include profane language. Re-run the command if you wish to add a tag!")
-                        else:
-                            if tag is not None:
-                                ign = ign + f' [{tag}]'
-                            await author.edit(nick=ign)
-                            await ctx.author.edit(nick=ign)
+                        else: # Set user's tag
+                            new_nick = ign + f' [{tag}]'
+                            await author.edit(nick=new_nick)
                     elif tag == None:
                         pass
-                    else:
-                        await ctx.send("Your tag will not be updated since you do not have at least on of the required roles!")
+                    else: # 'tag' argument is NOT None, but user doesn't have roles
+                        await ctx.send("Your tag will not be updated since you do not have the active/staff/server booster role!")
                     
 
                     await ctx.author.remove_roles(self.bot.guest, self.bot.awaiting_app)
@@ -64,8 +62,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
                 elif guild_name == "XL":
                     if author.nick is None or "[✧XL✧]" not in author.nick:
-                        ign = ign + " [✧XL✧]"
-                        await author.edit(nick=ign)
+                        new_nick = ign + " [✧XL✧]"
+                        await author.edit(nick=new_nick)
                     await ctx.author.remove_roles(self.bot.member_role, self.bot.awaiting_app)
                     await ctx.author.add_roles(self.bot.guest, self.bot.ally)
 
@@ -109,7 +107,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.author.edit(nick=ign)
                 guild_name = await hypixel.get_guild(name)
                 if guild_name == "Miscellaneous":
-                    if self.bot.active_role or self.bot.staff in author.roles:
+                    if self.bot.active_role or self.bot.staff or self.bot.former_staff or self.bot.server_booster in author.roles:
                         while True:
                             embed = discord.Embed(title="What would you like your tag to be? ",
                                                   url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png",
@@ -136,9 +134,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             elif tag in badwords.split('\n'):
                                 await ctx.send("The tag may not include profane language")
                             else:
-                                if tag is not None:
-                                    ign = ign + f' [{tag}]'
-                                await author.edit(nick=ign)
+                                new_nick = ign + f' [{tag}]'
+                                await author.edit(nick=new_nick)
                                 break
 
                     else:
@@ -153,8 +150,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
                 elif guild_name == "XL":
                     if author.nick is None or "[✧XL✧]" not in author.nick:
-                        ign = ign + " [✧XL✧]"
-                        await author.edit(nick=ign)
+                        new_nick = ign + " [✧XL✧]"
+                        await author.edit(nick=new_nick)
                     await ctx.author.remove_roles(self.bot.member_role, self.bot.awaiting_app)
                     await ctx.author.add_roles(self.bot.guest, self.bot.ally)
 
