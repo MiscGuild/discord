@@ -1319,8 +1319,25 @@ async def on_guild_channel_create(channel):
 
 @tasks.loop(count=1)
 async def after_cache_ready():
+    # replace the below IDs in testing servers - make sure to revert before committing. 
     bot.error_channel = bot.get_channel(523743721443950612)
     bot.dnkl_channel = bot.get_channel(629564802812870657)
+    bot.misc_guild = bot.get_guild(522586672148381726)
+
+    bot.guild_master = discord.utils.get(bot.misc_guild.roles, name="Guild Master")
+    bot.admin = discord.utils.get(bot.misc_guild.roles, name="Admin")
+    bot.staff = discord.utils.get(bot.misc_guild.roles, name="Staff")
+    bot.former_staff = discord.utils.get(bot.misc_guild.roles, name="Former Staff")
+    bot.new_member = discord.utils.get(bot.misc_guild.roles, name="New Member")
+    bot.guest = discord.utils.get(bot.misc_guild.roles, name="Guest")
+    bot.member_role = discord.utils.get(bot.misc_guild.roles, name="Member")
+    bot.active_role = discord.utils.get(bot.misc_guild.roles, name="Active")
+    bot.inactive_role = discord.utils.get(bot.misc_guild.roles, name="Inactive")
+    bot.awaiting_app = discord.utils.get(bot.misc_guild.roles, name="Awaiting Approval")
+    bot.ally = discord.utils.get(bot.misc_guild.roles, name="Ally")
+    bot.server_booster = discord.utils.get(bot.misc_guild.roles, name="Server Booster")
+    bot.adminids = [x.id for x in bot.admin.members]
+
     with open('dnkl.json', 'r') as f:
         data = str(f.read()).replace("'", '"')
     with open('dnkl.json', 'w') as f:
