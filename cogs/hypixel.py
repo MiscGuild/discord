@@ -41,7 +41,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                 "The tag may not include special characters unless it's the tag of an ally guild. Re-run the command if you wish to add a tag!")
                         elif len(tag) > 6:
                             await ctx.send("The tag may not be longer than 6 characters. Re-run the command if you wish to add a tag!")
-                        elif tag in badwords.split('\n'):
+                        elif tag.lower() in badwords.split('\n'):
                             await ctx.send("The tag may not include profane language. Re-run the command if you wish to add a tag!")
                         else: # Set user's tag
                             new_nick = ign + f' [{tag}]'
@@ -131,7 +131,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                     "The tag may not include special characters unless it's the tag of an ally guild.")
                             elif len(tag) > 6:
                                 await ctx.send("The tag may not be longer than 6 characters.")
-                            elif tag in badwords.split('\n'):
+                            elif tag.lower() in badwords.split('\n'):
                                 await ctx.send("The tag may not include profane language")
                             else:
                                 new_nick = ign + f' [{tag}]'
