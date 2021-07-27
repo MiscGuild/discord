@@ -320,12 +320,11 @@ async def on_guild_channel_create(channel):
                                                     f"\nReply with `Deny` to deny the do-not-kick-list request"
                                                     f"\nReply with `Error` if the user made an error while applying for the do not kick list")
 
-                                staff = discord.utils.get(channel.guild.roles, name="Staff")
 
                                 while True:
                                     action = await bot.wait_for('message', check=lambda x: x.channel == channel)
                                     member = channel.guild.get_member(action.author.id)
-                                    if staff in member.roles:
+                                    if bot.staff in member.roles:
                                         action = (action.content).capitalize()
                                         if action in ('Approve', 'Deny', 'Error'):
                                             if action == "Approve":
@@ -504,12 +503,10 @@ async def on_guild_channel_create(channel):
                                                     f"\nReply with `Deny` to deny the do-not-kick-list request"
                                                     f"\nReply with `Error` if the user made an error while applying for the do not kick list")
 
-                                staff = discord.utils.get(channel.guild.roles, name="Staff")
-
                                 while True:
                                     action = await bot.wait_for('message', check=lambda x: x.channel == channel)
                                     member = channel.guild.get_member(action.author.id)
-                                    if staff in member.roles:
+                                    if bot.staff in member.roles:
                                         action = (action.content).capitalize()
                                         if action in ('Approve', 'Deny', 'Error'):
                                             if action == "Approve":
@@ -648,15 +645,10 @@ async def on_guild_channel_create(channel):
                     await channel.send("I'll restart the process. If you think I made an error, select 'Other' upon restart")
                 else:
                     guild_name = await hypixel.get_guild(ign)
-                    guest = discord.utils.get(channel.guild.roles, name="Guest")
-                    member = discord.utils.get(channel.guild.roles, name="Member")
-                    awaiting_app = discord.utils.get(channel.guild.roles, name="Awaiting Approval")
-                    staff = discord.utils.get(channel.guild.roles, name="Staff")
-                    ally = discord.utils.get(channel.guild.roles, name="Ally")
-                    active_role = discord.utils.get(channel.guild.roles, name="Active")
                     await author.edit(nick=ign)
+
                     if guild_name == "Miscellaneous":
-                        if active_role or staff in author.roles:
+                        if len([role for role in author.roles if role in (bot.active_role, bot.staff, bot.former_staff, bot.server_booster)]):
                             while True:
                                 embed = discord.Embed(title="What would you like your tag to be? ",
                                                       url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png",
@@ -676,16 +668,15 @@ async def on_guild_channel_create(channel):
                                         "The tag may not include special characters unless it's the tag of an ally guild.")
                                 elif len(tag) > 6:
                                     await channel.send("The tag may not be longer than 6 characters.")
-                                elif tag in badwords.split('\n'):
+                                elif tag.lower() in badwords.split('\n'):
                                     await channel.send("The tag may not include profane language")
                                 else:
-                                    if tag is not None:
-                                        ign = ign + f' [{tag}]'
-                                    await author.edit(nick=ign)
+                                    new_nick = ign + f' [{tag}]'
+                                    await author.edit(nick=new_nick)
                                     break
 
 
-                        await author.add_roles(member)
+                        await author.add_roles(bot.member_role)
                         embed = discord.Embed(title="Your nick and role was successfully changed!",
                                                 description="await staff assistance.",
                                                 color=0x8368ff)
@@ -696,10 +687,10 @@ async def on_guild_channel_create(channel):
 
                     elif guild_name == "XL":
                         if "[✧XL✧]" not in author.nick:
-                            ign = ign + " [✧XL✧]"
-                        await author.edit(nick=ign)
-                        await author.remove_roles(member, awaiting_app)
-                        await author.add_roles(guest, ally)
+                            new_nick = ign + " [✧XL✧]"
+                        await author.edit(nick=new_nick)
+                        await author.remove_roles(bot.member_role, bot.awaiting_app)
+                        await author.add_roles(bot.guest, bot.ally)
                         embed = discord.Embed(title="Your nick and role was successfully changed!",
                                                 description="If this wasn't the change you anticipated, "
                                                             "await staff assistance.",
@@ -713,8 +704,8 @@ async def on_guild_channel_create(channel):
                         if str(channel.channel.category.name) == "RTickets":
                             await channel.send("You aren't in Miscellaneous in-game. Kindly await staff assistance!")
                         else:
-                            await author.remove_roles(member,awaiting_app)
-                            await author.add_roles(guest)
+                            await author.remove_roles(bot.member_role,bot.awaiting_app)
+                            await author.add_roles(bot.guest)
                             embed = discord.Embed(title="Your nick and role was successfully changed!",
                                                     description="If this wasn't the change you anticipated, "
                                                                 "await staff assistance.",
@@ -925,23 +916,19 @@ async def on_guild_channel_create(channel):
                         else:
                             guild_name = await hypixel.get_guild(name)
 
-                            guest = discord.utils.get(channel.guild.roles, name="Guest")
-                            member = discord.utils.get(channel.guild.roles, name="Member")
-                            awaiting_app = discord.utils.get(channel.guild.roles, name="Awaiting Approval")
-
                             await author.edit(nick=ign)
                             if guild_name == "Miscellaneous":
-                                await author.remove_roles(awaiting_app)
-                                await author.remove_roles(guest)
-                                await author.add_roles(member)
+                                await author.remove_roles(bot.awaiting_app)
+                                await author.remove_roles(bot.guest)
+                                await author.add_roles(bot.member_role)
                                 embed = discord.Embed(title="Your nick and role was successfully changed!",
                                                         description="Now let's proceed to your application!",
                                                         color=0x8368ff)
                                 await channel.send(embed=embed)
 
                             else:
-                                await author.remove_roles(member)
-                                await author.add_roles(guest)
+                                await author.remove_roles(bot.member_role)
+                                await author.add_roles(bot.guest)
                                 embed = discord.Embed(title="Your nick and role was successfully changed!",
                                                         description="Now let's proceed to your application!",
                                                         color=0x8368ff)
@@ -1319,8 +1306,25 @@ async def on_guild_channel_create(channel):
 
 @tasks.loop(count=1)
 async def after_cache_ready():
+    # replace the below IDs in testing servers - make sure to revert before committing. 
     bot.error_channel = bot.get_channel(523743721443950612)
     bot.dnkl_channel = bot.get_channel(629564802812870657)
+    bot.misc_guild = bot.get_guild(522586672148381726)
+
+    bot.guild_master = discord.utils.get(bot.misc_guild.roles, name="Guild Master")
+    bot.admin = discord.utils.get(bot.misc_guild.roles, name="Admin")
+    bot.staff = discord.utils.get(bot.misc_guild.roles, name="Staff")
+    bot.former_staff = discord.utils.get(bot.misc_guild.roles, name="Former Staff")
+    bot.new_member = discord.utils.get(bot.misc_guild.roles, name="New Member")
+    bot.guest = discord.utils.get(bot.misc_guild.roles, name="Guest")
+    bot.member_role = discord.utils.get(bot.misc_guild.roles, name="Member")
+    bot.active_role = discord.utils.get(bot.misc_guild.roles, name="Active")
+    bot.inactive_role = discord.utils.get(bot.misc_guild.roles, name="Inactive")
+    bot.awaiting_app = discord.utils.get(bot.misc_guild.roles, name="Awaiting Approval")
+    bot.ally = discord.utils.get(bot.misc_guild.roles, name="Ally")
+    bot.server_booster = discord.utils.get(bot.misc_guild.roles, name="Server Booster")
+    bot.adminids = [x.id for x in bot.admin.members]
+
     with open('dnkl.json', 'r') as f:
         data = str(f.read()).replace("'", '"')
     with open('dnkl.json', 'w') as f:
