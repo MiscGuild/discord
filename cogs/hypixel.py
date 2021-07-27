@@ -33,7 +33,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
                 await author.edit(nick=ign)
                 if guild_name == "Miscellaneous":
-                    if tag != None and self.bot.active_role or self.bot.staff or self.bot.former_staff or self.bot.server_booster in ctx.author.roles:
+                    if tag != None and len([role for role in ctx.author.roles if role in (self.bot.active_role, self.bot.staff, self.bot.former_staff, self.bot.server_booster)]):
                         with open('badwords.txt', 'r') as f:
                             badwords = f.read()
                         if tag.isascii() is False:
@@ -107,7 +107,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.author.edit(nick=ign)
                 guild_name = await hypixel.get_guild(name)
                 if guild_name == "Miscellaneous":
-                    if self.bot.active_role or self.bot.staff or self.bot.former_staff or self.bot.server_booster in author.roles:
+                    if len([role for role in ctx.author.roles if role in (self.bot.active_role, self.bot.staff, self.bot.former_staff, self.bot.server_booster)]):
                         while True:
                             embed = discord.Embed(title="What would you like your tag to be? ",
                                                   url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png",
