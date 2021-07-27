@@ -648,7 +648,7 @@ async def on_guild_channel_create(channel):
                     await author.edit(nick=ign)
 
                     if guild_name == "Miscellaneous":
-                        if bot.active_role or bot.staff or bot.former_staff or bot.server_booster in author.roles:
+                        if len([role for role in author.roles if role in (bot.active_role, bot.staff, bot.former_staff, bot.server_booster)]):
                             while True:
                                 embed = discord.Embed(title="What would you like your tag to be? ",
                                                       url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png",
