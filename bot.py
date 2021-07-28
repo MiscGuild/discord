@@ -14,6 +14,7 @@ intents.reactions = True
 intents.members = True
 
 bot = commands.Bot(command_prefix=commands.when_mentioned_or(config['bot']['prefix']), intents=intents, status=discord.Status.idle, activity=discord.Game(config['bot']['status']), case_insensitive=True)
+
 bot.config = config
 bot.token = config['bot']['token']
 bot.api_tokens = config['hypixel']['api_keys']
@@ -23,6 +24,19 @@ bot.active = int(280000)
 bot.inactive = int(105000)
 bot.dnkl = bot.inactive * 2
 bot.new_member = int(25000)
+bot.guild_master = discord.utils.get(bot.misc_guild.roles, name="Guild Master")
+bot.admin = discord.utils.get(bot.misc_guild.roles, name="Admin")
+bot.staff = discord.utils.get(bot.misc_guild.roles, name="Staff")
+bot.former_staff = discord.utils.get(bot.misc_guild.roles, name="Former Staff")
+bot.new_member_role = discord.utils.get(bot.misc_guild.roles, name="New Member")
+bot.guest = discord.utils.get(bot.misc_guild.roles, name="Guest")
+bot.member_role = discord.utils.get(bot.misc_guild.roles, name="Member")
+bot.active_role = discord.utils.get(bot.misc_guild.roles, name="Active")
+bot.inactive_role = discord.utils.get(bot.misc_guild.roles, name="Inactive")
+bot.awaiting_app = discord.utils.get(bot.misc_guild.roles, name="Awaiting Approval")
+bot.ally = discord.utils.get(bot.misc_guild.roles, name="Ally")
+bot.server_booster = discord.utils.get(bot.misc_guild.roles, name="Server Booster")
+bot.adminids = [x.id for x in bot.admin.members]
 
 class HelpCommand(commands.MinimalHelpCommand):
     async def send_pages(self):
@@ -479,16 +493,33 @@ async def on_guild_channel_create(channel):
                                                 inline=True)
                                 await channel.send(embed=embed)
 
-                                await channel.send("**When will your inactivity begin? (Start date) (DD/MM/YYYY)**")
+                                embed = discord.Embed(title="When will your inactivity begin? (Start date)",
+                                                      description="DD/MM/YYYY",
+                                                      color=0x8368ff)
+                                embed.set_footer(text="For Example:\n 1/2/2021 = 1st Feb 2021")
+                                await channel.send(embed=embed)
                                 start = await bot.wait_for('message', check=lambda x: x.author == author and x.channel == channel)
                                 start = start.content
-                                await channel.send('**When will your inactivity end? (End date) (DD/MM/YYYY)**')
+                                embed = discord.Embed(title="When will your inactivity end? (End date)",
+                                                      description="DD/MM/YYYY",
+                                                      color=0x8368ff)
+                                embed.set_footer(text="For Example:\n 1/2/2021 = 1st Feb 2021")
+                                await channel.send(embed=embed)
                                 end = await bot.wait_for('message', check=lambda x: x.author == author and x.channel == channel)
                                 end = end.content
-                                await channel.send("**What's the reason behind your inactivity?**")
+                                embed = discord.Embed(title="What's the reason behind your inactivity?",
+                                                      color=0x8368ff)
+                                await channel.send(embed=embed)
                                 reason = await bot.wait_for('message', check=lambda x: x.author == author and x.channel == channel)
                                 reason = reason.content
 
+                                if int(start.split('/')[1]) > 12:
+                                    newdate = f'{start.split("/")[1]}/{start.split("/")[0]}/{start.split("/")[2]}'
+                                    start = newdate
+                                if int(end.split('/')[1]) > 12:
+                                    newdate = f'{end.split("/")[1]}/{end.split("/")[0]}/{end.split("/")[2]}'
+                                    end = newdate
+                                await channel.send("You entered the dates incorrectly. This was automatically corrected.")
                                 await channel.send(
                                     f"Alright! Kindly await staff assistance!"
                                     f"\n**Start:** {start}"
@@ -543,6 +574,11 @@ async def on_guild_channel_create(channel):
                                                 data.update(dnkl_dict)
                                                 with open('dnkl.json', 'w') as f:
                                                     json.dump(data, f)
+                                                embed = discord.Embed(title="This DNKL Application has been accepted!",
+                                                                      description="The DNKL Embed has been sent to <#629564802812870657>",
+                                                                      color=0x00A86B)
+                                                await channel.send(embed=embed)
+
                                                 break
 
                                             elif action == "Deny":
@@ -648,7 +684,7 @@ async def on_guild_channel_create(channel):
                     await author.edit(nick=ign)
 
                     if guild_name == "Miscellaneous":
-                        if len([role for role in author.roles if role in (bot.active_role, bot.staff, bot.former_staff, bot.server_booster)]):
+                        if [role for role in author.roles if role in (bot.active_role, bot.staff, bot.former_staff, bot.server_booster)]:
                             while True:
                                 embed = discord.Embed(title="What would you like your tag to be? ",
                                                       url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png",
@@ -669,7 +705,7 @@ async def on_guild_channel_create(channel):
                                 elif len(tag) > 6:
                                     await channel.send("The tag may not be longer than 6 characters.")
                                 elif tag.lower() in badwords.split('\n'):
-                                    await channel.send("The tag may not include profane language")
+                                    await channel.send("The tag may not include profanity")
                                 else:
                                     new_nick = ign + f' [{tag}]'
                                     await author.edit(nick=new_nick)
@@ -1309,21 +1345,7 @@ async def after_cache_ready():
     # replace the below IDs in testing servers - make sure to revert before committing. 
     bot.error_channel = bot.get_channel(523743721443950612)
     bot.dnkl_channel = bot.get_channel(629564802812870657)
-    bot.misc_guild = bot.get_guild(522586672148381726)
-
-    bot.guild_master = discord.utils.get(bot.misc_guild.roles, name="Guild Master")
-    bot.admin = discord.utils.get(bot.misc_guild.roles, name="Admin")
-    bot.staff = discord.utils.get(bot.misc_guild.roles, name="Staff")
-    bot.former_staff = discord.utils.get(bot.misc_guild.roles, name="Former Staff")
-    bot.new_member = discord.utils.get(bot.misc_guild.roles, name="New Member")
-    bot.guest = discord.utils.get(bot.misc_guild.roles, name="Guest")
-    bot.member_role = discord.utils.get(bot.misc_guild.roles, name="Member")
-    bot.active_role = discord.utils.get(bot.misc_guild.roles, name="Active")
-    bot.inactive_role = discord.utils.get(bot.misc_guild.roles, name="Inactive")
-    bot.awaiting_app = discord.utils.get(bot.misc_guild.roles, name="Awaiting Approval")
-    bot.ally = discord.utils.get(bot.misc_guild.roles, name="Ally")
-    bot.server_booster = discord.utils.get(bot.misc_guild.roles, name="Server Booster")
-    bot.adminids = [x.id for x in bot.admin.members]
+    bot.misc_guild = bot.get_guild(522586672148381726);
 
     with open('dnkl.json', 'r') as f:
         data = str(f.read()).replace("'", '"')

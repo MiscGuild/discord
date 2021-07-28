@@ -316,7 +316,7 @@ class staff(commands.Cog, name="Staff"):
 
                                 if mojang.status != 200:  # If the IGN is invalid
                                     await member.remove_roles(self.bot.member_role, self.bot.guest)
-                                    await member.add_roles(self.bot.new_member)
+                                    await member.add_roles(self.bot.new_member_role)
                                     await message.edit(content=
                                                        f"{name} ||{member}|| Player doesn't exist. **++New Member | --Member | -- Guest**")
 
@@ -336,10 +336,12 @@ class staff(commands.Cog, name="Staff"):
 
                             if self.bot.member_role not in member.roles:
                                 await member.add_roles(self.bot.member_role)
-                                await member.remove_roles(self.bot.new_member, self.bot.guest)
+                                await member.remove_roles(self.bot.new_member_role, self.bot.guest)
 
-                            if len([role for role in author.roles if role in (bot.active_role, bot.staff, bot.former_staff, bot.server_booster)]):
+                            if [role for role in member.roles if role in (self.bot.active_role, self.bot.staff, self.bot.former_staff, self.bot.server_booster)]:
                                 change_nick = False
+                            else:
+                                change_nick = True
 
                             for user in req['guild']["members"]:
                                 if uuid == user["uuid"]:
@@ -350,7 +352,7 @@ class staff(commands.Cog, name="Staff"):
                                     if usergrank != 'Resident':
                                         if totalexp < self.bot.inactive:
                                             username = await hypixel.name_grabber(member)
-                                            if change_nick:
+                                            if change_nick is True:
                                                 await member.edit(nick=username)
                                             await member.add_roles(self.bot.inactive_role)
                                             await member.remove_roles(self.bot.active_role)
@@ -358,14 +360,14 @@ class staff(commands.Cog, name="Staff"):
                                                 content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
 
                                         elif totalexp >= self.bot.active:  # If the member is active
-                                            await member.remove_roles(self.bot.inactive_role, self.bot.new_member)
+                                            await member.remove_roles(self.bot.inactive_role, self.bot.new_member_role)
                                             await member.add_roles(self.bot.active_role)
                                             await message.edit(
                                                 content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
 
                                         elif totalexp > self.bot.inactive:
                                             username = await hypixel.name_grabber(member)
-                                            if change_nick:
+                                            if change_nick is True:
                                                 await member.edit(nick=username)
                                             await member.remove_roles(self.bot.inactive_role, self.bot.active_role)
                                             await message.edit(
@@ -373,7 +375,7 @@ class staff(commands.Cog, name="Staff"):
                                     else: # For residents
                                         if totalexp < self.bot.resident_req:
                                             username = await hypixel.name_grabber(member)
-                                            if change_nick:
+                                            if change_nick is True:
                                                 await member.edit(nick=username)
                                             await member.add_roles(self.bot.inactive_role)
                                             await member.remove_roles(self.bot.active_role)
@@ -381,7 +383,7 @@ class staff(commands.Cog, name="Staff"):
                                                 content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
 
                                         elif totalexp >= self.bot.active:  # If the member is active
-                                            await member.remove_roles(self.bot.inactive_role, self.bot.new_member)
+                                            await member.remove_roles(self.bot.inactive_role, self.bot.new_member_role)
                                             await member.add_roles(self.bot.active_role)
                                             await message.edit(
                                                 content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
@@ -396,19 +398,18 @@ class staff(commands.Cog, name="Staff"):
 
 
 
-
                         elif ign in xl_members:
                             if member.nick is None or "[✧XL✧]" not in member.nick:
                                 new_nick = ign + " [✧XL✧]"
                             await member.edit(nick=new_nick)
                             await member.add_roles(self.bot.guest, self.bot.ally)
-                            await member.remove_roles(self.bot.member_role, self.bot.new_member, self.bot.active_role, self.bot.inactive_role)
+                            await member.remove_roles(self.bot.member_role, self.bot.new_member_role, self.bot.active_role, self.bot.inactive_role)
                             await message.edit(
                                 content=f"{name} ||{member}|| Member of XL **++XL - Ally \| ++Guest | --Member | --Active**")
 
                         else:
                             await member.add_roles(self.bot.guest)
-                            await member.remove_roles(self.bot.member_role, self.bot.new_member, self.bot.active_role, self.bot.ally, self.bot.inactive_role)
+                            await member.remove_roles(self.bot.member_role, self.bot.new_member_role, self.bot.active_role, self.bot.ally, self.bot.inactive_role)
                             await message.edit(
                                 content=f"{name} ||{member}|| Member of an unallied guild **++Guest | --Member | --Active**")
                 await ctx.send('**Rolecheck completed**')

@@ -24,19 +24,11 @@ class Tickets(commands.Cog, name="Tickets"):
                         uuid = request['id']
 
                         guild_name = await hypixel.get_guild(name)
-                        newmember = discord.utils.get(ctx.guild.roles, name="New Member")
-                        awaiting_app = discord.utils.get(ctx.guild.roles, name="Awaiting Approval")
-                        member = discord.utils.get(ctx.guild.roles, name="Member")
-                        guest = discord.utils.get(ctx.guild.roles, name="Guest")
-                        staff = discord.utils.get(ctx.guild.roles, name="Staff")
-                        officer = discord.utils.get(ctx.guild.roles, name="Officer")
-                        tofficer = discord.utils.get(ctx.guild.roles, name="Trial Officer")
-                        ally = discord.utils.get(ctx.guild.roles, name="Ally")
 
 
                         nick = await author.edit(nick=ign)
                         if guild_name == "Miscellaneous":
-                            await ctx.author.remove_roles(newmember)
+                            await ctx.author.remove_roles(self.bot.new_member_role)
 
                             await ctx.channel.purge(limit=1)
                             embed = discord.Embed(title="Registration successful!")
@@ -45,14 +37,14 @@ class Tickets(commands.Cog, name="Tickets"):
 
                             embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
                             await ctx.send(embed=embed)
-                            await ctx.author.add_roles(member)
+                            await ctx.author.add_roles(self.bot.member_role)
 
                         elif guild_name == "XL":
                             if "[✧XL✧]" not in ctx.author.nick:
                                 ign = ign + " [✧XL✧]"
                             nick = await author.edit(nick=ign)
-                            await ctx.author.remove_roles(newmember)
-                            await ctx.author.add_roles(guest, ally)
+                            await ctx.author.remove_roles(self.bot.new_member_role)
+                            await ctx.author.add_roles(self.bot.guest, self.bot.ally)
 
 
                             await ctx.channel.purge(limit=1)
@@ -62,8 +54,8 @@ class Tickets(commands.Cog, name="Tickets"):
                             await ctx.send(embed=embed)
 
                         elif guild_name not in ("Miscellaneous", "XL"):
-                            await ctx.author.remove_roles(newmember)
-                            await ctx.author.add_roles(awaiting_app)
+                            await ctx.author.remove_roles(self.bot.new_member_role)
+                            await ctx.author.add_roles(self.bot.awaiting_app)
                             if nick is None:
                                 nick = author.name
 
@@ -78,19 +70,13 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                                 category=category)
                             await ticket_channel.set_permissions(ctx.guild.get_role(ctx.guild.id), send_messages=False,
                                                                 read_messages=False)
-                            await ticket_channel.set_permissions(staff, send_messages=True, read_messages=True,
-                                                                add_reactions=True, embed_links=True, attach_files=True,
-                                                                read_message_history=True, external_emojis=True)
-                            await ticket_channel.set_permissions(officer, send_messages=True, read_messages=True,
-                                                                add_reactions=True, embed_links=True, attach_files=True,
-                                                                read_message_history=True, external_emojis=True)
-                            await ticket_channel.set_permissions(tofficer, send_messages=True, read_messages=True,
+                            await ticket_channel.set_permissions(self.bot.staff, send_messages=True, read_messages=True,
                                                                 add_reactions=True, embed_links=True, attach_files=True,
                                                                 read_message_history=True, external_emojis=True)
                             await ticket_channel.set_permissions(author, send_messages=True, read_messages=True,
                                                                 add_reactions=True, embed_links=True, attach_files=True,
                                                                 read_message_history=True, external_emojis=True)
-                            await ticket_channel.set_permissions(newmember, send_messages=False, read_messages=False,
+                            await ticket_channel.set_permissions(self.bot.new_member_role, send_messages=False, read_messages=False,
                                                                 add_reactions=True, embed_links=True, attach_files=True,
                                                                 read_message_history=True, external_emojis=True)
 
@@ -126,8 +112,7 @@ class Tickets(commands.Cog, name="Tickets"):
         """Deletes the ticket channel the command is used in.
         """
         logs = self.bot.get_channel(714821811832881222)
-        Staff = discord.utils.get(ctx.guild.roles, name="Staff")
-        if Staff in ctx.author.roles:
+        if self.bot.staff in ctx.author.roles:
             if ctx.channel.category.name in ('RTickets',  '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL','EVENT'):
                 name = ctx.channel.name
                 embed = discord.Embed(title='This ticket will be deleted in 10 seconds!', description='', color=0xDE3163)
@@ -230,61 +215,6 @@ class Tickets(commands.Cog, name="Tickets"):
                 await channel.send(embed=embed)
                 break
 
-    @commands.command()
-    @commands.is_owner()
-    async def ticketss(self, ctx):
-        embed = discord.Embed(title='Tickets',
-                            description="Tickets can be created for any of the following reasons:-\n"
-                                        "> Do Not Kick List\n"
-                                        "> Discord Nick/Role Change\n"
-                                        "> Problems/Queries/Complaint/Suggestion\n"
-                                        "> Reporting a player\n"
-                                        "> Milestone\n"
-                                        "> Staff Application\n"
-                                        "> Event\n"
-                                        "> Other\n"
-                                        "The ticket reasons have been explained in detail towards the end of this message.\n"
-                                        " Once you have created a ticket by reacting to the bot's message, you will see that there is a new ticket in the \"🎫 Ticket Section\" category.\n"
-                                        " When you open the ticket, you will be greeted by a message from the Miscellaneous Bot.\n"
-                                        " The bot will ask you to choose the reason behind the creation of your ticket from a given list."
-                                        " Choose the appropriate reason and then proceed!\n"
-                                        "Once you have created your ticket, staff will respond within 24 hours.\n",color= 0x8368ff)
-        embed.set_thumbnail(url='https://media.discordapp.net/attachments/650248396480970782/727875702187229234/Tickets.png?width=1440&height=360')
-        embed2 = discord.Embed(title='', description="**Do Not Kick List**:-"
-                                                    "Once the ticket is created, follow the bots instructions.\n"
-                                                    "You must either have a valid reason for applying and also meet the do not kick list requirements.\n"
-                                                    "Accepted Reasons:\n"
-                                                    "> School\n"
-                                                    "> Medical Reasons\n"
-                                                    "> Punished by parents\n"
-                                                    "> Situations out of your control\n"
-                                                    "> Vacation (< 2 weeks)\n\n"
-                                                    "If your account is banned for more than 30 days, then it will be temporarily kicked until it's unbanned."
-                                                    " If you want to join with an alt, that's fine. "
-                                                    " We reserve the right to do this for any bans under 30 days as well."
-                                                    ""
-                                                    "**Discord Nick/Role Change**:-\n"
-                                                    "Once the ticket is created, the bot will attempt to automatically sync your roles if it is successful, inform staff that you got the change you desired. "
-                                                    "If not, inform staff what you would like to change and they will gladly help you!\n\n"
-                                                    ""
-                                                    "**Problems/Queries/Complaints/Suggestions**:-\n"
-                                                    " If you face difficulty in anything, create a ticket! We'll be glad to help you!\n\n"
-                                                    "**Reporting a player**:-\n"
-                                                    "When reporting a player, make sure to explain your situation in maximum detail."
-                                                    "Providing the following details is considered the bare minimum:-\n"
-                                                    "> Name of user you would like to report\n"
-                                                    "> Explanation about the offense\n"
-                                                    "> Time of offense\n"
-                                                    "> Proof of offense\n"
-                                                    "If you would like to report a staff member, DM Rowdies.\n\n"
-                                                    ""
-                                                    "**Milestone**:-\n"
-                                                    "Once you choose milestone as the reason behind the creation of your ticket, "
-                                                    "the bot will ask you to give your milestone that you achieved along with proof of this feat."
-                                                    "Once that's done, staff will review your milestone and if it is accepted, "
-                                                    "it will be included in the following Sunday's milestone post!", color=0x8368ff)
-        await ctx.send(embed=embed)
-        await ctx.send(embed=embed2)
 
 def setup(bot):
     bot.add_cog(Tickets(bot))
