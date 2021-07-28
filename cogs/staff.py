@@ -338,7 +338,7 @@ class staff(commands.Cog, name="Staff"):
                                 await member.add_roles(self.bot.member_role)
                                 await member.remove_roles(self.bot.new_member, self.bot.guest)
 
-                            if len([role for role in author.roles if role in (bot.active_role, bot.staff, bot.former_staff, bot.server_booster)]):
+                            if len([role for role in ctx.author.roles if role in (self.bot.active_role, self.bot.staff, self.bot.former_staff, self.bot.server_booster)]):
                                 change_nick = False
 
                             for user in req['guild']["members"]:
