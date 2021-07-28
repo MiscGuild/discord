@@ -338,10 +338,7 @@ class staff(commands.Cog, name="Staff"):
                                 await member.add_roles(self.bot.member_role)
                                 await member.remove_roles(self.bot.new_member_role, self.bot.guest)
 
-                            if [role for role in member.roles if role in (self.bot.active_role, self.bot.staff, self.bot.former_staff, self.bot.server_booster)]:
-                                change_nick = False
-                            else:
-                                change_nick = True
+                            has_tag_perms = any(role in ctx.author.roles for role in self.bot.tag_allowed_roles)
 
                             for user in req['guild']["members"]:
                                 if uuid == user["uuid"]:
@@ -352,7 +349,7 @@ class staff(commands.Cog, name="Staff"):
                                     if usergrank != 'Resident':
                                         if totalexp < self.bot.inactive:
                                             username = await hypixel.name_grabber(member)
-                                            if change_nick is True:
+                                            if has_tag_perms is False:
                                                 await member.edit(nick=username)
                                             await member.add_roles(self.bot.inactive_role)
                                             await member.remove_roles(self.bot.active_role)
@@ -367,7 +364,7 @@ class staff(commands.Cog, name="Staff"):
 
                                         elif totalexp > self.bot.inactive:
                                             username = await hypixel.name_grabber(member)
-                                            if change_nick is True:
+                                            if has_tag_perms is False:
                                                 await member.edit(nick=username)
                                             await member.remove_roles(self.bot.inactive_role, self.bot.active_role)
                                             await message.edit(
@@ -375,7 +372,7 @@ class staff(commands.Cog, name="Staff"):
                                     else: # For residents
                                         if totalexp < self.bot.resident_req:
                                             username = await hypixel.name_grabber(member)
-                                            if change_nick is True:
+                                            if has_tag_perms is False:
                                                 await member.edit(nick=username)
                                             await member.add_roles(self.bot.inactive_role)
                                             await member.remove_roles(self.bot.active_role)
@@ -390,7 +387,7 @@ class staff(commands.Cog, name="Staff"):
 
                                         elif totalexp > self.bot.resident_req:
                                             username = await hypixel.name_grabber(member)
-                                            if change_nick:
+                                            if has_tag_perms is False:
                                                 await member.edit(nick=username)
                                             await member.remove_roles(self.bot.inactive_role, self.bot.active_role)
                                             await message.edit(

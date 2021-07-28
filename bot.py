@@ -672,7 +672,8 @@ async def on_guild_channel_create(channel):
                     await author.edit(nick=ign)
 
                     if guild_name == "Miscellaneous":
-                        if [role for role in author.roles if role in (bot.active_role, bot.staff, bot.former_staff, bot.server_booster)]:
+                        has_tag_perms = any(role in author.roles for role in bot.tag_allowed_roles)
+                        if has_tag_perms is True:
                             while True:
                                 embed = discord.Embed(title="What would you like your tag to be? ",
                                                       url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png",
@@ -1346,6 +1347,7 @@ async def after_cache_ready():
     bot.awaiting_app = discord.utils.get(bot.misc_guild.roles, name="Awaiting Approval")
     bot.ally = discord.utils.get(bot.misc_guild.roles, name="Ally")
     bot.server_booster = discord.utils.get(bot.misc_guild.roles, name="Server Booster")
+    bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster)
     bot.adminids = [x.id for x in bot.admin.members]
 
     with open('dnkl.json', 'r') as f:
