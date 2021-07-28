@@ -671,8 +671,9 @@ async def on_guild_channel_create(channel):
                     guild_name = await hypixel.get_guild(ign)
                     await author.edit(nick=ign)
 
-                    if guild_name == "Miscellaneous":
-                        has_tag_perms = any(role in author.roles for role in bot.tag_allowed_roles)
+                    has_tag_perms = any(role in author.roles for role in bot.tag_allowed_roles)
+
+                    if guild_name == "Miscellaneous" or has_tag_perms is True:
                         if has_tag_perms is True:
                             while True:
                                 embed = discord.Embed(title="What would you like your tag to be? ",

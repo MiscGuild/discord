@@ -26,14 +26,11 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.send('Please enter a valid ign!')
             else:
                 guild_name = await hypixel.get_guild(name)
-
-                if guild_name != "Miscellaneous" and tag is not None:
-                    await ctx.send("Guild tags are exclusively for active members, server boosters, staff members and allies!")
-
+                has_tag_perms = any(role in ctx.author.roles for role in self.bot.tag_allowed_roles)
 
                 await author.edit(nick=ign)
-                if guild_name == "Miscellaneous":
-                    has_tag_perms = any(role in ctx.author.roles for role in self.bot.tag_allowed_roles)
+                if guild_name == "Miscellaneous" or has_tag_perms is True:
+
                     if tag != None and has_tag_perms is True:
                         with open('badwords.txt', 'r') as f:
                             badwords = f.read()
@@ -60,7 +57,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                         color=0x8368ff)
                     embed.set_footer(text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
                     await ctx.send(embed=embed)
-
+                elif guild_name != "Miscellaneous" and tag is not None:
+                    await ctx.send("Your tag will not be updated since you do not have the active/staff/former staff/server booster role!")
                 elif guild_name == "XL":
                     if author.nick is None or "[✧XL✧]" not in author.nick:
                         new_nick = ign + " [✧XL✧]"
