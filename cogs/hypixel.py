@@ -1,12 +1,14 @@
+import json
+import math
+from datetime import datetime
+from io import BytesIO
+
+import aiohttp
 import discord
 from discord.ext import commands
-from cogs.utils import hypixel
-import math
-import aiohttp
-from datetime import datetime
-import json
 from quickchart import QuickChart, QuickChartFunction
-from io import BytesIO
+
+from cogs.utils import hypixel
 
 
 class Hypixel(commands.Cog, name="Hypixel"):
@@ -38,27 +40,31 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             await ctx.send(
                                 "The tag may not include special characters unless it's the tag of an ally guild. Re-run the command if you wish to add a tag!")
                         elif len(tag) > 6:
-                            await ctx.send("The tag may not be longer than 6 characters. Re-run the command if you wish to add a tag!")
+                            await ctx.send(
+                                "The tag may not be longer than 6 characters. Re-run the command if you wish to add a tag!")
                         elif tag.lower() in badwords.split('\n'):
-                            await ctx.send("The tag may not include profanity. Re-run the command if you wish to add a tag!")
-                        else: # Set user's tag
+                            await ctx.send(
+                                "The tag may not include profanity. Re-run the command if you wish to add a tag!")
+                        else:  # Set user's tag
                             new_nick = ign + f' [{tag}]'
                             await author.edit(nick=new_nick)
                     elif tag == None:
                         pass
-                    else: # 'tag' argument is NOT None, but user doesn't have roles
-                        await ctx.send("Your tag will not be updated since you do not have the active/staff/former staff/server booster role!")
-                    
+                    else:  # 'tag' argument is NOT None, but user doesn't have roles
+                        await ctx.send(
+                            "Your tag will not be updated since you do not have the active/staff/former staff/server booster role!")
 
                     await ctx.author.remove_roles(self.bot.guest, self.bot.awaiting_app)
                     await ctx.author.add_roles(self.bot.member_role)
                     embed = discord.Embed(title="Your nick, role and tag were successfully changed!",
-                                        description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
-                                        color=0x8368ff)
-                    embed.set_footer(text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
+                                          description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
+                                          color=0x8368ff)
+                    embed.set_footer(
+                        text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
                     await ctx.send(embed=embed)
                 elif guild_name != "Miscellaneous" and tag is not None:
-                    await ctx.send("Your tag will not be updated since you do not have the active/staff/former staff/server booster role!")
+                    await ctx.send(
+                        "Your tag will not be updated since you do not have the active/staff/former staff/server booster role!")
                 elif guild_name == "XL":
                     if author.nick is None or "[✧XL✧]" not in author.nick:
                         new_nick = ign + " [✧XL✧]"
@@ -67,13 +73,13 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     await ctx.author.add_roles(self.bot.guest, self.bot.ally)
 
                     embed = discord.Embed(title="Your nick and role was successfully changed!",
-                                        description="If this wasn't the change you anticipated, "
-                                                    "kindly create a ticket or get in contact with staff!",
-                                        color=0x8368ff)
+                                          description="If this wasn't the change you anticipated, "
+                                                      "kindly create a ticket or get in contact with staff!",
+                                          color=0x8368ff)
 
                     embed.set_footer(text="Member of XL"
-                                        "\n• Member & Awaiting Approval were removed"
-                                        "\n• Guest & XL - Ally were given")
+                                          "\n• Member & Awaiting Approval were removed"
+                                          "\n• Guest & XL - Ally were given")
                     await ctx.send(embed=embed)
 
 
@@ -87,16 +93,17 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         if guild_name is None:
                             guild_name = "no guild (Guildless)"
                         embed = discord.Embed(title="Your nick and role was successfully changed!",
-                                            description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
-                                            color=0x8368ff)
-                        embed.set_footer(text=f"Member of {guild_name}\n• Nick Changed\n• Member & Awaiting Approval were removed\n• Guest was given")
+                                              description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
+                                              color=0x8368ff)
+                        embed.set_footer(
+                            text=f"Member of {guild_name}\n• Nick Changed\n• Member & Awaiting Approval were removed\n• Guest was given")
                         await ctx.send(embed=embed)
         else:
             embed = discord.Embed(title="What is your Minecraft username?",
                                   color=0x8368ff)
             await ctx.send(embed=embed)
             name = await self.bot.wait_for('message',
-                                               check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+                                           check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
             name = name.content
             ign, uuid = await hypixel.get_dispnameID(name)
 
@@ -121,8 +128,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             embed.set_footer(text="If you don't want a tag, type: None")
                             await ctx.send(embed=embed)
                             tag = await self.bot.wait_for('message',
-                                                     check=lambda
-                                                         x: x.channel == ctx.channel and x.author == author)
+                                                          check=lambda
+                                                              x: x.channel == ctx.channel and x.author == author)
                             tag = tag.content
                             with open('badwords.txt', 'r') as f:
                                 badwords = f.read()
@@ -192,7 +199,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             req = await hypixel.get_data(name)
             if req["player"] is None:
                 embed = discord.Embed(title="Your discord nick doesn't match your minecraft name",
-                                    description=',sync `Your minecraft name`', color=0xff0000)
+                                      description=',sync `Your minecraft name`', color=0xff0000)
                 await ctx.channel.purge(limit=1)
                 await ctx.send(embed=embed)
             else:
@@ -310,9 +317,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 else:
                     ll = 'Unknown'
 
-
-                embed = discord.Embed(title=f"{rank} {ign} {gtag}", url=f'https://plancke.io/hypixel/player/stats/{name}',
-                                    color=0x8368ff)
+                embed = discord.Embed(title=f"{rank} {ign} {gtag}",
+                                      url=f'https://plancke.io/hypixel/player/stats/{name}',
+                                      color=0x8368ff)
                 embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
                 embed.add_field(name="Network Level:", value=f"`{level}`", inline=True)
                 embed.add_field(name="Karma:", value=f"`{karma}`", inline=True)
@@ -338,7 +345,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{ign}') as resp:
                     request = await resp.json(content_type=None)
-            
+
             if resp.status != 200:
                 await ctx.send('Unknown IGN!')
             else:
@@ -352,14 +359,16 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
                     if int(sm) & int(em) <= 12:
                         dates = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May",
-                                6: "June", 7: "July", 8: "August", 9: "September",
-                                10: "October", 11: "November", 12: "December"}
+                                 6: "June", 7: "July", 8: "August", 9: "September",
+                                 10: "October", 11: "November", 12: "December"}
                         start_month = dates.get(int(sm))
                         end_month = dates.get(int(em))
 
-                        embed = discord.Embed(title=f"{rank} {ign}", url=f'https://plancke.io/hypixel/player/stats/{ign}',
-                                            color=0x0ffff)
-                        embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}?size=512&default=MHF_Steve&overlay')
+                        embed = discord.Embed(title=f"{rank} {ign}",
+                                              url=f'https://plancke.io/hypixel/player/stats/{ign}',
+                                              color=0x0ffff)
+                        embed.set_thumbnail(
+                            url=f'https://crafatar.com/renders/body/{uuid}?size=512&default=MHF_Steve&overlay')
                         embed.add_field(name="IGN:", value=f"{ign}", inline=False)
                         embed.add_field(name="Start:", value=f"{sd} {start_month} {sy}", inline=False)
                         embed.add_field(name="End:", value=f"{ed} {end_month} {ey}", inline=False)
@@ -374,44 +383,48 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         with open('dnkl.json', 'w') as f:
                             json.dump(data, f)
                     else:
-                        embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`", color=0xff0000)
+                        embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`",
+                                              color=0xff0000)
                         await ctx.send(embed=embed)
                 else:
-                    embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`", color=0xff0000)
+                    embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`",
+                                          color=0xff0000)
                     await ctx.send(embed=embed)
             await session.close()
 
         else:
             await ctx.send("**What is the name of the user you wish to add to the do not kick list?**")
 
-            name = await self.bot.wait_for('message', check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+            name = await self.bot.wait_for('message',
+                                           check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
             name = name.content
             ign, uuid = await hypixel.get_dispnameID(name)
             rank = await hypixel.get_rank(name)
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{ign}') as resp:
                     request = await resp.json(content_type=None)
-            
+
             if resp.status != 200:
-                await ctx.send('Unknown IGN!')  
+                await ctx.send('Unknown IGN!')
             else:
                 uuid = request['id']
                 with open('dnkl.json') as f:
                     data = json.load(f)
-            
+
                 await ctx.send("**What is the start date?** (DD/MM/YYYY)")
                 start_date = await self.bot.wait_for('message',
-                                            check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+                                                     check=lambda
+                                                         x: x.channel == ctx.channel and x.author == ctx.author)
                 start_date = start_date.content
                 await ctx.send("**What is the end date?** (DD/MM/YYYY)")
                 end_date = await self.bot.wait_for('message',
-                                                check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+                                                   check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
                 end_date = end_date.content
 
                 await ctx.send("**What is the reason behind their inactivity?**")
 
                 reason = await self.bot.wait_for('message',
-                                                check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+                                                 check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
                 reason = reason.content
 
                 if start_date != None and "/" in start_date and end_date != None and "/" in end_date:
@@ -420,20 +433,22 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
                     if int(sm) & int(em) <= 12:
                         dates = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May",
-                                6: "June", 7: "July", 8: "August", 9: "September",
-                                10: "October", 11: "November", 12: "December"}
+                                 6: "June", 7: "July", 8: "August", 9: "September",
+                                 10: "October", 11: "November", 12: "December"}
                         start_month = dates.get(int(sm))
                         end_month = dates.get(int(em))
 
-                        embed = discord.Embed(title=f"{rank} {ign}", url=f'https://plancke.io/hypixel/player/stats/{ign}',
-                                            color=0x0ffff)
-                        embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}?size=512&default=MHF_Steve&overlay')
+                        embed = discord.Embed(title=f"{rank} {ign}",
+                                              url=f'https://plancke.io/hypixel/player/stats/{ign}',
+                                              color=0x0ffff)
+                        embed.set_thumbnail(
+                            url=f'https://crafatar.com/renders/body/{uuid}?size=512&default=MHF_Steve&overlay')
                         embed.add_field(name="IGN:", value=f"{ign}", inline=False)
                         embed.add_field(name="Start:", value=f"{sd} {start_month} {sy}", inline=False)
                         embed.add_field(name="End:", value=f"{ed} {end_month} {ey}", inline=False)
                         embed.add_field(name="Reason", value=f"{reason}", inline=False)
                         embed.set_author(name="Do not kick list")
-                        
+
                         message = await self.bot.dnkl_channel.send(embed=embed)
 
                         dnkl_dict = {ign: message.id}
@@ -442,10 +457,12 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         with open('dnkl.json', 'w') as f:
                             json.dump(data, f)
                     else:
-                        embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`", color=0xff0000)
+                        embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`",
+                                              color=0xff0000)
                         await ctx.send(embed=embed)
                 else:
-                    embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`", color=0xff0000)
+                    embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`",
+                                          color=0xff0000)
                     await ctx.send(embed=embed)
             await session.close()
 
@@ -479,7 +496,6 @@ class Hypixel(commands.Cog, name="Hypixel"):
             await ctx.send(f'{ign} has been removed from the do-not-kick-list!')
         await session.close()
 
-
     @commands.command()
     async def dnkllist(self, ctx, raw=None):
         name = ""
@@ -493,11 +509,10 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 name = name + f"{x}\n"
 
             embed = discord.Embed(title='The people on the do not kick list are as follows',
-                                description=name,
-                                color=0x8368ff)
+                                  description=name,
+                                  color=0x8368ff)
             embed.set_footer(text=f'Total: {len(keys)}')
             await ctx.send(embed=embed)
-
 
     @commands.command(aliases=["gi"])
     async def ginfo(self, ctx, *, name):
@@ -557,7 +572,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
                     # EMBED
                     embed = discord.Embed(title=f"{guild} {gtag}", url=f"https://plancke.io/hypixel/guild/name/{name}",
-                                        description=f"{gdesc}", color=0x9900ff)
+                                          description=f"{gdesc}", color=0x9900ff)
                     embed.add_field(name="Level:", value=f"`{glvl}`", inline=True)
                     embed.add_field(name="Members:", value=f"`{gmembers}`", inline=True)
                     embed.add_field(name="Legacy Rank:", value=f"`{glg}`", inline=True)
@@ -586,7 +601,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 for i in range(len(req['guild']['members'])):
                     uuid = req['guild']['members'][i]['uuid']
                     async with aiohttp.ClientSession() as session:
-                        async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as names:
+                        async with session.get(
+                                f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as names:
                             names = await names.json()
 
                     name = names['name'] + f" [{req['guild']['members'][i]['rank']}]"
@@ -595,14 +611,13 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     array[name] = exp
                     exp = 0
 
-
                 await msg.edit(content="**Please wait!**\n `SENDING!`")
                 sortedList = sorted(array.items(), key=lambda x: x[1], reverse=True)
 
                 x = 0
                 embed = discord.Embed(title=f"Here's the guild experience of all users!",
-                                    description=f"Total: {len(sortedList)}",
-                                    color=0x8368ff)
+                                      description=f"Total: {len(sortedList)}",
+                                      color=0x8368ff)
                 if len(sortedList) <= 25:
                     for user in sortedList:
                         embed.add_field(name=f"{user[0]}", value=(format(user[1], ',d')), inline=True)
@@ -639,7 +654,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 if expHistory >= self.bot.active:
                     uuid = g['members'][i]['uuid']
                     async with aiohttp.ClientSession() as session:
-                        async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
+                        async with session.get(
+                                f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
                             a = await resp.json()
                     name = a['name'] + f"[{g['members'][i]['rank']}]"
                     exp += expHistory
@@ -650,7 +666,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             sortedList = sorted(array.items(), key=lambda x: x[1], reverse=True)
             await msg.edit(content="**Please wait!**\n `SENDING!`")
             embed = discord.Embed(title=f"Here's the guild experience of all active users!",
-                                description=f"Total: {len(sortedList)}", color=0x8368ff)
+                                  description=f"Total: {len(sortedList)}", color=0x8368ff)
             if len(sortedList) <= 25:
                 for user in sortedList:
                     embed.add_field(name=f"{user[0]}", value=(format(user[1], ',d')), inline=True)
@@ -686,7 +702,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 if expHistory < self.bot.inactive:
                     uuid = g['members'][i]['uuid']
                     async with aiohttp.ClientSession() as session:
-                        async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
+                        async with session.get(
+                                f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
                             a = await resp.json()
                     name = a['name']
                     rank = g['members'][i]['rank']
@@ -699,8 +716,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
             sortedList = sorted(array.items(), key=lambda x: x[1], reverse=True)
             await msg.edit(content="**Please wait!**\n `SENDING!`")
             x = 0
-            embed = discord.Embed(title=f"Here's a list of all inactive members along with their weekly guild experience!",
-                                description=f"Total: {len(sortedList)}", color=0x8368ff)
+            embed = discord.Embed(
+                title=f"Here's a list of all inactive members along with their weekly guild experience!",
+                description=f"Total: {len(sortedList)}", color=0x8368ff)
             if len(sortedList) <= 25:
                 for user in sortedList:
                     embed.add_field(name=f"{user[0]}", value=(format(user[1], ',d')), inline=True)
@@ -752,7 +770,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 if rank == reqrank:
                     uuid = g['members'][i]['uuid']
                     async with aiohttp.ClientSession() as session:
-                        async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
+                        async with session.get(
+                                f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
                             a = await resp.json()
                             await session.close()
                     name = a['name']
@@ -766,7 +785,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             sortedList = sorted(array.items(), key=lambda x: x[1], reverse=True)
             x = 0
             embed = discord.Embed(title=f"Here's the guild experience of all users with the {reqrank} rank!",
-                                description=f"Total: {len(sortedList)}", color=0x8368ff)
+                                  description=f"Total: {len(sortedList)}", color=0x8368ff)
             if len(sortedList) <= 25:
                 for user in sortedList:
                     embed.add_field(name=f"{user[0]}", value=(format(user[1], ',d')), inline=True)
@@ -794,7 +813,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         weeklyexp = []
         if name in ('top', 'Top'):
             embed = discord.Embed(title="Incorrect syntax!",
-                                description="The command you're trying to use is `,gtop`", color=0xff0000)
+                                  description="The command you're trying to use is `,gtop`", color=0xff0000)
             await ctx.send(embed=embed)
         else:
             async with aiohttp.ClientSession() as session:
@@ -813,7 +832,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
                 if "guild" not in req or req['guild'] is None:
                     embed = discord.Embed(title=f"{name}", url=f'https://plancke.io/hypixel/player/stats/{name}',
-                                        color=0xf04747)
+                                          color=0xf04747)
                     embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
                     embed.add_field(name="Guildless!",
                                     value="You must be in a guild for the command to work!")
@@ -836,8 +855,10 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             totalexp = sum(totalexp.values())
 
                             if name.title() in ("Rowdies", "Polarpowah"):
-                                rainbow_bg = QuickChartFunction("getGradientFillHelper('horizontal',['rgba(250, 0, 0,0.3)','rgba(250, 70, 0,0.3)','rgba(255, 130, 0,0.3)','rgba(252, 187, 0,0.3)','rgba(255, 200, 0,0.3)','rgba(255, 255, 0,0.3)','rgba(179, 255, 0,0.3)','rgba(85, 255, 0,0.3)','rgba(0, 255, 0,0.3)','rgba(0, 255, 100,0.3)','rgba(0, 255, 200,0.3)','rgba(0, 100, 255,0.3)','rgba(0, 0, 255,0.3)','rgba(100, 0, 255,0.3)','rgba(255, 0, 255,0.3)'])")
-                                rainbow_border = QuickChartFunction("getGradientFillHelper('horizontal',['rgba(250, 0, 0,0.4)','rgba(250, 70, 0,0.4)','rgba(255, 130, 0,0.4)','rgba(252, 187, 0,0.4)','rgba(255, 200, 0,0.4)','rgba(255, 255, 0,0.4)','rgba(179, 255, 0,0.4)','rgba(85, 255, 0,0.4)','rgba(0, 255, 0,0.4)','rgba(0, 255, 100,0.4)','rgba(0, 255, 200,0.4)','rgba(0, 100, 255,0.4)','rgba(0, 0, 255,0.4)','rgba(100, 0, 255,0.4)','rgba(255, 0, 255,0.4)'])")
+                                rainbow_bg = QuickChartFunction(
+                                    "getGradientFillHelper('horizontal',['rgba(250, 0, 0,0.3)','rgba(250, 70, 0,0.3)','rgba(255, 130, 0,0.3)','rgba(252, 187, 0,0.3)','rgba(255, 200, 0,0.3)','rgba(255, 255, 0,0.3)','rgba(179, 255, 0,0.3)','rgba(85, 255, 0,0.3)','rgba(0, 255, 0,0.3)','rgba(0, 255, 100,0.3)','rgba(0, 255, 200,0.3)','rgba(0, 100, 255,0.3)','rgba(0, 0, 255,0.3)','rgba(100, 0, 255,0.3)','rgba(255, 0, 255,0.3)'])")
+                                rainbow_border = QuickChartFunction(
+                                    "getGradientFillHelper('horizontal',['rgba(250, 0, 0,0.4)','rgba(250, 70, 0,0.4)','rgba(255, 130, 0,0.4)','rgba(252, 187, 0,0.4)','rgba(255, 200, 0,0.4)','rgba(255, 255, 0,0.4)','rgba(179, 255, 0,0.4)','rgba(85, 255, 0,0.4)','rgba(0, 255, 0,0.4)','rgba(0, 255, 100,0.4)','rgba(0, 255, 200,0.4)','rgba(0, 100, 255,0.4)','rgba(0, 0, 255,0.4)','rgba(100, 0, 255,0.4)','rgba(255, 0, 255,0.4)'])")
                                 colour, GraphColor, GraphBorder = 0x36393f, rainbow_bg, rainbow_border
                             elif rank == "Resident":
                                 if totalexp > self.bot.resident_req:
@@ -854,10 +875,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
                             totalexp = (format(totalexp, ',d'))
                             for key, value in expHistory.items():
-                                results.append([key,value])
+                                results.append([key, value])
                                 dates.append(key)
                                 weeklyexp.append(int(value))
-
 
                             dictionary = {
                                 0: 'Today:',
@@ -873,18 +893,19 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             for x in results:
                                 if z < 7:
                                     date = dictionary.get(z, "None")
-                                    gexphistory = gexphistory + f"➤ {date} **{format(weeklyexp[z],',d')}**\n"
+                                    gexphistory = gexphistory + f"➤ {date} **{format(weeklyexp[z], ',d')}**\n"
                                     z = z + 1
 
                                 else:
                                     break
-                            if "commands" not in ctx.channel.name and ctx.channel.category.name not in ('🎫 Ticket Section','DNKL','MILESTONES','REPORTS','EVENT','OTHER','RTickets'):
-                                name = name.replace("_",        "\_")
+                            if "commands" not in ctx.channel.name and ctx.channel.category.name not in (
+                            '🎫 Ticket Section', 'DNKL', 'MILESTONES', 'REPORTS', 'EVENT', 'OTHER', 'RTickets'):
+                                name = name.replace("_", "\_")
                                 await ctx.send(f"__**{name}**__\n**Guild Experience -** `{totalexp}`")
                             else:
                                 embed = discord.Embed(title=f"{name}",
-                                                    url=f'https://plancke.io/hypixel/player/stats/{name}',
-                                                    color=colour)
+                                                      url=f'https://plancke.io/hypixel/player/stats/{name}',
+                                                      color=colour)
                                 embed.set_author(name=gname, url=f'https://plancke.io/hypixel/guild/player/{name}')
                                 embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
                                 embed.add_field(name="Rank:", value=rank, inline=True)
@@ -892,7 +913,6 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                 embed.add_field(name="Quests Completed:", value=cq, inline=True)
                                 embed.add_field(name="Overall Exp:", value=f"`{totalexp}`", inline=False)
                                 embed.add_field(name="GEXP History", value=gexphistory, inline=False)
-
 
                                 weeklyexp.reverse()
                                 dates.reverse()
@@ -927,11 +947,11 @@ class Hypixel(commands.Cog, name="Hypixel"):
             name = await hypixel.name_grabber(ctx.author)
         async with aiohttp.ClientSession() as session:
             async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-                request = await resp.json(content_type=None)  
+                request = await resp.json(content_type=None)
 
         if resp.status != 200:
             await ctx.send('Unknown IGN!')
-        else:      
+        else:
             name = request['name']
             uuid = request['id']
             api = hypixel.get_api()
@@ -961,21 +981,21 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         totalexp = (format(totalexp, ',d'))
                         if eligiblity is False:
                             embed = discord.Embed(title=name,
-                                                url=f'https://visage.surgeplay.com/full/832/{uuid}',
-                                                color=0xff3333)
+                                                  url=f'https://visage.surgeplay.com/full/832/{uuid}',
+                                                  color=0xff3333)
                             embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
                             embed.set_author(name="Do-not-kick-list: Eligibility Check")
                             embed.add_field(name="You are not eligible to apply for the do not kick list.",
-                                            value=f"You need a minimum of {format(self.bot.dnkl,',d')} weekly guild experience.\n You have {totalexp} weekly guild experience.",
+                                            value=f"You need a minimum of {format(self.bot.dnkl, ',d')} weekly guild experience.\n You have {totalexp} weekly guild experience.",
                                             inline=True)
                         else:
                             embed = discord.Embed(title=name,
-                                                url=f'https://visage.surgeplay.com/full/832/{uuid}',
-                                                color=0x333cff)
+                                                  url=f'https://visage.surgeplay.com/full/832/{uuid}',
+                                                  color=0x333cff)
                             embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
                             embed.set_author(name='Do-not-kick-list: Eligibility Check')
                             embed.add_field(name="You are eligible to apply for the do not kick list.",
-                                            value=f"You meet the minimum of {format(self.bot.dnkl,',d')} weekly guild experience.\n You have {totalexp} weekly guild experience.",
+                                            value=f"You meet the minimum of {format(self.bot.dnkl, ',d')} weekly guild experience.\n You have {totalexp} weekly guild experience.",
                                             inline=True)
                         await ctx.send(embed=embed)
         await session.close()
@@ -1005,27 +1025,26 @@ class Hypixel(commands.Cog, name="Hypixel"):
             weeklygexp = f'&f&lWeekly Top&r%5Cn'
 
             color = {'RED': '&c',
-                    'GOLD': '&6',
-                    'GREEN': '&a',
-                    'YELLOW': '&e',
-                    'LIGHT_PURPLE': '&d',
-                    'WHITE': '&f',
-                    'BLUE': '&9',
-                    'DARK_GREEN': '&2',
-                    'DARK_RED': '&4',
-                    'DARK_AQUA': '&3',
-                    'DARK_PURPLE': '&5',
-                    'DARK_GRAY': '&8',
-                    'BLACK': '&0',
-                    'DARK_BLUE': '&1'}
+                     'GOLD': '&6',
+                     'GREEN': '&a',
+                     'YELLOW': '&e',
+                     'LIGHT_PURPLE': '&d',
+                     'WHITE': '&f',
+                     'BLUE': '&9',
+                     'DARK_GREEN': '&2',
+                     'DARK_RED': '&4',
+                     'DARK_AQUA': '&3',
+                     'DARK_PURPLE': '&5',
+                     'DARK_GRAY': '&8',
+                     'BLACK': '&0',
+                     'DARK_BLUE': '&1'}
             await msg.edit(content=f"**Please wait!**\n `Approximate wait time: 10 seconds`")
-
-
 
             for user in sortedList:
                 if iteration_number < 11:
                     async with aiohttp.ClientSession() as session:
-                        async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{user[0]}') as resp:
+                        async with session.get(
+                                f'https://sessionserver.mojang.com/session/minecraft/profile/{user[0]}') as resp:
                             mojang = await resp.json()
                             await session.close()
                     name = mojang['name']
@@ -1090,7 +1109,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                                     playerrank = f'&6[MVP&c++&6]'
                                                     print('Rank acquired- MVP++ (Gold + No rankPlusColor)')
 
-                                            elif data['player']['monthlyRankColor'] == 'AQUA':  # Aqua MVP++ w/custom + colors
+                                            elif data['player'][
+                                                'monthlyRankColor'] == 'AQUA':  # Aqua MVP++ w/custom + colors
                                                 if 'rankPlusColor' in data['player']:
                                                     pluscolor = color.get(data['player']['rankPlusColor'])
                                                     print('Rank acquired- MVP++ (Aqua + rankPlusColor)')
@@ -1171,24 +1191,25 @@ class Hypixel(commands.Cog, name="Hypixel"):
             dailygexp = f'&f&lDaily Top - {date}&r%5Cn'
 
             color = {'RED': '&c',
-                    'GOLD': '&6',
-                    'GREEN': '&a',
-                    'YELLOW': '&e',
-                    'LIGHT_PURPLE': '&d',
-                    'WHITE': '&f',
-                    'BLUE': '&9',
-                    'DARK_GREEN': '&2',
-                    'DARK_RED': '&4',
-                    'DARK_AQUA': '&3',
-                    'DARK_PURPLE': '&5',
-                    'DARK_GRAY': '&8',
-                    'BLACK': '&0',
-                    'DARK_BLUE': '&1'}
+                     'GOLD': '&6',
+                     'GREEN': '&a',
+                     'YELLOW': '&e',
+                     'LIGHT_PURPLE': '&d',
+                     'WHITE': '&f',
+                     'BLUE': '&9',
+                     'DARK_GREEN': '&2',
+                     'DARK_RED': '&4',
+                     'DARK_AQUA': '&3',
+                     'DARK_PURPLE': '&5',
+                     'DARK_GRAY': '&8',
+                     'BLACK': '&0',
+                     'DARK_BLUE': '&1'}
             await msg.edit(content=f"**Please wait!**\n `Approximate wait time: 10 seconds`")
             for user in sortedList:
                 if z < 11:
                     async with aiohttp.ClientSession() as session:
-                        async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{user[0]}') as resp:
+                        async with session.get(
+                                f'https://sessionserver.mojang.com/session/minecraft/profile/{user[0]}') as resp:
                             mojang = await resp.json()
                             name = mojang['name']
                             await session.close()
@@ -1203,29 +1224,28 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         return None
                     if "prefix" in data["player"]:
                         player_prefix = (data["player"]["prefix"])
-                        if player_prefix == "§d[PIG§b+++§d]":  #Pig+++
+                        if player_prefix == "§d[PIG§b+++§d]":  # Pig+++
                             print('Rank acquired- PIG')
                             playerrank = f"&d[PIG&b+++&d]"
-                        elif player_prefix == "§c[SLOTH]":  #Sloth
+                        elif player_prefix == "§c[SLOTH]":  # Sloth
                             print('Rank acquired- Sloth')
                             playerrank = "&c[SLOTH]"
-                        elif player_prefix == "§c[OWNER]":  #Owner
+                        elif player_prefix == "§c[OWNER]":  # Owner
                             print('Rank acquired- Owner')
                             playerrank = "&c[OWNER]"
-
 
                     if "newPackageRank" in data["player"]:
                         if "rank" in data["player"]:
                             rank = (data["player"]["rank"])
-                            if rank == 'YOUTUBER':  #Youtuber
+                            if rank == 'YOUTUBER':  # Youtuber
                                 playerrank = '&c[&fYOUTUBE&c]'
-                            if rank == 'ADMIN':  #Admin
+                            if rank == 'ADMIN':  # Admin
                                 print('Rank acquired- Admin')
                                 playerrank = '&c[ADMIN]'
-                            if rank == 'MODERATOR':  #Moderator
+                            if rank == 'MODERATOR':  # Moderator
                                 print('Rank acquired- Moderator')
                                 playerrank = '&2[MOD]'
-                            if rank == 'HELPER':  #Helper
+                            if rank == 'HELPER':  # Helper
                                 print('Rank acquired- Helper')
                                 playerrank = '&9[HELPER]'
 
@@ -1238,7 +1258,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             if rank == 'MVP_PLUS':
                                 if "monthlyPackageRank" in data["player"]:
 
-                                    if (data["player"]["monthlyPackageRank"]) == "NONE": #Had MVP++ but now is an MVP+
+                                    if (data["player"]["monthlyPackageRank"]) == "NONE":  # Had MVP++ but now is an MVP+
                                         if 'rankPlusColor' in data['player']:
                                             pluscolor = color.get(data['player']['rankPlusColor'])
                                             print('Rank acquired- MVP+ (MVP++ sub category)')
@@ -1248,29 +1268,30 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
                                     else:
 
-
-                                        if 'monthlyRankColor' not in data['player'] or data['player']['monthlyRankColor'] == 'GOLD': #Gold MVP++
-                                            if 'rankPlusColor' in data['player']: #Gold MVP++ w/custom + colors
+                                        if 'monthlyRankColor' not in data['player'] or data['player'][
+                                            'monthlyRankColor'] == 'GOLD':  # Gold MVP++
+                                            if 'rankPlusColor' in data['player']:  # Gold MVP++ w/custom + colors
                                                 pluscolor = color.get(data['player']['rankPlusColor'])
                                                 print('Rank acquired- MVP++ (Gold + rankPlusColor)')
                                                 playerrank = f'&6[MVP{pluscolor}++&6]'
-                                            else: #Gold MVP++ w/o custom + colors
+                                            else:  # Gold MVP++ w/o custom + colors
                                                 playerrank = f'&6[MVP&c++&6]'
                                                 print('Rank acquired- MVP++ (Gold + No rankPlusColor)')
 
 
-                                        elif data['player']['monthlyRankColor'] == 'AQUA': #Aqua MVP++ w/custom + colors
+                                        elif data['player'][
+                                            'monthlyRankColor'] == 'AQUA':  # Aqua MVP++ w/custom + colors
                                             if 'rankPlusColor' in data['player']:
                                                 pluscolor = color.get(data['player']['rankPlusColor'])
                                                 print('Rank acquired- MVP++ (Aqua + rankPlusColor)')
                                                 playerrank = f'&b[MVP{pluscolor}++&b]'
-                                            else: #Aqua MVP++ w/o custom + colors
+                                            else:  # Aqua MVP++ w/o custom + colors
                                                 playerrank = f'&b[MVP&c++&b]'
                                                 print('Rank acquired- MVP++ (Aqua + No rankPlusColor)')
 
 
 
-                                else: #MVP+ (No MVP++ subcategory found)
+                                else:  # MVP+ (No MVP++ subcategory found)
                                     if 'rankPlusColor' in data['player']:
                                         pluscolor = color.get(data['player']['rankPlusColor'])
                                         print('Rank acquired- MVP+ (MVP+ category)')
@@ -1290,20 +1311,16 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         print('Rank acquired- Non')
                         playerrank = '&7'
 
-
-
-
-
                     if z != 10:
-                        dailygexp = dailygexp + f"&6{z}. {playerrank} {name} &2{format(user[1],',d')} Guild Experience%5Cn"
+                        dailygexp = dailygexp + f"&6{z}. {playerrank} {name} &2{format(user[1], ',d')} Guild Experience%5Cn"
                     if z == 10:
                         dailygexp = dailygexp + f"&6{z}. {playerrank} {name} &2{format(user[1], ',d')} Guild Experience"
                     z = z + 1
             await msg.delete()
-            dailygexp = dailygexp.replace('+','%2B')
-            dailygexp = dailygexp.replace('&','%26')
-            dailygexp = dailygexp.replace(' ','%20')
-            dailygexp = dailygexp.replace(',','%2C')
+            dailygexp = dailygexp.replace('+', '%2B')
+            dailygexp = dailygexp.replace('&', '%26')
+            dailygexp = dailygexp.replace(' ', '%20')
+            dailygexp = dailygexp.replace(',', '%2C')
 
             url = f"https://chat.miscguild.xyz/render.png?m=custom&d={dailygexp}&t=1"
 
@@ -1312,8 +1329,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     image_data = BytesIO(await resp.read())
                     await session.close()
 
-                    
             await ctx.send(file=discord.File(image_data, 'dailylb.jpg'))
+
 
 def setup(bot):
     bot.add_cog(Hypixel(bot))

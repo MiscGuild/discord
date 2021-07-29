@@ -8,6 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 import asyncio
 import requests
 
+
 class staff(commands.Cog, name="Staff"):
     def __init__(self, bot):
         self.bot = bot
@@ -17,15 +18,20 @@ class staff(commands.Cog, name="Staff"):
         """Lists the requirements
         """
         embed = discord.Embed(title="Miscellaneous Guild Requirements",
-                            description="These requirements are subject to change!",
-                            color=0x8368ff)
-        embed.add_field(name="Active", value=f"•  {format(self.bot.active,',d')} Weekly Guild Experience", inline=False)
-        embed.add_field(name="Do Not Kick List Eligibility", value=f"•  {format(self.bot.dnkl,',d')} Weekly Guild Experience", inline=False)
-        embed.add_field(name="Resident", value=f"•  {format(self.bot.resident_req,',d')} Weekly Guild Experience", inline=False)
-        embed.add_field(name="Member", value=f"•  {format(self.bot.inactive,',d')} Weekly Guild Experience", inline=False)
-        embed.add_field(name="New Member", value=f"•  {format(self.bot.new_member,',d')} Daily Guild Experience", inline=False)
+                              description="These requirements are subject to change!",
+                              color=0x8368ff)
+        embed.add_field(name="Active", value=f"•  {format(self.bot.active, ',d')} Weekly Guild Experience",
+                        inline=False)
+        embed.add_field(name="Do Not Kick List Eligibility",
+                        value=f"•  {format(self.bot.dnkl, ',d')} Weekly Guild Experience", inline=False)
+        embed.add_field(name="Resident", value=f"•  {format(self.bot.resident_req, ',d')} Weekly Guild Experience",
+                        inline=False)
+        embed.add_field(name="Member", value=f"•  {format(self.bot.inactive, ',d')} Weekly Guild Experience",
+                        inline=False)
+        embed.add_field(name="New Member", value=f"•  {format(self.bot.new_member, ',d')} Daily Guild Experience",
+                        inline=False)
         embed.set_footer(text="You are considered a New Member for the first 7 days after joining the guild"
-                            "\nIf you fail to meet the New Member/Member requirements, you will be kicked!")
+                              "\nIf you fail to meet the New Member/Member requirements, you will be kicked!")
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['res'])
@@ -33,17 +39,19 @@ class staff(commands.Cog, name="Staff"):
         """Lists the methods to get the resident rank
         """
         embed = discord.Embed(title='How to get Resident?',
-                            description='To be eligible for Resident, you must be one of the following',
-                            color=0x8368ff)
+                              description='To be eligible for Resident, you must be one of the following',
+                              color=0x8368ff)
         embed.add_field(name="Veteran", value="Be in the guild for more than 1 year",
                         inline=False)
-        embed.add_field(name="Youtuber", value="If you're a youtuber with more than 5,000 subscribers, you aren't subject to any guild requirements.",
+        embed.add_field(name="Youtuber",
+                        value="If you're a youtuber with more than 5,000 subscribers, you aren't subject to any guild requirements.",
                         inline=False)
         embed.add_field(name="Sugar Daddy", value="Spend Money on the guild by doing giveaways, sponsoring events!",
                         inline=False)
         embed.add_field(name="GvG Team", value="Be an exceptional GvG player.",
                         inline=False)
-        embed.set_footer(text=f"Everyone who has the resident rank must get {format(self.bot.resident_req,',d')} weekly guild experience! (Except YouTubers)")
+        embed.set_footer(
+            text=f"Everyone who has the resident rank must get {format(self.bot.resident_req, ',d')} weekly guild experience! (Except YouTubers)")
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['ticket'])
@@ -51,26 +59,26 @@ class staff(commands.Cog, name="Staff"):
         """Explains the entire ticket system
         """
         embed = discord.Embed(title="How to create a ticket?",
-                            color=0x8368ff)
+                              color=0x8368ff)
         embed.add_field(name="Go to #🎟-tickets-🎟",
                         value="#🎟-tickets-🎟 is located in the noticeboard category",
                         inline=False)
         embed.add_field(name="Tickets can be created for the following reasons",
                         value="> Discord Nick/Role Change\n"
-                            "> Do not kick list\n"
-                            "> Problems/Queries/Complaint/Suggestion\n"
-                            "> Reporting a player\n"
-                            "> Milestone\n"
-                            "> Staff Application\n"
-                            "> Event\n"
-                            "> Other",
+                              "> Do not kick list\n"
+                              "> Problems/Queries/Complaint/Suggestion\n"
+                              "> Reporting a player\n"
+                              "> Milestone\n"
+                              "> Staff Application\n"
+                              "> Event\n"
+                              "> Other",
                         inline=False)
         embed.add_field(name="Click the button under the message sent by @TicketTool",
                         value="The following image shows you what you need to click.",
                         inline=False)
-        embed.set_image(url=f"https://media.discordapp.net/attachments/420572640172834816/864894505509847070/unknown.png?width=1229&height=670")
+        embed.set_image(
+            url=f"https://media.discordapp.net/attachments/420572640172834816/864894505509847070/unknown.png?width=1229&height=670")
         await ctx.send(embed=embed)
-
 
     @commands.command()
     @commands.has_role(538015368782807040)
@@ -103,7 +111,8 @@ class staff(commands.Cog, name="Staff"):
                 if expHistory >= self.bot.active and rank == "Member":
                     uuid = g['guild']['members'][i]['uuid']
                     async with aiohttp.ClientSession() as session:
-                        async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
+                        async with session.get(
+                                f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
                             a = await resp.json()
                             await session.close()
                     name = a['name']
@@ -119,7 +128,8 @@ class staff(commands.Cog, name="Staff"):
                 elif expHistory < self.bot.active and rank == "Active":
                     uuid = g['guild']['members'][i]['uuid']
                     async with aiohttp.ClientSession() as session:
-                        async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
+                        async with session.get(
+                                f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
                             a = await resp.json()
                             await session.close()
                     name = a['name']
@@ -136,7 +146,8 @@ class staff(commands.Cog, name="Staff"):
                     if rank == "Member":
                         uuid = g['guild']['members'][i]['uuid']
                         async with aiohttp.ClientSession() as session:
-                            async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
+                            async with session.get(
+                                    f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
                                 a = await resp.json()
                         time = str(datetime.fromtimestamp(int(str(joined)[:-3])))
                         name = a['name']
@@ -152,7 +163,8 @@ class staff(commands.Cog, name="Staff"):
                         if expHistory < self.bot.resident_req:
                             uuid = g['guild']['members'][i]['uuid']
                             async with aiohttp.ClientSession() as session:
-                                async with session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
+                                async with session.get(
+                                        f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
                                     a = await resp.json()
                             time = str(datetime.fromtimestamp(int(str(joined)[:-3])))
                             name = a['name']
@@ -175,7 +187,7 @@ class staff(commands.Cog, name="Staff"):
 
             '---------------------------------------------------------------ACTIVE PROMOTION------------------------------------------------------------------------------'
             embed = discord.Embed(title=f"The users to be PROMOTED are as follows:",
-                                description=f"Total: {len(ActivesortedList)}", color=0x43b581)
+                                  description=f"Total: {len(ActivesortedList)}", color=0x43b581)
             y = 0
             if len(ActivesortedList) <= 25:
                 for user in ActivesortedList:
@@ -195,7 +207,7 @@ class staff(commands.Cog, name="Staff"):
 
             '---------------------------------------------------------------ACTIVE DEMOTION-------------------------------------------------------------------------------'
             embed = discord.Embed(title=f"The users to be DEMOTED are as follows:",
-                                description=f"Total: {len(ActiveDemoteSortedList)}", color=0xf04747)
+                                  description=f"Total: {len(ActiveDemoteSortedList)}", color=0xf04747)
             z = 0
             if len(ActiveDemoteSortedList) <= 25:
                 for user in ActiveDemoteSortedList:
@@ -236,7 +248,7 @@ class staff(commands.Cog, name="Staff"):
 
             '---------------------------------------------------------------INACTIVE MEMBERS------------------------------------------------------------------------------'
             embed = discord.Embed(title=f"The users to be kicked are as follows:",
-                                description=f"Total: {len(InactivesortedList)}", color=0xf04747)
+                                  description=f"Total: {len(InactivesortedList)}", color=0xf04747)
             x = 0
             if len(InactivesortedList) <= 25:
                 for user in InactivesortedList:
@@ -257,7 +269,7 @@ class staff(commands.Cog, name="Staff"):
             await msg.delete()
             await ctx.send(
                 "**PLEASE CHECK THE DO NOT KICK LIST BEFORE KICKING ANYONE**\nDon't PM the veterans if they're on the do not kick list!")
-            
+
     @commands.command()
     @commands.has_role(538015368782807040)
     async def rolecheck(self, ctx):
@@ -266,9 +278,9 @@ class staff(commands.Cog, name="Staff"):
         msg = await ctx.send("**Processing all the prerequisites**")
 
         misc_uuids, xl_uuids, = await hypixel.get_guild_members("Miscellaneous"), await hypixel.get_guild_members("XL")
-        misc_members, xl_members= [], []
+        misc_members, xl_members = [], []
 
-        #Miscellaneous Member Names
+        # Miscellaneous Member Names
         await msg.edit(content="**Processing** - 1/2")
         with ThreadPoolExecutor(max_workers=10) as executor:
             with requests.Session() as session:
@@ -282,11 +294,10 @@ class staff(commands.Cog, name="Staff"):
                     )
                     for individual_uuid in misc_uuids
                 ]
-                for response in await asyncio.gather(*tasks): #Puts the result into a list
+                for response in await asyncio.gather(*tasks):  # Puts the result into a list
                     misc_members.append(response)
 
-
-        #XL Member Names
+        # XL Member Names
         await msg.edit(content="**Processing** - 2/2")
         with ThreadPoolExecutor(max_workers=10) as executor:
             with requests.Session() as session:
@@ -327,7 +338,8 @@ class staff(commands.Cog, name="Staff"):
                                 await session.close()
 
                             # Miscellaneous
-                        if ign in misc_members and ign not in ("Rowdies", "PolarPowah", "LBROz", "Fantastic_Doge", "ElijahRus", "BotTyler"):
+                        if ign in misc_members and ign not in (
+                        "Rowdies", "PolarPowah", "LBROz", "Fantastic_Doge", "ElijahRus", "BotTyler"):
                             async with aiohttp.ClientSession() as session:
                                 async with session.get(
                                         f"https://api.hypixel.net/guild?key={hypixel.get_api()}&player={uuid}") as resp:
@@ -369,7 +381,7 @@ class staff(commands.Cog, name="Staff"):
                                             await member.remove_roles(self.bot.inactive_role, self.bot.active_role)
                                             await message.edit(
                                                 content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
-                                    else: # For residents
+                                    else:  # For residents
                                         if totalexp < self.bot.resident_req:
                                             username = await hypixel.name_grabber(member)
                                             if has_tag_perms is False:
@@ -398,15 +410,17 @@ class staff(commands.Cog, name="Staff"):
                         elif ign in xl_members:
                             if member.nick is None or "[✧XL✧]" not in member.nick:
                                 new_nick = ign + " [✧XL✧]"
-                            await member.edit(nick=new_nick)
+                                await member.edit(nick=new_nick)
                             await member.add_roles(self.bot.guest, self.bot.ally)
-                            await member.remove_roles(self.bot.member_role, self.bot.new_member_role, self.bot.active_role, self.bot.inactive_role)
+                            await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
+                                                      self.bot.active_role, self.bot.inactive_role)
                             await message.edit(
                                 content=f"{name} ||{member}|| Member of XL **++XL - Ally \| ++Guest | --Member | --Active**")
 
                         else:
                             await member.add_roles(self.bot.guest)
-                            await member.remove_roles(self.bot.member_role, self.bot.new_member_role, self.bot.active_role, self.bot.ally, self.bot.inactive_role)
+                            await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
+                                                      self.bot.active_role, self.bot.ally, self.bot.inactive_role)
                             await message.edit(
                                 content=f"{name} ||{member}|| Member of an unallied guild **++Guest | --Member | --Active**")
                 await ctx.send('**Rolecheck completed**')
@@ -414,11 +428,10 @@ class staff(commands.Cog, name="Staff"):
         inactivity_channel = self.bot.get_channel(848067712156434462)
 
         embed = discord.Embed(title="You do not meet the guild requirements!",
-                            description=f"Member requirement - **{format(self.bot.inactive,',d')}** Weekly Guild Experience\nResident requirement - **{format(self.bot.resident_req,',d')}** Weekly Guild Experience",
-                            color = 0xDC143C)
+                              description=f"Member requirement - **{format(self.bot.inactive, ',d')}** Weekly Guild Experience\nResident requirement - **{format(self.bot.resident_req, ',d')}** Weekly Guild Experience",
+                              color=0xDC143C)
         await inactivity_channel.send(f"<@&848051215287058443>")
         await inactivity_channel.send(embed=embed)
-
 
     @commands.command(aliases=['fs'])
     @commands.has_role(538015368782807040)
@@ -439,15 +452,15 @@ class staff(commands.Cog, name="Staff"):
                 awaiting_app = discord.utils.get(ctx.guild.roles, name="Awaiting Approval")
                 ally = discord.utils.get(ctx.guild.roles, name="Ally")
 
-
                 await member.edit(nick=ign)
 
                 if guild_name == "Miscellaneous":
-                    await member.remove_roles(guest,awaiting_app,newmember)
+                    await member.remove_roles(guest, awaiting_app, newmember)
                     await member.add_roles(member_)
                     embed = discord.Embed(title=f"{member.name}'s nick and role were successfully changed!",
-                                        color=0x8368ff)
-                    embed.set_footer(text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
+                                          color=0x8368ff)
+                    embed.set_footer(
+                        text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
                     await ctx.send(embed=embed)
 
 
@@ -455,15 +468,15 @@ class staff(commands.Cog, name="Staff"):
                     if "[✧XL✧]" not in member.nick:
                         ign = ign + " [✧XL✧]"
                     await member.edit(nick=ign)
-                    await member.remove_roles(member_,awaiting_app)
+                    await member.remove_roles(member_, awaiting_app)
                     await member.add_roles(guest, ally)
 
                     embed = discord.Embed(title=f"{member.name}'s nick and role were successfully changed!",
-                                        color=0x8368ff)
+                                          color=0x8368ff)
 
                     embed.set_footer(text="Member of XL"
-                                        "\n• Member & Awaiting Approval were removed"
-                                        "\n• Guest & XL - Ally were given")
+                                          "\n• Member & Awaiting Approval were removed"
+                                          "\n• Guest & XL - Ally were given")
                     await ctx.send(embed=embed)
 
                 elif guild_name is None:
@@ -490,10 +503,10 @@ class staff(commands.Cog, name="Staff"):
 
         else:
             embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
-                                description="Your role lacks permissions to force sync a member's nick!", color=0xff0000)
+                                  description="Your role lacks permissions to force sync a member's nick!",
+                                  color=0xff0000)
             await ctx.channel.purge(limit=1)
             await ctx.send(embed=embed)
-
 
     @commands.command()
     @commands.has_role(522588118251995147)
@@ -504,14 +517,15 @@ class staff(commands.Cog, name="Staff"):
             embed = discord.Embed(title="Staff checkup", color=0x8368ff)
             while True:
                 await ctx.send('**What is the name of the staff member?**')
-                staff_name = await self.bot.wait_for('message', check=lambda x: x.author == ctx.message.author and x.channel == ctx.channel)
+                staff_name = await self.bot.wait_for('message', check=lambda
+                    x: x.author == ctx.message.author and x.channel == ctx.channel)
                 staff_name = staff_name.content
 
                 await ctx.send(f"**What are your comments about** *{staff_name}*")
-                staff_comm = await self.bot.wait_for('message', check=lambda x: x.author == ctx.message.author and x.channel == ctx.channel)
+                staff_comm = await self.bot.wait_for('message', check=lambda
+                    x: x.author == ctx.message.author and x.channel == ctx.channel)
                 staff_comm = staff_comm.content
                 embed.add_field(name=staff_name, value=staff_comm, inline=False)
-
 
                 embed1 = discord.Embed(title="Is that it or are there more staff members?", color=0x8368ff)
                 embed1.add_field(name="If yes:", value="Reply with `Yes`")
@@ -529,18 +543,18 @@ class staff(commands.Cog, name="Staff"):
                     break
         else:
             embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
-                                description="Your role lacks permissions make a post for the staff checkup!", color=0xff0000)
+                                  description="Your role lacks permissions make a post for the staff checkup!",
+                                  color=0xff0000)
             await ctx.channel.purge(limit=1)
             await ctx.send(embed=embed)
-
-
 
     @commands.command()
     @commands.has_role(538015368782807040)
     async def challenge(self, ctx, x):
         channel = self.bot.get_channel(753103243659444286)
         if x == "e":
-            msg = await ctx.send(content="**What would you like the first challenge under the easy category to be (name)?**")
+            msg = await ctx.send(
+                content="**What would you like the first challenge under the easy category to be (name)?**")
             challenge1 = await self.bot.wait_for('message', check=lambda x: x.author == ctx.message.author)
             challenge1 = challenge1.content
 

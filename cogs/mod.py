@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
+
 from cogs.utils import hypixel
+
 
 class Moderation(commands.Cog, name="Moderation"):
     def __init__(self, bot):
@@ -19,10 +21,9 @@ class Moderation(commands.Cog, name="Moderation"):
         role = discord.utils.get(ctx.guild.roles, name="Muted")
         await member.add_roles(role)
         embed = discord.Embed(title="User Muted!",
-                            description=f"**{member}** was muted by **{name}**!",
-                            color=0xff00f6)
+                              description=f"**{member}** was muted by **{name}**!",
+                              color=0xff00f6)
         await ctx.send(embed=embed)
-
 
     # Unmute
     @commands.command()
@@ -37,10 +38,9 @@ class Moderation(commands.Cog, name="Moderation"):
         role = discord.utils.get(ctx.guild.roles, name="Muted")
         await member.remove_roles(role)
         embed = discord.Embed(title="User unmuted!",
-                            description=f"**{member}** was unmuted by **{name}**!",
-                            color=0xff00f6)
+                              description=f"**{member}** was unmuted by **{name}**!",
+                              color=0xff00f6)
         await ctx.send(embed=embed)
-
 
     # Clear
     @commands.command(aliases=["purge", "prune"])
@@ -51,7 +51,6 @@ class Moderation(commands.Cog, name="Moderation"):
         name = await hypixel.name_grabber(ctx.author)
 
         await ctx.channel.purge(limit=amount)
-
 
     # Kick
     @commands.command()
@@ -94,7 +93,7 @@ class Moderation(commands.Cog, name="Moderation"):
 
     @commands.command()
     @commands.has_permissions(ban_members=True)
-    async def softban(self, ctx, user: discord.Member, *, reason = None):
+    async def softban(self, ctx, user: discord.Member, *, reason=None):
         """Softbans a user!
 
         Bans and then unbans a user to remove all of their messages
@@ -106,6 +105,7 @@ class Moderation(commands.Cog, name="Moderation"):
         await ctx.guild.ban(user, reason=reason)
         await ctx.guild.unban(user, reason=reason)
         await ctx.send(f'{user.name} has been softbanned.')
+
 
 def setup(bot):
     bot.add_cog(Moderation(bot))
