@@ -1,8 +1,11 @@
+import asyncio
+
+import aiohttp
 import discord
 from discord.ext import commands
-import asyncio
-import aiohttp
+
 from cogs.utils import hypixel
+
 
 class Tickets(commands.Cog, name="Tickets"):
     def __init__(self, bot):
@@ -25,7 +28,6 @@ class Tickets(commands.Cog, name="Tickets"):
 
                         guild_name = await hypixel.get_guild(name)
 
-
                         nick = await author.edit(nick=ign)
                         if guild_name == "Miscellaneous":
                             await ctx.author.remove_roles(self.bot.new_member_role)
@@ -45,7 +47,6 @@ class Tickets(commands.Cog, name="Tickets"):
                             nick = await author.edit(nick=ign)
                             await ctx.author.remove_roles(self.bot.new_member_role)
                             await ctx.author.add_roles(self.bot.guest, self.bot.ally)
-
 
                             await ctx.channel.purge(limit=1)
                             embed = discord.Embed(title="Registration successful!")
@@ -67,38 +68,49 @@ class Tickets(commands.Cog, name="Tickets"):
 
                             category = discord.utils.get(ctx.guild.categories, name="RTickets")
                             ticket_channel = await ctx.guild.create_text_channel(f"registration-ticket-{nick}",
-                                                                                category=category)
+                                                                                 category=category)
                             await ticket_channel.set_permissions(ctx.guild.get_role(ctx.guild.id), send_messages=False,
-                                                                read_messages=False)
+                                                                 read_messages=False)
                             await ticket_channel.set_permissions(self.bot.staff, send_messages=True, read_messages=True,
-                                                                add_reactions=True, embed_links=True, attach_files=True,
-                                                                read_message_history=True, external_emojis=True)
+                                                                 add_reactions=True, embed_links=True,
+                                                                 attach_files=True,
+                                                                 read_message_history=True, external_emojis=True)
+                            await ticket_channel.set_permissions(self.bot.t_officer, send_messages=True, read_messages=True,
+                                                                 add_reactions=True, embed_links=True,
+                                                                 attach_files=True,
+                                                                 read_message_history=True, external_emojis=True)
                             await ticket_channel.set_permissions(author, send_messages=True, read_messages=True,
-                                                                add_reactions=True, embed_links=True, attach_files=True,
-                                                                read_message_history=True, external_emojis=True)
-                            await ticket_channel.set_permissions(self.bot.new_member_role, send_messages=False, read_messages=False,
-                                                                add_reactions=True, embed_links=True, attach_files=True,
-                                                                read_message_history=True, external_emojis=True)
+                                                                 add_reactions=True, embed_links=True,
+                                                                 attach_files=True,
+                                                                 read_message_history=True, external_emojis=True)
+                            await ticket_channel.set_permissions(self.bot.new_member_role, send_messages=False,
+                                                                 read_messages=False,
+                                                                 add_reactions=True, embed_links=True,
+                                                                 attach_files=True,
+                                                                 read_message_history=True, external_emojis=True)
 
                             try:
-                                embed = discord.Embed(title="Miscellaneous Guild Requirements", description="These requirements are subject to change!", color=0x8368ff)
+                                embed = discord.Embed(title="Miscellaneous Guild Requirements",
+                                                      description="These requirements are subject to change!",
+                                                      color=0x8368ff)
                                 embed.add_field(name="Active",
-                                                value=f"•  {format(self.bot.active,',d')} Weekly Guild Experience",
+                                                value=f"•  {format(self.bot.active, ',d')} Weekly Guild Experience",
                                                 inline=False)
                                 embed.add_field(name="DNKL Eligibility",
-                                                value=f"•  {format(self.bot.dnkl,',d')} Weekly Guild Experience",
+                                                value=f"•  {format(self.bot.dnkl, ',d')} Weekly Guild Experience",
                                                 inline=False)
                                 embed.add_field(name="Resident",
-                                                value=f"•  {format(self.bot.resident_req,',d')} Weekly Guild Experience",
+                                                value=f"•  {format(self.bot.resident_req, ',d')} Weekly Guild Experience",
                                                 inline=False)
                                 embed.add_field(name="Member",
-                                                value=f"•  {format(self.bot.inactive,',d')} Weekly Guild Experience",
+                                                value=f"•  {format(self.bot.inactive, ',d')} Weekly Guild Experience",
                                                 inline=False)
                                 embed.add_field(name="New Member",
-                                                value=f"•  {format(self.bot.new_member,',d')} Daily Guild Experience",
+                                                value=f"•  {format(self.bot.new_member, ',d')} Daily Guild Experience",
                                                 inline=False)
-                                embed.set_footer(text="You are considered a New Member for the first 7 days after joining the guild"
-                                                    "\nIf you fail to meet the New Member/Member requirements, you will be kicked!")
+                                embed.set_footer(
+                                    text="You are considered a New Member for the first 7 days after joining the guild"
+                                         "\nIf you fail to meet the New Member/Member requirements, you will be kicked!")
                                 await ctx.author.send(embed=embed)
                             except Exception:
                                 pass
@@ -113,9 +125,11 @@ class Tickets(commands.Cog, name="Tickets"):
         """
         logs = self.bot.get_channel(714821811832881222)
         if self.bot.staff in ctx.author.roles:
-            if ctx.channel.category.name in ('RTickets',  '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL','EVENT'):
+            if ctx.channel.category.name in (
+            'RTickets', '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL', 'EVENT'):
                 name = ctx.channel.name
-                embed = discord.Embed(title='This ticket will be deleted in 10 seconds!', description='', color=0xDE3163)
+                embed = discord.Embed(title='This ticket will be deleted in 10 seconds!', description='',
+                                      color=0xDE3163)
                 msg = await ctx.send(embed=embed)
                 await asyncio.sleep(10)
                 await discord.TextChannel.delete(ctx.channel)
@@ -123,18 +137,20 @@ class Tickets(commands.Cog, name="Tickets"):
                 author = ctx.author
                 name = await hypixel.name_grabber(author)
                 embed = discord.Embed(title=f'{ctx.channel.name} was deleted by {name}',
-                                    description="", color=0x8368ff)
+                                      description="", color=0x8368ff)
                 await logs.send(embed=embed)
 
     @commands.command()
     @commands.has_role(522588118251995147)
-    async def accept(self, ctx,  member: discord.Member):
+    async def accept(self, ctx, member: discord.Member):
         """Used to accept staff applications. This command must be typed in the application channel. It doesn't work anywhere else.
         """
         if ctx.channel.category.name in ('RTickets', '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL'):
-            embed = discord.Embed(title=f"Congratulations {member.name}, your staff application has been accepted!", description="Please view the following as they'll help you become a better staff member!", color=0x8368ff)
+            embed = discord.Embed(title=f"Congratulations {member.name}, your staff application has been accepted!",
+                                  description="Please view the following as they'll help you become a better staff member!",
+                                  color=0x8368ff)
             embed.set_footer(text="https://bit.ly/MiscStaffGuide\n"
-                                "#staff-faq")
+                                  "#staff-faq")
             await ctx.send(embed=embed)
 
     @commands.command()
@@ -145,10 +161,11 @@ class Tickets(commands.Cog, name="Tickets"):
         name = await hypixel.name_grabber(member)
 
         embed = discord.Embed(title=f"{name}, your application has been denied!",
-                            description="The reasons are listed below",
-                            color=0xf04747)
+                              description="The reasons are listed below",
+                              color=0xf04747)
 
-        embed.set_footer(text="You may reapply in 2 weeks. \nFollowing is the transcript so that you can refer to it while reapplying.")
+        embed.set_footer(
+            text="You may reapply in 2 weeks. \nFollowing is the transcript so that you can refer to it while reapplying.")
 
         question_number = {
             1: 'What is your age?',
@@ -168,7 +185,7 @@ class Tickets(commands.Cog, name="Tickets"):
         }
 
         all_questions = ''
-        for x in range(1,15):
+        for x in range(1, 15):
             question = question_number.get(int(x), 'None')
             all_questions = all_questions + f"{x})" + question + "\n\n"
 
@@ -177,19 +194,21 @@ class Tickets(commands.Cog, name="Tickets"):
         while True:
             while True:
                 await ctx.send("What is the question number of the reply that you would like to critique?"
-                            "\n**Please just give the question number!**"
-                            "If you would like to critique something in general, reply with `14`")
-                question = await self.bot.wait_for('message', check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+                               "\n**Please just give the question number!**"
+                               "If you would like to critique something in general, reply with `14`")
+                question = await self.bot.wait_for('message',
+                                                   check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
                 question = question.content
-                if str(question) in ("1","2","3","4","5","6","7","8","9","10","11","12","13","14"):
+                if str(question) in ("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"):
                     question = question_number.get(int(question), 'None')
                     break
                 else:
                     await ctx.send("Please respond with a valid number. (1-14)")
 
             await ctx.send(f"`{question}`"
-                        "\n**What was the issue that you found with their reply?**")
-            critique = await self.bot.wait_for('message', check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+                           "\n**What was the issue that you found with their reply?**")
+            critique = await self.bot.wait_for('message',
+                                               check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
             critique = critique.content
 
             embed.add_field(name=question,
@@ -204,8 +223,8 @@ class Tickets(commands.Cog, name="Tickets"):
             embed1.add_field(name="If not:", value="Reply with `No`")
             await ctx.send(embed=embed1)
 
-
-            more = await self.bot.wait_for('message', check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+            more = await self.bot.wait_for('message',
+                                           check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
             more = more.content
             more = more.capitalize()
 

@@ -1,11 +1,12 @@
 from discord.ext import commands
 
+
 class Owner(commands.Cog, command_attrs=dict(hidden=True)):
     def __init__(self, bot):
-        self.bot=bot
+        self.bot = bot
         self.blacklisted = ['roles']
 
-    #load extension
+    # load extension
     @commands.command()
     @commands.is_owner()
     async def load(self, ctx, extension):
@@ -16,7 +17,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         except Exception as e:
             await ctx.send(e)
 
-    #unload extension
+    # unload extension
     @commands.command()
     @commands.is_owner()
     async def unload(self, ctx, extension):
@@ -27,7 +28,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         except Exception as e:
             await ctx.send(e)
 
-    #reload extensions command
+    # reload extensions command
     @commands.command()
     @commands.is_owner()
     async def reload(self, ctx, extension):
@@ -38,6 +39,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         except Exception as e:
             await ctx.send(e)
 
-#Add cog to main bot
+
+# Add cog to main bot
 def setup(bot):
     bot.add_cog(Owner(bot))

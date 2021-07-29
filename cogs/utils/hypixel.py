@@ -1,16 +1,20 @@
 # hypixel.py
-import math, datetime, random, aiohttp, toml
+import aiohttp
+import datetime
+import math
+import random
+import toml
 from datetime import datetime
-
 
 configFile = toml.load('config.toml')
 
 
 def get_api():
     API_KEY = configFile['hypixel']['api_keys']
-    
+
     api = random.choice(API_KEY)
     return api
+
 
 async def get_data(name):
     api = get_api()
@@ -19,17 +23,20 @@ async def get_data(name):
             req = await resp.json()
     return req
 
+
 async def get_data1(name):
     async with aiohttp.ClientSession() as session:
         async with session.get(f"https://api.slothpixel.me/api/players/{name}") as resp:
             req = await resp.json()
     return req
 
+
 async def get_guild_data(name):
     async with aiohttp.ClientSession() as session:
         async with session.get(f"https://api.slothpixel.me/api/guilds/{name}") as resp:
             req = await resp.json()
     return req
+
 
 async def get_leaderboards():
     api = get_api()
@@ -41,6 +48,7 @@ async def get_leaderboards():
     elif not req["success"]:
         return None
 
+
 async def name_grabber(author):
     name = author.nick
     if name is None:
@@ -49,12 +57,13 @@ async def name_grabber(author):
         name = name.split()[0]
     return name
 
+
 async def get_level(name):
     data = await get_data(name)
     if data["player"] is None:
         return None
-    exp = int(data["player"]["networkExp"]) # This just gets the player experience from our data
-    exp =  (math.sqrt((2 * exp) + 30625) / 50) - 2.5
+    exp = int(data["player"]["networkExp"])  # This just gets the player experience from our data
+    exp = (math.sqrt((2 * exp) + 30625) / 50) - 2.5
     print('Level acquired')
     return round(exp, 2)
 
@@ -99,47 +108,47 @@ async def get_rank(name):
             return ("[SLOTH]")
         elif player_prefix == "§c[OWNER]":
             print('Rank acquired- Owner')
-            return("[OWNER]")
+            return ("[OWNER]")
     if "newPackageRank" in data["player"]:
-            if "rank" in data["player"]:
-                rank = (data["player"]["rank"])
-                if rank == 'YOUTUBER':
-                    return ('[YOUTUBE]')
-                if rank == 'ADMIN':
-                    print('Rank acquired- Admin')
-                    return('[ADMIN]')
-                if rank == 'MODERATOR':
-                    print('Rank acquired- Moderator')
-                    return('[MOD]')
-                if rank == 'HELPER':
-                    print('Rank acquired- Helper')
-                    return('[HELPER]')
-            else:
-                rank = (data["player"]["newPackageRank"])
-                if rank == 'MVP_PLUS':
-                    if "monthlyPackageRank" in data["player"]:
-                        mvp_plus_plus = (data["player"]["monthlyPackageRank"])
-                        if mvp_plus_plus == "NONE":
-                            print('Rank acquired- MVP+')
-                            return ('[MVP+]')
-                        else:
-                            print('Rank acquired- MVP+')
-                            return("[MVP++]")
+        if "rank" in data["player"]:
+            rank = (data["player"]["rank"])
+            if rank == 'YOUTUBER':
+                return ('[YOUTUBE]')
+            if rank == 'ADMIN':
+                print('Rank acquired- Admin')
+                return ('[ADMIN]')
+            if rank == 'MODERATOR':
+                print('Rank acquired- Moderator')
+                return ('[MOD]')
+            if rank == 'HELPER':
+                print('Rank acquired- Helper')
+                return ('[HELPER]')
+        else:
+            rank = (data["player"]["newPackageRank"])
+            if rank == 'MVP_PLUS':
+                if "monthlyPackageRank" in data["player"]:
+                    mvp_plus_plus = (data["player"]["monthlyPackageRank"])
+                    if mvp_plus_plus == "NONE":
+                        print('Rank acquired- MVP+')
+                        return ('[MVP+]')
                     else:
                         print('Rank acquired- MVP+')
-                        return("[MVP+]")
-                elif rank == 'MVP':
-                    print('Rank acquired- MVP')
-                    return ('[MVP]')
-                elif rank == 'VIP_PLUS':
-                    print('Rank acquired- VIP+')
-                    return ('[VIP+]')
-                elif rank == 'VIP':
-                    print('Rank acquired- VIP')
-                    return ('[VIP]')
+                        return ("[MVP++]")
+                else:
+                    print('Rank acquired- MVP+')
+                    return ("[MVP+]")
+            elif rank == 'MVP':
+                print('Rank acquired- MVP')
+                return ('[MVP]')
+            elif rank == 'VIP_PLUS':
+                print('Rank acquired- VIP+')
+                return ('[VIP+]')
+            elif rank == 'VIP':
+                print('Rank acquired- VIP')
+                return ('[VIP]')
     else:
-         print('Rank acquired- Non')
-         return ('')
+        print('Rank acquired- Non')
+        return ('')
 
 
 async def get_guild(name):
@@ -161,7 +170,7 @@ async def get_guild(name):
         gname = req["guild"]['name']
         return (f"{gname}")
     else:
-       return None
+        return None
 
 
 async def get_gtag(name):
@@ -194,7 +203,7 @@ async def get_flogin(name):
     data = await get_data(name)
     if data["player"] is None:
         return None
-    first_login= data["player"]["firstLogin"]
+    first_login = data["player"]["firstLogin"]
     time = datetime.fromtimestamp(int(str(first_login)[:-3]))
     print('First login acquired')
     return time
@@ -205,12 +214,12 @@ async def get_llogin(name):
     if data["player"] is None:
         return None
     if "lastLogin" in data["player"]:
-        Last_login= data["player"]["lastLogin"]
+        Last_login = data["player"]["lastLogin"]
         time = datetime.fromtimestamp(int(str(Last_login)[:-3]))
         print('Last login acquired')
         return time
     else:
-        return('Unknown')
+        return ('Unknown')
 
 
 async def get_guild_level(exp):
@@ -233,7 +242,7 @@ async def get_guild_level(exp):
     ]
     level = 0
 
-    for i in range(0,1000):
+    for i in range(0, 1000):
         need = 0
         if i >= len(EXP_NEEDED):
             need = EXP_NEEDED[len(EXP_NEEDED) - 1]
@@ -241,7 +250,7 @@ async def get_guild_level(exp):
             need = EXP_NEEDED[i]
 
         if ((exp - need) < 0):
-            return round((((level + (exp / need)) *100)/100), 2)
+            return round((((level + (exp / need)) * 100) / 100), 2)
 
 
 async def get_challenges_completed(name):
@@ -271,6 +280,7 @@ async def get_completed_quests(name):
     else:
         return ("-")
 
+
 async def get_online_status(name):
     request = await get_data1(name)
     if request["online"] is True:
@@ -279,6 +289,7 @@ async def get_online_status(name):
     else:
         print("The user is offline")
         return False
+
 
 async def get_guild_members(gname):
     api = get_api()
@@ -292,6 +303,7 @@ async def get_guild_members(gname):
         uuids.append(uuid)
     return uuids
 
+
 async def get_misc_members(gname):
     api = get_api()
     async with aiohttp.ClientSession() as session:
@@ -302,8 +314,9 @@ async def get_misc_members(gname):
     for i in range(len(req['guild']['members'])):
         uuid = req['guild']['members'][i]['uuid']
         expHistory = sum(req['guild']['members'][i]['expHistory'].values())
-        gmemberdata.append([uuid,expHistory])
+        gmemberdata.append([uuid, expHistory])
     return gmemberdata
+
 
 def fetch(session, individual_uuid):
     base_url = "https://sessionserver.mojang.com/session/minecraft/profile/"
@@ -314,7 +327,6 @@ def fetch(session, individual_uuid):
             return None
         name = data['name']
         return name
-
 
 
 def discord_member_check(session, member):
@@ -334,19 +346,18 @@ def discord_member_check(session, member):
         return invalid_members
 
 
-
 def get_color(color):
     if color == "res_met":
-        l1 = [0x2c7354,0x07AB99,0x1b456b]
-        l2 = ['rgba(44, 115, 84,0.3)','rgba(7, 171, 144,0.3)','rgba(6, 144, 87,0.3)']
-        l3 = ['rgba(44, 115, 84,0.1)','rgba(7, 171, 144,0.1)','rgba(6, 144, 87,0.1)']
+        l1 = [0x2c7354, 0x07AB99, 0x1b456b]
+        l2 = ['rgba(44, 115, 84,0.3)', 'rgba(7, 171, 144,0.3)', 'rgba(6, 144, 87,0.3)']
+        l3 = ['rgba(44, 115, 84,0.1)', 'rgba(7, 171, 144,0.1)', 'rgba(6, 144, 87,0.1)']
 
-        index = random.randint(0,2)
+        index = random.randint(0, 2)
 
-        return l1[index],l2[index],l3[index]
+        return l1[index], l2[index], l3[index]
 
     elif color == "res_not_met":
-        l1 = [0xf04747,0xAD1B13,0x620B06,0xFF0000,0xFF4C6E,0xF068AA]
+        l1 = [0xf04747, 0xAD1B13, 0x620B06, 0xFF0000, 0xFF4C6E, 0xF068AA]
         l2 = ['rgba(240, 71, 71,0.3)',
               'rgba(173, 27, 19,0.3)',
               'rgba(98, 11, 6,0.3)',
@@ -365,7 +376,7 @@ def get_color(color):
         return l1[index], l2[index], l3[index]
 
     elif color == "active":
-        l1 = [0x96ADFF,0x32AAF9,0x0073BF,0x07DFFF,0x0731FF]
+        l1 = [0x96ADFF, 0x32AAF9, 0x0073BF, 0x07DFFF, 0x0731FF]
         l2 = ['rgba(150, 173, 255,0.3)',
               'rgba(50, 170, 249,0.3)',
               'rgba(0, 115, 191,0.3)',
@@ -397,7 +408,7 @@ def get_color(color):
         return l1[index], l2[index], l3[index]
 
     elif color == "inactive":
-        l1 = [0xf04747,0xAD1B13,0x620B06,0xFF0000,0xFF4C6E,0xF068AA]
+        l1 = [0xf04747, 0xAD1B13, 0x620B06, 0xFF0000, 0xFF4C6E, 0xF068AA]
         l2 = ['rgba(240, 71, 71,0.3)',
               'rgba(173, 27, 19,0.3)',
               'rgba(98, 11, 6,0.3)',
@@ -414,4 +425,3 @@ def get_color(color):
         index = random.randint(0, 5)
 
         return l1[index], l2[index], l3[index]
-
