@@ -1491,7 +1491,6 @@ async def ticketer():
                                    check=lambda x: x.channel == bot.ticket_channel)
         clicker_id = click.author.id
         clicker = bot.misc_guild.get_member(clicker_id)
-        print(clicker)
         await click.respond(type=InteractionType.ChannelMessageWithSource, embed=creating_ticket)
 
         name = await hypixel.name_grabber(clicker)
@@ -1518,6 +1517,7 @@ async def ticketer():
                                              add_reactions=True, embed_links=True,
                                              attach_files=True,
                                              read_message_history=True, external_emojis=True)
+        await ticket_channel.send(f"{clicker.mention}")
 
 
 @tasks.loop(count=1)
