@@ -1484,9 +1484,7 @@ async def ticketer():
 
     await bot.ticket_channel.send(embed=ticket_embed, components=[ticket_creation])
 
-    buttons = {
-        "embed": creating_ticket
-    }
+
 
     while True:
         click = await bot.wait_for("button_click",
@@ -1503,11 +1501,11 @@ async def ticketer():
                                                                   category=category)
         await ticket_channel.set_permissions(bot.misc_guild.get_role(bot.misc_guild.id), send_messages=False,
                                              read_messages=False)
-        await ticket_channel.set_permissions(bot.misc_guild.staff, send_messages=True, read_messages=True,
+        await ticket_channel.set_permissions(bot.staff, send_messages=True, read_messages=True,
                                              add_reactions=True, embed_links=True,
                                              attach_files=True,
                                              read_message_history=True, external_emojis=True)
-        await ticket_channel.set_permissions(bot.misc_guild.t_officer, send_messages=True, read_messages=True,
+        await ticket_channel.set_permissions(bot.t_officer, send_messages=True, read_messages=True,
                                              add_reactions=True, embed_links=True,
                                              attach_files=True,
                                              read_message_history=True, external_emojis=True)
@@ -1515,7 +1513,7 @@ async def ticketer():
                                              add_reactions=True, embed_links=True,
                                              attach_files=True,
                                              read_message_history=True, external_emojis=True)
-        await ticket_channel.set_permissions(bot.misc_guild.new_member_role, send_messages=False,
+        await ticket_channel.set_permissions(bot.new_member_role, send_messages=False,
                                              read_messages=False,
                                              add_reactions=True, embed_links=True,
                                              attach_files=True,
