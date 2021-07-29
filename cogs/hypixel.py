@@ -368,7 +368,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                               url=f'https://plancke.io/hypixel/player/stats/{ign}',
                                               color=0x0ffff)
                         embed.set_thumbnail(
-                            url=f'https://crafatar.com/renders/body/{uuid}?size=512&default=MHF_Steve&overlay')
+                            url=f'https://crafatar.com/renders/body/{uuid}')
                         embed.add_field(name="IGN:", value=f"{ign}", inline=False)
                         embed.add_field(name="Start:", value=f"{sd} {start_month} {sy}", inline=False)
                         embed.add_field(name="End:", value=f"{ed} {end_month} {ey}", inline=False)
@@ -442,7 +442,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                               url=f'https://plancke.io/hypixel/player/stats/{ign}',
                                               color=0x0ffff)
                         embed.set_thumbnail(
-                            url=f'https://crafatar.com/renders/body/{uuid}?size=512&default=MHF_Steve&overlay')
+                            url=f'https://crafatar.com/renders/body/{uuid}')
                         embed.add_field(name="IGN:", value=f"{ign}", inline=False)
                         embed.add_field(name="Start:", value=f"{sd} {start_month} {sy}", inline=False)
                         embed.add_field(name="End:", value=f"{ed} {end_month} {ey}", inline=False)
