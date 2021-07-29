@@ -257,7 +257,6 @@ async def on_guild_channel_create(channel):
             embed.add_field(name="GvG Application", value="Reply with `GvG`", inline=False)
             embed.add_field(name="Other", value="Reply with `Other`", inline=False)
             await channel.send(embed=embed)
-            await asyncio.sleep(0.5)
             reply = await bot.wait_for('message', check=lambda x: x.channel == channel)
 
             author = reply.author
@@ -310,387 +309,238 @@ async def on_guild_channel_create(channel):
                                 embed.set_thumbnail(
                                     url=f'https://visage.surgeplay.com/full/832/{uuid}')
                                 embed.set_author(name="Do-not-kick-list: Eligibility Check")
-                                embed.set_footer(text="Miscellaneous Bot | Coded by Rowdies")
+                                embed.set_footer(text="Even though you do not meet the requirements,"
+                                                      " you might still be accepted so we shall proceed with the application process!")
                                 embed.add_field(name="You are not eligible to apply for the do not kick list.",
                                                 value=f"You need a minimum of {format(bot.dnkl, ',d')} weekly guild experience."
                                                       f"\n You have {totalexp} weekly guild experience.",
                                                 inline=True)
                                 await channel.send(embed=embed)
-                                await channel.send(
-                                    "Even though you do not meet the requirements, "
-                                    "you might still be accepted so we shall proceed with the application process!")
-
-                                await channel.send("**When will your inactivity begin? (Start date) (DD/MM/YYYY)**")
-                                start = await bot.wait_for('message',
-                                                           check=lambda x: x.author == author and x.channel == channel)
-                                start = start.content
-                                await channel.send('**When will your inactivity end? (End date) (DD/MM/YYYY)**')
-                                end = await bot.wait_for('message',
-                                                         check=lambda x: x.author == author and x.channel == channel)
-                                end = end.content
-                                await channel.send("**What's the reason behind your inactivity?**")
-                                reason = await bot.wait_for('message',
-                                                            check=lambda x: x.author == author and x.channel == channel)
-                                reason = reason.content
-
-                                await channel.send(
-                                    f"Alright! Kindly await staff assistance!"
-                                    f"\n**Start:** {start}"
-                                    f"\n**End:** {end}"
-                                    f"\n**Reason:** {reason}"
-                                    f"\n*If you made an error, kindly notify staff by typing after this message*"
-                                    f"\n\n||,dnkladd {name} {start} {end} {reason}||"
-                                )
-                                await channel.send("**Staff, what do you wish to do with this dnkl request?**"
-                                                   f"\nReply with `Approve` to approve the do-not-kick-list request"
-                                                   f"\nReply with `Deny` to deny the do-not-kick-list request"
-                                                   f"\nReply with `Error` if the user made an error while applying for the do not kick list")
-
-                                while True:
-                                    action = await bot.wait_for('message', check=lambda x: x.channel == channel)
-                                    member = channel.guild.get_member(action.author.id)
-                                    if bot.staff in member.roles:
-                                        action = (action.content).capitalize()
-                                        if action in ('Approve', 'Deny', 'Error'):
-                                            if action == "Approve":
-                                                a, b, c = start.split('/')
-                                                p, q, r = end.split('/')
-                                                ign, uuid = await hypixel.get_dispnameID(name)
-                                                rank = await hypixel.get_rank(name)
-                                                dates = {1: "January", 2: "February", 3: "March", 4: "April",
-                                                         5: "May",
-                                                         6: "June", 7: "July", 8: "August", 9: "September",
-                                                         10: "October", 11: "November", 12: "December"}
-                                                start_month = dates.get(int(b))
-                                                end_month = dates.get(int(q))
-
-                                                embed = discord.Embed(title=f"{rank} {ign}",
-                                                                      url=f'https://plancke.io/hypixel/player/stats/{ign}',
-                                                                      color=0x0ffff)
-                                                embed.set_thumbnail(
-                                                    url=f'https://visage.surgeplay.com/full/832/{uuid}')
-                                                embed.add_field(name="IGN:", value=f"{ign}", inline=False)
-                                                embed.add_field(name="Start:", value=f"{a} {start_month} {c}",
-                                                                inline=False)
-                                                embed.add_field(name="End:", value=f"{p} {end_month} {r}",
-                                                                inline=False)
-                                                embed.add_field(name="Reason", value=f"{reason}", inline=False)
-                                                embed.set_author(name="Do not kick list")
-                                                dnkl_channel = bot.get_channel(629564802812870657)
-                                                message = await dnkl_channel.send(embed=embed)
-
-                                                with open('dnkl.json') as f:
-                                                    data = json.load(f)
-                                                dnkl_dict = {ign: message.id}
-
-                                                data.update(dnkl_dict)
-                                                with open('dnkl.json', 'w') as f:
-                                                    json.dump(data, f)
-
-                                                await channel.send(
-                                                    "**This do not kick list request has been approved and the member has been added!**")
-                                                break
-
-                                            elif action == "Deny":
-                                                await channel.send(
-                                                    "**This do not kick list request has been denied!**")
-
-                                            elif action == "Error":
-                                                await channel.send(
-                                                    "**What is the name of the user you wish to add to the do not kick list?**")
-
-                                                name = await bot.wait_for('message', check=lambda
-                                                    x: x.channel == channel.channel)
-                                                name = name.content
-                                                async with aiohttp.ClientSession() as session:
-                                                    async with session.get(
-                                                            f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-                                                        request = await resp.json()
-                                                        ign = request['name']
-                                                        uuid = request['id']
-                                                        rank = await hypixel.get_rank(name)
-                                                        with open('dnkl.json') as f:
-                                                            data = json.load(f)
-                                                        if resp.status_code != 200:
-                                                            await channel.send('Unknown IGN!')
-                                                        else:
-                                                            await channel.send(
-                                                                "**What is the start date?** (DD/MM/YYYY)")
-                                                            start_date = await bot.wait_for('message',
-                                                                                            check=lambda
-                                                                                                x: x.channel == channel.channel)
-                                                            start_date = start_date.content
-                                                            await channel.send(
-                                                                "**What is the end date?** (DD/MM/YYYY)")
-                                                            end_date = await bot.wait_for('message',
-                                                                                          check=lambda
-                                                                                              x: x.channel == channel.channel)
-                                                            end_date = end_date.content
-                                                            a, b, c = start_date.split('/')
-                                                            p, q, r = end_date.split('/')
-
-                                                            await channel.send(
-                                                                "**What's the reason for inactivity?**")
-                                                            reason = await bot.wait_for('message',
-                                                                                        check=lambda
-                                                                                            x: x.channel == channel.channel)
-                                                            reason = reason.content
-
-                                                            if int(b) > 12:
-                                                                embed = discord.Embed(
-                                                                    title='Please enter a valid date!',
-                                                                    description="`DD/MM/YYYY`",
-                                                                    color=0xff0000)
-                                                                await channel.send(embed=embed)
-                                                            if int(q) > 12:
-                                                                embed = discord.Embed(
-                                                                    title='Please enter a valid date!',
-                                                                    description="`DD/MM/YYYY`",
-                                                                    color=0xff0000)
-                                                                await channel.send(embed=embed)
-                                                            if int(b) & int(q) <= 12:
-                                                                dates = {1: "January", 2: "February", 3: "March",
-                                                                         4: "April", 5: "May",
-                                                                         6: "June", 7: "July", 8: "August",
-                                                                         9: "September",
-                                                                         10: "October", 11: "November",
-                                                                         12: "December"}
-                                                                start_month = dates.get(int(b))
-                                                                end_month = dates.get(int(q))
-
-                                                                embed = discord.Embed(title=f"{rank} {ign}",
-                                                                                      url=f'https://plancke.io/hypixel/player/stats/{ign}',
-                                                                                      color=0x0ffff)
-                                                                embed.set_thumbnail(
-                                                                    url=f'https://visage.surgeplay.com/full/832/{uuid}')
-                                                                embed.add_field(name="IGN:", value=f"{ign}",
-                                                                                inline=False)
-                                                                embed.add_field(name="Start:",
-                                                                                value=f"{a} {start_month} {c}",
-                                                                                inline=False)
-                                                                embed.add_field(name="End:",
-                                                                                value=f"{p} {end_month} {r}",
-                                                                                inline=False)
-                                                                embed.add_field(name="Reason", value=f"{reason}",
-                                                                                inline=False)
-                                                                embed.set_author(name="Do not kick list")
-                                                                await channel.channel.purge(limit=1)
-                                                                dnkl_channel = bot.get_channel(629564802812870657)
-                                                                message = await dnkl_channel.send(embed=embed)
-
-                                                                dnkl_dict = {ign: message.id}
-
-                                                                data.update(dnkl_dict)
-                                                                with open('dnkl.json', 'w') as f:
-                                                                    json.dump(data, f)
-
-                                                                await session.close()
-                                        else:
-                                            continue
-                                    else:
-                                        continue
-
-
-                            else:
+                            if eligiblity is True:
                                 embed = discord.Embed(title=name,
                                                       url=f'https://visage.surgeplay.com/full/832/{uuid}',
                                                       color=0x333cff)
                                 embed.set_thumbnail(
                                     url=f'https://visage.surgeplay.com/full/832/{uuid}')
                                 embed.set_author(name='Do-not-kick-list: Eligibility Check')
-                                embed.set_footer(text="Miscellaneous Bot | Coded by Rowdies")
                                 embed.add_field(name="You are eligible to apply for the do not kick list.",
                                                 value=f"You meet the minimum of {format(bot.dnkl, ',d')} weekly guild experience."
                                                       f"\n You have {totalexp} weekly guild experience.",
                                                 inline=True)
                                 await channel.send(embed=embed)
 
-                                embed = discord.Embed(title="When will your inactivity begin? (Start date)",
-                                                      description="DD/MM/YYYY",
-                                                      color=0x8368ff)
-                                embed.set_footer(text="For Example:\n 1/2/2021 = 1st Feb 2021")
-                                await channel.send(embed=embed)
-                                start = await bot.wait_for('message',
-                                                           check=lambda x: x.author == author and x.channel == channel)
-                                start = start.content
-                                embed = discord.Embed(title="When will your inactivity end? (End date)",
-                                                      description="DD/MM/YYYY",
-                                                      color=0x8368ff)
-                                embed.set_footer(text="For Example:\n 1/2/2021 = 1st Feb 2021")
-                                await channel.send(embed=embed)
-                                end = await bot.wait_for('message',
-                                                         check=lambda x: x.author == author and x.channel == channel)
-                                end = end.content
-                                embed = discord.Embed(title="What's the reason behind your inactivity?",
-                                                      color=0x8368ff)
-                                await channel.send(embed=embed)
-                                reason = await bot.wait_for('message',
-                                                            check=lambda x: x.author == author and x.channel == channel)
-                                reason = reason.content
+                            embed = discord.Embed(title="When will your inactivity begin? (Start date)",
+                                                  description="DD/MM/YYYY",
+                                                  color=0x8368ff)
+                            embed.set_footer(text="For Example:\n 1/2/2021 = 1st Feb 2021")
+                            await channel.send(embed=embed)
+                            start = await bot.wait_for('message',
+                                                       check=lambda x: x.author == author and x.channel == channel)
+                            start = start.content
+                            embed = discord.Embed(title="When will your inactivity end? (End date)",
+                                                  description="DD/MM/YYYY",
+                                                  color=0x8368ff)
+                            embed.set_footer(text="For Example:\n 1/2/2021 = 1st Feb 2021")
+                            await channel.send(embed=embed)
+                            end = await bot.wait_for('message',
+                                                     check=lambda x: x.author == author and x.channel == channel)
+                            end = end.content
+                            embed = discord.Embed(title="What's the reason behind your inactivity?",
+                                                  color=0x8368ff)
+                            await channel.send(embed=embed)
+                            reason = await bot.wait_for('message',
+                                                        check=lambda x: x.author == author and x.channel == channel)
+                            reason = reason.content
 
-                                if int(start.split('/')[1]) > 12:
-                                    newdate = f'{start.split("/")[1]}/{start.split("/")[0]}/{start.split("/")[2]}'
-                                    start = newdate
-                                if int(end.split('/')[1]) > 12:
-                                    newdate = f'{end.split("/")[1]}/{end.split("/")[0]}/{end.split("/")[2]}'
-                                    end = newdate
+                            if int(start.split('/')[1]) > 12:
+                                newdate = f'{start.split("/")[1]}/{start.split("/")[0]}/{start.split("/")[2]}'
+                                start = newdate
                                 await channel.send(
-                                    "You entered the dates incorrectly. This was automatically corrected.")
+                                    "You entered the start date incorrectly. This was automatically corrected.")
+                            if int(end.split('/')[1]) > 12:
+                                newdate = f'{end.split("/")[1]}/{end.split("/")[0]}/{end.split("/")[2]}'
+                                end = newdate
                                 await channel.send(
-                                    f"Alright! Kindly await staff assistance!"
-                                    f"\n**Start:** {start}"
-                                    f"\n**End:** {end}"
-                                    f"\n**Reason:** {reason}"
-                                    f"\n*If you made an error, kindly notify staff by typing after this message*"
-                                    f"\n\n||,dnkladd {name} {author.mention} {start} {end} {reason}||"
-                                )
+                                    "You entered the end date incorrectly. This was automatically corrected.")
+                            await channel.send(
+                                f"Alright! Kindly await staff assistance!"
+                                f"\n**Start:** {start}"
+                                f"\n**End:** {end}"
+                                f"\n**Reason:** {reason}"
+                                f"\n*If you made an error, kindly notify staff by typing after this message*"
+                                f"\n\n||,dnkladd {name} {author.mention} {start} {end} {reason}||"
+                            )
 
-                                await channel.send("**Staff, what do you wish to do with this dnkl request?**"
-                                                   f"\nReply with `Approve` to approve the do-not-kick-list request"
-                                                   f"\nReply with `Deny` to deny the do-not-kick-list request"
-                                                   f"\nReply with `Error` if the user made an error while applying for the do not kick list")
 
-                                while True:
-                                    action = await bot.wait_for('message', check=lambda x: x.channel == channel)
-                                    member = channel.guild.get_member(action.author.id)
-                                    if bot.staff in member.roles:
-                                        action = (action.content).capitalize()
-                                        if action in ('Approve', 'Deny', 'Error'):
-                                            if action == "Approve":
-                                                a, b, c = start.split('/')
-                                                p, q, r = end.split('/')
-                                                ign, uuid = await hypixel.get_dispnameID(name)
-                                                rank = await hypixel.get_rank(name)
-                                                dates = {1: "January", 2: "February", 3: "March", 4: "April",
-                                                         5: "May",
-                                                         6: "June", 7: "July", 8: "August", 9: "September",
-                                                         10: "October", 11: "November", 12: "December"}
-                                                start_month = dates.get(int(b))
-                                                end_month = dates.get(int(q))
+                            dnkl_decision = discord.Embed(title="Staff, what do you wish to do with this dnkl request?",
+                                                         description=f"\nClick `Approve` to approve the do-not-kick-list request"
+                                                                     f"\nClick `Deny` to deny the do-not-kick-list request"
+                                                                     f"\nClick `Error` if the user made an error while applying for the do not kick list",
+                                                         color=0x8368ff)
 
-                                                embed = discord.Embed(title=f"{rank} {ign}",
-                                                                      url=f'https://plancke.io/hypixel/player/stats/{ign}',
-                                                                      color=0x0ffff)
-                                                embed.set_thumbnail(
-                                                    url=f'https://visage.surgeplay.com/full/832/{uuid}')
-                                                embed.add_field(name="IGN:", value=f"{ign}", inline=False)
-                                                embed.add_field(name="Start:", value=f"{a} {start_month} {c}",
-                                                                inline=False)
-                                                embed.add_field(name="End:", value=f"{p} {end_month} {r}",
-                                                                inline=False)
-                                                embed.add_field(name="Reason", value=f"{reason}", inline=False)
-                                                embed.set_author(name="Do not kick list")
-                                                dnkl_channel = bot.get_channel(629564802812870657)
-                                                message = await dnkl_channel.send(embed=embed)
+                            approve = Button(style=ButtonStyle.blue, label="Approve", id="approve")
+                            deny = Button(style=ButtonStyle.red, label="Deny", id="deny")
+                            error = Button(style=ButtonStyle.grey, label="Error", id="error")
 
-                                                with open('dnkl.json') as f:
-                                                    data = json.load(f)
-                                                dnkl_dict = {ign: message.id}
 
-                                                data.update(dnkl_dict)
-                                                with open('dnkl.json', 'w') as f:
-                                                    json.dump(data, f)
-                                                embed = discord.Embed(title="This DNKL Application has been accepted!",
-                                                                      description="The DNKL Embed has been sent to <#629564802812870657>",
-                                                                      color=0x00A86B)
+                            await channel.send(embed=dnkl_decision, components=[[approve, deny],[error]])
+
+                            while True:
+                                click = await bot.wait_for("button_click",
+                                                           check=lambda x: x.channel == channel and (bot.staff in bot.misc_guild.get_member(x.author.id).roles or bot.t_officer in bot.misc_guild.get_member(x.author.id).roles))
+
+                                if click.component.id == "approve":
+                                    a, b, c = start.split('/')
+                                    p, q, r = end.split('/')
+                                    ign, uuid = await hypixel.get_dispnameID(name)
+                                    rank = await hypixel.get_rank(name)
+                                    dates = {1: "January", 2: "February", 3: "March", 4: "April",
+                                             5: "May",
+                                             6: "June", 7: "July", 8: "August", 9: "September",
+                                             10: "October", 11: "November", 12: "December"}
+                                    start_month = dates.get(int(b))
+                                    end_month = dates.get(int(q))
+
+                                    embed = discord.Embed(title=f"{rank} {ign}",
+                                                          url=f'https://plancke.io/hypixel/player/stats/{ign}',
+                                                          color=0x0ffff)
+                                    embed.set_thumbnail(
+                                        url=f'https://crafatar.com/renders/body/{uuid}')
+                                    embed.add_field(name="IGN:", value=f"{ign}", inline=False)
+                                    embed.add_field(name="Start:", value=f"{a} {start_month} {c}",
+                                                    inline=False)
+                                    embed.add_field(name="End:", value=f"{p} {end_month} {r}",
+                                                    inline=False)
+                                    embed.add_field(name="Reason", value=f"{reason}", inline=False)
+                                    embed.set_author(name="Do not kick list")
+                                    message = await bot.dnkl_channel.send(embed=embed)
+
+                                    with open('dnkl.json') as f:
+                                        data = json.load(f)
+                                    dnkl_dict = {ign: message.id}
+
+                                    data.update(dnkl_dict)
+                                    with open('dnkl.json', 'w') as f:
+                                        json.dump(data, f)
+                                    embed = discord.Embed(title="This DNKL Application has been accepted!",
+                                                          description="The DNKL Embed has been sent to <#629564802812870657>",
+                                                          color=0x00A86B)
+                                    await channel.send(embed=embed)
+                                    success_embed = discord.Embed(title="Success",color=0x00FF00)
+                                    await click.respond(embed=success_embed)
+                                    break
+                                elif click.component.id == "deny":
+                                    embed = discord.Embed(title="This do not kick list request has been denied",
+                                                          color=0xff0000)
+                                    await channel.send(embed=embed)
+                                    success_embed = discord.Embed(title="Success", color=0x00FF00)
+                                    await click.respond(embed=success_embed)
+                                    break
+
+                                elif click.component.id == "error":
+                                    embed = discord.Embed(title="What is their username?",
+                                                          color=0x8368ff)
+                                    await channel.send(embed=embed)
+
+                                    name = await bot.wait_for('message', check=lambda
+                                        x: x.channel == channel.channel)
+                                    name = name.content
+                                    async with aiohttp.ClientSession() as session:
+                                        async with session.get(
+                                                f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
+                                            request = await resp.json()
+                                            ign = request['name']
+                                            uuid = request['id']
+                                            rank = await hypixel.get_rank(name)
+                                            with open('dnkl.json') as f:
+                                                data = json.load(f)
+                                            if resp.status_code != 200:
+                                                await channel.send('Unknown IGN!')
+                                            else:
+                                                embed = discord.Embed(
+                                                    title="When will their inactivity begin? (Start date)",
+                                                    description="DD/MM/YYYY",
+                                                    color=0x8368ff)
+                                                embed.set_footer(text="For Example:\n 1/2/2021 = 1st Feb 2021")
                                                 await channel.send(embed=embed)
+                                                start_date = await bot.wait_for('message',
+                                                                           check=lambda
+                                                                               x: x.author == author and x.channel == channel)
+                                                start_date = start_date.content
+                                                embed = discord.Embed(
+                                                    title="When will their inactivity end? (End date)",
+                                                    description="DD/MM/YYYY",
+                                                    color=0x8368ff)
+                                                embed.set_footer(text="For Example:\n 1/2/2021 = 1st Feb 2021")
+                                                await channel.send(embed=embed)
+                                                end_date = await bot.wait_for('message',
+                                                                              check=lambda
+                                                                                  x: x.channel == channel.channel)
+                                                end_date = end_date.content
+                                                a, b, c = start_date.split('/')
+                                                p, q, r = end_date.split('/')
 
-                                                break
+                                                embed = discord.Embed(
+                                                    title="What's the reason behind their inactivity?",
+                                                    color=0x8368ff)
+                                                reason = await bot.wait_for('message',
+                                                                            check=lambda
+                                                                                x: x.channel == channel.channel)
+                                                reason = reason.content
 
-                                            elif action == "Deny":
-                                                await channel.send("**This do not kick list request has been denied!")
+                                                if int(b) > 12:
+                                                    embed = discord.Embed(
+                                                        title='Please enter a valid date!',
+                                                        description="`DD/MM/YYYY`",
+                                                        color=0xff0000)
+                                                    await channel.send(embed=embed)
+                                                if int(q) > 12:
+                                                    embed = discord.Embed(
+                                                        title='Please enter a valid date!',
+                                                        description="`DD/MM/YYYY`",
+                                                        color=0xff0000)
+                                                    await channel.send(embed=embed)
+                                                if int(b) & int(q) <= 12:
+                                                    dates = {1: "January", 2: "February", 3: "March",
+                                                             4: "April", 5: "May",
+                                                             6: "June", 7: "July", 8: "August",
+                                                             9: "September",
+                                                             10: "October", 11: "November", 12: "December"}
+                                                    start_month = dates.get(int(b))
+                                                    end_month = dates.get(int(q))
 
-                                            elif action == "Error":
-                                                await channel.send(
-                                                    "**What is the name of the user you wish to add to the do not kick list?**")
+                                                    embed = discord.Embed(title=f"{rank} {ign}",
+                                                                          url=f'https://plancke.io/hypixel/player/stats/{ign}',
+                                                                          color=0x0ffff)
+                                                    embed.set_thumbnail(
+                                                        url=f'https://crafatar.com/renders/body/{uuid}')
+                                                    embed.add_field(name="IGN:", value=f"{ign}",
+                                                                    inline=False)
+                                                    embed.add_field(name="Start:",
+                                                                    value=f"{a} {start_month} {c}",
+                                                                    inline=False)
+                                                    embed.add_field(name="End:",
+                                                                    value=f"{p} {end_month} {r}",
+                                                                    inline=False)
+                                                    embed.add_field(name="Reason", value=f"{reason}",
+                                                                    inline=False)
+                                                    embed.set_author(name="Do not kick list")
+                                                    await channel.channel.purge(limit=1)
 
-                                                name = await bot.wait_for('message', check=lambda
-                                                    x: x.channel == channel.channel)
-                                                name = name.content
-                                                async with aiohttp.ClientSession() as session:
-                                                    async with session.get(
-                                                            f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-                                                        request = await resp.json()
-                                                        ign = request['name']
-                                                        uuid = request['id']
-                                                        rank = await hypixel.get_rank(name)
-                                                        with open('dnkl.json') as f:
-                                                            data = json.load(f)
-                                                        if resp.status_code != 200:
-                                                            await channel.send('Unknown IGN!')
-                                                        else:
-                                                            await channel.send(
-                                                                "**What is the start date?** (DD/MM/YYYY)")
-                                                            start_date = await bot.wait_for('message',
-                                                                                            check=lambda
-                                                                                                x: x.channel == channel.channel)
-                                                            start_date = start_date.content
-                                                            await channel.send("**What is the end date?** (DD/MM/YYYY)")
-                                                            end_date = await bot.wait_for('message',
-                                                                                          check=lambda
-                                                                                              x: x.channel == channel.channel)
-                                                            end_date = end_date.content
-                                                            a, b, c = start_date.split('/')
-                                                            p, q, r = end_date.split('/')
+                                                    message = await bot.dnkl_channel.send(embed=embed)
 
-                                                            await channel.send("**What's the reason for inactivity?**")
-                                                            reason = await bot.wait_for('message',
-                                                                                        check=lambda
-                                                                                            x: x.channel == channel.channel)
-                                                            reason = reason.content
+                                                    dnkl_dict = {ign: message.id}
 
-                                                            if int(b) > 12:
-                                                                embed = discord.Embed(
-                                                                    title='Please enter a valid date!',
-                                                                    description="`DD/MM/YYYY`",
-                                                                    color=0xff0000)
-                                                                await channel.send(embed=embed)
-                                                            if int(q) > 12:
-                                                                embed = discord.Embed(
-                                                                    title='Please enter a valid date!',
-                                                                    description="`DD/MM/YYYY`",
-                                                                    color=0xff0000)
-                                                                await channel.send(embed=embed)
-                                                            if int(b) & int(q) <= 12:
-                                                                dates = {1: "January", 2: "February", 3: "March",
-                                                                         4: "April", 5: "May",
-                                                                         6: "June", 7: "July", 8: "August",
-                                                                         9: "September",
-                                                                         10: "October", 11: "November", 12: "December"}
-                                                                start_month = dates.get(int(b))
-                                                                end_month = dates.get(int(q))
+                                                    data.update(dnkl_dict)
+                                                    with open('dnkl.json', 'w') as f:
+                                                        json.dump(data, f)
 
-                                                                embed = discord.Embed(title=f"{rank} {ign}",
-                                                                                      url=f'https://plancke.io/hypixel/player/stats/{ign}',
-                                                                                      color=0x0ffff)
-                                                                embed.set_thumbnail(
-                                                                    url=f'https://visage.surgeplay.com/full/832/{uuid}')
-                                                                embed.add_field(name="IGN:", value=f"{ign}",
-                                                                                inline=False)
-                                                                embed.add_field(name="Start:",
-                                                                                value=f"{a} {start_month} {c}",
-                                                                                inline=False)
-                                                                embed.add_field(name="End:",
-                                                                                value=f"{p} {end_month} {r}",
-                                                                                inline=False)
-                                                                embed.add_field(name="Reason", value=f"{reason}",
-                                                                                inline=False)
-                                                                embed.set_author(name="Do not kick list")
-                                                                await channel.channel.purge(limit=1)
-                                                                dnkl_channel = bot.get_channel(629564802812870657)
-                                                                message = await dnkl_channel.send(embed=embed)
+                                                    await session.close()
+                                                    success_embed = discord.Embed(title="Success", color=0x00FF00)
+                                                    await click.respond(embed=success_embed)
+                                                    break
 
-                                                                dnkl_dict = {ign: message.id}
 
-                                                                data.update(dnkl_dict)
-                                                                with open('dnkl.json', 'w') as f:
-                                                                    json.dump(data, f)
-
-                                                                await session.close()
-                                        else:
-                                            continue
-                                    else:
-                                        continue
 
                 break
 
@@ -824,401 +674,195 @@ async def on_guild_channel_create(channel):
                     nickmatching = nickmatching.capitalize()
                     if nickmatching in ('Yes', 'Ye', 'Yup', 'Y', 'Yeah', 'Yus'):
                         name = await hypixel.name_grabber(author)
-
-                        async with aiohttp.ClientSession() as session:
-                            async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-                                request = await resp.json()
-                                await session.close()
-                        uuid = request['id']
-                        await channel.edit(name=f"Staff-Application-{name}",
-                                           category=discord.utils.get(channel.guild.categories, name="OTHER"))
-                        '''AGE'''
-                        embed = discord.Embed(title="What is your age?",
-                                              description="Kindly reply with a number",
-                                              color=0x4b89e4)
-                        await channel.send(embed=embed)
-                        age = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
-                        age = age.content
-
-                        '''VETERENCY'''
-                        embed = discord.Embed(title="For how long have you been in Miscellaneous?",
-                                              description="You can check this through \"/g menu\" ingame",
-                                              color=0x4b89e4)
-                        await channel.send(embed=embed)
-                        veterency = await bot.wait_for('message',
-                                                       check=lambda x: x.channel == channel and x.author == author)
-                        veterency = veterency.content
-
-                        '''PAST INFRACTIONS'''
-                        embed = discord.Embed(title="Have you had any past infractions on Hypixel?",
-                                              description="Kindly reply with a Yes or No",
-                                              color=0x4b89e4)
-                        await channel.send(embed=embed)
-                        infractions = await bot.wait_for('message',
-                                                         check=lambda x: x.channel == channel and x.author == author)
-                        infractions = infractions.content
-                        infractions = infractions.capitalize()
-
-                        embed = discord.Embed(title="Kindly make sure that your answers are as detailed as possible."
-                                                    "\nGiving short answers will hinder your chances at getting staff.",
-                                              description="When answering, answer in the form of one message. One question, one message!",
-                                              color=0x4b89e4)
-                        await channel.send(embed=embed)
-                        await asyncio.sleep(3)
-
-                        '''------------------------------------------------------Questions------------------------------------------------'''
-
-                        '''WHY STAFF'''
-                        embed = discord.Embed(title="Why have you decided to apply for staff?",
-                                              description="Please make sure that you respond in one message",
-                                              color=0x4b89e4)
-                        await channel.send(embed=embed)
-                        whystaff = await bot.wait_for('message',
-                                                      check=lambda x: x.channel == channel and x.author == author)
-                        whystaff = whystaff.content
-
-                        '''WHY MISC'''
-                        embed = discord.Embed(title="What brought you to Miscellaneous, and what has kept you here?",
-                                              description="Please make sure that you respond in one message",
-                                              color=0x4b89e4)
-                        await channel.send(embed=embed)
-                        whymisc = await bot.wait_for('message',
-                                                     check=lambda x: x.channel == channel and x.author == author)
-                        whymisc = whymisc.content
-
-                        '''Suggest'''
-                        embed = discord.Embed(
-                            title="What is something that you could suggest that could improve the guild?",
-                            description="Please make sure that you respond in one message",
-                            color=0x4b89e4)
-                        await channel.send(embed=embed)
-                        suggestion = await bot.wait_for('message',
-                                                        check=lambda x: x.channel == channel and x.author == author)
-                        suggestion = suggestion.content
-
-                        '''SCENARIO 1'''
-                        embed = discord.Embed(
-                            title="You have just started as a trial officer and an officer starts arguing with another member. "
-                                  "This argument starts to get serious quite quickly. What do you do? ",
-                            description="Make your answer as detailed as possible!",
-                            color=0x4b89e4)
-                        await channel.send(embed=embed)
-                        scen1 = await bot.wait_for('message',
-                                                   check=lambda x: x.channel == channel and x.author == author)
-                        scen1 = scen1.content
-
-                        '''SCENARIO 2'''
-                        embed = discord.Embed(
-                            title="Suppose it's your first week of being a trial officer and you guild-mute a well-known player. "
-                                  "Your guildmates start spamming you calling you a bad officer and telling you to unmute them. "
-                                  "What would you do?",
-                            description="Make your answer as detailed as possible!",
-                            color=0x4b89e4)
-                        await channel.send(embed=embed)
-                        scen2 = await bot.wait_for('message',
-                                                   check=lambda x: x.channel == channel and x.author == author)
-                        scen2 = scen2.content
-
-                        '''SCENARIO 3'''
-                        embed = discord.Embed(
-                            title="Upon joining a game and you discover that a guild member is in your game and is hacking. "
-                                  "What do you do?",
-                            description="Please make sure that you respond in one message",
-                            color=0x4b89e4)
-                        await channel.send(embed=embed)
-                        scen3 = await bot.wait_for('message',
-                                                   check=lambda x: x.channel == channel and x.author == author)
-                        scen3 = scen3.content
-
-                        '''STAFF'''
-                        embed = discord.Embed(title="Have you been staff in any other guild or on any server? "
-                                                    "If yes, which one?",
-                                              description="Please make sure that you respond in one message",
-                                              color=0x4b89e4)
-                        await channel.send(embed=embed)
-                        staff = await bot.wait_for('message',
-                                                   check=lambda x: x.channel == channel and x.author == author)
-                        staff = staff.content
-
-                        '''TIME'''
-                        embed = discord.Embed(title="How much time do you have to contribute to the role? (Per day)",
-                                              description="Please make sure that you respond in one message",
-                                              color=0x4b89e4)
-                        await channel.send(embed=embed)
-                        time_ = await bot.wait_for('message',
-                                                   check=lambda x: x.channel == channel and x.author == author)
-                        time_ = time_.content
-
-                        '''GENERAL QUESTION'''
-                        embed = discord.Embed(title="Tell us about a time you made a mistake within the last year. "
-                                                    "How did you deal with it? What did you learn?",
-                                              escription="Make your answer as detailed as possible!",
-                                              color=0x4b89e4)
-                        await channel.send(embed=embed)
-                        question = await bot.wait_for('message',
-                                                      check=lambda x: x.channel == channel and x.author == author)
-                        question = question.content
-
-                        '''ANYTHING ELSE'''
-                        embed = discord.Embed(title="Anything else you would like us to know?",
-                                              color=0x4b89e4)
-                        await channel.send(embed=embed)
-                        random = await bot.wait_for('message',
-                                                    check=lambda x: x.channel == channel and x.author == author)
-                        random = random.content
-
-                        await channel.send("Great! You're done with the application!"
-                                           "\nI'm working on compiling the application and I'll send it once I'm done compiling!")
-
-                        embed = discord.Embed(title=f"{name}'s Staff Application", color=0x4b89e4)
-                        embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
-                        embed.add_field(name="1) What is your age?", value=age, inline=False)
-                        embed.add_field(name="2) How long have you been in the guild for?", value=veterency,
-                                        inline=False)
-                        embed.add_field(name="3) Have you had any past infractions on Hypixel?", value=infractions,
-                                        inline=False)
-                        embed.add_field(name="4) Why have you decided to apply for staff?", value=whystaff,
-                                        inline=False)
-                        embed.add_field(name="5) What brought you to Miscellaneous, and what has kept you here?",
-                                        value=whymisc, inline=False)
-                        embed.add_field(name="6) What is something you could suggest that would improve the guild?",
-                                        value=suggestion, inline=False)
-                        embed.add_field(
-                            name="7) You have just started as a trial officer and an officer starts arguing with another member. This argument starts to get serious quite quickly. What do you do?",
-                            value=scen1, inline=False)
-                        embed.add_field(
-                            name="8) Suppose it's your first week of being a trial officer and you guild-mute a well-known player. Your guildmates start spamming you calling you a bad officer and telling you to unmute them. What would you do?",
-                            value=scen2, inline=False)
-                        embed.add_field(
-                            name="9) Upon joining a game and you discover that a guild member is in your game and is hacking. What do you do?",
-                            value=scen3, inline=False)
-                        embed.add_field(
-                            name="10) Have you been staff in any other guild or on any server? If yes, which one?",
-                            value=staff, inline=False)
-                        embed.add_field(name="11) How much time do you have to contribute to the role? (Per day)",
-                                        value=time_, inline=False)
-                        embed.add_field(
-                            name="12) Tell us about a time you made a mistake within the last year. How did you deal with it? What did you learn?",
-                            value=question, inline=False)
-                        embed.add_field(name="13) Anything else you would us to know?", value=random, inline=False)
-                        await channel.send(embed=embed)
-                        await channel.send(
-                            "If you made any error, make a new ticket, rectify your mistake and copy paste your answer.")
-                        break
-
                     else:
-                        await channel.send('What is your minecraft username?')
-                        role_reply = await bot.wait_for('message',
+                        embed = discord.Embed(title="What is your Minecraft Username?",
+                                              color=0x4b89e4)
+                        await channel.send(embed=embed)
+                        username = await bot.wait_for('message',
                                                         check=lambda x: x.channel == channel and x.author == author)
-                        name = role_reply.content
+                        name = username.content
                         ign, uuid = await hypixel.get_dispnameID(name)
-                        if ign is None:
-                            await channel.send('Please enter a valid ign!')
-                            await channel.send(
-                                "I'll restart the process. "
-                                "If you think I made an error, select 'Other' upon restart")
-                        else:
-                            guild_name = await hypixel.get_guild(name)
 
-                            await author.edit(nick=ign)
-                            if guild_name == "Miscellaneous":
-                                await author.remove_roles(bot.awaiting_app)
-                                await author.remove_roles(bot.guest)
-                                await author.add_roles(bot.member_role)
-                                embed = discord.Embed(title="Your nick and role was successfully changed!",
-                                                      description="Now let's proceed to your application!",
-                                                      color=0x8368ff)
-                                await channel.send(embed=embed)
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
+                            request = await resp.json()
+                            await session.close()
+                    uuid = request['id']
+                    await channel.edit(name=f"Staff-Application-{name}",
+                                       category=discord.utils.get(channel.guild.categories, name="OTHER"))
+                    '''AGE'''
+                    embed = discord.Embed(title="What is your age?",
+                                          description="Kindly reply with a number",
+                                          color=0x4b89e4)
+                    await channel.send(embed=embed)
+                    age = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                    age = age.content
 
-                            else:
-                                await author.remove_roles(bot.member_role)
-                                await author.add_roles(bot.guest)
-                                embed = discord.Embed(title="Your nick and role was successfully changed!",
-                                                      description="Now let's proceed to your application!",
-                                                      color=0x8368ff)
-                                await channel.send(embed=embed)
+                    '''VETERENCY'''
+                    embed = discord.Embed(title="For how long have you been in Miscellaneous?",
+                                          description="You can check this through \"/g menu\" ingame",
+                                          color=0x4b89e4)
+                    await channel.send(embed=embed)
+                    veterency = await bot.wait_for('message',
+                                                   check=lambda x: x.channel == channel and x.author == author)
+                    veterency = veterency.content
 
-                            async with aiohttp.ClientSession() as session:
-                                async with session.get(
-                                        f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-                                    request = await resp.json()
-                                    await session.close()
-                            uuid = request['id']
-
-                            await channel.edit(name=f"Staff-Application-{name}",
-                                               category=discord.utils.get(channel.guild.categories, name="OTHER"))
-                            '''AGE'''
-                            embed = discord.Embed(title="What is your age?",
-                                                  description="Kindly reply with a number",
-                                                  color=0x4b89e4)
-                            await channel.send(embed=embed)
-                            age = await bot.wait_for('message',
+                    '''PAST INFRACTIONS'''
+                    embed = discord.Embed(title="Have you had any past infractions on Hypixel?",
+                                          description="Kindly reply with a Yes or No",
+                                          color=0x4b89e4)
+                    await channel.send(embed=embed)
+                    infractions = await bot.wait_for('message',
                                                      check=lambda x: x.channel == channel and x.author == author)
-                            age = age.content
+                    infractions = infractions.content
+                    infractions = infractions.capitalize()
 
-                            '''VETERENCY'''
-                            embed = discord.Embed(title="For how long have you been in Miscellaneous?",
-                                                  description="You can check this through \"/g menu\" ingame",
-                                                  color=0x4b89e4)
-                            await channel.send(embed=embed)
-                            veterency = await bot.wait_for('message',
-                                                           check=lambda x: x.channel == channel and x.author == author)
-                            veterency = veterency.content
+                    embed = discord.Embed(title="Kindly make sure that your answers are as detailed as possible."
+                                                "\nGiving short answers will hinder your chances at getting staff.",
+                                          description="When answering, answer in the form of one message. One question, one message!",
+                                          color=0x4b89e4)
+                    await channel.send(embed=embed)
+                    await asyncio.sleep(3)
 
-                            '''PAST INFRACTIONS'''
-                            embed = discord.Embed(title="Have you had any past infractions on Hypixel?",
-                                                  description="Kindly reply with a Yes or No",
-                                                  color=0x4b89e4)
-                            await channel.send(embed=embed)
-                            infractions = await bot.wait_for('message', check=lambda
-                                x: x.channel == channel and x.author == author)
-                            infractions = infractions.content
-                            infractions = infractions.capitalize()
+                    '''------------------------------------------------------Questions------------------------------------------------'''
 
-                            embed = discord.Embed(
-                                title="Kindly make sure that your answers are as detailed as possible."
-                                      "\nGiving short answers will hinder your chances at getting staff.",
-                                description="When answering, answer in the form of one message. "
-                                            "One question, one message!",
-                                color=0x4b89e4)
-                            await channel.send(embed=embed)
-                            await asyncio.sleep(3)
-                            # ------------------------------------------------------Questions------------------------------------------------
+                    '''WHY STAFF'''
+                    embed = discord.Embed(title="Why have you decided to apply for staff?",
+                                          description="Please make sure that you respond in one message",
+                                          color=0x4b89e4)
+                    await channel.send(embed=embed)
+                    whystaff = await bot.wait_for('message',
+                                                  check=lambda x: x.channel == channel and x.author == author)
+                    whystaff = whystaff.content
 
-                            # WHY STAFF
-                            embed = discord.Embed(title="Why have you decided to apply for staff?",
-                                                  description="Please make sure that you respond in one message",
-                                                  color=0x4b89e4)
-                            await channel.send(embed=embed)
-                            whystaff = await bot.wait_for('message',
-                                                          check=lambda x: x.channel == channel and x.author == author)
-                            whystaff = whystaff.content
+                    '''WHY MISC'''
+                    embed = discord.Embed(title="What brought you to Miscellaneous, and what has kept you here?",
+                                          description="Please make sure that you respond in one message",
+                                          color=0x4b89e4)
+                    await channel.send(embed=embed)
+                    whymisc = await bot.wait_for('message',
+                                                 check=lambda x: x.channel == channel and x.author == author)
+                    whymisc = whymisc.content
 
-                            # WHY MISC
-                            embed = discord.Embed(title="What brought you to Miscellaneous, "
-                                                        "and what has kept you here?",
-                                                  description="Please make sure that you respond in one message",
-                                                  color=0x4b89e4)
-                            await channel.send(embed=embed)
-                            whymisc = await bot.wait_for('message',
-                                                         check=lambda x: x.channel == channel and x.author == author)
-                            whymisc = whymisc.content
+                    '''Suggest'''
+                    embed = discord.Embed(
+                        title="What is something that you could suggest that could improve the guild?",
+                        description="Please make sure that you respond in one message",
+                        color=0x4b89e4)
+                    await channel.send(embed=embed)
+                    suggestion = await bot.wait_for('message',
+                                                    check=lambda x: x.channel == channel and x.author == author)
+                    suggestion = suggestion.content
 
-                            # Suggest
-                            embed = discord.Embed(
-                                title="What is something that you could suggest that could improve the guild?",
-                                description="Please make sure that you respond in one message",
-                                color=0x4b89e4)
-                            await channel.send(embed=embed)
-                            suggestion = await bot.wait_for('message',
-                                                            check=lambda x: x.channel == channel and x.author == author)
-                            suggestion = suggestion.content
+                    '''SCENARIO 1'''
+                    embed = discord.Embed(
+                        title="You have just started as a trial officer and an officer starts arguing with another member. "
+                              "This argument starts to get serious quite quickly. What do you do? ",
+                        description="Make your answer as detailed as possible!",
+                        color=0x4b89e4)
+                    await channel.send(embed=embed)
+                    scen1 = await bot.wait_for('message',
+                                               check=lambda x: x.channel == channel and x.author == author)
+                    scen1 = scen1.content
 
-                            # SCENARIO 1
-                            embed = discord.Embed(
-                                title="You have just started as a trial officer and an officer starts arguing with another member."
-                                      " This argument starts to get serious quite quickly. What do you do? ",
-                                description="Make your answer as detailed as possible!",
-                                color=0x4b89e4)
-                            await channel.send(embed=embed)
-                            scen1 = await bot.wait_for('message',
-                                                       check=lambda x: x.channel == channel and x.author == author)
-                            scen1 = scen1.content
+                    '''SCENARIO 2'''
+                    embed = discord.Embed(
+                        title="Suppose it's your first week of being a trial officer and you guild-mute a well-known player. "
+                              "Your guildmates start spamming you calling you a bad officer and telling you to unmute them. "
+                              "What would you do?",
+                        description="Make your answer as detailed as possible!",
+                        color=0x4b89e4)
+                    await channel.send(embed=embed)
+                    scen2 = await bot.wait_for('message',
+                                               check=lambda x: x.channel == channel and x.author == author)
+                    scen2 = scen2.content
 
-                            # SCENARIO 2
-                            embed = discord.Embed(
-                                title="Suppose it's your first week of being a trial officer and you guild-mute a well-known player."
-                                      " Your guildmates start spamming you calling you a bad officer and telling you to unmute them."
-                                      " What would you do?",
-                                description="Make your answer as detailed as possible!",
-                                color=0x4b89e4)
-                            await channel.send(embed=embed)
-                            scen2 = await bot.wait_for('message',
-                                                       check=lambda x: x.channel == channel and x.author == author)
-                            scen2 = scen2.content
+                    '''SCENARIO 3'''
+                    embed = discord.Embed(
+                        title="Upon joining a game and you discover that a guild member is in your game and is hacking. "
+                              "What do you do?",
+                        description="Please make sure that you respond in one message",
+                        color=0x4b89e4)
+                    await channel.send(embed=embed)
+                    scen3 = await bot.wait_for('message',
+                                               check=lambda x: x.channel == channel and x.author == author)
+                    scen3 = scen3.content
 
-                            # SCENARIO 3
-                            embed = discord.Embed(
-                                title="Upon joining a game and you discover that a guild member is in your game and is hacking."
-                                      " What do you do?",
-                                description="Please make sure that you respond in one message",
-                                color=0x4b89e4)
-                            await channel.send(embed=embed)
-                            scen3 = await bot.wait_for('message',
-                                                       check=lambda x: x.channel == channel and x.author == author)
-                            scen3 = scen3.content
+                    '''STAFF'''
+                    embed = discord.Embed(title="Have you been staff in any other guild or on any server? "
+                                                "If yes, which one?",
+                                          description="Please make sure that you respond in one message",
+                                          color=0x4b89e4)
+                    await channel.send(embed=embed)
+                    staff = await bot.wait_for('message',
+                                               check=lambda x: x.channel == channel and x.author == author)
+                    staff = staff.content
 
-                            # STAFF
-                            embed = discord.Embed(
-                                title="Have you been staff in any other guild or on any server? If yes, which one?",
-                                description="Please make sure that you respond in one message", color=0x4b89e4)
-                            await channel.send(embed=embed)
-                            staff = await bot.wait_for('message',
-                                                       check=lambda x: x.channel == channel and x.author == author)
-                            staff = staff.content
+                    '''TIME'''
+                    embed = discord.Embed(title="How much time do you have to contribute to the role? (Per day)",
+                                          description="Please make sure that you respond in one message",
+                                          color=0x4b89e4)
+                    await channel.send(embed=embed)
+                    time_ = await bot.wait_for('message',
+                                               check=lambda x: x.channel == channel and x.author == author)
+                    time_ = time_.content
 
-                            # TIME
-                            embed = discord.Embed(
-                                title="How much time do you have to contribute to the role? (Per day)",
-                                description="Please make sure that you respond in one message", color=0x4b89e4)
-                            await channel.send(embed=embed)
-                            time_ = await bot.wait_for('message',
-                                                       check=lambda x: x.channel == channel and x.author == author)
-                            time_ = time_.content
+                    '''GENERAL QUESTION'''
+                    embed = discord.Embed(title="Tell us about a time you made a mistake within the last year. "
+                                                "How did you deal with it? What did you learn?",
+                                          escription="Make your answer as detailed as possible!",
+                                          color=0x4b89e4)
+                    await channel.send(embed=embed)
+                    question = await bot.wait_for('message',
+                                                  check=lambda x: x.channel == channel and x.author == author)
+                    question = question.content
 
-                            # GENERAL QUESTION
-                            embed = discord.Embed(
-                                title="Tell us about a time you made a mistake within the last year. How did you deal with it? What did you learn?",
-                                description="Make your answer as detailed as possible!", color=0x4b89e4)
-                            await channel.send(embed=embed)
-                            question = await bot.wait_for('message',
-                                                          check=lambda x: x.channel == channel and x.author == author)
-                            question = question.content
+                    '''ANYTHING ELSE'''
+                    embed = discord.Embed(title="Anything else you would like us to know?",
+                                          color=0x4b89e4)
+                    await channel.send(embed=embed)
+                    random = await bot.wait_for('message',
+                                                check=lambda x: x.channel == channel and x.author == author)
+                    random = random.content
 
-                            # ANYTHING ELSE
-                            embed = discord.Embed(title="Anything else you would like us to know?", color=0x4b89e4)
-                            await channel.send(embed=embed)
-                            random = await bot.wait_for('message',
-                                                        check=lambda x: x.channel == channel and x.author == author)
-                            random = random.content
+                    await channel.send("Great! You're done with the application!"
+                                       "\nI'm working on compiling the application and I'll send it once I'm done compiling!")
 
-                            msg = await channel.send(
-                                "Great! You're done with the application!\n I'm working on compiling the application and I'll send it once I'm done compiling!")
-                            embed = discord.Embed(title=f"{name}'s Staff Application", color=0x4b89e4)
-                            embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
-                            embed.add_field(name="1) What is your age?", value=age, inline=False)
-                            embed.add_field(name="2) How long have you been in the guild for?", value=veterency,
-                                            inline=False)
-                            embed.add_field(name="3) Have you had any past infractions on Hypixel?", value=infractions,
-                                            inline=False)
-                            embed.add_field(name="4) Why have you decided to apply for staff?", value=whystaff,
-                                            inline=False)
-                            embed.add_field(name="5) What brought you to Miscellaneous, and what has kept you here?",
-                                            value=whymisc, inline=False)
-                            embed.add_field(name="6) What is something you could suggest that would improve the guild?",
-                                            value=suggestion, inline=False)
-                            embed.add_field(
-                                name="7) You have just started as a trial officer and an officer starts arguing with another member. This argument starts to get serious quite quickly. What do you do?",
-                                value=scen1, inline=False)
-                            embed.add_field(
-                                name="8) Suppose it's your first week of being a trial officer and you guild-mute a well-known player. Your guildmates start spamming you calling you a bad officer and telling you to unmute them. What would you do?",
-                                value=scen2, inline=False)
-                            embed.add_field(
-                                name="9) Upon joining a game and you discover that a guild member is in your game and is hacking. What do you do?",
-                                value=scen3, inline=False)
-                            embed.add_field(
-                                name="10) Have you been staff in any other guild or on any server? If yes, which one?",
-                                value=staff, inline=False)
-                            embed.add_field(name="11) How much time do you have to contribute to the role? (Per day)",
-                                            value=time_, inline=False)
-                            embed.add_field(
-                                name="12) Tell us about a time you made a mistake within the last year. How did you deal with it? What did you learn?",
-                                value=question, inline=False)
-                            embed.add_field(name="13) Anything else you would us to know?", value=random, inline=False)
-                            await channel.send(embed=embed)
-                            await channel.send(
-                                "If you made any error, make a new ticket, rectify your mistake and copy paste your answer.")
-                            break
+                    embed = discord.Embed(title=f"{name}'s Staff Application", color=0x4b89e4)
+                    embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
+                    embed.add_field(name="1) What is your age?", value=age, inline=False)
+                    embed.add_field(name="2) How long have you been in the guild for?", value=veterency,
+                                    inline=False)
+                    embed.add_field(name="3) Have you had any past infractions on Hypixel?", value=infractions,
+                                    inline=False)
+                    embed.add_field(name="4) Why have you decided to apply for staff?", value=whystaff,
+                                    inline=False)
+                    embed.add_field(name="5) What brought you to Miscellaneous, and what has kept you here?",
+                                    value=whymisc, inline=False)
+                    embed.add_field(name="6) What is something you could suggest that would improve the guild?",
+                                    value=suggestion, inline=False)
+                    embed.add_field(
+                        name="7) You have just started as a trial officer and an officer starts arguing with another member. This argument starts to get serious quite quickly. What do you do?",
+                        value=scen1, inline=False)
+                    embed.add_field(
+                        name="8) Suppose it's your first week of being a trial officer and you guild-mute a well-known player. Your guildmates start spamming you calling you a bad officer and telling you to unmute them. What would you do?",
+                        value=scen2, inline=False)
+                    embed.add_field(
+                        name="9) Upon joining a game and you discover that a guild member is in your game and is hacking. What do you do?",
+                        value=scen3, inline=False)
+                    embed.add_field(
+                        name="10) Have you been staff in any other guild or on any server? If yes, which one?",
+                        value=staff, inline=False)
+                    embed.add_field(name="11) How much time do you have to contribute to the role? (Per day)",
+                                    value=time_, inline=False)
+                    embed.add_field(
+                        name="12) Tell us about a time you made a mistake within the last year. How did you deal with it? What did you learn?",
+                        value=question, inline=False)
+                    embed.add_field(name="13) Anything else you would us to know?", value=random, inline=False)
+                    await channel.send(embed=embed)
+                    await channel.send(
+                        "If you made any error, make a new ticket, rectify your mistake and copy paste your answer.")
+                    break
 
                 else:
                     await channel.send(
