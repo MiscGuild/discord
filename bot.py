@@ -1171,6 +1171,7 @@ async def after_cache_ready():
     bot.error_channel = bot.get_channel(523743721443950612)
     bot.dnkl_channel = bot.get_channel(629564802812870657)
     bot.ticket_channel = bot.get_channel(650248396480970782)
+    bot.logs = bot.get_channel(714821811832881222)
     bot.misc_guild = bot.get_guild(522586672148381726)
     bot.guild_master = discord.utils.get(bot.misc_guild.roles, name="Guild Master")
     bot.admin = discord.utils.get(bot.misc_guild.roles, name="Admin")

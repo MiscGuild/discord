@@ -132,7 +132,6 @@ class Tickets(commands.Cog, name="Tickets"):
             transcript_file = discord.File(io.BytesIO(transcript.encode()),
                                        filename=f"deleted-{ctx.channel.name}.html")
 
-        logs = self.bot.get_channel(714821811832881222)
         if self.bot.staff in ctx.author.roles:
             if ctx.channel.category.name in self.bot.ticket_categories:
                 name = ctx.channel.name
@@ -145,8 +144,8 @@ class Tickets(commands.Cog, name="Tickets"):
                 name = await hypixel.name_grabber(ctx.author)
                 embed = discord.Embed(title=f'{ctx.channel.name} was deleted by {name}',
                                       description="", color=0x8368ff)
-                await logs.send(embed=embed)
-                await logs.send(file=transcript_file)
+                await self.bot.logs.send(embed=embed)
+                await self.bot.logs.send(file=transcript_file)
 
 
     @commands.command()
@@ -180,7 +179,7 @@ class Tickets(commands.Cog, name="Tickets"):
             transcript = await chat_exporter.export(ctx.channel)
 
             if transcript is None:
-                embed= discord.Embed("Transcript creation failed!",
+                embed = discord.Embed("Transcript creation failed!",
                                      color=0xDE3163)
                 await ctx.send(embed=embed)
                 return
