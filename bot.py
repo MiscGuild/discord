@@ -555,9 +555,15 @@ async def on_guild_channel_create(channel):
                 name = role_reply.content
                 ign, uuid = await hypixel.get_dispnameID(name)
                 if ign is None:
-                    await channel.send('Please enter a valid ign!')
-                    await channel.send(
-                        "I'll restart the process. If you think I made an error, select 'Other' upon restart")
+                    embed = discord.Embed(title="Please enter a valid minecraft username!",
+                                          description="The ticket process will be restarted so you can rectify your mistake!",
+                                          color=0xDE3163)
+                    await channel.channel.send(embed=embed)
+                elif ign in bot.staff_names and bot.staff not in author.roles:
+                    embed = discord.Embed(title="Staff impersonation is a punishable offense!",
+                                          description="The ticket process will be restarted!",
+                                          color=0xDE3163)
+                    await channel.send(embed=embed)
                 else:
                     guild_name = await hypixel.get_guild(ign)
                     await author.edit(nick=ign)
@@ -1189,6 +1195,7 @@ async def after_cache_ready():
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster)
     bot.ticket_categories = ('RTickets', '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL')
     bot.adminids = [x.id for x in bot.admin.members]
+    bot.staff_names = [await hypixel.name_grabber(member) for member in bot.staff.members]
 
     DiscordComponents(bot)
     chat_exporter.init_exporter(bot)

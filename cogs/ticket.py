@@ -23,7 +23,13 @@ class Tickets(commands.Cog, name="Tickets"):
                         request = await resp.json(content_type=None)
 
                     if resp.status != 200:
-                        await ctx.send('Please enter a valid ign!')
+                        embed = discord.Embed(title="Please enter a valid minecraft username!",
+                                              color=0xDE3163)
+                        await ctx.channel.send(embed=embed)
+                    elif request['name'] in self.bot.staff_names and self.bot.staff not in ctx.author.roles:
+                        embed = discord.Embed(title="Staff impersonation is a punishable offense!",
+                                              color=0xDE3163)
+                        await ctx.channel.send(embed=embed)
                     else:
                         ign = request['name']
                         uuid = request['id']
@@ -214,7 +220,7 @@ class Tickets(commands.Cog, name="Tickets"):
 
         embed = discord.Embed(title=f"{name}, your application has been denied!",
                               description="The reasons are listed below",
-                              color=0xf04747)
+                              color=0xDE3163)
 
         embed.set_footer(
             text="You may reapply in 2 weeks. \nFollowing is the transcript so that you can refer to it while reapplying.")
