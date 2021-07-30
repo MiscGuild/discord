@@ -64,7 +64,7 @@ class staff(commands.Cog, name="Staff"):
                         value="#🎟-tickets-🎟 is located in the noticeboard category",
                         inline=False)
         embed.add_field(name="Tickets can be created for the following reasons",
-                        value="> Discord Nick/Role Change\n"
+                        value="> Discord Nick/Role & Tag Change/\n"
                               "> Do not kick list\n"
                               "> Problems/Queries/Complaint/Suggestion\n"
                               "> Reporting a player\n"
@@ -73,11 +73,11 @@ class staff(commands.Cog, name="Staff"):
                               "> Event\n"
                               "> Other",
                         inline=False)
-        embed.add_field(name="Click the button under the message sent by @TicketTool",
+        embed.add_field(name="Click the button under the message sent by @Miscellaneous",
                         value="The following image shows you what you need to click.",
                         inline=False)
         embed.set_image(
-            url=f"https://media.discordapp.net/attachments/420572640172834816/864894505509847070/unknown.png?width=1229&height=670")
+            url=f"https://media.discordapp.net/attachments/813075018820222976/870799273892147230/unknown.png?width=1316&height=671")
         await ctx.send(embed=embed)
 
     @commands.command()
