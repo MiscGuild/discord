@@ -142,6 +142,8 @@ class Tickets(commands.Cog, name="Tickets"):
     @commands.command()
     @commands.has_role(538015368782807040, 522588122807271424)
     async def add(self, ctx, member: discord.Member):
+        """Adds the specified user to the ticket.
+        """
         if ctx.channel.category.name in self.bot.ticket_categories:
             await ctx.channel.set_permissions(member, send_messages=True, read_messages=True,
                                                  add_reactions=True, embed_links=True,
@@ -152,9 +154,18 @@ class Tickets(commands.Cog, name="Tickets"):
             await ctx.send(embed=embed)
 
     @commands.command()
+    @commands.has_role(538015368782807040, 522588122807271424)
+    async def rename(self, ctx, channel_name):
+        """Renames the channel
+        """
+        if ctx.channel.category.name in self.bot.ticket_categories:
+            await ctx.channel.edit(name=f"{channel_name}")
+
+
+    @commands.command()
     @commands.has_role(522588118251995147)
     async def accept(self, ctx, member: discord.Member):
-        """Used to accept staff applications. This command must be typed in the application channel. It doesn't work anywhere else.
+        """Used to accept staff applications. This command must be typed in the application channel. It doesn't work elsewhere.
         """
         if ctx.channel.category.name in self.bot.ticket_categories:
             embed = discord.Embed(title=f"Congratulations {member.name}, your staff application has been accepted!",
