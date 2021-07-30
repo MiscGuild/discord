@@ -2,6 +2,8 @@ import asyncio
 
 import aiohttp
 import discord
+import io
+import chat_exporter
 from discord.ext import commands
 
 from cogs.utils import hypixel
@@ -161,6 +163,27 @@ class Tickets(commands.Cog, name="Tickets"):
         if ctx.channel.category.name in self.bot.ticket_categories:
             await ctx.channel.edit(name=f"{channel_name}")
 
+    @commands.command()
+    @commands.has_role(538015368782807040, 522588122807271424)
+    async def transcript(self, ctx):
+        """Creates a transcript for the channel the command is entered in
+        """
+        if ctx.channel.category.name in self.bot.ticket_categories:
+            transcript = await chat_exporter.export(ctx.channel)
+
+            if transcript is None:
+                embed= discord.Embed("Transcript creation failed!",
+                                     color=0xff0000)
+                await ctx.send(embed=embed)
+                return
+
+            transcript_file = discord.File(io.BytesIO(transcript.encode()),
+                                           filename=f"transcript-{ctx.channel.name}.html")
+
+            embed= discord.Emebd(title="Transcript creation successful!",
+                                 color=0x00A86B)
+            await ctx.send(embed=embed)
+            await ctx.send(file=transcript_file)
 
     @commands.command()
     @commands.has_role(522588118251995147)
