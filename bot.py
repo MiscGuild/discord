@@ -426,14 +426,14 @@ async def on_guild_channel_create(channel):
                                                           description="The DNKL Embed has been sent to <#629564802812870657>",
                                                           color=0x00A86B)
                                     await channel.send(embed=embed)
-                                    success_embed = discord.Embed(title="Success",color=0x00FF00)
+                                    success_embed = discord.Embed(title="Success",color=0x00A86B)
                                     await click.respond(embed=success_embed)
                                     break
                                 elif click.component.id == "deny":
                                     embed = discord.Embed(title="This do not kick list request has been denied",
                                                           color=0xff0000)
                                     await channel.send(embed=embed)
-                                    success_embed = discord.Embed(title="Success", color=0x00FF00)
+                                    success_embed = discord.Embed(title="Success", color=0x00A86B)
                                     await click.respond(embed=success_embed)
                                     break
 
@@ -536,7 +536,7 @@ async def on_guild_channel_create(channel):
                                                         json.dump(data, f)
 
                                                     await session.close()
-                                                    success_embed = discord.Embed(title="Success", color=0x00FF00)
+                                                    success_embed = discord.Embed(title="Success", color=0x00A86B)
                                                     await click.respond(embed=success_embed)
                                                     break
 
@@ -1185,6 +1185,7 @@ async def after_cache_ready():
     bot.ally = discord.utils.get(bot.misc_guild.roles, name="Ally")
     bot.server_booster = discord.utils.get(bot.misc_guild.roles, name="Server Booster")
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster)
+    bot.ticket_categories = ('RTickets', '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL')
     bot.adminids = [x.id for x in bot.admin.members]
 
     ticketer.start()

@@ -125,8 +125,7 @@ class Tickets(commands.Cog, name="Tickets"):
         """
         logs = self.bot.get_channel(714821811832881222)
         if self.bot.staff in ctx.author.roles:
-            if ctx.channel.category.name in (
-            'RTickets', '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL', 'EVENT'):
+            if ctx.channel.category.name in self.bot.ticket_categories:
                 name = ctx.channel.name
                 embed = discord.Embed(title='This ticket will be deleted in 10 seconds!', description='',
                                       color=0xDE3163)
@@ -141,11 +140,23 @@ class Tickets(commands.Cog, name="Tickets"):
                 await logs.send(embed=embed)
 
     @commands.command()
+    @commands.has_role(538015368782807040, 522588122807271424)
+    async def add(self, ctx, member: discord.Member):
+        if ctx.channel.category.name in self.bot.ticket_categories:
+            await ctx.channel.set_permissions(member, send_messages=True, read_messages=True,
+                                                 add_reactions=True, embed_links=True,
+                                                 attach_files=True,
+                                                 read_message_history=True, external_emojis=True)
+            embed = discord.Embed(title=f"{member.title} has been added to the ticket!",
+                                  color=0x00A86B)
+            await ctx.send(embed=embed)
+
+    @commands.command()
     @commands.has_role(522588118251995147)
     async def accept(self, ctx, member: discord.Member):
         """Used to accept staff applications. This command must be typed in the application channel. It doesn't work anywhere else.
         """
-        if ctx.channel.category.name in ('RTickets', '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL'):
+        if ctx.channel.category.name in self.bot.ticket_categories:
             embed = discord.Embed(title=f"Congratulations {member.name}, your staff application has been accepted!",
                                   description="Please view the following as they'll help you become a better staff member!",
                                   color=0x8368ff)
