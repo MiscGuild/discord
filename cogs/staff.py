@@ -339,7 +339,7 @@ class staff(commands.Cog, name="Staff"):
 
                             # Miscellaneous
                         if ign in misc_members and ign not in (
-                        "Rowdies", "PolarPowah", "LBROz", "Fantastic_Doge", "ElijahRus", "BotTyler"):
+                                "Rowdies", "PolarPowah", "LBROz", "Fantastic_Doge", "ElijahRus", "BotTyler"):
                             async with aiohttp.ClientSession() as session:
                                 async with session.get(
                                         f"https://api.hypixel.net/guild?key={hypixel.get_api()}&player={uuid}") as resp:
@@ -461,6 +461,8 @@ class staff(commands.Cog, name="Staff"):
                                           color=0x8368ff)
                     embed.set_footer(
                         text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
+                    embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
+
                     await ctx.send(embed=embed)
 
 
@@ -471,12 +473,30 @@ class staff(commands.Cog, name="Staff"):
                     await member.remove_roles(member_, awaiting_app)
                     await member.add_roles(guest, ally)
 
-                    embed = discord.Embed(title=f"{member.name}'s nick and role were successfully changed!",
+                    embed = discord.Embed(title=f"{member.name}'s nick, role and tag were successfully changed!",
                                           color=0x8368ff)
 
                     embed.set_footer(text="Member of XL"
                                           "\n• Member & Awaiting Approval were removed"
-                                          "\n• Guest & XL - Ally were given")
+                                          "\n• Guest, Ally were given")
+                    embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
+
+                    await ctx.send(embed=embed)
+
+                elif guild_name == "Lucid":
+                    if "[✧LUCID✧]" not in member.nick:
+                        ign = ign + " [✧LUCID✧]"
+                    await member.edit(nick=ign)
+                    await member.remove_roles(member_, awaiting_app)
+                    await member.add_roles(guest, ally)
+
+                    embed = discord.Embed(title=f"{member.name}'s nick, role and tag were successfully changed!",
+                                          color=0x8368ff)
+
+                    embed.set_footer(text="Member of Lucid"
+                                          "\n• Member & Awaiting Approval were removed"
+                                          "\n• Guest, Ally were given")
+                    embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                     await ctx.send(embed=embed)
 
                 elif guild_name is None:
@@ -487,18 +507,22 @@ class staff(commands.Cog, name="Staff"):
                                           color=0x8368ff)
                     embed.set_footer(
                         text=f"Member of {guild_name}\n• Nick Changed\n• Member & Awaiting Approval were removed\n• Guest was given")
+                    embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
+
                     await ctx.send(embed=embed)
 
-                elif guild_name not in ("Miscellaneous", "XL"):
+                elif guild_name not in ("Miscellaneous", "XL", "Lucid"):
                     await member.remove_roles(member_, awaiting_app, newmember, ally)
                     await member.add_roles(guest)
 
                     embed = discord.Embed(title=f"{member.name}'s nick and role were successfully changed!",
                                           color=0x8368ff)
 
+                    embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                     embed.set_footer(text=f"Member of {guild_name}"
                                           "\n• Member & Awaiting Approval were removed"
                                           "\n• Guest was given")
+
                     await ctx.send(embed=embed)
 
         else:

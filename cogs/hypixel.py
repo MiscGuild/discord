@@ -67,6 +67,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                           color=0x8368ff)
                     embed.set_footer(
                         text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
+                    embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                     await ctx.send(embed=embed)
                 elif guild_name != "Miscellaneous" and tag is not None:
                     await ctx.send(
@@ -78,19 +79,36 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     await ctx.author.remove_roles(self.bot.member_role, self.bot.awaiting_app)
                     await ctx.author.add_roles(self.bot.guest, self.bot.ally)
 
-                    embed = discord.Embed(title="Your nick and role was successfully changed!",
+                    embed = discord.Embed(title="Your nick, role and tag were successfully changed!",
                                           description="If this wasn't the change you anticipated, "
                                                       "kindly create a ticket or get in contact with staff!",
                                           color=0x8368ff)
 
                     embed.set_footer(text="Member of XL"
                                           "\n• Member & Awaiting Approval were removed"
-                                          "\n• Guest & XL - Ally were given")
+                                          "\n• Guest & Ally were given")
+                    embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                     await ctx.send(embed=embed)
 
+                elif guild_name == "Lucid":
+                    if author.nick is None or "[✧LUCID✧]" not in author.nick:
+                        new_nick = ign + " [✧LUCID✧]"
+                        await author.edit(nick=new_nick)
+                    await ctx.author.remove_roles(self.bot.member_role, self.bot.awaiting_app)
+                    await ctx.author.add_roles(self.bot.guest, self.bot.ally)
 
+                    embed = discord.Embed(title="Your nick, role and tag successfully changed!",
+                                          description="If this wasn't the change you anticipated, "
+                                                      "kindly create a ticket or get in contact with staff!",
+                                          color=0x8368ff)
 
-                elif guild_name not in ("Miscellaneous", "XL"):
+                    embed.set_footer(text="Member of Lucid"
+                                          "\n• Member & Awaiting Approval were removed"
+                                          "\n• Guest & Ally were given")
+                    embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
+                    await ctx.send(embed=embed)
+
+                elif guild_name not in ("Miscellaneous", "XL", "Lucid"):
                     if str(ctx.channel.category.name) == "RTickets":
                         await ctx.send("You aren't in Miscellaneous in-game. Kindly await staff assistance!")
                     else:
@@ -165,6 +183,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                               color=0x8368ff)
                         embed.set_footer(
                             text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
+                        embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                         await ctx.send(embed=embed)
 
                 elif guild_name == "XL":
@@ -174,19 +193,36 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     await ctx.author.remove_roles(self.bot.member_role, self.bot.awaiting_app)
                     await ctx.author.add_roles(self.bot.guest, self.bot.ally)
 
-                    embed = discord.Embed(title="Your nick and role was successfully changed!",
+                    embed = discord.Embed(title="Your nick, role and tag were successfully changed!",
                                           description="If this wasn't the change you anticipated, "
                                                       "kindly create a ticket or get in contact with staff!",
                                           color=0x8368ff)
 
                     embed.set_footer(text="Member of XL"
                                           "\n• Member & Awaiting Approval were removed"
-                                          "\n• Guest & XL - Ally were given")
+                                          "\n• Guest & Allywere given")
+                    embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                     await ctx.send(embed=embed)
 
+                elif guild_name == "Lucid":
+                    if author.nick is None or "[✧LUCID✧]" not in author.nick:
+                        new_nick = ign + " [✧LUCID✧]"
+                        await author.edit(nick=new_nick)
+                    await ctx.author.remove_roles(self.bot.member_role, self.bot.awaiting_app)
+                    await ctx.author.add_roles(self.bot.guest, self.bot.ally)
 
+                    embed = discord.Embed(title="Your nick, role and tag were successfully changed!",
+                                          description="If this wasn't the change you anticipated, "
+                                                      "kindly create a ticket or get in contact with staff!",
+                                          color=0x8368ff)
 
-                elif guild_name not in ("Miscellaneous", "XL"):
+                    embed.set_footer(text="Member of Lucid"
+                                          "\n• Member & Awaiting Approval were removed"
+                                          "\n• Guest & Allywere given")
+                    embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
+                    await ctx.send(embed=embed)
+
+                elif guild_name not in ("Miscellaneous", "XL", "Lucid"):
                     if str(ctx.channel.category.name) == "RTickets":
                         await ctx.send("You aren't in Miscellaneous in-game. Kindly await staff assistance!")
                     else:
@@ -199,6 +235,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                               color=0x8368ff)
                         embed.set_footer(
                             text=f"Member of {guild_name}\n• Nick Changed\n• Member & Awaiting Approval were removed\n• Guest was given")
+                        embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                         await ctx.send(embed=embed)
 
     @commands.command(aliases=["i"])
@@ -911,7 +948,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                 else:
                                     break
                             if "commands" not in ctx.channel.name and ctx.channel.category.name not in (
-                            '🎫 Ticket Section', 'DNKL', 'MILESTONES', 'REPORTS', 'EVENT', 'OTHER', 'RTickets'):
+                                    '🎫 Ticket Section', 'DNKL', 'MILESTONES', 'REPORTS', 'EVENT', 'OTHER', 'RTickets'):
                                 name = name.replace("_", "\_")
                                 await ctx.send(f"__**{name}**__\n**Guild Experience -** `{totalexp}`")
                             else:
