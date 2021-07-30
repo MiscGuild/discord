@@ -1,4 +1,6 @@
 import discord
+import chat_exporter
+import io
 from discord.ext import commands
 
 from cogs.utils import hypixel
@@ -48,9 +50,25 @@ class Moderation(commands.Cog, name="Moderation"):
     async def clear(self, ctx, amount: int, *, reason=None):
         """Clears the chat based on the given amount!
         """
-        name = await hypixel.name_grabber(ctx.author)
+        transcript = await chat_exporter.export(ctx.channel,limit=amount)
+        if transcript is None:
+            pass
+        else:
+            transcript_file = discord.File(io.BytesIO(transcript.encode()),
+                                       filename=f"deleted-{ctx.channel.name}.html")
 
-        await ctx.channel.purge(limit=amount)
+        logs = self.bot.get_channel(714821811832881222)
+        if self.bot.staff in ctx.author.roles:
+            if ctx.channel.category.name in self.bot.ticket_categories:
+                await ctx.channel.purge(limit=amount)
+
+                name = await hypixel.name_grabber(ctx.author)
+                embed = discord.Embed(title=f'{name} purged {amount} messages in {ctx.channel.name}',
+                                      description=f"**Reason:** {reason}", color=0x8368ff)
+                await logs.send(embed=embed)
+                await logs.send(file=transcript_file)
+
+
 
     # Kick
     @commands.command()
