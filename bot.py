@@ -7,6 +7,7 @@ import traceback
 import aiohttp
 import discord
 import toml
+import chat_exporter
 from discord.ext import commands, tasks
 from discord_components import DiscordComponents, Button, ButtonStyle, InteractionType
 from cogs.utils import hypixel
@@ -67,7 +68,7 @@ if __name__ == '__main__':
 @bot.event
 async def on_ready():
     print('The Miscellaneous Bot is ONLINE!')
-    DiscordComponents(bot)
+
 
 
 @bot.event
@@ -1187,6 +1188,9 @@ async def after_cache_ready():
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster)
     bot.ticket_categories = ('RTickets', '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL')
     bot.adminids = [x.id for x in bot.admin.members]
+
+    DiscordComponents(bot)
+    chat_exporter.init_exporter(bot)
 
     ticketer.start()
 

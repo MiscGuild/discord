@@ -16,4 +16,5 @@ urllib3==1.26.5
 yarl==1.6.3
 zope.interface==5.4.0
 discord-components==1.1.4
+chat-exporter==1.6.2
 
