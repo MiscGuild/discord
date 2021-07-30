@@ -127,11 +127,9 @@ class Tickets(commands.Cog, name="Tickets"):
         """
         transcript = await chat_exporter.export(ctx.channel)
         if transcript is None:
-            embed = discord.Embed("Transcript creation failed!",
-                                  color=0xDE3163)
-            await ctx.send(embed=embed)
-            return
-        transcript_file = discord.File(io.BytesIO(transcript.encode()),
+            pass
+        else:
+            transcript_file = discord.File(io.BytesIO(transcript.encode()),
                                        filename=f"deleted-{ctx.channel.name}.html")
 
         logs = self.bot.get_channel(714821811832881222)
@@ -149,7 +147,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                       description="", color=0x8368ff)
                 await logs.send(embed=embed)
                 await logs.send(file=transcript_file)
-                
+
 
     @commands.command()
     @commands.has_role(538015368782807040, 522588122807271424)
