@@ -70,7 +70,6 @@ async def on_ready():
     print('The Miscellaneous Bot is ONLINE!')
 
 
-
 @bot.event
 async def on_command_error(ctx, error):
     # Prevents commands with local handlers or cogs with overwrritten on_command_errors being handled here
@@ -372,23 +371,24 @@ async def on_guild_channel_create(channel):
                                 f"\n\n||,dnkladd {name} {author.mention} {start} {end} {reason}||"
                             )
 
-
                             dnkl_decision = discord.Embed(title="Staff, what do you wish to do with this dnkl request?",
-                                                         description=f"\nClick `Approve` to approve the do-not-kick-list request"
-                                                                     f"\nClick `Deny` to deny the do-not-kick-list request"
-                                                                     f"\nClick `Error` if the user made an error while applying for the do not kick list",
-                                                         color=0x8368ff)
+                                                          description=f"\nClick `Approve` to approve the do-not-kick-list request"
+                                                                      f"\nClick `Deny` to deny the do-not-kick-list request"
+                                                                      f"\nClick `Error` if the user made an error while applying for the do not kick list",
+                                                          color=0x8368ff)
 
                             approve = Button(style=ButtonStyle.blue, label="Approve", id="approve")
                             deny = Button(style=ButtonStyle.red, label="Deny", id="deny")
                             error = Button(style=ButtonStyle.grey, label="Error", id="error")
 
-
-                            await channel.send(embed=dnkl_decision, components=[[approve, deny],[error]])
+                            await channel.send(embed=dnkl_decision, components=[[approve, deny], [error]])
 
                             while True:
                                 click = await bot.wait_for("button_click",
-                                                           check=lambda x: x.channel == channel and (bot.staff in bot.misc_guild.get_member(x.author.id).roles or bot.t_officer in bot.misc_guild.get_member(x.author.id).roles))
+                                                           check=lambda x: x.channel == channel and (
+                                                                       bot.staff in bot.misc_guild.get_member(
+                                                                   x.author.id).roles or bot.t_officer in bot.misc_guild.get_member(
+                                                                   x.author.id).roles))
 
                                 if click.component.id == "approve":
                                     a, b, c = start.split('/')
@@ -427,7 +427,7 @@ async def on_guild_channel_create(channel):
                                                           description="The DNKL Embed has been sent to <#629564802812870657>",
                                                           color=0x00A86B)
                                     await channel.send(embed=embed)
-                                    success_embed = discord.Embed(title="Success",color=0x00A86B)
+                                    success_embed = discord.Embed(title="Success", color=0x00A86B)
                                     await click.respond(embed=success_embed)
                                     break
                                 elif click.component.id == "deny":
@@ -465,8 +465,8 @@ async def on_guild_channel_create(channel):
                                                 embed.set_footer(text="For Example:\n 1/2/2021 = 1st Feb 2021")
                                                 await channel.send(embed=embed)
                                                 start_date = await bot.wait_for('message',
-                                                                           check=lambda
-                                                                               x: x.author == author and x.channel == channel)
+                                                                                check=lambda
+                                                                                    x: x.author == author and x.channel == channel)
                                                 start_date = start_date.content
                                                 embed = discord.Embed(
                                                     title="When will their inactivity end? (End date)",
@@ -541,8 +541,6 @@ async def on_guild_channel_create(channel):
                                                     await click.respond(embed=success_embed)
                                                     break
 
-
-
                 break
 
             elif reply in ("Role", "Username", "Name"):
@@ -605,6 +603,8 @@ async def on_guild_channel_create(channel):
                         embed.set_footer(text="Member of Miscellaneous"
                                               "\n• Guest & Awaiting Approval were removed"
                                               "\n• Member was given")
+                        embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
+
                         await channel.send(embed=embed)
 
                     elif guild_name == "XL":
@@ -613,16 +613,33 @@ async def on_guild_channel_create(channel):
                         await author.edit(nick=new_nick)
                         await author.remove_roles(bot.member_role, bot.awaiting_app)
                         await author.add_roles(bot.guest, bot.ally)
-                        embed = discord.Embed(title="Your nick and role was successfully changed!",
+                        embed = discord.Embed(title="Your nick, role and tag were successfully changed!",
                                               description="If this wasn't the change you anticipated, "
                                                           "await staff assistance.",
                                               color=0x8368ff)
                         embed.set_footer(text="Member of XL"
                                               "\n• Member & Awaiting Approval were removed"
-                                              "\n• Guest & XL - Ally were given")
+                                              "\n• Guest & Ally were given")
+                        embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                         await channel.send(embed=embed)
 
-                    elif guild_name not in ("Miscellaneous", "XL"):
+                    elif guild_name == "Lucid":
+                        if "[✧LUCID✧]" not in author.nick:
+                            new_nick = ign + " [✧LUCID✧]"
+                        await author.edit(nick=new_nick)
+                        await author.remove_roles(bot.member_role, bot.awaiting_app)
+                        await author.add_roles(bot.guest, bot.ally)
+                        embed = discord.Embed(title="Your nick, role and tag were successfully changed!",
+                                              description="If this wasn't the change you anticipated, "
+                                                          "await staff assistance.",
+                                              color=0x8368ff)
+                        embed.set_footer(text="Member of Lucid"
+                                              "\n• Member & Awaiting Approval were removed"
+                                              "\n• Guest & Ally were given")
+                        embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
+                        await channel.send(embed=embed)
+
+                    elif guild_name not in ("Miscellaneous", "XL", "Lucid"):
                         if str(channel.channel.category.name) == "RTickets":
                             await channel.send("You aren't in Miscellaneous in-game. Kindly await staff assistance!")
                         else:
@@ -635,6 +652,7 @@ async def on_guild_channel_create(channel):
                             embed.set_footer(text=f"Member of {guild_name}"
                                                   f"\n• Member & Awaiting Approval were removed"
                                                   f"\n• Guest was given")
+                            embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                             await channel.send(embed=embed)
 
             elif reply in "Report":
@@ -686,7 +704,7 @@ async def on_guild_channel_create(channel):
                                               color=0x4b89e4)
                         await channel.send(embed=embed)
                         username = await bot.wait_for('message',
-                                                        check=lambda x: x.channel == channel and x.author == author)
+                                                      check=lambda x: x.channel == channel and x.author == author)
                         name = username.content
                         ign, uuid = await hypixel.get_dispnameID(name)
 
@@ -1134,8 +1152,6 @@ async def ticketer():
     ticket_creation = Button(style=ButtonStyle.blue, label="✉️Create Ticket", id="embed")
 
     await bot.ticket_channel.send(embed=ticket_embed, components=[ticket_creation])
-
-
 
     while True:
         click = await bot.wait_for("button_click",

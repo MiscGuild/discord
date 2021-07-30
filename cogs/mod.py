@@ -40,8 +40,8 @@ class Moderation(commands.Cog, name="Moderation"):
         if reason is None:
             reason = f'Unmuted by: {name}'
 
-        role = discord.utils.get(ctx.guild.roles, name="Muted")
-        await member.remove_roles(role)
+        muted_role = discord.utils.get(ctx.guild.roles, name="Muted")
+        await member.remove_roles(muted_role)
         embed = discord.Embed(title="User unmuted!",
                               description=f"**{member}** was unmuted by **{name}**!",
                               color=0xff00f6)
@@ -56,24 +56,21 @@ class Moderation(commands.Cog, name="Moderation"):
     async def clear(self, ctx, amount: int, *, reason=None):
         """Clears the chat based on the given amount!
         """
-        transcript = await chat_exporter.export(ctx.channel,limit=amount)
+        name = await hypixel.name_grabber(ctx.author)
+        transcript = await chat_exporter.export(ctx.channel, limit=amount)
         if transcript is None:
+            print("transcript failed")
             pass
         else:
             transcript_file = discord.File(io.BytesIO(transcript.encode()),
-                                       filename=f"deleted-{ctx.channel.name}.html")
+                                           filename=f"purge-{ctx.channel.name}-by-{name}.html")
 
         if self.bot.staff in ctx.author.roles:
-            if ctx.channel.category.name in self.bot.ticket_categories:
-                await ctx.channel.purge(limit=amount)
-
-                name = await hypixel.name_grabber(ctx.author)
-                embed = discord.Embed(title=f'{name} purged {amount} messages in {ctx.channel.name}',
-                                      description=f"**Reason:** {reason}", color=0x8368ff)
-                await self.bot.logs.send(embed=embed)
-                await self.bot.logs.send(file=transcript_file)
-
-
+            await ctx.channel.purge(limit=amount)
+            embed = discord.Embed(title=f'{name} purged {amount} messages in {ctx.channel.name}',
+                                  description=f"**Reason:** {reason}", color=0x8368ff)
+            await self.bot.logs.send(embed=embed)
+            await self.bot.logs.send(file=transcript_file)
 
     # Kick
     @commands.command()
