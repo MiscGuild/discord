@@ -246,16 +246,16 @@ async def on_guild_channel_create(channel):
                     break
         elif channel.category.name == '🎫 Ticket Section':
             await asyncio.sleep(3)
-            embed = discord.Embed(title="What's your reason behind creating this ticket?",
+            embed = discord.Embed(title="What did you make this ticket?",
                                   description="Please reply with your reason from the list given below!",
                                   color=0x8368ff)
             embed.add_field(name="Do-Not-Kick-List", value="Reply with `DNKL`", inline=False)
-            embed.add_field(name="Role/Username Change", value="Reply with `Role`", inline=False)
+            embed.add_field(name="Role/Username/Tag Change", value="Reply with `Role`", inline=False)
             embed.add_field(name="Report", value="Reply with `Report`", inline=False)
             embed.add_field(name="Problem/Query/Complaint/Suggestion", value="Reply with `General`", inline=False)
             embed.add_field(name="Milestone", value="Reply with `Milestone`", inline=False)
             embed.add_field(name="Staff Application", value="Reply with `Staff`", inline=False)
-            embed.add_field(name="GvG Application", value="Reply with `GvG`", inline=False)
+            embed.add_field(name="GvG Team Application", value="Reply with `GvG`", inline=False)
             embed.add_field(name="Other", value="Reply with `Other`", inline=False)
             await channel.send(embed=embed)
             reply = await bot.wait_for('message', check=lambda x: x.channel == channel)
