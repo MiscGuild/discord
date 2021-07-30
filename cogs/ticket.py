@@ -94,7 +94,8 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                  add_reactions=True, embed_links=True,
                                                                  attach_files=True,
                                                                  read_message_history=True, external_emojis=True)
-                            await ticket_channel.set_permissions(self.bot.t_officer, send_messages=True, read_messages=True,
+                            await ticket_channel.set_permissions(self.bot.t_officer, send_messages=True,
+                                                                 read_messages=True,
                                                                  add_reactions=True, embed_links=True,
                                                                  attach_files=True,
                                                                  read_message_history=True, external_emojis=True)
@@ -147,7 +148,7 @@ class Tickets(commands.Cog, name="Tickets"):
             pass
         else:
             transcript_file = discord.File(io.BytesIO(transcript.encode()),
-                                       filename=f"deleted-{ctx.channel.name}.html")
+                                           filename=f"deleted-{ctx.channel.name}.html")
 
         if self.bot.staff in ctx.author.roles:
             if ctx.channel.category.name in self.bot.ticket_categories:
@@ -164,23 +165,22 @@ class Tickets(commands.Cog, name="Tickets"):
                 await self.bot.logs.send(embed=embed)
                 await self.bot.logs.send(file=transcript_file)
 
-
     @commands.command()
-    @commands.has_role(538015368782807040, 522588122807271424)
+    @commands.has_role(538015368782807040 or 522588122807271424)
     async def add(self, ctx, member: discord.Member):
         """Adds the specified user to the ticket.
         """
         if ctx.channel.category.name in self.bot.ticket_categories:
             await ctx.channel.set_permissions(member, send_messages=True, read_messages=True,
-                                                 add_reactions=True, embed_links=True,
-                                                 attach_files=True,
-                                                 read_message_history=True, external_emojis=True)
+                                              add_reactions=True, embed_links=True,
+                                              attach_files=True,
+                                              read_message_history=True, external_emojis=True)
             embed = discord.Embed(title=f"{member.title} has been added to the ticket!",
                                   color=0x00A86B)
             await ctx.send(embed=embed)
 
     @commands.command()
-    @commands.has_role(538015368782807040, 522588122807271424)
+    @commands.has_role(538015368782807040 or 522588122807271424)
     async def rename(self, ctx, channel_name):
         """Renames the channel
         """
@@ -188,7 +188,7 @@ class Tickets(commands.Cog, name="Tickets"):
             await ctx.channel.edit(name=f"{channel_name}")
 
     @commands.command()
-    @commands.has_role(538015368782807040, 522588122807271424)
+    @commands.has_role(538015368782807040 or 522588122807271424)
     async def transcript(self, ctx):
         """Creates a transcript for the channel the command is entered in
         """
@@ -196,16 +196,16 @@ class Tickets(commands.Cog, name="Tickets"):
             transcript = await chat_exporter.export(ctx.channel)
 
             if transcript is None:
-                embed = discord.Embed("Transcript creation failed!",
-                                     color=0xDE3163)
+                embed = discord.Embed(text="Transcript creation failed!",
+                                      color=0xDE3163)
                 await ctx.send(embed=embed)
                 return
 
             transcript_file = discord.File(io.BytesIO(transcript.encode()),
                                            filename=f"transcript-{ctx.channel.name}.html")
 
-            embed= discord.Emebd(title="Transcript creation successful!",
-                                 color=0x00A86B)
+            embed = discord.Emebd(title="Transcript creation successful!",
+                                  color=0x00A86B)
             await ctx.send(embed=embed)
             await ctx.send(file=transcript_file)
 
