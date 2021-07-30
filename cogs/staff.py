@@ -467,7 +467,7 @@ class staff(commands.Cog, name="Staff"):
 
 
                 elif guild_name == "XL":
-                    if "[✧XL✧]" not in member.nick:
+                    if member.nick is None or "[✧XL✧]" not in member.nick:
                         ign = ign + " [✧XL✧]"
                     await member.edit(nick=ign)
                     await member.remove_roles(member_, awaiting_app)
@@ -484,7 +484,7 @@ class staff(commands.Cog, name="Staff"):
                     await ctx.send(embed=embed)
 
                 elif guild_name == "Lucid":
-                    if "[✧LUCID✧]" not in member.nick:
+                    if member.nick is None or "[✧LUCID✧]" not in member.nick:
                         ign = ign + " [✧LUCID✧]"
                     await member.edit(nick=ign)
                     await member.remove_roles(member_, awaiting_app)
