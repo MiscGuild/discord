@@ -25,7 +25,13 @@ class Hypixel(commands.Cog, name="Hypixel"):
             ign, uuid = await hypixel.get_dispnameID(name)
 
             if ign is None:
-                await ctx.send('Please enter a valid ign!')
+                embed = discord.Embed(title="Please enter a valid minecraft username!",
+                                      color=0xDE3163)
+                await ctx.channel.send(embed=embed)
+            elif ign in self.bot.staff_names and self.bot.staff not in ctx.author.roles:
+                embed = discord.Embed(title="Staff impersonation is a punishable offense!",
+                                      color=0xDE3163)
+                await ctx.channel.send(embed=embed)
             else:
                 guild_name = await hypixel.get_guild(name)
                 has_tag_perms = any(role in ctx.author.roles for role in self.bot.tag_allowed_roles)
@@ -108,7 +114,13 @@ class Hypixel(commands.Cog, name="Hypixel"):
             ign, uuid = await hypixel.get_dispnameID(name)
 
             if ign is None:
-                await ctx.send('Please enter a valid ign!')
+                embed = discord.Embed(title="Please enter a valid minecraft username!",
+                                      color=0xDE3163)
+                await ctx.channel.send(embed=embed)
+            elif ign in self.bot.staff_names and self.bot.staff not in ctx.author.roles:
+                embed = discord.Embed(title="Staff impersonation is a punishable offense!",
+                                      color=0xDE3163)
+                await ctx.channel.send(embed=embed)
             else:
                 await ctx.author.edit(nick=ign)
                 guild_name = await hypixel.get_guild(name)
