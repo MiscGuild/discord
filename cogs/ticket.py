@@ -73,7 +73,19 @@ class Tickets(commands.Cog, name="Tickets"):
                             embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                             embed.add_field(name=ign, value="Member of Lucid")
                             await ctx.send(embed=embed)
-                        elif guild_name not in ("Miscellaneous", "XL", "Lucid"):
+                        elif guild_name == "OUT":
+                            if "[O✌T]" not in ctx.author.nick:
+                                ign = ign + " [O✌T]"
+                            nick = await author.edit(nick=ign)
+                            await ctx.author.remove_roles(self.bot.new_member_role)
+                            await ctx.author.add_roles(self.bot.guest, self.bot.ally)
+
+                            await ctx.channel.purge(limit=1)
+                            embed = discord.Embed(title="Registration successful!")
+                            embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
+                            embed.add_field(name=ign, value="Member of OUT")
+                            await ctx.send(embed=embed)
+                        elif guild_name not in ("Miscellaneous", "XL", "Lucid", "OUT"):
                             await ctx.author.remove_roles(self.bot.new_member_role)
                             await ctx.author.add_roles(self.bot.awaiting_app)
                             if nick is None:
