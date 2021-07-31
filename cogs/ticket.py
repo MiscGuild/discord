@@ -50,7 +50,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             await ctx.author.add_roles(self.bot.member_role)
 
                         elif guild_name == "XL":
-                            if "[✧XL✧]" not in ctx.author.nick:
+                            if ctx.author.nick is None or "[✧XL✧]" not in ctx.author.nick:
                                 ign = ign + " [✧XL✧]"
                             nick = await author.edit(nick=ign)
                             await ctx.author.remove_roles(self.bot.new_member_role)
@@ -62,7 +62,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             embed.add_field(name=ign, value="Member of XL")
                             await ctx.send(embed=embed)
                         elif guild_name == "Lucid":
-                            if "[✧LUCID✧]" not in ctx.author.nick:
+                            if ctx.author.nick is None or "[✧LUCID✧]" not in ctx.author.nick:
                                 ign = ign + " [✧LUCID✧]"
                             nick = await author.edit(nick=ign)
                             await ctx.author.remove_roles(self.bot.new_member_role)
@@ -74,7 +74,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             embed.add_field(name=ign, value="Member of Lucid")
                             await ctx.send(embed=embed)
                         elif guild_name == "OUT":
-                            if "[O✌T]" not in ctx.author.nick:
+                            if ctx.author.nick is None or "[O✌T]" not in ctx.author.nick:
                                 ign = ign + " [O✌T]"
                             nick = await author.edit(nick=ign)
                             await ctx.author.remove_roles(self.bot.new_member_role)
