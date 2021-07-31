@@ -639,7 +639,23 @@ async def on_guild_channel_create(channel):
                         embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                         await channel.send(embed=embed)
 
-                    elif guild_name not in ("Miscellaneous", "XL", "Lucid"):
+                    elif guild_name == "OUT":
+                        if "[O✌T]" not in author.nick:
+                            new_nick = ign + " [O✌T]"
+                        await author.edit(nick=new_nick)
+                        await author.remove_roles(bot.member_role, bot.awaiting_app)
+                        await author.add_roles(bot.guest, bot.ally)
+                        embed = discord.Embed(title="Your nick, role and tag were successfully changed!",
+                                              description="If this wasn't the change you anticipated, "
+                                                          "await staff assistance.",
+                                              color=0x8368ff)
+                        embed.set_footer(text="Member of OUT"
+                                              "\n• Member & Awaiting Approval were removed"
+                                              "\n• Guest & Ally were given")
+                        embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
+                        await channel.send(embed=embed)
+
+                    elif guild_name not in ("Miscellaneous", "XL", "Lucid", "OUT"):
                         if str(channel.channel.category.name) == "RTickets":
                             await channel.send("You aren't in Miscellaneous in-game. Kindly await staff assistance!")
                         else:
