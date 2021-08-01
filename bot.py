@@ -4,6 +4,7 @@ import logging
 import sys
 import traceback
 
+import io
 import aiohttp
 import discord
 import toml
@@ -75,7 +76,7 @@ async def on_command_error(ctx, error):
     # Prevents commands with local handlers or cogs with overwrritten on_command_errors being handled here
     if isinstance(error, commands.CommandNotFound):
         embed = discord.Embed(title='Invalid Command!',
-                              descrption='Use `,help` to view a list of all commands!', color=0xff0000)
+                              descrption='Use `,help` to view a list of all commands!', color=0xDE3163)
         await ctx.send(embed=embed)
         return
     elif ctx.command.has_error_handler() or ctx.cog.has_error_handler():
@@ -86,17 +87,17 @@ async def on_command_error(ctx, error):
 
     if isinstance(error, commands.NotOwner):
         embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
-                              description="You are not the owner of this bot!", color=0xff0000)
+                              description="You are not the owner of this bot!", color=0xDE3163)
         await ctx.send(embed=embed)
     elif isinstance(error, commands.MissingRole):
         embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
                               description="You do not have the required roles to access this restricted command!",
-                              color=0xff0000)
+                              color=0xDE3163)
         await ctx.send(embed=embed)
     elif isinstance(error, commands.MissingPermissions):
         embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
                               description="You do not have the required roles to access this restricted command!",
-                              color=0xff0000)
+                              color=0xDE3163)
         await ctx.send(embed=embed)
     elif isinstance(error, commands.MissingRequiredArgument):
         usage = f"{ctx.prefix}{ctx.command.name}"
@@ -107,7 +108,7 @@ async def on_command_error(ctx, error):
                 usage += " <" + key + ">"
         embed = discord.Embed(title="Missing arguments",
                               description=f"Command usage:\n`{usage}`\nFor more help, see `{ctx.prefix}help {ctx.command}`",
-                              color=0xff0000)
+                              color=0xDE3163)
         await ctx.send(embed=embed)
 
     else:
@@ -305,7 +306,7 @@ async def on_guild_channel_create(channel):
                             if eligiblity is False:
                                 embed = discord.Embed(title=name,
                                                       url=f'https://visage.surgeplay.com/full/832/{uuid}',
-                                                      color=0xff3333)
+                                                      color=0xDE3163)
                                 embed.set_thumbnail(
                                     url=f'https://visage.surgeplay.com/full/832/{uuid}')
                                 embed.set_author(name="Do-not-kick-list: Eligibility Check")
@@ -432,7 +433,7 @@ async def on_guild_channel_create(channel):
                                     break
                                 elif click.component.id == "deny":
                                     embed = discord.Embed(title="This do not kick list request has been denied",
-                                                          color=0xff0000)
+                                                          color=0xDE3163)
                                     await channel.send(embed=embed)
                                     success_embed = discord.Embed(title="Success", color=0x00A86B)
                                     await click.respond(embed=success_embed)
@@ -541,7 +542,55 @@ async def on_guild_channel_create(channel):
                                                     await click.respond(embed=success_embed)
                                                     break
 
-                break
+                stop_embed = discord.Embed(title="Can this ticket be closed?",
+                                      description="Click `Yes` if you resolved your issue and want to delete the ticket.\n Click `No` if you wish to wait for staff assistance\nClick `Restart` if you wish to restart the ticket process",
+                                      color=0x8368ff)
+                yes = Button(style=ButtonStyle.blue, label="Yes", id="yes")
+                no = Button(style=ButtonStyle.red, label="No", id="no")
+                restart = Button(style=ButtonStyle.grey, label="Restart", id="restart")
+
+                await channel.send(embed=stop_embed, components=[[yes, no], [restart]])
+
+                while True:
+                    click = await bot.wait_for("button_click",
+                                               check=lambda x: (x.author == author and x.channel == channel) or (bot.staff in x.author.roles and x.channel == channel))
+
+                    if click.component.id == "yes":
+                        success_embed = discord.Embed(title="Success", color=0x00A86B)
+                        await click.respond(embed=success_embed)
+                        transcript = await chat_exporter.export(channel)
+                        if transcript is None:
+                            pass
+                        else:
+                            transcript_file = discord.File(io.BytesIO(transcript.encode()),
+                                                           filename=f"deleted-{channel.name}.html")
+
+                        if channel.category.name in bot.ticket_categories:
+                            name = channel.name
+                            embed = discord.Embed(title='This ticket will be deleted in 10 seconds!',
+                                                  description='',
+                                                  color=0xDE3163)
+                            msg = await channel.send(embed=embed)
+                            await asyncio.sleep(10)
+                            await discord.TextChannel.delete(channel)
+
+                            name = await hypixel.name_grabber(author)
+                            embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
+                                                  description="They deleted their own ticket.", color=0x8368ff)
+                            await bot.logs.send(embed=embed)
+                            await bot.logs.send(file=transcript_file)
+                            break
+                    elif click.component.id == "no":
+                        success_embed = discord.Embed(title="Success", color=0x00A86B)
+                        await click.respond(embed=success_embed)
+                        embed = discord.Embed(title="The ticket will not be closed. ",
+                                              description="Kindly await staff assistance!", color=0xde3163)
+                        await channel.send(embed=embed)
+                        break
+                    elif click.component.id == "restart":
+                        embed = discord.Embed(title="Restarting", description="The ticket process will restart in 5 seconds!",
+                                              color=0x00a86b)
+                        asyncio.sleep(5)
 
             elif reply in ("Role", "Username", "Name"):
                 await channel.edit(name=f"Role/NameChange-{name}",
@@ -640,6 +689,69 @@ async def on_guild_channel_create(channel):
                                                   f"\n• Guest was given")
                             embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                             await channel.send(embed=embed)
+                stop_embed = discord.Embed(title="Can this ticket be closed?",
+                                           description="Click `Yes` if you resolved your issue and want to delete the ticket.\n Click `No` if you wish to wait for staff assistance\nClick `Restart` if you wish to restart the ticket process",
+                                           color=0x8368ff)
+                yes = Button(style=ButtonStyle.blue, label="Yes", id="yes")
+                no = Button(style=ButtonStyle.red, label="No", id="no")
+                restart = Button(style=ButtonStyle.grey, label="Restart", id="restart")
+
+                await channel.send(embed=stop_embed, components=[[yes, no], [restart]])
+
+                while True:
+                    click = await bot.wait_for("button_click",
+                                               check=lambda x: (x.author == author and x.channel == channel) or (
+                                                           bot.staff in x.author.roles and x.channel == channel))
+
+                    if click.component.id == "yes":
+                        success_embed = discord.Embed(title="Success", color=0x00A86B)
+                        await click.respond(embed=success_embed)
+                        transcript = await chat_exporter.export(channel)
+                        if transcript is None:
+                            pass
+                        else:
+                            transcript_file = discord.File(io.BytesIO(transcript.encode()),
+                                                           filename=f"deleted-{channel.name}.html")
+
+                        if channel.category.name in bot.ticket_categories:
+                            name = channel.name
+                            embed = discord.Embed(title='This ticket will be deleted in 10 seconds!',
+                                                  description='',
+                                                  color=0xDE3163)
+                            msg = await channel.send(embed=embed)
+                            await asyncio.sleep(10)
+                            await discord.TextChannel.delete(channel)
+
+                            name = await hypixel.name_grabber(author)
+                            embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
+                                                  description="They deleted their own ticket.", color=0x8368ff)
+                            await bot.logs.send(embed=embed)
+                            await bot.logs.send(file=transcript_file)
+                            break
+                    elif click.component.id == "no":
+                        success_embed = discord.Embed(title="Success", color=0x00A86B)
+                        await click.respond(embed=success_embed)
+                        embed = discord.Embed(title="The ticket will not be closed. ",
+                                              description="Kindly await staff assistance!", color=0xde3163)
+                        await channel.send(embed=embed)
+                        break
+                    elif click.component.id == "restart":
+                        embed = discord.Embed(title="Restarting",
+                                              description="The ticket process will restart in 5 seconds!",
+                                              color=0x00a86b)
+                        asyncio.sleep(5)
+                    elif click.component.id == "no":
+                        success_embed = discord.Embed(title="Success", color=0x00A86B)
+                        await click.respond(embed=success_embed)
+                        embed = discord.Embed(title="The ticket will not be closed. ",
+                                              description="Kindly await staff assistance!", color=0xde3163)
+                        await channel.send(embed=embed)
+                        break
+                    elif click.component.id = "restart":
+                        embed = discord.Embed(title="Restarting",
+                                              description="The ticket process will restart in 5 seconds!",
+                                              color=0x00a86b)
+                        asyncio.sleep(5)
 
             elif reply in "Report":
                 await channel.edit(name=f"Report-{name}",
