@@ -144,87 +144,64 @@ async def on_member_join(member):
 # Ticket Handling
 @bot.event
 async def on_guild_channel_create(channel):
-    while True:
-        if channel.category.name == "RTickets":
-            embed = discord.Embed(title="Do you wish to join Miscellaneous in-game?", color=0x8368ff)
-            embed.add_field(name="If you do", value="Type `Yes`")
-            embed.add_field(name="If you don't", value="Type `No`")
+    if channel.category.name == "RTickets":
+        embed = discord.Embed(title="Do you wish to join Miscellaneous in-game?", color=0x8368ff)
+        embed.add_field(name="If you do", value="Type `Yes`")
+        embed.add_field(name="If you don't", value="Type `No`")
+        await channel.send(embed=embed)
+        reply = await bot.wait_for('message', check=lambda x: x.channel == channel)
+        author = reply.author
+        reply = reply.content
+        reply = reply.capitalize()
+        if reply in ('Yes', 'Yeah', 'Ye', 'Yea'):
+            await channel.send(
+                'Alright. Kindly wait until staff get in contact with you.'
+                '\n`You are recommended to leave your present guild (if any) so that staff can invite you to Miscellaneous ASAP`'
+                '\nIf you get in the guild and want the member role in the discord, use ,sync `Your Minecraft Name` ! ')
+            await asyncio.sleep(3)
+            embed1 = discord.Embed(title="Miscellaneous Guild Requirements",
+                                   description="These requirements are subject to change!",
+                                   color=0x8368ff)
+            embed1.set_author(name="While you wait, kindly take a look a the guild requirements!")
+            embed1.add_field(name="Active",
+                             value=f"•  {format(bot.active, ',d')} Weekly Guild Experience",
+                             inline=False)
+            embed1.add_field(name="Do Not Kick List Eligibility",
+                             value=f"•  {format(bot.dnkl, ',d')} Weekly Guild Experience",
+                             inline=False)
+            embed1.add_field(name="Resident", value=f"•  {format(bot.resident_req, ',d')} Weekly Guild Experience",
+                             inline=False)
+            embed1.add_field(name="Member",
+                             value=f"•  {format(bot.inactive, ',d')} Weekly Guild Experience",
+                             inline=False)
+            embed1.add_field(name="New Member",
+                             value=f"•  {format(bot.new_member, ',d')} Daily Guild Experience",
+                             inline=False)
+            embed1.set_footer(text="You are considered a New Member for the first 7 days after joining the guild"
+                                   "\nIf you fail to meet the New Member/Member requirements, you will be kicked!")
+            await channel.send(embed=embed1)
+        elif reply in ('No', 'Nah', 'Nope'):
+            embed = discord.Embed(title="Did you join the discord to organize a GvG with Miscellaneous?",
+                                  color=0x8368ff)
+            embed.add_field(name="If yes", value="Type `Yes`")
+            embed.add_field(name="If not", value="Type `No`")
             await channel.send(embed=embed)
-            reply = await bot.wait_for('message', check=lambda x: x.channel == channel)
-            author = reply.author
-            reply = reply.content
-            reply = reply.capitalize()
-            if reply in ('Yes', 'Yeah', 'Ye', 'Yea'):
-                await channel.send(
-                    'Alright. Kindly wait until staff get in contact with you.'
-                    '\n`You are recommended to leave your present guild (if any) so that staff can invite you to Miscellaneous ASAP`'
-                    '\nIf you get in the guild and want the member role in the discord, use ,sync `Your Minecraft Name` ! ')
-                await asyncio.sleep(3)
-                embed1 = discord.Embed(title="Miscellaneous Guild Requirements",
-                                       description="These requirements are subject to change!",
-                                       color=0x8368ff)
-                embed1.set_author(name="While you wait, kindly take a look a the guild requirements!")
-                embed1.add_field(name="Active",
-                                 value=f"•  {format(bot.active, ',d')} Weekly Guild Experience",
-                                 inline=False)
-                embed1.add_field(name="Do Not Kick List Eligibility",
-                                 value=f"•  {format(bot.dnkl, ',d')} Weekly Guild Experience",
-                                 inline=False)
-                embed1.add_field(name="Resident", value=f"•  {format(bot.resident_req, ',d')} Weekly Guild Experience",
-                                 inline=False)
-                embed1.add_field(name="Member",
-                                 value=f"•  {format(bot.inactive, ',d')} Weekly Guild Experience",
-                                 inline=False)
-                embed1.add_field(name="New Member",
-                                 value=f"•  {format(bot.new_member, ',d')} Daily Guild Experience",
-                                 inline=False)
-                embed1.set_footer(text="You are considered a New Member for the first 7 days after joining the guild"
-                                       "\nIf you fail to meet the New Member/Member requirements, you will be kicked!")
-                await channel.send(embed=embed1)
-                break
-            elif reply in ('No', 'Nah', 'Nope'):
-                embed = discord.Embed(title="Did you join the discord to organize a GvG with Miscellaneous?",
+            noreply = await bot.wait_for('message', check=lambda x: x.channel == channel)
+            noreply = noreply.content
+            noreply = noreply.capitalize()
+            if noreply in ('Yes', 'Yeah', 'Ye', 'Yea'):
+                embed = discord.Embed(title="In order to organize a GvG with miscellaneous, "
+                                            "kindly list the following and await staff assistance!",
+                                      description="• Your guild's plancke"
+                                                  "\n• Your preferred gamemode"
+                                                  "\n• Your preferred timezone"
+                                                  "\n• Number of players",
                                       color=0x8368ff)
-                embed.add_field(name="If yes", value="Type `Yes`")
-                embed.add_field(name="If not", value="Type `No`")
+                embed.set_footer(text="Upon completion of all of the above, kindly await staff assistance!")
                 await channel.send(embed=embed)
-                noreply = await bot.wait_for('message', check=lambda x: x.channel == channel)
-                noreply = noreply.content
-                noreply = noreply.capitalize()
-                if noreply in ('Yes', 'Yeah', 'Ye', 'Yea'):
-                    embed = discord.Embed(title="In order to organize a GvG with miscellaneous, "
-                                                "kindly list the following and await staff assistance!",
-                                          description="• Your guild's plancke"
-                                                      "\n• Your preferred gamemode"
-                                                      "\n• Your preferred timezone"
-                                                      "\n• Number of players",
-                                          color=0x8368ff)
-                    embed.set_footer(text="Upon completion of all of the above, kindly await staff assistance!")
-                    await channel.send(embed=embed)
-                    break
-                elif noreply == "No":
-                    await channel.send(
-                        "**Okay, kindly specify your reason behind joining the Miscellaneous discord and then await staff help!**")
-                    break
-                else:
-                    embed = discord.Embed(title="My massive computer brain thinks you made a mistake.",
-                                          color=0xff0000)
-                    embed.add_field(name="If this is true", value="Type `Yes`", inline=False)
-                    embed.add_field(name="If this is false", value="Type `No`", inline=False)
-                    await channel.send(embed=embed)
-                    errorreply = await bot.wait_for('message', check=lambda x: x.channel == channel)
-                    errorreply = errorreply.content
-                    errorreply = errorreply.capitalize()
-                    if errorreply in ('Yes', 'Yeah', 'Ye', 'Yea'):
-                        embed = discord.Embed(title="Great! Let's start over!",
-                                              color=0x8368ff)
-                        await channel.send(embed=embed)
-                    else:
-                        embed = discord.Embed(
-                            title="Alright! Kindly specify why you joined the discord and await staff assistance!",
-                            color=0x8368ff)
-                        await channel.send(embed=embed)
-                        break
+            elif noreply == "No":
+                await channel.send(
+                    "**Okay, kindly specify your reason behind joining the Miscellaneous discord and then await staff help!**")
             else:
                 embed = discord.Embed(title="My massive computer brain thinks you made a mistake.",
                                       color=0xff0000)
@@ -243,8 +220,26 @@ async def on_guild_channel_create(channel):
                         title="Alright! Kindly specify why you joined the discord and await staff assistance!",
                         color=0x8368ff)
                     await channel.send(embed=embed)
-                    break
-        elif channel.category.name == '🎫 Ticket Section':
+        else:
+            embed = discord.Embed(title="My massive computer brain thinks you made a mistake.",
+                                  color=0xff0000)
+            embed.add_field(name="If this is true", value="Type `Yes`", inline=False)
+            embed.add_field(name="If this is false", value="Type `No`", inline=False)
+            await channel.send(embed=embed)
+            errorreply = await bot.wait_for('message', check=lambda x: x.channel == channel)
+            errorreply = errorreply.content
+            errorreply = errorreply.capitalize()
+            if errorreply in ('Yes', 'Yeah', 'Ye', 'Yea'):
+                embed = discord.Embed(title="Great! Let's start over!",
+                                      color=0x8368ff)
+                await channel.send(embed=embed)
+            else:
+                embed = discord.Embed(
+                    title="Alright! Kindly specify why you joined the discord and await staff assistance!",
+                    color=0x8368ff)
+                await channel.send(embed=embed)
+    elif channel.category.name == '🎫 Ticket Section':
+        while True:
             await asyncio.sleep(3)
             embed = discord.Embed(title="What did you make this ticket?",
                                   description="Please reply with your reason from the list given below!",
@@ -387,9 +382,9 @@ async def on_guild_channel_create(channel):
                             while True:
                                 click = await bot.wait_for("button_click",
                                                            check=lambda x: x.channel == channel and (
-                                                                       bot.staff in bot.misc_guild.get_member(
-                                                                   x.author.id).roles or bot.t_officer in bot.misc_guild.get_member(
-                                                                   x.author.id).roles))
+                                                                   bot.staff in bot.misc_guild.get_member(
+                                                               x.author.id).roles or bot.t_officer in bot.misc_guild.get_member(
+                                                               x.author.id).roles))
 
                                 if click.component.id == "approve":
                                     a, b, c = start.split('/')
@@ -543,8 +538,8 @@ async def on_guild_channel_create(channel):
                                                     break
 
                 stop_embed = discord.Embed(title="Can this ticket be closed?",
-                                      description="Click `Yes` if you resolved your issue and want to delete the ticket.\n Click `No` if you wish to wait for staff assistance\nClick `Restart` if you wish to restart the ticket process",
-                                      color=0x8368ff)
+                                           description="Click `Yes` if you resolved your issue and want to delete the ticket.\n Click `No` if you wish to wait for staff assistance\nClick `Restart` if you wish to restart the ticket process",
+                                           color=0x8368ff)
                 yes = Button(style=ButtonStyle.blue, label="Yes", id="yes")
                 no = Button(style=ButtonStyle.red, label="No", id="no")
                 restart = Button(style=ButtonStyle.grey, label="Restart", id="restart")
@@ -590,7 +585,7 @@ async def on_guild_channel_create(channel):
                     elif click.component.id == "restart":
                         embed = discord.Embed(title="Restarting", description="The ticket process will restart in 5 seconds!",
                                               color=0x00a86b)
-                        asyncio.sleep(5)
+                        asyncio.sleep(2)
 
             elif reply in ("Role", "Username", "Name"):
                 await channel.edit(name=f"Role/NameChange-{name}",
@@ -663,7 +658,7 @@ async def on_guild_channel_create(channel):
                                     ign = ign + " " + gtag
 
                                 await author.remove_roles(bot.new_member_role, bot.awaiting_app,
-                                                              bot.member_role)
+                                                          bot.member_role)
                                 await author.add_roles(bot.guest, bot.ally)
 
                                 embed = discord.Embed(title="Your nick, role and tag were successfully changed!",
@@ -701,7 +696,7 @@ async def on_guild_channel_create(channel):
                 while True:
                     click = await bot.wait_for("button_click",
                                                check=lambda x: (x.author == author and x.channel == channel) or (
-                                                           bot.staff in x.author.roles and x.channel == channel))
+                                                       bot.staff in x.author.roles and x.channel == channel))
 
                     if click.component.id == "yes":
                         success_embed = discord.Embed(title="Success", color=0x00A86B)
@@ -739,19 +734,8 @@ async def on_guild_channel_create(channel):
                         embed = discord.Embed(title="Restarting",
                                               description="The ticket process will restart in 5 seconds!",
                                               color=0x00a86b)
-                        asyncio.sleep(5)
-                    elif click.component.id == "no":
-                        success_embed = discord.Embed(title="Success", color=0x00A86B)
-                        await click.respond(embed=success_embed)
-                        embed = discord.Embed(title="The ticket will not be closed. ",
-                                              description="Kindly await staff assistance!", color=0xde3163)
-                        await channel.send(embed=embed)
-                        break
-                    elif click.component.id == "restart":
-                        embed = discord.Embed(title="Restarting",
-                                              description="The ticket process will restart in 5 seconds!",
-                                              color=0x00a86b)
-                        asyncio.sleep(5)
+                        asyncio.sleep(2)
+
 
             elif reply in "Report":
                 await channel.edit(name=f"Report-{name}",
@@ -1263,6 +1247,7 @@ async def ticketer():
         category = discord.utils.get(bot.misc_guild.categories, name="🎫 Ticket Section")
         ticket_channel = await bot.misc_guild.create_text_channel(f"ticket-{name}",
                                                                   category=category)
+        print("Channel created")
         await ticket_channel.set_permissions(bot.misc_guild.get_role(bot.misc_guild.id), send_messages=False,
                                              read_messages=False)
         await ticket_channel.set_permissions(bot.staff, send_messages=True, read_messages=True,
@@ -1288,11 +1273,11 @@ async def ticketer():
 @tasks.loop(count=1)
 async def after_cache_ready():
     # replace the below IDs in testing servers - make sure to revert before committing.
-    bot.error_channel = bot.get_channel(523743721443950612)
-    bot.dnkl_channel = bot.get_channel(629564802812870657)
-    bot.ticket_channel = bot.get_channel(650248396480970782)
-    bot.logs = bot.get_channel(714821811832881222)
-    bot.misc_guild = bot.get_guild(522586672148381726)
+    bot.error_channel = bot.get_channel(859916798111907875)
+    bot.dnkl_channel = bot.get_channel(859916798111907875)
+    bot.ticket_channel = bot.get_channel(859916798111907875)
+    bot.logs = bot.get_channel(859916798111907875)
+    bot.misc_guild = bot.get_guild(859916798111907871)
     bot.guild_master = discord.utils.get(bot.misc_guild.roles, name="Guild Master")
     bot.admin = discord.utils.get(bot.misc_guild.roles, name="Admin")
     bot.staff = discord.utils.get(bot.misc_guild.roles, name="Staff")
