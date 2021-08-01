@@ -435,7 +435,7 @@ class staff(commands.Cog, name="Staff"):
         await inactivity_channel.send(f"<@&848051215287058443>")
         await inactivity_channel.send(embed=embed)
 
-    
+
     @commands.command(aliases=['fs'])
     @commands.has_role(538015368782807040)
     async def forcesync(self, ctx, member: discord.Member, name):
