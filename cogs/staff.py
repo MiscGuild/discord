@@ -466,84 +466,26 @@ class staff(commands.Cog, name="Staff"):
                     await ctx.send(embed=embed)
 
 
-                elif guild_name == "XL":
-                    if member.nick is None or "[✧XL✧]" not in member.nick:
-                        ign = ign + " [✧XL✧]"
-                    await member.edit(nick=ign)
-                    await member.remove_roles(member_, awaiting_app)
-                    await member.add_roles(guest, ally)
+                elif guild_name in self.bot.misc_allies:
+                    for guild in self.bot.misc_allies:
+                        if guild == guild_name:
+                            gtag = hypixel.get_gtag(guild)
+                            if member.nick is None or gtag not in member.nick:
+                                ign = ign + " " + gtag
+                            await member.remove_roles(self.bot.new_member_role)
 
-                    embed = discord.Embed(title=f"{member.name}'s nick, role and tag were successfully changed!",
-                                          color=0x8368ff)
+                            await member.add_roles(self.bot.guest, self.bot.ally)
 
-                    embed.set_footer(text="Member of XL"
-                                          "\n• Member & Awaiting Approval were removed"
-                                          "\n• Guest, Ally were given")
-                    embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
 
-                    await ctx.send(embed=embed)
+                            embed = discord.Embed(title=f"{member.name}'s nick and role were successfully changed!",
+                                                  color=0x8368ff)
+                            embed.set_footer(
+                                text=f"Member of {guild}\n• Nick & Tag Changed\n• Member & Awaiting Approval were removed\n• Guest and Ally were given")
+                            embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
+                            await ctx.send(embed=embed)
 
-                elif guild_name == "Lucid":
-                    if member.nick is None or "[✧LUCID✧]" not in member.nick:
-                        ign = ign + " [✧LUCID✧]"
-                    await member.edit(nick=ign)
-                    await member.remove_roles(member_, awaiting_app)
-                    await member.add_roles(guest, ally)
 
-                    embed = discord.Embed(title=f"{member.name}'s nick, role and tag were successfully changed!",
-                                          color=0x8368ff)
-
-                    embed.set_footer(text="Member of Lucid"
-                                          "\n• Member & Awaiting Approval were removed"
-                                          "\n• Guest, Ally were given")
-                    embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
-                    await ctx.send(embed=embed)
-
-                elif guild_name == "OUT":
-                    if member.nick is None or "[O✌T]" not in member.nick:
-                        ign = ign + " [O✌T]"
-                    await member.edit(nick=ign)
-                    await member.remove_roles(member_, awaiting_app)
-                    await member.add_roles(guest, ally)
-
-                    embed = discord.Embed(title=f"{member.name}'s nick, role and tag were successfully changed!",
-                                          color=0x8368ff)
-
-                    embed.set_footer(text="Member of OUT"
-                                          "\n• Member & Awaiting Approval were removed"
-                                          "\n• Guest, Ally were given")
-                    embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
-                    await ctx.send(embed=embed)
-
-                elif guild_name == "Cronos":
-                    if member.nick is None or "[CRONOS❤]" not in member.nick:
-                        ign = ign + " [CRONOS❤]"
-                    await member.edit(nick=ign)
-                    await member.remove_roles(member_, awaiting_app)
-                    await member.add_roles(guest, ally)
-
-                    embed = discord.Embed(title=f"{member.name}'s nick, role and tag were successfully changed!",
-                                          color=0x8368ff)
-
-                    embed.set_footer(text="Member of Cronos"
-                                          "\n• Member & Awaiting Approval were removed"
-                                          "\n• Guest, Ally were given")
-                    embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
-                    await ctx.send(embed=embed)
-
-                elif guild_name is None:
-                    await member.remove_roles(member_, awaiting_app, newmember)
-                    await member.add_roles(guest)
-                    guild_name = "Guildless (No Guild)"
-                    embed = discord.Embed(title=f"{member.name}'s nick and role were successfully changed!",
-                                          color=0x8368ff)
-                    embed.set_footer(
-                        text=f"Member of {guild_name}\n• Nick Changed\n• Member & Awaiting Approval were removed\n• Guest was given")
-                    embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
-
-                    await ctx.send(embed=embed)
-
-                elif guild_name not in ("Miscellaneous", "XL", "Lucid", "OUT", "Cronos"):
+                elif guild_name not in "Miscellaneous" or self.bot.misc_allies:
                     await member.remove_roles(member_, awaiting_app, newmember, ally)
                     await member.add_roles(guest)
 
@@ -556,6 +498,19 @@ class staff(commands.Cog, name="Staff"):
                                           "\n• Guest was given")
 
                     await ctx.send(embed=embed)
+                elif guild_name is None:
+                    await member.remove_roles(member_, awaiting_app, newmember)
+                    await member.add_roles(guest)
+                    guild_name = "Guildless (No Guild)"
+                    embed = discord.Embed(title=f"{member.name}'s nick and role were successfully changed!",
+                                          color=0x8368ff)
+                    embed.set_footer(
+                        text=f"Member of {guild_name}\n• Nick Changed\n• Member & Awaiting Approval were removed\n• Guest was given")
+                    embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
+
+                    await ctx.send(embed=embed)
+
+
 
         else:
             embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
