@@ -416,8 +416,8 @@ class staff(commands.Cog, name="Staff"):
                             for guild in self.bot.misc_allies:
                                 if guild == guild_name:
                                     gtag = hypixel.get_gtag(guild)
-                                    if member.nick is None or gtag not in member.nick:
-                                        ign = ign + " " + gtag
+                                    if member.nick is None or str(gtag) not in member.nick:
+                                        ign = ign + " " + str(gtag)
 
                                     await member.add_roles(self.bot.guest, self.bot.ally)
                                     await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
@@ -472,9 +472,9 @@ class staff(commands.Cog, name="Staff"):
                 elif guild_name in self.bot.misc_allies:
                     for guild in self.bot.misc_allies:
                         if guild == guild_name:
-                            gtag = hypixel.get_gtag(guild)
-                            if member.nick is None or gtag not in member.nick:
-                                ign = ign + " " + gtag
+                            gtag = await hypixel.get_gtag(guild)
+                            if member.nick is None or str(gtag) not in member.nick:
+                                ign = ign + " " + str(gtag)
                             await member.remove_roles(self.bot.new_member_role)
 
                             await member.add_roles(self.bot.guest, self.bot.ally)

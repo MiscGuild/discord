@@ -52,9 +52,9 @@ class Tickets(commands.Cog, name="Tickets"):
                         elif guild_name in self.bot.misc_allies:
                             for guild in self.bot.misc_allies:
                                 if guild == guild_name:
-                                    gtag = hypixel.get_gtag(guild)
-                                    if ctx.author.nick is None or gtag not in ctx.author.nick:
-                                        ign = ign + " " + gtag
+                                    gtag = await hypixel.get_gtag(guild)
+                                    if ctx.author.nick is None or str(gtag) not in ctx.author.nick:
+                                        ign = ign + " " + str(gtag)
 
                                     await ctx.author.remove_roles(self.bot.new_member_role)
                                     await ctx.author.add_roles(self.bot.guest, self.bot.ally)

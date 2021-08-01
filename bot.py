@@ -653,9 +653,9 @@ async def on_guild_channel_create(channel):
                     elif guild_name in bot.misc_allies:
                         for guild in bot.misc_allies:
                             if guild == guild_name:
-                                gtag = hypixel.get_gtag(guild)
-                                if author.nick is None or gtag not in author.nick:
-                                    ign = ign + " " + gtag
+                                gtag = await hypixel.get_gtag(guild)
+                                if author.nick is None or str(gtag) not in author.nick:
+                                    ign = ign + " " + str(gtag)
 
                                 await author.remove_roles(bot.new_member_role, bot.awaiting_app,
                                                           bot.member_role)
