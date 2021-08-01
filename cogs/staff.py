@@ -277,8 +277,13 @@ class staff(commands.Cog, name="Staff"):
         """
         msg = await ctx.send("**Processing all the prerequisites**")
 
-        misc_uuids, xl_uuids, = await hypixel.get_guild_members("Miscellaneous"), await hypixel.get_guild_members("XL")
-        misc_members, xl_members = [], []
+
+
+        misc_uuids, = await hypixel.get_guild_members("Miscellaneous")
+        misc_members = ally_members = ally_uuids = []
+        for guild in self.bot.misc_allies:
+            ally_uuids = ally_uuids + await hypixel.get_guild_members(guild)
+
 
         # Miscellaneous Member Names
         await msg.edit(content="**Processing** - 1/2")
@@ -297,7 +302,7 @@ class staff(commands.Cog, name="Staff"):
                 for response in await asyncio.gather(*tasks):  # Puts the result into a list
                     misc_members.append(response)
 
-        # XL Member Names
+        # Ally Member Names
         await msg.edit(content="**Processing** - 2/2")
         with ThreadPoolExecutor(max_workers=10) as executor:
             with requests.Session() as session:
@@ -309,10 +314,10 @@ class staff(commands.Cog, name="Staff"):
                         hypixel.fetch,
                         *(session, individual_uuid)  # Allows us to pass in multiple arguments to `fetch`
                     )
-                    for individual_uuid in xl_uuids
+                    for individual_uuid in ally_uuids
                 ]
                 for response in await asyncio.gather(*tasks):  # Puts the result into a list
-                    xl_members.append(response)
+                    ally_members.append(response)
 
         for guild in self.bot.guilds:
             if str(guild) == "Miscellaneous [MISC]":  # Check if the Discord is Miscellaneous
@@ -405,24 +410,21 @@ class staff(commands.Cog, name="Staff"):
                                             await message.edit(
                                                 content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
 
+                        # Ally
+                        elif ign in ally_members:
+                            guild_name = await hypixel.get_guild(name)
+                            for guild in self.bot.misc_allies:
+                                if guild == guild_name:
+                                    gtag = hypixel.get_gtag(guild)
+                                    if member.nick is None or gtag not in member.nick:
+                                        ign = ign + " " + gtag
 
+                                    await member.add_roles(self.bot.guest, self.bot.ally)
+                                    await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
+                                                              self.bot.active_role, self.bot.inactive_role)
+                                    await message.edit(
+                                        content=f"{name} ||{member}|| Member of {guild} **++Ally \| ++Guest | --Member | --Active**")
 
-                        elif ign in xl_members:
-                            if member.nick is None or "[✧XL✧]" not in member.nick:
-                                new_nick = ign + " [✧XL✧]"
-                                await member.edit(nick=new_nick)
-                            await member.add_roles(self.bot.guest, self.bot.ally)
-                            await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
-                                                      self.bot.active_role, self.bot.inactive_role)
-                            await message.edit(
-                                content=f"{name} ||{member}|| Member of XL **++XL - Ally \| ++Guest | --Member | --Active**")
-
-                        else:
-                            await member.add_roles(self.bot.guest)
-                            await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
-                                                      self.bot.active_role, self.bot.ally, self.bot.inactive_role)
-                            await message.edit(
-                                content=f"{name} ||{member}|| Member of an unallied guild **++Guest | --Member | --Active**")
                 await ctx.send('**Rolecheck completed**')
 
         inactivity_channel = self.bot.get_channel(848067712156434462)
@@ -433,6 +435,7 @@ class staff(commands.Cog, name="Staff"):
         await inactivity_channel.send(f"<@&848051215287058443>")
         await inactivity_channel.send(embed=embed)
 
+    
     @commands.command(aliases=['fs'])
     @commands.has_role(538015368782807040)
     async def forcesync(self, ctx, member: discord.Member, name):
