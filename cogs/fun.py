@@ -154,6 +154,16 @@ class Fun(commands.Cog, name="Fun"):
         embed.set_image(url=req['link'])
         await ctx.send(embed=embed)
 
+    @commands.command()
+    async def avatar(self, ctx, member: discord.Member):
+        """Sends the member's discord avatar
+        """
+        embed=discord.Embed(title=f"{member.name}'s avatar:",color=0x8368ff)
+        embed.set_image(url=member.avatar_url)
+        await ctx.send(embed=embed)
+
+
+
 
 def setup(bot):
     bot.add_cog(Fun(bot))
