@@ -77,13 +77,15 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             if ctx.author.nick is None or gtag not in ctx.author.nick:
                                 ign = ign + " " + gtag
 
-                            await ctx.author.remove_roles(self.bot.new_member_role)
+                            await ctx.author.remove_roles(self.bot.new_member_role,self.bot.awaiting_app,self.bot.member_role)
                             await ctx.author.add_roles(self.bot.guest, self.bot.ally)
 
-                            await ctx.channel.purge(limit=1)
-                            embed = discord.Embed(title="Registration successful!")
-                            embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
-                            embed.add_field(name=ign, value=f"Member of {guild}")
+                            embed = discord.Embed(title="Your nick, role and tag were successfully changed!",
+                                                  description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
+                                                  color=0x8368ff)
+                            embed.set_footer(
+                                text=f"Member of {guild}\n• Nick & Tag Changed\n• Member & Awaiting Approval were removed\n• Guest and Ally were given")
+                            embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                             await ctx.send(embed=embed)
 
                 elif guild_name not in "Miscellaneous" or self.bot.misc_allies:
@@ -174,10 +176,12 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             await ctx.author.remove_roles(self.bot.new_member_role)
                             await ctx.author.add_roles(self.bot.guest, self.bot.ally)
 
-                            await ctx.channel.purge(limit=1)
-                            embed = discord.Embed(title="Registration successful!")
-                            embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
-                            embed.add_field(name=ign, value=f"Member of {guild}")
+                            embed = discord.Embed(title="Your nick, role and tag were successfully changed!",
+                                                  description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
+                                                  color=0x8368ff)
+                            embed.set_footer(
+                                text=f"Member of {guild}\n• Nick & Tag Changed\n• Member & Awaiting Approval were removed\n• Guest and Ally were given")
+                            embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                             await ctx.send(embed=embed)
 
                 elif guild_name not in "Miscellaneous" or self.bot.misc_allies:
