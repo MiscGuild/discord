@@ -85,7 +85,19 @@ class Tickets(commands.Cog, name="Tickets"):
                             embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                             embed.add_field(name=ign, value="Member of OUT")
                             await ctx.send(embed=embed)
-                        elif guild_name not in ("Miscellaneous", "XL", "Lucid", "OUT"):
+                        elif guild_name == "Cronos":
+                            if ctx.author.nick is None or "[CRONOS❤]" not in ctx.author.nick:
+                                ign = ign + " [CRONOS❤]"
+                            nick = await author.edit(nick=ign)
+                            await ctx.author.remove_roles(self.bot.new_member_role)
+                            await ctx.author.add_roles(self.bot.guest, self.bot.ally)
+
+                            await ctx.channel.purge(limit=1)
+                            embed = discord.Embed(title="Registration successful!")
+                            embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
+                            embed.add_field(name=ign, value="Member of Cronos")
+                            await ctx.send(embed=embed)
+                        elif guild_name not in ("Miscellaneous", "XL", "Lucid", "OUT", "Cronos"):
                             await ctx.author.remove_roles(self.bot.new_member_role)
                             await ctx.author.add_roles(self.bot.awaiting_app)
                             if nick is None:
@@ -178,7 +190,7 @@ class Tickets(commands.Cog, name="Tickets"):
                 await self.bot.logs.send(file=transcript_file)
 
     @commands.command()
-    @commands.has_role(538015368782807040 or 522588122807271424)
+    @commands.has_any_role(538015368782807040, 522588122807271424)
     async def add(self, ctx, member: discord.Member):
         """Adds the specified user to the ticket.
         """
@@ -187,20 +199,35 @@ class Tickets(commands.Cog, name="Tickets"):
                                               add_reactions=True, embed_links=True,
                                               attach_files=True,
                                               read_message_history=True, external_emojis=True)
-            embed = discord.Embed(title=f"{member.title} has been added to the ticket!",
+            embed = discord.Embed(title=f"{member.name} has been added to the ticket!",
                                   color=0x00A86B)
             await ctx.send(embed=embed)
 
     @commands.command()
-    @commands.has_role(538015368782807040 or 522588122807271424)
+    @commands.has_any_role(538015368782807040, 522588122807271424)
+    async def remove(self, ctx, member: discord.Member):
+        """Removes the specified user from the ticket.
+        """
+        if ctx.channel.category.name in self.bot.ticket_categories:
+            await ctx.channel.set_permissions(member, send_messages=False, read_messages=False,
+                                              add_reactions=False, embed_links=False,
+                                              attach_files=False,
+                                              read_message_history=False, external_emojis=False)
+            embed = discord.Embed(title=f"{member.name} has been removed from the ticket!",
+                                  color=0x00A86B)
+            await ctx.send(embed=embed)
+
+    @commands.command()
+    @commands.has_any_role(538015368782807040, 522588122807271424)
     async def rename(self, ctx, channel_name):
         """Renames the channel
         """
         if ctx.channel.category.name in self.bot.ticket_categories:
+            channel_name = channel_name.replace(" ", "-")
             await ctx.channel.edit(name=f"{channel_name}")
 
     @commands.command()
-    @commands.has_role(538015368782807040 or 522588122807271424)
+    @commands.has_any_role(538015368782807040, 522588122807271424)
     async def transcript(self, ctx):
         """Creates a transcript for the channel the command is entered in
         """
@@ -216,7 +243,7 @@ class Tickets(commands.Cog, name="Tickets"):
             transcript_file = discord.File(io.BytesIO(transcript.encode()),
                                            filename=f"transcript-{ctx.channel.name}.html")
 
-            embed = discord.Emebd(title="Transcript creation successful!",
+            embed = discord.Embed(title="Transcript creation successful!",
                                   color=0x00A86B)
             await ctx.send(embed=embed)
             await ctx.send(file=transcript_file)
