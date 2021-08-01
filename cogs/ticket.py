@@ -49,55 +49,23 @@ class Tickets(commands.Cog, name="Tickets"):
                             await ctx.send(embed=embed)
                             await ctx.author.add_roles(self.bot.member_role)
 
-                        elif guild_name == "XL":
-                            if ctx.author.nick is None or "[✧XL✧]" not in ctx.author.nick:
-                                ign = ign + " [✧XL✧]"
-                            nick = await author.edit(nick=ign)
-                            await ctx.author.remove_roles(self.bot.new_member_role)
-                            await ctx.author.add_roles(self.bot.guest, self.bot.ally)
+                        elif guild_name in self.bot.misc_allies:
+                            for guild in self.bot.misc_allies:
+                                if guild == guild_name:
+                                    gtag = hypixel.get_gtag(guild)
+                                    if ctx.author.nick is None or gtag not in ctx.author.nick:
+                                        ign = ign + " " + gtag
 
-                            await ctx.channel.purge(limit=1)
-                            embed = discord.Embed(title="Registration successful!")
-                            embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
-                            embed.add_field(name=ign, value="Member of XL")
-                            await ctx.send(embed=embed)
-                        elif guild_name == "Lucid":
-                            if ctx.author.nick is None or "[✧LUCID✧]" not in ctx.author.nick:
-                                ign = ign + " [✧LUCID✧]"
-                            nick = await author.edit(nick=ign)
-                            await ctx.author.remove_roles(self.bot.new_member_role)
-                            await ctx.author.add_roles(self.bot.guest, self.bot.ally)
+                                    await ctx.author.remove_roles(self.bot.new_member_role)
+                                    await ctx.author.add_roles(self.bot.guest, self.bot.ally)
 
-                            await ctx.channel.purge(limit=1)
-                            embed = discord.Embed(title="Registration successful!")
-                            embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
-                            embed.add_field(name=ign, value="Member of Lucid")
-                            await ctx.send(embed=embed)
-                        elif guild_name == "OUT":
-                            if ctx.author.nick is None or "[O✌T]" not in ctx.author.nick:
-                                ign = ign + " [O✌T]"
-                            nick = await author.edit(nick=ign)
-                            await ctx.author.remove_roles(self.bot.new_member_role)
-                            await ctx.author.add_roles(self.bot.guest, self.bot.ally)
+                                    await ctx.channel.purge(limit=1)
+                                    embed = discord.Embed(title="Registration successful!")
+                                    embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
+                                    embed.add_field(name=ign, value=f"Member of {guild}")
+                                    await ctx.send(embed=embed)
 
-                            await ctx.channel.purge(limit=1)
-                            embed = discord.Embed(title="Registration successful!")
-                            embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
-                            embed.add_field(name=ign, value="Member of OUT")
-                            await ctx.send(embed=embed)
-                        elif guild_name == "Cronos":
-                            if ctx.author.nick is None or "[CRONOS❤]" not in ctx.author.nick:
-                                ign = ign + " [CRONOS❤]"
-                            nick = await author.edit(nick=ign)
-                            await ctx.author.remove_roles(self.bot.new_member_role)
-                            await ctx.author.add_roles(self.bot.guest, self.bot.ally)
-
-                            await ctx.channel.purge(limit=1)
-                            embed = discord.Embed(title="Registration successful!")
-                            embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
-                            embed.add_field(name=ign, value="Member of Cronos")
-                            await ctx.send(embed=embed)
-                        elif guild_name not in ("Miscellaneous", "XL", "Lucid", "OUT", "Cronos"):
+                        elif guild_name not in "Miscellaneous" or self.bot.misc_allies:
                             await ctx.author.remove_roles(self.bot.new_member_role)
                             await ctx.author.add_roles(self.bot.awaiting_app)
                             if nick is None:

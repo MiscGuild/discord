@@ -176,13 +176,11 @@ async def get_guild(name):
 async def get_gtag(name):
     req = await get_guild_data(name)
     if len(req) < 2:
-        return None
+        return (" ")
     if req["tag"] is None:
-        print("The user is not in any guild!")
         return (" ")
     else:
         gtag = req["tag"]
-        print("Gtag acquired")
         return (f"[{gtag}]")
 
 
