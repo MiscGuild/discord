@@ -515,6 +515,22 @@ class staff(commands.Cog, name="Staff"):
                     embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                     await ctx.send(embed=embed)
 
+                elif guild_name == "Cronos":
+                    if member.nick is None or "[CRONOS❤]" not in member.nick:
+                        ign = ign + " [CRONOS❤]"
+                    await member.edit(nick=ign)
+                    await member.remove_roles(member_, awaiting_app)
+                    await member.add_roles(guest, ally)
+
+                    embed = discord.Embed(title=f"{member.name}'s nick, role and tag were successfully changed!",
+                                          color=0x8368ff)
+
+                    embed.set_footer(text="Member of Cronos"
+                                          "\n• Member & Awaiting Approval were removed"
+                                          "\n• Guest, Ally were given")
+                    embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
+                    await ctx.send(embed=embed)
+
                 elif guild_name is None:
                     await member.remove_roles(member_, awaiting_app, newmember)
                     await member.add_roles(guest)
@@ -527,7 +543,7 @@ class staff(commands.Cog, name="Staff"):
 
                     await ctx.send(embed=embed)
 
-                elif guild_name not in ("Miscellaneous", "XL", "Lucid", "OUT"):
+                elif guild_name not in ("Miscellaneous", "XL", "Lucid", "OUT", "Cronos"):
                     await member.remove_roles(member_, awaiting_app, newmember, ally)
                     await member.add_roles(guest)
 
