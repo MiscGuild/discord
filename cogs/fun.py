@@ -162,7 +162,23 @@ class Fun(commands.Cog, name="Fun"):
         embed.set_image(url=member.avatar_url)
         await ctx.send(embed=embed)
 
-
+    @commands.command()
+    async def userinfo(self,ctx,member:discord.Member):
+        """Sends an embed with the discord member's info
+        """
+        embed = discord.Embed(title=f"{member.name}", description=member.nick, color=member.color)
+        embed.set_thumbnail(url=member.avatar_url)
+        embed.add_field(name="Account created:", value=str(member.created_at)[:-7], inline=False)
+        embed.add_field(name="Joined this discord on:", value=str(member.joined_at)[:-7],inline=False)
+        if member.premium_since is not None:
+            embed.add_field(name="Server booster since:", value=str(member.premium_since)[:-7], inline=False)
+        else:
+            embed.add_field(name="Server booster:", value="False", inline=False)
+        total_roles = ""
+        for role in member.roles:
+            total_roles = total_roles + f"{role}\n"
+        embed.add_field(name="Roles:", value=total_roles, inline=False)
+        await ctx.send(embed=embed)
 
 
 def setup(bot):
