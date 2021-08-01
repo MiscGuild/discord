@@ -747,7 +747,7 @@ async def on_guild_channel_create(channel):
                                               description="Kindly await staff assistance!", color=0xde3163)
                         await channel.send(embed=embed)
                         break
-                    elif click.component.id = "restart":
+                    elif click.component.id == "restart":
                         embed = discord.Embed(title="Restarting",
                                               description="The ticket process will restart in 5 seconds!",
                                               color=0x00a86b)
