@@ -279,7 +279,7 @@ class staff(commands.Cog, name="Staff"):
 
 
 
-        misc_uuids, = await hypixel.get_guild_members("Miscellaneous")
+        misc_uuids = await hypixel.get_guild_members("Miscellaneous")
         misc_members = ally_members = ally_uuids = []
         for guild in self.bot.misc_allies:
             ally_uuids = ally_uuids + await hypixel.get_guild_members(guild)
