@@ -88,7 +88,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                             await ctx.send(embed=embed)
 
-                elif guild_name not in "Miscellaneous" or self.bot.misc_allies:
+                elif guild_name != "Miscellaneous" and guild_name not in self.bot.misc_allies:
                     if str(ctx.channel.category.name) == "RTickets":
                         await ctx.send("You aren't in Miscellaneous in-game. Kindly await staff assistance!")
                     else:
