@@ -669,7 +669,7 @@ async def on_guild_channel_create(channel):
                                 embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                                 await channel.send(embed=embed)
 
-                    elif guild_name not in "Miscellaneous" or bot.misc_allies:
+                    elif guild_name != "Miscellaneous" and guild_name not in bot.misc_allies:
                         if str(channel.channel.category.name) == "RTickets":
                             await channel.send("You aren't in Miscellaneous in-game. Kindly await staff assistance!")
                         else:
