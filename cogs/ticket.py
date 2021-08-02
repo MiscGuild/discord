@@ -65,7 +65,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                     embed.add_field(name=ign, value=f"Member of {guild}")
                                     await ctx.send(embed=embed)
 
-                        elif guild_name not in "Miscellaneous" or self.bot.misc_allies:
+                        elif guild_name == "Miscellaneous" and guild_name not in self.bot.misc_allies
                             await ctx.author.remove_roles(self.bot.new_member_role)
                             await ctx.author.add_roles(self.bot.awaiting_app)
                             if nick is None:
