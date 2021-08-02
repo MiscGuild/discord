@@ -488,7 +488,7 @@ class staff(commands.Cog, name="Staff"):
                             await ctx.send(embed=embed)
 
 
-                elif guild_name not in "Miscellaneous" or self.bot.misc_allies:
+                elif guild_name == "Miscellaneous" and guild_name not in self.bot.misc_allies
                     await member.remove_roles(member_, awaiting_app, newmember, ally)
                     await member.add_roles(guest)
 
