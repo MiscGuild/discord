@@ -341,7 +341,6 @@ class staff(commands.Cog, name="Staff"):
                                     ign = mojang_json["name"]
                                     uuid = mojang_json['id']
                                 await session.close()
-                        print(ally_members)
                             # Miscellaneous
                         if ign in misc_members and ign not in (
                                 "Rowdies", "PolarPowah", "LBROz", "Fantastic_Doge", "ElijahRus", "BotTyler"):
