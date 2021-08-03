@@ -1301,7 +1301,7 @@ async def after_cache_ready():
     DiscordComponents(bot)
     chat_exporter.init_exporter(bot)
 
-    ticketer.start()
+    #ticketer.start()
 
     print("Cache filled and task complete.")
 
