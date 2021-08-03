@@ -282,7 +282,7 @@ class staff(commands.Cog, name="Staff"):
         misc_uuids = await hypixel.get_guild_members("Miscellaneous")
         misc_members = ally_members = ally_uuids = []
         for guild in self.bot.misc_allies:
-            ally_uuids = ally_uuids + await hypixel.get_guild_members(guild)
+            ally_uuids.append(await hypixel.get_guild_members(guild))
 
 
         # Miscellaneous Member Names
@@ -369,11 +369,11 @@ class staff(commands.Cog, name="Staff"):
                                             if has_tag_perms is False:
                                                 await member.edit(nick=username)
                                             await member.add_roles(self.bot.inactive_role)
-                                            await member.remove_roles(self.bot.active_role)
+                                            await member.remove_roles(self.bot.active_role, self.bot.ally)
                                             await message.edit(content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
 
                                         elif totalexp >= self.bot.active:  # If the member is active
-                                            await member.remove_roles(self.bot.inactive_role, self.bot.new_member_role)
+                                            await member.remove_roles(self.bot.inactive_role, self.bot.new_member_role, self.bot.ally)
                                             await member.add_roles(self.bot.active_role)
                                             await message.edit(content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
 
@@ -381,7 +381,7 @@ class staff(commands.Cog, name="Staff"):
                                             username = await hypixel.name_grabber(member)
                                             if has_tag_perms is False:
                                                 await member.edit(nick=username)
-                                            await member.remove_roles(self.bot.inactive_role, self.bot.active_role)
+                                            await member.remove_roles(self.bot.inactive_role, self.bot.active_role, self.bot.ally)
                                             await message.edit(content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
                                     else:  # For residents
                                         if totalexp < self.bot.resident_req:
@@ -389,11 +389,11 @@ class staff(commands.Cog, name="Staff"):
                                             if has_tag_perms is False:
                                                 await member.edit(nick=username)
                                             await member.add_roles(self.bot.inactive_role)
-                                            await member.remove_roles(self.bot.active_role)
+                                            await member.remove_roles(self.bot.active_role, self.bot.ally)
                                             await message.edit(content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
 
                                         elif totalexp >= self.bot.active:  # If the member is active
-                                            await member.remove_roles(self.bot.inactive_role, self.bot.new_member_role)
+                                            await member.remove_roles(self.bot.inactive_role, self.bot.new_member_role, self.bot.ally)
                                             await member.add_roles(self.bot.active_role)
                                             await message.edit(content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
 
@@ -401,7 +401,7 @@ class staff(commands.Cog, name="Staff"):
                                             username = await hypixel.name_grabber(member)
                                             if has_tag_perms is False:
                                                 await member.edit(nick=username)
-                                            await member.remove_roles(self.bot.inactive_role, self.bot.active_role)
+                                            await member.remove_roles(self.bot.inactive_role, self.bot.active_role, self.bot.ally)
                                             await message.edit(content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
 
                         # Ally
