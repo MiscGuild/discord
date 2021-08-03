@@ -282,7 +282,7 @@ class staff(commands.Cog, name="Staff"):
         misc_uuids = await hypixel.get_guild_members("Miscellaneous")
         misc_members = ally_members = ally_uuids = []
         for guild in self.bot.misc_allies:
-            ally_uuids.append(await hypixel.get_guild_members(guild))
+            ally_uuids = ally_uuids + await hypixel.get_guild_members(guild)
 
 
         # Miscellaneous Member Names
@@ -341,7 +341,8 @@ class staff(commands.Cog, name="Staff"):
                                     ign = mojang_json["name"]
                                     uuid = mojang_json['id']
                                 await session.close()
-
+                        print(misc_members)
+                        print(ally_members)
                             # Miscellaneous
                         if ign in misc_members and ign not in (
                                 "Rowdies", "PolarPowah", "LBROz", "Fantastic_Doge", "ElijahRus", "BotTyler"):
