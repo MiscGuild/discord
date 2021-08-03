@@ -344,7 +344,7 @@ def discord_member_check(session, member):
         return invalid_members
 
 
-def get_color(color):
+async def get_color(color):
     if color == "res_met":
         l1 = [0x2c7354, 0x07AB99, 0x1b456b]
         l2 = ['rgba(44, 115, 84,0.3)', 'rgba(7, 171, 144,0.3)', 'rgba(6, 144, 87,0.3)']
@@ -423,3 +423,5 @@ def get_color(color):
         index = random.randint(0, 5)
 
         return l1[index], l2[index], l3[index]
+
+
