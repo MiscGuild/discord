@@ -280,9 +280,9 @@ class staff(commands.Cog, name="Staff"):
 
 
         misc_uuids = await hypixel.get_guild_members("Miscellaneous")
-        misc_members = ally_members = ally_uuids = []
-        for guild in self.bot.misc_allies:
-            ally_uuids = ally_uuids + await hypixel.get_guild_members(guild)
+        misc_members, ally_members,  ally_uuids = [], [], []
+        for x in self.bot.misc_allies:
+            ally_uuids = ally_uuids + await hypixel.get_guild_members(x)
 
 
         # Miscellaneous Member Names
@@ -295,9 +295,9 @@ class staff(commands.Cog, name="Staff"):
                     loop.run_in_executor(
                         executor,
                         hypixel.fetch,
-                        *(session, individual_uuid)  # Allows us to pass in multiple arguments to `fetch`
+                        *(session, individual_misc_uuid)  # Allows us to pass in multiple arguments to `fetch`
                     )
-                    for individual_uuid in misc_uuids
+                    for individual_misc_uuid in misc_uuids
                 ]
                 for response in await asyncio.gather(*tasks):  # Puts the result into a list
                     misc_members.append(response)
@@ -312,9 +312,9 @@ class staff(commands.Cog, name="Staff"):
                     loop.run_in_executor(
                         executor,
                         hypixel.fetch,
-                        *(session, individual_uuid)  # Allows us to pass in multiple arguments to `fetch`
+                        *(session, individual_ally_uuid)  # Allows us to pass in multiple arguments to `fetch`
                     )
-                    for individual_uuid in ally_uuids
+                    for individual_ally_uuid in ally_uuids
                 ]
                 for response in await asyncio.gather(*tasks):  # Puts the result into a list
                     ally_members.append(response)
