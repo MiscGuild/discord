@@ -1270,6 +1270,7 @@ async def ticketer():
         await ticket_channel.send(f"{clicker.mention}")
 
 
+
 @tasks.loop(count=1)
 async def after_cache_ready():
     # replace the below IDs in testing servers - make sure to revert before committing.
