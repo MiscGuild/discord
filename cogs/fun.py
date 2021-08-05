@@ -165,11 +165,9 @@ class Fun(commands.Cog, name="Fun"):
             url = f"https://some-random-api.ml/canvas/horny?avatar={ctx.author.avatar_url}"
         else:
             url = f"https://some-random-api.ml/canvas/horny?avatar={member.avatar_url}"
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                image_data = BytesIO(await resp.read())
-                await session.close()
-        await ctx.send(file=discord.File(image_data, 'hornycard.jpg'))
+        embed = discord.Embed(title=f"The simp card you requested", color=0x8368ff)
+        embed.set_image(url=url)
+        await ctx.send(embed=embed)
     @commands.command(aliases=['simp'])
     async def simpcard(self, ctx, member: discord.Member = None):
         """Gives the mentioned member a simpcard"""
@@ -178,11 +176,9 @@ class Fun(commands.Cog, name="Fun"):
         else:
             url = f"https://some-random-api.ml/canvas/simpcard?avatar={member.avatar_url}"
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                image_data = BytesIO(await resp.read())
-                await session.close()
-        await ctx.send(file=discord.File(image_data, 'simpcard.jpg'))
+        embed = discord.Embed(title=f"The horny card you requested", color=0x8368ff)
+        embed.set_image(url=url)
+        await ctx.send(embed=embed)
     @commands.command()
     async def avatar(self, ctx, member: discord.Member):
         """Sends the member's discord avatar
@@ -239,7 +235,7 @@ class Fun(commands.Cog, name="Fun"):
                     embed = discord.Embed(title=f'{songTitle} by {songArtist}', description=chunk,
                                           color=0x8368ff)
                     await lyricsSession.close()
-                    await ctx.reply(embed=embed)
+                    await ctx.reply(embed=embed, mention_author=False)
 
             except discord.HTTPException:
                 embed = discord.Embed(title=f'{songTitle} by {songArtist}', description=chunk,
