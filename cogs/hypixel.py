@@ -68,7 +68,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     embed.set_footer(
                         text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
                     embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
-                    await ctx.send(embed=embed)
+                    await ctx.reply(embed=embed)
 
                 elif guild_name in self.bot.misc_allies:
                     for guild in self.bot.misc_allies:
@@ -339,7 +339,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 embed.add_field(name="Quests Completed:", value=f"`{cq}`", inline=True)
                 embed.add_field(name="First • Last login", value=f"`{fl} • {ll}`", inline=False)
                 embed.set_image(url=f"https://gen.plancke.io/exp/{name}.png")
-                await ctx.send(embed=embed)
+                await ctx.reply(embed=embed, mention_author=False)
 
     # Do-Not-Kick-List
     @commands.command()
@@ -591,7 +591,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     embed.add_field(name="Publicly Listed:", value=f"`{publiclisting}`", inline=True)
                     embed.add_field(name="Online players record:", value=f"`{onlinerecord}`", inline=True)
                     embed.set_author(name="Guild Stats")
-                    await ctx.send(embed=embed)
+                    await ctx.reply(embed=embed, mention_author=False)
 
     @commands.command(aliases=['ge'])
     async def gexp(self, ctx, gname):
@@ -947,7 +947,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                 }
                                 chart_url = chart.get_url()
                                 embed.set_image(url=chart_url)
-                                await ctx.send(embed=embed)
+                                await ctx.reply(embed=embed, mention_author=False)
             await session.close()
 
     @commands.command(aliases=['dnklchk'])
@@ -1008,7 +1008,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             embed.add_field(name="You are eligible to apply for the do not kick list.",
                                             value=f"You meet the minimum of {format(self.bot.dnkl, ',d')} weekly guild experience.\n You have {totalexp} weekly guild experience.",
                                             inline=True)
-                        await ctx.send(embed=embed)
+                        await ctx.reply(embed=embed, mention_author=False)
         await session.close()
 
     @commands.command(aliases=["gt"])
