@@ -181,7 +181,7 @@ async def get_gtag(name):
             await session.close()
     if len(req['guild']) < 2:
         return (" ")
-    if req["tag"] is None:
+    if req["guild"]["tag"] is None:
         return (" ")
     else:
         gtag = req["guild"]["tag"]
