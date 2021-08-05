@@ -335,7 +335,7 @@ class staff(commands.Cog, name="Staff"):
                                     await member.add_roles(self.bot.new_member_role)
                                     await message.edit(content=
                                                        f"{name} ||{member}|| Player doesn't exist. **++New Member | --Member | -- Guest**")
-
+                                    continue
                                 elif self.bot.guild_master not in member.roles:
                                     mojang_json = await mojang.json()
                                     ign = mojang_json["name"]
@@ -421,7 +421,7 @@ class staff(commands.Cog, name="Staff"):
                             await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
                                                       self.bot.active_role, self.bot.inactive_role,self.bot.ally)
                             await message.edit(
-                                content=f"{name} ||{member}|| ++Guest | --Member | --Active**")
+                                content=f"{name} ||{member}|| **++Guest | --Member | --Active**")
 
                 await ctx.send('**Rolecheck completed**')
 
