@@ -440,7 +440,7 @@ async def on_guild_channel_create(channel):
                                     await channel.send(embed=embed)
 
                                     name = await bot.wait_for('message', check=lambda
-                                        x: x.channel == channel.channel)
+                                        x: x.channel == channel)
                                     name = name.content
                                     async with aiohttp.ClientSession() as session:
                                         async with session.get(
@@ -548,7 +548,7 @@ async def on_guild_channel_create(channel):
 
                 while True:
                     click = await bot.wait_for("button_click",
-                                               check=lambda x: (x.author == author and x.channel == channel) or (bot.staff in x.author.roles and x.channel == channel))
+                                               check=lambda x: (x.author == author and x.channel == channel) or (bot.staff in (bot.get_user(x.author.id).roles) and x.channel == channel))
 
                     if click.component.id == "yes":
                         success_embed = discord.Embed(title="Success", color=0x00A86B)
