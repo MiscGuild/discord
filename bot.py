@@ -1229,7 +1229,7 @@ async def ticketer():
     ticket_embed = discord.Embed(title="Click the following button to create a ticket!",
                                  description="If you're facing any issues, message a staff member!\n\nOnce you create the ticket, you'll see the bot's prompt. Respond appropriately.",
                                  color=0x8368ff)
-    creating_ticket = discord.Embed(title="Ticket successfully created!", color=0x00A86B)
+
 
     ticket_creation = Button(style=ButtonStyle.blue, label="✉️Create Ticket", id="embed")
 
@@ -1240,14 +1240,20 @@ async def ticketer():
                                    check=lambda x: x.channel == bot.ticket_channel)
         clicker_id = click.author.id
         clicker = bot.misc_guild.get_member(clicker_id)
-        await click.respond(type=InteractionType.ChannelMessageWithSource, embed=creating_ticket)
+
 
         name = await hypixel.name_grabber(clicker)
 
         category = discord.utils.get(bot.misc_guild.categories, name="🎫 Ticket Section")
         ticket_channel = await bot.misc_guild.create_text_channel(f"ticket-{name}",
-                                                                  category=category)
-        print("Channel created")
+                                                                  category=category,
+                                                                  topic="<:t:869239368060112906><:i:869239367942697010><:c:869239368383074414>"
+                                                                        "<:k:869239367854612480><:e:869239368517287936><:t:869239368060112906>")
+        creating_ticket = discord.Embed(title="Click here to go to your ticket!", url=f"https://discord.com/channels/{bot.misc_guild}/{ticket_channel.id}")
+        creating_ticket.set_author(name="Ticket successfully created!", color=0x00A86B)
+
+        await click.respond(type=InteractionType.ChannelMessageWithSource, embed=creating_ticket)
+
         await ticket_channel.set_permissions(bot.misc_guild.get_role(bot.misc_guild.id), send_messages=False,
                                              read_messages=False)
         await ticket_channel.set_permissions(bot.staff, send_messages=True, read_messages=True,
