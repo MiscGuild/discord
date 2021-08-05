@@ -64,11 +64,12 @@ class Fun(commands.Cog, name="Fun"):
         """Sends an image of a dog
         """
         async with aiohttp.ClientSession() as session:
-            async with session.get('https://some-random-api.ml/img/dog') as resp:
+            async with session.get('https://some-random-api.ml/animal/dog') as resp:
                 req = await resp.json()
                 await session.close()
         embed = discord.Embed(title="Here's the dog you requested:", color=0xD2691e)
-        embed.set_image(url=req['link'])
+        embed.set_footer(text=f"**Fun Fact**:\n{req['fact']}")
+        embed.set_image(url=req['image'])
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -76,11 +77,12 @@ class Fun(commands.Cog, name="Fun"):
         """Sends an image of a cat
         """
         async with aiohttp.ClientSession() as session:
-            async with session.get('https://some-random-api.ml/img/cat') as resp:
+            async with session.get('https://some-random-api.ml/animal/cat') as resp:
                 req = await resp.json()
                 await session.close()
         embed = discord.Embed(title="Here's the cat you requested:", color=0xD2691e)
-        embed.set_image(url=req['link'])
+        embed.set_footer(text=f"**Fun Fact**:\n{req['fact']}")
+        embed.set_image(url=req['image'])
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['bird'])
