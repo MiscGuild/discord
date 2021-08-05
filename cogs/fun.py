@@ -4,6 +4,7 @@ import random
 import discord
 import datetime
 from discord.ext import commands
+from io import BytesIO
 
 from cogs.utils import hypixel
 
@@ -158,21 +159,30 @@ class Fun(commands.Cog, name="Fun"):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def horny(self,ctx, member: discord.member = None):
+    async def horny(self,ctx, member: discord.Member = None):
         """Gives the mentioned member a horny card"""
         if member is None:
-            await ctx.send(text=f"https://some-random-api.ml/canvas/horny?avatar={ctx.author.avatar_url}")
+            url = f"https://some-random-api.ml/canvas/horny?avatar={ctx.author.avatar_url}"
         else:
-            await ctx.send(text=f"https://some-random-api.ml/canvas/horny?avatar={member.avatar_url}")
-
+            url = f"https://some-random-api.ml/canvas/horny?avatar={member.avatar_url}"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                image_data = BytesIO(await resp.read())
+                await session.close()
+        await ctx.send(file=discord.File(image_data, 'hornycard.jpg'))
     @commands.command(aliases=['simp'])
-    async def simpcard(self, ctx, member: discord.member = None):
+    async def simpcard(self, ctx, member: discord.Member = None):
         """Gives the mentioned member a simpcard"""
         if member is None:
-            await ctx.send(text=f"https://some-random-api.ml/canvas/simpcard?avatar={ctx.author.avatar_url}")
+            url = f"https://some-random-api.ml/canvas/simpcard?avatar={ctx.author.avatar_url}"
         else:
-            await ctx.send(text=f"https://some-random-api.ml/canvas/simpcard?avatar={member.avatar_url}")
+            url = f"https://some-random-api.ml/canvas/simpcard?avatar={member.avatar_url}"
 
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                image_data = BytesIO(await resp.read())
+                await session.close()
+        await ctx.send(file=discord.File(image_data, 'simpcard.jpg'))
     @commands.command()
     async def avatar(self, ctx, member: discord.Member):
         """Sends the member's discord avatar
@@ -219,26 +229,21 @@ class Fun(commands.Cog, name="Fun"):
                     await ctx.send(f'Recieved Poor Status code of {jsondata.status}.')
                 else:
                     lyricsData = await jsondata.json()  # load json data
-            songLyrics = lyricsData['lyrics']  # the lyrics
-            songArtist = lyricsData['author']  # the authors name
-            songTitle = lyricsData['title']  # the songs title
+                    songLyrics = lyricsData['lyrics']  # the lyrics
+                    songArtist = lyricsData['author']  # the authors name
+                    songTitle = lyricsData['title']  # the songs title
 
             try:
                 for chunk in [songLyrics[i:i + 2000] for i in range(0, len(songLyrics),
                                                                     2000)]:  # if the lyrics extend the discord character limit (2000): split the embed
                     embed = discord.Embed(title=f'{songTitle} by {songArtist}', description=chunk,
                                           color=0x8368ff)
-                    embed.timestamp = datetime.utcnow()
-
                     await lyricsSession.close()
-
                     await ctx.reply(embed=embed)
 
             except discord.HTTPException:
                 embed = discord.Embed(title=f'{songTitle} by {songArtist}', description=chunk,
                                       color=0x8368ff)
-                embed.timestamp = datetime.utcnow()
-
                 await lyricsSession.close()  # closing the session
 
                 await ctx.reply(embed=embed, mention_author=False)
