@@ -261,7 +261,7 @@ async def on_guild_channel_create(channel):
             reply = reply.content
             reply = reply.capitalize()
 
-            if reply in ("Dnkl", "Do not kick list", "Do-Not-Kick-List"):
+            if reply in ("Dnkl", "Do not kick list", "Do-not-kick-list"):
 
                 name = await hypixel.name_grabber(author)
 
@@ -587,7 +587,7 @@ async def on_guild_channel_create(channel):
                                               color=0x00a86b)
                         asyncio.sleep(2)
 
-            elif reply in ("Role", "Username", "Name"):
+            elif reply in ("Role", "Username", "Name", "Tag"):
                 await channel.edit(name=f"Role/NameChange-{name}",
                                    category=discord.utils.get(channel.guild.categories, name="OTHER"))
                 embed = discord.Embed(title="What is your Minecraft username?",
