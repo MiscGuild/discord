@@ -320,7 +320,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                   topic="<:t:869239368060112906><:i:869239367942697010><:c:869239368383074414>"
                                                                         "<:k:869239367854612480><:e:869239368517287936><:t:869239368060112906>")
         creating_ticket = discord.Embed(title="Click here to go to your ticket!",
-                                        url=f"https://discord.com/channels/{self.bot.misc_guild}/{ticket_channel.id}",
+                                        url=f"https://discord.com/channels/522586672148381726/{ticket_channel.id}",
                                         color=0x00A86B)
         creating_ticket.set_author(name="Ticket successfully created!")
 
