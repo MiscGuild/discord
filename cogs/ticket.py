@@ -310,6 +310,42 @@ class Tickets(commands.Cog, name="Tickets"):
                 await channel.send(embed=embed)
                 break
 
+    @commands.command()
+    async def new(self, ctx):
+        name = await hypixel.name_grabber(ctx.author)
+
+        category = discord.utils.get(self.bot.misc_guild.categories, name="🎫 Ticket Section")
+        ticket_channel = await self.bot.misc_guild.create_text_channel(f"ticket-{name}",
+                                                                  category=category,
+                                                                  topic="<:t:869239368060112906><:i:869239367942697010><:c:869239368383074414>"
+                                                                        "<:k:869239367854612480><:e:869239368517287936><:t:869239368060112906>")
+        creating_ticket = discord.Embed(title="Click here to go to your ticket!",
+                                        url=f"https://discord.com/channels/{self.bot.misc_guild}/{ticket_channel.id}")
+        creating_ticket.set_author(name="Ticket successfully created!", color=0x00A86B)
+
+        await ctx.send(embed=creating_ticket)
+
+        await ticket_channel.set_permissions(self.bot.misc_guild.get_role(self.bot.misc_guild.id), send_messages=False,
+                                             read_messages=False)
+        await ticket_channel.set_permissions(self.bot.staff, send_messages=True, read_messages=True,
+                                             add_reactions=True, embed_links=True,
+                                             attach_files=True,
+                                             read_message_history=True, external_emojis=True)
+        await ticket_channel.set_permissions(self.bot.t_officer, send_messages=True, read_messages=True,
+                                             add_reactions=True, embed_links=True,
+                                             attach_files=True,
+                                             read_message_history=True, external_emojis=True)
+        await ticket_channel.set_permissions(self.clicker, send_messages=True, read_messages=True,
+                                             add_reactions=True, embed_links=True,
+                                             attach_files=True,
+                                             read_message_history=True, external_emojis=True)
+        await ticket_channel.set_permissions(self.bot.new_member_role, send_messages=False,
+                                             read_messages=False,
+                                             add_reactions=True, embed_links=True,
+                                             attach_files=True,
+                                             read_message_history=True, external_emojis=True)
+        await ticket_channel.send(f"{ctx.author.mention}")
+
 
 def setup(bot):
     bot.add_cog(Tickets(bot))
