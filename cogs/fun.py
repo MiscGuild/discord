@@ -69,7 +69,7 @@ class Fun(commands.Cog, name="Fun"):
                 req = await resp.json()
                 await session.close()
         embed = discord.Embed(title="Here's the dog you requested:", color=0x8368ff)
-        embed.set_footer(text=f"**Fun Fact**:\n{req['fact']}")
+        embed.set_footer(text=f"Fun Fact:\n{req['fact']}")
         embed.set_image(url=req['image'])
         await ctx.send(embed=embed)
 
@@ -82,7 +82,7 @@ class Fun(commands.Cog, name="Fun"):
                 req = await resp.json()
                 await session.close()
         embed = discord.Embed(title="Here's the cat you requested:", color=0x8368ff)
-        embed.set_footer(text=f"**Fun Fact**:\n{req['fact']}")
+        embed.set_footer(text=f"Fun Fact:\n{req['fact']}")
         embed.set_image(url=req['image'])
         await ctx.send(embed=embed)
 
@@ -95,7 +95,7 @@ class Fun(commands.Cog, name="Fun"):
                 req = await resp.json()
                 await session.close()
         embed = discord.Embed(title="Here's the bird you requested:", color=0x8368ff)
-        embed.set_footer(text=f"**Fun Fact**:\n{req['fact']}")
+        embed.set_footer(text=f"Fun Fact:\n{req['fact']}")
         embed.set_image(url=req['image'])
         await ctx.send(embed=embed)
 
@@ -108,7 +108,7 @@ class Fun(commands.Cog, name="Fun"):
                 req = await resp.json()
                 await session.close()
         embed = discord.Embed(title="Here's the panda you requested:", color=0x8368ff)
-        embed.set_footer(text=f"**Fun Fact**:\n{req['fact']}")
+        embed.set_footer(text=f"Fun Fact:\n{req['fact']}")
         embed.set_image(url=req['image'])
         await ctx.send(embed=embed)
 
