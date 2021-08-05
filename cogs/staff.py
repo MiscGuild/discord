@@ -95,7 +95,7 @@ class staff(commands.Cog, name="Staff"):
         with open('dnkl.json') as f:
             data = json.load(f)
 
-        key = data.keys()
+        dnkl_names = data.keys()
 
         activearray = {}
         activedemotearray = {}
@@ -118,7 +118,7 @@ class staff(commands.Cog, name="Staff"):
                     name = a['name']
                     time = str(datetime.fromtimestamp(int(str(joined)[:-3])))
                     dt = (time[0:10])
-                    if name in key:
+                    if name in dnkl_names:
                         name = name + f'[DNKL]\n{dt}'
                     else:
                         name = name + f'[{rank}]\n{dt}'
@@ -135,7 +135,7 @@ class staff(commands.Cog, name="Staff"):
                     name = a['name']
                     time = str(datetime.fromtimestamp(int(str(joined)[:-3])))
                     dt = (time[0:10])
-                    if name in key:
+                    if name in dnkl_names:
                         name = name + f'[DNKL]\n{dt}'
                     else:
                         name = name + f'[{rank}]\n{dt}'
@@ -152,7 +152,7 @@ class staff(commands.Cog, name="Staff"):
                         time = str(datetime.fromtimestamp(int(str(joined)[:-3])))
                         name = a['name']
                         dt = (time[0:10])
-                        if name in key:
+                        if name in dnkl_names:
                             name = name + f'[DNKL]\n{dt}'
                         else:
                             name = name + f'[{rank}]\n{dt}'
@@ -169,7 +169,7 @@ class staff(commands.Cog, name="Staff"):
                             time = str(datetime.fromtimestamp(int(str(joined)[:-3])))
                             name = a['name']
                             dt = (time[0:10])
-                            if name in key:
+                            if name in dnkl_names:
                                 name = name + f'[DNKL]\n{dt}'
                             else:
                                 name = name + f'[{rank}]\n{dt}'
@@ -186,7 +186,7 @@ class staff(commands.Cog, name="Staff"):
             await msg.edit(content="**Please wait!**\n `The embeds are being sent!`")
 
             '---------------------------------------------------------------ACTIVE PROMOTION------------------------------------------------------------------------------'
-            embed = discord.Embed(title=f"The users to be PROMOTED are as follows:",
+            embed = discord.Embed(title=f"Promote the following users:",
                                   description=f"Total: {len(ActivesortedList)}", color=0x43b581)
             y = 0
             if len(ActivesortedList) <= 25:
@@ -206,7 +206,7 @@ class staff(commands.Cog, name="Staff"):
                         await ctx.send(embed=embed)
 
             '---------------------------------------------------------------ACTIVE DEMOTION-------------------------------------------------------------------------------'
-            embed = discord.Embed(title=f"The users to be DEMOTED are as follows:",
+            embed = discord.Embed(title=f"Demote the following users:",
                                   description=f"Total: {len(ActiveDemoteSortedList)}", color=0xf04747)
             z = 0
             if len(ActiveDemoteSortedList) <= 25:
@@ -227,7 +227,7 @@ class staff(commands.Cog, name="Staff"):
 
             '---------------------------------------------------------------VETERAN WARNING-------------------------------------------------------------------------------'
             embed = discord.Embed(
-                title=f"Kindly PM the following veterans on discord and inform them that they don't meet the requirements!",
+                title=f"Following are the residents who don't meet the requirements:",
                 description=f"Total: {len(VeteransortedList)}", color=0xe5ba6c)
             w = 0
             if len(VeteransortedList) <= 25:
@@ -267,8 +267,7 @@ class staff(commands.Cog, name="Staff"):
                         await ctx.send(embed=embed)
 
             await msg.delete()
-            await ctx.send(
-                "**PLEASE CHECK THE DO NOT KICK LIST BEFORE KICKING ANYONE**\nDon't PM the veterans if they're on the do not kick list!")
+
 
     @commands.command()
     @commands.has_role(538015368782807040)
