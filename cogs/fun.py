@@ -2,6 +2,7 @@ import aiohttp
 import random
 
 import discord
+import datetime
 from discord.ext import commands
 
 from cogs.utils import hypixel
@@ -169,6 +170,49 @@ class Fun(commands.Cog, name="Fun"):
         embed.add_field(name="Roles:", value=total_roles, inline=False)
         await ctx.send(embed=embed)
 
+    @commands.command(aliases=['lyrc', 'lrc', 'lyr'])
+    async def lyrics(self, ctx, *, search=None):
+        """A command to find lyrics easily!"""
+
+        if search is None:
+            embed = discord.Embed(title="No search argument!",
+                                  description="You have not entered a song name!",color=0xDE3163)
+            await ctx.reply(embed=embed)
+
+
+
+        song = search.replace(' ', '%20')
+
+        async with aiohttp.ClientSession() as lyricsSession:
+            async with lyricsSession.get(
+                    f'https://some-random-api.ml/lyrics?title={song}') as jsondata:
+                if not (300 > jsondata.status >= 200):
+                    await ctx.send(f'Recieved Poor Status code of {jsondata.status}.')
+                else:
+                    lyricsData = await jsondata.json()  # load json data
+            songLyrics = lyricsData['lyrics']  # the lyrics
+            songArtist = lyricsData['author']  # the authors name
+            songTitle = lyricsData['title']  # the songs title
+
+            try:
+                for chunk in [songLyrics[i:i + 2000] for i in range(0, len(songLyrics),
+                                                                    2000)]:  # if the lyrics extend the discord character limit (2000): split the embed
+                    embed = discord.Embed(title=f'{songTitle} by {songArtist}', description=chunk,
+                                          color=0x8368ff)
+                    embed.timestamp = datetime.utcnow()
+
+                    await lyricsSession.close()
+
+                    await ctx.reply(embed=embed)
+
+            except discord.HTTPException:
+                embed = discord.Embed(title=f'{songTitle} by {songArtist}', description=chunk,
+                                      color=0x8368ff)
+                embed.timestamp = datetime.utcnow()
+
+                await lyricsSession.close()  # closing the session
+
+                await ctx.reply(embed=embed, mention_author=False)
 
 def setup(bot):
     bot.add_cog(Fun(bot))
