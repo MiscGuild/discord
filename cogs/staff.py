@@ -271,7 +271,7 @@ class staff(commands.Cog, name="Staff"):
 
     @commands.command()
     @commands.has_role(538015368782807040)
-    async def rolecheck(self, ctx):
+    async def rolecheck(self, ctx, send_ping=None):
         """Checks the roles of all the users and changes them on the basis of their guild
         """
         msg = await ctx.send("**Processing all the prerequisites**")
@@ -421,16 +421,15 @@ class staff(commands.Cog, name="Staff"):
                                                       self.bot.active_role, self.bot.inactive_role,self.bot.ally)
                             await message.edit(
                                 content=f"{name} ||{member}|| **++Guest | --Member | --Active**")
-
                 await ctx.send('**Rolecheck completed**')
+        if send_ping is None:
+            inactivity_channel = self.bot.get_channel(848067712156434462)
 
-        inactivity_channel = self.bot.get_channel(848067712156434462)
-
-        embed = discord.Embed(title="You do not meet the guild requirements!",
-                              description=f"Member requirement - **{format(self.bot.inactive, ',d')}** Weekly Guild Experience\nResident requirement - **{format(self.bot.resident_req, ',d')}** Weekly Guild Experience",
-                              color=0xDC143C)
-        await inactivity_channel.send(f"<@&848051215287058443>")
-        await inactivity_channel.send(embed=embed)
+            embed = discord.Embed(title="You do not meet the guild requirements!",
+                                  description=f"Member requirement - **{format(self.bot.inactive, ',d')}** Weekly Guild Experience\nResident requirement - **{format(self.bot.resident_req, ',d')}** Weekly Guild Experience",
+                                  color=0xDC143C)
+            await inactivity_channel.send(f"<@&848051215287058443>")
+            await inactivity_channel.send(embed=embed)
 
 
     @commands.command(aliases=['fs'])
