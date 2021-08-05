@@ -165,7 +165,13 @@ class Fun(commands.Cog, name="Fun"):
         else:
             await ctx.send(text=f"https://some-random-api.ml/canvas/horny?avatar={member.avatar_url}")
 
-
+    @commands.command(aliases=['simp'])
+    async def simpcard(self, ctx, member: discord.member = None):
+        """Gives the mentioned member a simpcard"""
+        if member is None:
+            await ctx.send(text=f"https://some-random-api.ml/canvas/simpcard?avatar={ctx.author.avatar_url}")
+        else:
+            await ctx.send(text=f"https://some-random-api.ml/canvas/simpcard?avatar={member.avatar_url}")
 
     @commands.command()
     async def avatar(self, ctx, member: discord.Member):
