@@ -55,7 +55,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                     gtag = await hypixel.get_gtag(guild)
                                     if ctx.author.nick is None or str(gtag) not in ctx.author.nick:
                                         ign = ign + " " + str(gtag)
-
+                                    await ctx.author.edit(nick=ign)
                                     await ctx.author.remove_roles(self.bot.new_member_role)
                                     await ctx.author.add_roles(self.bot.guest, self.bot.ally)
 

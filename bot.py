@@ -1300,7 +1300,7 @@ async def after_cache_ready():
     bot.server_booster = discord.utils.get(bot.misc_guild.roles, name="Server Booster")
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster)
     bot.ticket_categories = ('RTickets', '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL')
-    bot.misc_allies = ("XL", "Lucid", "Cronos", "OUT","Betrayed")
+    bot.misc_allies = ("XL", "Lucid", "Cronos", "OUT", "Betrayed")
     bot.adminids = [x.id for x in bot.admin.members]
     bot.staff_names = [await hypixel.name_grabber(member) for member in bot.staff.members]
 
