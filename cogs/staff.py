@@ -407,10 +407,10 @@ class staff(commands.Cog, name="Staff"):
                             guild_name = await hypixel.get_guild(name)
                             for guild in self.bot.misc_allies:
                                 if guild == guild_name:
-                                    gtag = await hypixel.get_gtag(guild)
+                                    gtag = await hypixel.get_gtag(guild_name)
                                     if member.nick is None or str(gtag) not in member.nick:
                                         ign = ign + " " + str(gtag)
-                                    await member.edit(nick=ign)
+                                        await member.edit(nick=ign)
                                     await member.add_roles(self.bot.guest, self.bot.ally)
                                     await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
                                                               self.bot.active_role, self.bot.inactive_role)

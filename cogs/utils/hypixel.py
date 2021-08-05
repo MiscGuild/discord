@@ -174,15 +174,18 @@ async def get_guild(name):
 
 
 async def get_gtag(name):
-    req = await get_guild_data(name)
-    if len(req) < 2:
+    api = get_api()
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f'https://api.hypixel.net/guild?key={api}&name={name}') as resp:
+            req = await resp.json()
+            await session.close()
+    if len(req['guild']) < 2:
         return (" ")
     if req["tag"] is None:
         return (" ")
     else:
-        gtag = req["tag"]
+        gtag = req["guild"]["tag"]
         return (f"[{gtag}]")
-
 
 async def get_dispnameID(name):
     async with aiohttp.ClientSession() as session:
