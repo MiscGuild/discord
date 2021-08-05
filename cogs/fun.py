@@ -158,6 +158,16 @@ class Fun(commands.Cog, name="Fun"):
         await ctx.send(embed=embed)
 
     @commands.command()
+    async def horny(self,ctx, member: discord.member = None):
+        """Gives the mentioned member a horny card"""
+        if member is None:
+            await ctx.send(text=f"https://some-random-api.ml/canvas/horny?avatar={ctx.author.avatar_url}")
+        else:
+            await ctx.send(text=f"https://some-random-api.ml/canvas/horny?avatar={member.avatar_url}")
+
+
+
+    @commands.command()
     async def avatar(self, ctx, member: discord.Member):
         """Sends the member's discord avatar
         """
