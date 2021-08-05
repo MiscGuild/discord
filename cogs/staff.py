@@ -407,7 +407,7 @@ class staff(commands.Cog, name="Staff"):
                             guild_name = await hypixel.get_guild(name)
                             for guild in self.bot.misc_allies:
                                 if guild == guild_name:
-                                    gtag = hypixel.get_gtag(guild)
+                                    gtag = await hypixel.get_gtag(guild)
                                     if member.nick is None or str(gtag) not in member.nick:
                                         ign = ign + " " + str(gtag)
                                     await member.edit(nick=ign)
