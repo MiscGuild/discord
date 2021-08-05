@@ -21,7 +21,7 @@ class Fun(commands.Cog, name="Fun"):
             async with session.get('https://foodish-api.herokuapp.com/api/images/pizza') as resp:
                 req = await resp.json()
                 await session.close()
-        embed = discord.Embed(title="Here's the pizza you requested:", color=0xD2691e)
+        embed = discord.Embed(title="Here's the pizza you requested:", color=0x8368ff)
         embed.set_image(url=req['image'])
         await ctx.send(embed=embed)
 
@@ -48,7 +48,7 @@ class Fun(commands.Cog, name="Fun"):
                      "Most likely", "My reply is no.", "My sources say no.", "Outlook not so good.", "Outlook good.",
                      "Reply hazy, try again.", "Signs point to yes.", "Very doubtful.", "Without a doubt.", "Yes.",
                      "Yes – definitely.", "You may rely on it."]
-        embed = discord.Embed(title=f'{random.choice(responses)}', color=0x0ffff)
+        embed = discord.Embed(title=f'{random.choice(responses)}', color=0x8368ff)
         embed.set_author(name=f"{question}")
         embed.set_footer(text=f'{user_name}')
         await ctx.send(embed=embed)
@@ -68,7 +68,7 @@ class Fun(commands.Cog, name="Fun"):
             async with session.get('https://some-random-api.ml/animal/dog') as resp:
                 req = await resp.json()
                 await session.close()
-        embed = discord.Embed(title="Here's the dog you requested:", color=0xD2691e)
+        embed = discord.Embed(title="Here's the dog you requested:", color=0x8368ff)
         embed.set_footer(text=f"**Fun Fact**:\n{req['fact']}")
         embed.set_image(url=req['image'])
         await ctx.send(embed=embed)
@@ -81,7 +81,7 @@ class Fun(commands.Cog, name="Fun"):
             async with session.get('https://some-random-api.ml/animal/cat') as resp:
                 req = await resp.json()
                 await session.close()
-        embed = discord.Embed(title="Here's the cat you requested:", color=0xD2691e)
+        embed = discord.Embed(title="Here's the cat you requested:", color=0x8368ff)
         embed.set_footer(text=f"**Fun Fact**:\n{req['fact']}")
         embed.set_image(url=req['image'])
         await ctx.send(embed=embed)
@@ -91,11 +91,12 @@ class Fun(commands.Cog, name="Fun"):
         """Sends an image of a birb
         """
         async with aiohttp.ClientSession() as session:
-            async with session.get('https://some-random-api.ml/img/birb') as resp:
+            async with session.get('https://some-random-api.ml/animal/birb') as resp:
                 req = await resp.json()
                 await session.close()
-        embed = discord.Embed(title="Here's the birb you requested:", color=0xD2691e)
-        embed.set_image(url=req['link'])
+        embed = discord.Embed(title="Here's the bird you requested:", color=0x8368ff)
+        embed.set_footer(text=f"**Fun Fact**:\n{req['fact']}")
+        embed.set_image(url=req['image'])
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -103,11 +104,23 @@ class Fun(commands.Cog, name="Fun"):
         """Sends an image of a panda
         """
         async with aiohttp.ClientSession() as session:
-            async with session.get('https://some-random-api.ml/img/panda') as resp:
+            async with session.get('https://some-random-api.ml/animal/panda') as resp:
                 req = await resp.json()
                 await session.close()
-        embed = discord.Embed(title="Here's the panda you requested:", color=0xD2691e)
-        embed.set_image(url=req['link'])
+        embed = discord.Embed(title="Here's the panda you requested:", color=0x8368ff)
+        embed.set_footer(text=f"**Fun Fact**:\n{req['fact']}")
+        embed.set_image(url=req['image'])
+        await ctx.send(embed=embed)
+
+    @commands.command()
+    async def joke(self, ctx):
+        """Sends a joke
+        """
+        async with aiohttp.ClientSession() as session:
+            async with session.get('https://some-random-api.ml/joke') as resp:
+                req = await resp.json()
+                await session.close()
+        embed = discord.Embed(title=req['joke'], color=0x8368ff)
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -120,10 +133,10 @@ class Fun(commands.Cog, name="Fun"):
                 req = await resp.json()
                 await session.close()
         if user is None or ctx.author == user:
-            embed = discord.Embed(title=f"{author} pats themselves.", color=0xD2691e)
+            embed = discord.Embed(title=f"{author} pats themselves.", color=0x8368ff)
         else:
             user = await hypixel.name_grabber(user)
-            embed = discord.Embed(title=f"{author} pats {user}.", color=0xD2691e)
+            embed = discord.Embed(title=f"{author} pats {user}.", color=0x8368ff)
         embed.set_image(url=req['link'])
         await ctx.send(embed=embed)
 
@@ -137,10 +150,10 @@ class Fun(commands.Cog, name="Fun"):
                 req = await resp.json()
                 await session.close()
         if user is None or ctx.author == user:
-            embed = discord.Embed(title=f"{author} hugs themselves.", color=0xD2691e)
+            embed = discord.Embed(title=f"{author} hugs themselves.", color=0x8368ff)
         else:
             user = await hypixel.name_grabber(user)
-            embed = discord.Embed(title=f"{author} hugs {user}.", color=0xD2691e)
+            embed = discord.Embed(title=f"{author} hugs {user}.", color=0x8368ff)
         embed.set_image(url=req['link'])
         await ctx.send(embed=embed)
 
@@ -176,7 +189,7 @@ class Fun(commands.Cog, name="Fun"):
 
         if search is None:
             embed = discord.Embed(title="No search argument!",
-                                  description="You have not entered a song name!",color=0xDE3163)
+                                  description="You have not entered a song name!", color=0xDE3163)
             await ctx.reply(embed=embed)
 
 
