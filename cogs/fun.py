@@ -159,28 +159,17 @@ class Fun(commands.Cog, name="Fun"):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def horny(self,ctx, member: discord.Member = None):
+    async def horny(self,ctx, member: discord.User = None):
         """Gives the mentioned member a horny card"""
-        if member is None:
-            url = f"https://some-random-api.ml/canvas/horny?avatar={ctx.author.avatar_url}"
-        else:
-            url = f"https://some-random-api.ml/canvas/horny?avatar={member.avatar_url}"
-        embed = discord.Embed(title=f"The simp card you requested", color=0x8368ff)
-        embed.set_image(url=url)
-        await ctx.send(embed=embed)
+        member = member or ctx.author
+        await ctx.send(f"https://some-random-api.ml/canvas/horny?avatar={member.avatar_url}")
     @commands.command(aliases=['simp'])
-    async def simpcard(self, ctx, member: discord.Member = None):
+    async def simpcard(self, ctx, member: discord.User = None):
         """Gives the mentioned member a simpcard"""
-        if member is None:
-            url = f"https://some-random-api.ml/canvas/simpcard?avatar={ctx.author.avatar_url}"
-        else:
-            url = f"https://some-random-api.ml/canvas/simpcard?avatar={member.avatar_url}"
-
-        embed = discord.Embed(title=f"The horny card you requested", color=0x8368ff)
-        embed.set_image(url=url)
-        await ctx.send(embed=embed)
+        member = member or ctx.author
+        await ctx.send(f"https://some-random-api.ml/canvas/simpcard?avatar={member.avatar_url}")
     @commands.command()
-    async def avatar(self, ctx, member: discord.Member):
+    async def avatar(self, ctx, member: discord.User):
         """Sends the member's discord avatar
         """
         embed=discord.Embed(title=f"{member.name}'s avatar:",color=0x8368ff)
