@@ -1,8 +1,8 @@
 import discord
 from discord import role
-from discord.ext import commands
+from discord.ext import commands, tasks
 from cogs.utils import hypixel
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 import aiohttp
 from concurrent.futures import ThreadPoolExecutor
@@ -13,6 +13,7 @@ import re
 class miscellaneous(commands.Cog, name="Miscellaneous"):
     def __init__(self, bot):
         self.bot = bot
+        self.check_giveaways.start()
 
 
     @commands.command()
@@ -98,8 +99,10 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                     if int(duration[:-1]) <= 0:
                         await ctx.send(f"The duration {duration} is not valid!")
                     else:
-                        giveaway_duration = int(duration[:-1]) * seconds_per_unit[duration[-1]]
-                        break
+                        seconds_end = timedelta(seconds=int(duration[:-1]) * seconds_per_unit[duration[-1]])
+                        # Force giveaway time (s) to formatted datetime
+                        datetime_end = datetime.now() + seconds_end
+                        break   
                 except Exception:
                     await ctx.send(f"The duration {duration} is not valid!")
                     
@@ -246,8 +249,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                         "messageID" : f"{giveaway_msg.id}",
                         "prize" : f"{prize}", 
                         "number_winners" : f"{number_winners}",
-                        "time_of_finish" : "23:59", # Giveaway_duration
-                        "day_of_finish" : "DD/MM/YYYY", # Giveaway_duration
+                        "time_of_finish" : f"{datetime_end}",
                         "role_requirement_type" : f"{role_requirement_type}", 
                         "required_roles" : f"{required_roles}", 
                         "required_gexp" : f"{required_gexp}",
@@ -276,7 +278,35 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
 
         elif action.lower() == "list": # List all current giveaways
             await ctx.send("NOT CODED YET")
-        
+    
+
+
+    async def roll_giveaway(self, giveaway_info):
+        print("THIS IS THE ROLL GIVEAWAY FUNCTION")
+
+    
+    @tasks.loop(minutes=2)
+    async def check_giveaways(self):
+        with open("giveaways.json", "r+") as f:
+            json_data = json.load(f)
+
+        for entry in json_data:
+            entry = json_data[entry]
+            datetime_end = datetime.strptime(entry['time_of_finish'], "%Y-%m-%d %H:%M:%S.%f") 
+            
+            if entry['status'] == "active" and datetime_end < datetime.now(): # Giveaway needs to be ended
+                await self.roll_giveaway(self, entry)
+                continue
+
+            elif entry['status'] == "inactive": # If giveaway ended more than 10 days ago, delete it
+                if datetime.timedelta(days=10) < datetime_end:
+                    del json_data[entry]['messageID']
+                    json.dump(json_data, f)
+
+    @check_giveaways.before_loop
+    async def before_giveaway_check(self):
+        await self.bot.wait_until_ready()
+
 
 def setup(bot):
     bot.add_cog(miscellaneous(bot))

@@ -5,7 +5,6 @@
         "prize" : "", 
         "number_winners" : "X",
         "time_of_finish" : "23:59",
-        "day_of_finish" : "DD/MM/YYYY",
         "role_requirement_type" : "", 
         "required_roles" : "[XXXXXXXXXXXXXXXXX, XXXXXXXXXXXXXXXXX]", 
         "required_gexp" : "XXXXXX",
