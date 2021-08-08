@@ -38,7 +38,7 @@ class Tickets(commands.Cog, name="Tickets"):
 
                         nick = await author.edit(nick=ign)
                         if guild_name == "Miscellaneous":
-                            await ctx.author.remove_roles(self.bot.new_member_role)
+                            await ctx.author.remove_roles(self.bot.new_member_role, reason="Register")
 
                             await ctx.channel.purge(limit=1)
                             embed = discord.Embed(title="Registration successful!")
@@ -47,7 +47,7 @@ class Tickets(commands.Cog, name="Tickets"):
 
                             embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
                             await ctx.send(embed=embed)
-                            await ctx.author.add_roles(self.bot.member_role)
+                            await ctx.author.add_roles(self.bot.member_role, reason="Register")
 
                         elif guild_name in self.bot.misc_allies:
                             for guild in self.bot.misc_allies:
@@ -56,8 +56,8 @@ class Tickets(commands.Cog, name="Tickets"):
                                     if ctx.author.nick is None or str(gtag) not in ctx.author.nick:
                                         ign = ign + " " + str(gtag)
                                     await ctx.author.edit(nick=ign)
-                                    await ctx.author.remove_roles(self.bot.new_member_role)
-                                    await ctx.author.add_roles(self.bot.guest, self.bot.ally)
+                                    await ctx.author.remove_roles(self.bot.new_member_role, reason="Register")
+                                    await ctx.author.add_roles(self.bot.guest, self.bot.ally, reason="Register")
 
                                     await ctx.channel.purge(limit=1)
                                     embed = discord.Embed(title="Registration successful!")
@@ -66,8 +66,8 @@ class Tickets(commands.Cog, name="Tickets"):
                                     await ctx.send(embed=embed)
 
                         elif guild_name != "Miscellaneous" and guild_name not in self.bot.misc_allies:
-                            await ctx.author.remove_roles(self.bot.new_member_role)
-                            await ctx.author.add_roles(self.bot.awaiting_app)
+                            await ctx.author.remove_roles(self.bot.new_member_role, reason="Register")
+                            await ctx.author.add_roles(self.bot.awaiting_app, reason="Register")
                             if nick is None:
                                 nick = author.name
 
