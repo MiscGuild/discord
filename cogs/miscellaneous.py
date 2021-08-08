@@ -189,6 +189,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                         except Exception:
                             await ctx.send(f"The gexp requirement {required_gexp} is not valid!")
                 else:
+                    required_gexp = 0
                     raw_required_gexp = 0
                     break
 
@@ -209,13 +210,13 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
             while True:
                 # Check if user needs one, all, or none of the required roles. Formulate message accordingly
                 if role_requirement_type == "optional":
-                    role_requirement_type_message = "You must have at least ONE of the following roles:"
+                    role_requirement_type_message = "You must have at least one of the following roles:"
                     for required_role in required_roles:
                         role_requirement_type_message = role_requirement_type_message + f"\n- <@&{required_role}>"
                 elif role_requirement_type == "none":
                     role_requirement_type_message = "There are no required roles."
                 else:
-                    role_requirement_type_message = "You must have ALL of the following roles:"
+                    role_requirement_type_message = "You must have all of the following roles:"
                     for required_role in required_roles:
                         role_requirement_type_message = role_requirement_type_message + f"\n- <@&{required_role}>"
 
@@ -236,7 +237,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                 else:
                     # Send giveaway message
                     embed=discord.Embed(title=f"{prize}", color=0x8368ff).set_footer(text=f"{number_winners} Winner(s), Ends at INSERTTIEMHEREJEJEDONTBEDUMB")
-                    embed.add_field(name="[-] Information:" ,value=f"Sponsored by: {sponsors}", inline=False)
+                    embed.add_field(name="[-] Information:" ,value=f"Sponsored by: {sponsors} \nDuration: {duration}", inline=False)
                     embed.add_field(name="[-] Requirements:", value=f"{role_requirement_type_message} \nYou must have at least {required_gexp} weekly gexp.", inline=False)
                     giveaway_msg = await destination_channel.send(f"{self.bot.giveaways_events.mention} React with :tada: to enter!\n", embed=embed)
                     await giveaway_msg.add_reaction("\U0001F389")
