@@ -60,8 +60,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         await ctx.send(
                             "Your tag will not be updated since you do not have the active/staff/former staff/server booster role!")
 
-                    await ctx.author.remove_roles(self.bot.guest, self.bot.awaiting_app)
-                    await ctx.author.add_roles(self.bot.member_role)
+                    await ctx.author.remove_roles(self.bot.guest, self.bot.awaiting_app, reason="Sync")
+                    await ctx.author.add_roles(self.bot.member_role, reason="Sync")
                     embed = discord.Embed(title="Your nick, role and tag were successfully changed!",
                                           description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
                                           color=0x8368ff)
@@ -77,8 +77,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             if ctx.author.nick is None or str(gtag) not in ctx.author.nick:
                                 ign = ign + " " + str(gtag)
                             await ctx.author.edit(nick=ign)
-                            await ctx.author.remove_roles(self.bot.new_member_role,self.bot.awaiting_app,self.bot.member_role)
-                            await ctx.author.add_roles(self.bot.guest, self.bot.ally)
+                            await ctx.author.remove_roles(self.bot.new_member_role,self.bot.awaiting_app,self.bot.member_role, reason="Sync")
+                            await ctx.author.add_roles(self.bot.guest, self.bot.ally, reason="Sync")
 
                             embed = discord.Embed(title="Your nick, role and tag were successfully changed!",
                                                   description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
@@ -92,8 +92,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     if str(ctx.channel.category.name) == "RTickets":
                         await ctx.send("You aren't in Miscellaneous in-game. Kindly await staff assistance!")
                     else:
-                        await ctx.author.remove_roles(self.bot.member_role, self.bot.awaiting_app)
-                        await ctx.author.add_roles(self.bot.guest)
+                        await ctx.author.remove_roles(self.bot.member_role, self.bot.awaiting_app, reason="Sync")
+                        await ctx.author.add_roles(self.bot.guest, reason="Sync")
                         if guild_name is None:
                             guild_name = "no guild (Guildless)"
                         embed = discord.Embed(title="Your nick and role was successfully changed!",
@@ -156,8 +156,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                 break
 
                     else:
-                        await ctx.author.remove_roles(self.bot.guest, self.bot.awaiting_app)
-                        await ctx.author.add_roles(self.bot.member_role)
+                        await ctx.author.remove_roles(self.bot.guest, self.bot.awaiting_app, reason="Sync")
+                        await ctx.author.add_roles(self.bot.member_role, reason="Sync")
                         embed = discord.Embed(title="Your nick and role was successfully changed!",
                                               description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
                                               color=0x8368ff)
@@ -173,8 +173,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             if ctx.author.nick is None or str(gtag) not in ctx.author.nick:
                                 ign = ign + " " + str(gtag)
 
-                            await ctx.author.remove_roles(self.bot.new_member_role)
-                            await ctx.author.add_roles(self.bot.guest, self.bot.ally)
+                            await ctx.author.remove_roles(self.bot.new_member_role, reason="Sync")
+                            await ctx.author.add_roles(self.bot.guest, self.bot.ally, reason="Sync")
 
                             embed = discord.Embed(title="Your nick, role and tag were successfully changed!",
                                                   description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
@@ -188,8 +188,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     if str(ctx.channel.category.name) == "RTickets":
                         await ctx.send("You aren't in Miscellaneous in-game. Kindly await staff assistance!")
                     else:
-                        await ctx.author.remove_roles(self.bot.member_role, self.bot.awaiting_app)
-                        await ctx.author.add_roles(self.bot.guest)
+                        await ctx.author.remove_roles(self.bot.member_role, self.bot.awaiting_app, reason="Sync")
+                        await ctx.author.add_roles(self.bot.guest, reason="Sync")
                         if guild_name is None:
                             guild_name = "no guild (Guildless)"
                         embed = discord.Embed(title="Your nick and role was successfully changed!",
