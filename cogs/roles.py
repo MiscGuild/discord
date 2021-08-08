@@ -179,6 +179,8 @@ class Roles(commands.Cog):
             member = self.bot.misc_guild.get_member(int(res.user.id))
             for role in res.component:
                 if int(role.value) in role_ids:
+                    for x in role_ids:
+                        await member.remove_roles(self.bot.misc_guild.get_role(x), reason=“Pronouns Duplicate Prevention”
                     cached_role = self.bot.misc_guild.get_role(int(role.value))
                     if cached_role in member.roles:
                         await member.remove_roles(cached_role, reason=f"Pronoun role: {role.label} Removed")
