@@ -125,6 +125,8 @@ class Roles(commands.Cog):
             role = self.bot.misc_guild.get_role(int(res.component.id))
             if role in member.roles:
                 await member.remove_roles(role, reason="Pressed Button, removed role")
+                for x in role_ids:
+                    await member.remove_roles(self.bot.misc_guild.get_role(x), reason="Pronouns Duplicate Prevention")
                 await res.respond(type=InteractionType.ChannelMessageWithSource,
                                   content=f"Removed {res.component.label} role from you.", flags=64)
             elif role not in member.roles:
