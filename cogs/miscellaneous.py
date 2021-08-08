@@ -235,16 +235,17 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                 elif confirmation not in ["yes", "confirm", "go", "create"]:
                     await ctx.send(f"The input {confirmation} is not valid!")
                 else:
+                    # Force giveaway time (s) to formatted UTC datetime
+                    datetime_end = datetime.utcnow() + seconds_end
+                    datetime_end_str = datetime_end.strftime("%Y-%m-%d %H:%M:%S.%f")[:-7]
                     # Send giveaway message
-                    embed=discord.Embed(title=f"{prize}", color=0x8368ff).set_footer(text=f"{number_winners} Winner(s), Ends at INSERTTIEMHEREJEJEDONTBEDUMB")
+                    embed=discord.Embed(title=f"{prize}", color=0x8368ff).set_footer(text=f"{number_winners} Winner(s), Ends at {datetime_end_str} UTC/GMT")
                     embed.add_field(name="[-] Information:" ,value=f"Sponsored by: {sponsors} \nDuration: {duration}", inline=False)
                     embed.add_field(name="[-] Requirements:", value=f"{role_requirement_type_message} \nYou must have at least {required_gexp} weekly gexp.", inline=False)
                     giveaway_msg = await destination_channel.send(f"{self.bot.giveaways_events.mention} React with :tada: to enter!\n", embed=embed)
                     await giveaway_msg.add_reaction("\U0001F389")
                     await destination_channel.send(f"This giveaway was generously sponsored by **{sponsors}**.\nIf you win this giveaway, make a ticket to claim it!", color=0x8368ff)
                     
-                    # Force giveaway time (s) to formatted datetime
-                    datetime_end = datetime.now() + seconds_end
                     giveaway_data = {
                         "channelID" : f"{destination_channel.id}",
                         "messageID" : f"{giveaway_msg.id}",
@@ -401,12 +402,12 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
             giveaways_to_delete = []
             for entry in json_data:
                 entry = json_data[entry]
-                datetime_end = datetime.strptime(entry['time_of_finish'], "%Y-%m-%d %H:%M:%S.%f") 
-                if entry['status'] == "active" and datetime_end < datetime.now(): # Giveaway needs to be ended
+                datetime_end = datetime.strptime(entry['time_of_finish'], "%Y-%m-%d %H:%M:%S.%f")
+                if entry['status'] == "active" and datetime_end < datetime.utcnow(): # Giveaway needs to be ended
                     await self.roll_giveaway(entry)
 
                 elif entry['status'] == "inactive": # If giveaway ended more than 10 days ago, delete it
-                    if datetime.now() > datetime_end + timedelta(days=10):
+                    if datetime.utcnow() > datetime_end + timedelta(days=10):
                         giveaways_to_delete.append(entry['messageID'])
 
             for giveaway in giveaways_to_delete: # Seperate loop to avoid change in size during iteration
