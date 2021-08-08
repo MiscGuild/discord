@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 import asyncio
 import requests
 import re
+import random
 
 class miscellaneous(commands.Cog, name="Miscellaneous"):
     def __init__(self, bot):
@@ -100,8 +101,6 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                         await ctx.send(f"The duration {duration} is not valid!")
                     else:
                         seconds_end = timedelta(seconds=int(duration[:-1]) * seconds_per_unit[duration[-1]])
-                        # Force giveaway time (s) to formatted datetime
-                        datetime_end = datetime.now() + seconds_end
                         break   
                 except Exception:
                     await ctx.send(f"The duration {duration} is not valid!")
@@ -188,9 +187,9 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                             raw_required_gexp = int(required_gexp[:-1]) * multiplier_per_unit[required_gexp[-1]]
                             break
                         except Exception:
-                            await ctx.send(f"The duration {duration} is not valid!")
+                            await ctx.send(f"The gexp requirement {required_gexp} is not valid!")
                 else:
-                    required_gexp = 0
+                    raw_required_gexp = 0
                     break
 
 
@@ -238,12 +237,13 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                     # Send giveaway message
                     embed=discord.Embed(title=f"{prize}", color=0x8368ff).set_footer(text=f"{number_winners} Winner(s), Ends at INSERTTIEMHEREJEJEDONTBEDUMB")
                     embed.add_field(name="[-] Information:" ,value=f"Sponsored by: {sponsors}", inline=False)
-                    embed.add_field(name="[-] Requirements:", value=f"{role_requirement_type_message} \n\nYou must have at least {required_gexp} weekly gexp.", inline=False)
+                    embed.add_field(name="[-] Requirements:", value=f"{role_requirement_type_message} \nYou must have at least {required_gexp} weekly gexp.", inline=False)
                     giveaway_msg = await destination_channel.send(f"{self.bot.giveaways_events.mention} React with :tada: to enter!\n", embed=embed)
                     await giveaway_msg.add_reaction("\U0001F389")
                     await destination_channel.send(f"This giveaway was generously sponsored by **{sponsors}**.\nIf you win this giveaway, make a ticket to claim it!", color=0x8368ff)
                     
-
+                    # Force giveaway time (s) to formatted datetime
+                    datetime_end = datetime.now() + seconds_end
                     giveaway_data = {
                         "channelID" : f"{destination_channel.id}",
                         "messageID" : f"{giveaway_msg.id}",
@@ -252,7 +252,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                         "time_of_finish" : f"{datetime_end}",
                         "role_requirement_type" : f"{role_requirement_type}", 
                         "required_roles" : f"{required_roles}", 
-                        "required_gexp" : f"{required_gexp}",
+                        "required_gexp" : f"{raw_required_gexp}",
                         "sponsors" : f"{sponsors}", 
                         "giveaway_author" : f"{ctx.message.author}",
                         "status" : "active"
@@ -262,7 +262,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                         json_data = json.load(f)
                         json_data[giveaway_msg.id] = giveaway_data
                         f.seek(0)
-                        json.dump(json_data, f)  
+                        json.dump(json_data, f, indent=4)  
 
                     await ctx.send(f"Ok! The giveaway has been set up in <#{destination_channel.id}>.")
                     break
@@ -270,6 +270,20 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
         elif action.lower() in ["end", "finish"]: # End existing giveaway
             if message_ID == None:
                 await ctx.send("You must provide the message ID of a giveaway to end!")
+            else:
+                with open("giveaways.json", "r") as f:
+                    json_data = json.load(f)
+
+                if message_ID in json_data:
+                    entry = json_data[message_ID]
+                    if entry['status'] == "active":
+                        await self.roll_giveaway(entry)
+                        return
+                    else:
+                        await ctx.send("The giveaway specified has already ended!\n`To re-roll that giveaway, use the command ,giveaway reroll`")
+                        return
+                else:
+                    await ctx.send("The specified giveaway doesn't seem to exist!\n`Either this giveaway never existed, or the data for the giveaway was deleted after 10 days of disuse.`")
 
 
         elif action.lower() == "reroll": # Reroll existent giveaway
@@ -281,27 +295,124 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
     
 
 
-    async def roll_giveaway(self, giveaway_info):
-        print("THIS IS THE ROLL GIVEAWAY FUNCTION")
+    async def roll_giveaway(self, entry):
+        message = await self.bot.get_channel(int(entry['channelID'])).fetch_message(int(entry['messageID']))
+        message_channel = self.bot.get_channel(int(entry['channelID']))
+        reactions = message.reactions
+        entrants = []
+        winners = []
+
+        for reaction in reactions:
+            if (reaction.emoji.encode("unicode-escape") == b'\\U0001f389'): # If reaction is :tada:
+                has_reaction = True
+                entrants = await reaction.users().flatten()
+                del entrants[0]
+                break
+            
+        if has_reaction != True: # Giveaway message does not have the :tada: reaction
+            await message_channel.send(f"Yikes! The giveaway for {entry['prize']} doesn't seem to have the :tada: reaction :(")
+            entry['status'] = "inactive"
+            with open("giveaways.json", "w") as f:
+                json.dump(entry, f, indent=4)
+            return
+        
+
+        while len(winners) < int(entry['number_winners']): # Pick a random winner
+            while True: # Protection from infinite picking of winner
+                if len(entrants) == 0 and len(winners) == 0: # No eligible winners
+                    await message_channel.send(f"There were no eligible winners for `{entry['prize']}` - message ID `{entry['messageID']}`.")
+                    entry['status'] = "inactive"
+                    with open("giveaways.json", "w") as f:
+                        json.dump(entry, f, indent=4)
+                    return
+                elif len(entrants) == 0: # Less eligible winners that number_winners
+                    announcement = ""
+                    for winner in winners:
+                        announcement = announcement + f"{winner.mention},"
+                    await message_channel.send(f":tada: Congratulations {announcement} you won the giveaway for {entry['prize']}\nMake a ticket to claim!\n`There were less eligible winners for this giveaway than the expected number.`")
+                    entry['status'] = "inactive"
+                    with open("giveaways.json", "w") as f:
+                        json.dump(entry, f, indent=4)
+                    return
+                else:
+                    winner = random.choice(entrants)
+                    break
+            name = await hypixel.name_grabber(winner)
+
+            # ROLE REQUIREMENTS
+            if entry['required_roles'] != '[]':
+                print("There are some role reqs")
+                break
+
+            else:  # No required roles - GEXP REQUIREMENTS
+                if entry['required_gexp'] != "0": # There is a gexp requirement
+                    async with aiohttp.ClientSession() as session: # Get winner profile info
+                        async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
+                            request = await resp.json(content_type=None)
+                            await session.close()
+                    if resp.status != 200:
+                        entrants.remove(winner)
+
+                    else:
+                        name = request['name']
+                        uuid = request['id']
+                        api = hypixel.get_api()
+                        async with aiohttp.ClientSession() as session: # Get winner's weekly GEXP
+                            async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
+                                req = await resp.json(content_type=None)
+                                await session.close()
+                        if resp.status != 200:
+                            entrants.remove(winner)
+
+                        else: 
+                            if "guild" not in req or req['guild'] is None or req['guild']['_id'] != "53bd1b3aed503e868873e8f1": # Winner is guildless/Not in misc
+                                entrants.remove(winner)
+
+                            else: 
+                                for member in req['guild']["members"]:
+                                    if uuid == member["uuid"]:
+                                        if sum(member['expHistory'].values()) >= int(entry['required_gexp']): # Winner meets the gexp requirement
+                                            entrants.remove(winner)
+                                            winners.append(winner)
+                                            break
+                                            
+                                        else:
+                                            entrants.remove(winner)
+                                            break
+                                            
+                else: # There is no gexp requirement
+                    entrants.remove(winner)
+                    winners.append(winner)
+        entry['status'] = "inactive"
+        with open("giveaways.json", "w") as f:
+            json.dump(entry, f, indent=4)
+        announcement = ""
+        for winner in winners:
+            announcement = announcement + f"{winner.mention},"
+        await message_channel.send(f":tada: Congratulations {announcement} you won the giveaway for {entry['prize']}!\nMake a ticket to claim!")
+
 
     
     @tasks.loop(minutes=2)
     async def check_giveaways(self):
         with open("giveaways.json", "r+") as f:
             json_data = json.load(f)
+            giveaways_to_delete = []
+            for entry in json_data:
+                entry = json_data[entry]
+                datetime_end = datetime.strptime(entry['time_of_finish'], "%Y-%m-%d %H:%M:%S.%f") 
+                if entry['status'] == "active" and datetime_end < datetime.now(): # Giveaway needs to be ended
+                    await self.roll_giveaway(entry)
 
-        for entry in json_data:
-            entry = json_data[entry]
-            datetime_end = datetime.strptime(entry['time_of_finish'], "%Y-%m-%d %H:%M:%S.%f") 
-            
-            if entry['status'] == "active" and datetime_end < datetime.now(): # Giveaway needs to be ended
-                await self.roll_giveaway(self, entry)
-                continue
+                elif entry['status'] == "inactive": # If giveaway ended more than 10 days ago, delete it
+                    if datetime.now() > datetime_end + timedelta(days=10):
+                        giveaways_to_delete.append(entry['messageID'])
 
-            elif entry['status'] == "inactive": # If giveaway ended more than 10 days ago, delete it
-                if datetime.timedelta(days=10) < datetime_end:
-                    del json_data[entry]['messageID']
-                    json.dump(json_data, f)
+            for giveaway in giveaways_to_delete: # Seperate loop to avoid change in size during iteration
+                del json_data[giveaway]
+            f.seek(0)
+            f.truncate()
+            json.dump(json_data, f, indent=4)
 
     @check_giveaways.before_loop
     async def before_giveaway_check(self):
