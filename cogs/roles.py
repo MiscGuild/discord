@@ -114,11 +114,11 @@ class Roles(commands.Cog):
         await ctx.channel.send(embed=embed, components=[ticket_creation])
     @commands.Cog.listener()
     async def on_button_click(self, res):
-        role_ids = ["873167480812621845",
-                    "860050093872775179",
-                    "860050133226618901",
-                    "873167546461868132",
-                    "860050193482645504"]
+        role_ids = ["732279654261588048",
+                    "732824611175006239",
+                    "763704865297268776",
+                    "780717935140012052",
+                    "855657894518325258"]
         if res.component.id in role_ids:
             guild = self.bot.get_guild(700419839092850698)
             member = self.bot.misc_guild.get_member(int(res.user.id))
@@ -171,10 +171,10 @@ class Roles(commands.Cog):
 
     @commands.Cog.listener()
     async def on_select_option(self, res):
-        role_ids = [873167575515791360,
-                    860050247027523584,
-                    860050273862287390,
-                    860050305168965643]
+        role_ids = [849830869036040212,
+                    849830936434704404,
+                    849831004310077441,
+                    855598846843551744]
         if type(res.component) == list:
             member = self.bot.misc_guild.get_member(int(res.user.id))
             for role in res.component:
