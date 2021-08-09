@@ -321,9 +321,17 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
 
 
         elif action.lower() == "list": # List all current giveaways
-            await ctx.send("NOT CODED YET")
-    
-
+            with open("giveaways.json", "r") as f:
+                json_data = json.load(f)
+            if len(json_data) == 0:
+                embed = discord.Embed(title="There have been no giveaways in the last 10 days!", description="To make a new giveaway, use the command `,giveaway create`", color=0xFF0000)
+                await ctx.send(embed=embed)
+            else:
+                embed = discord.Embed(title="Giveaways:", description="Listed below are all active giveaways.", color=0x8368ff)
+                for entry in json_data:
+                    entry = json_data[entry]
+                    embed.add_field(name=f"{entry['prize']}", value=f"Channel: <#{entry['channelID']}> \nMessage ID: {entry['messageID']} \nNumber Of Winners: {entry['number_winners']} \nEnds At: {entry['time_of_finish']} \nStatus: {entry['status']}")
+                await ctx.send(embed=embed)
 
     async def roll_giveaway(self, entry, reroll_number=None):
         message = await self.bot.get_channel(int(entry['channelID'])).fetch_message(int(entry['messageID']))
