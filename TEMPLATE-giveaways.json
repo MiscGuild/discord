@@ -4,7 +4,7 @@
         "messageID" : "XXXXXXXXXXXXXXXXX",
         "prize" : "", 
         "number_winners" : "X",
-        "time_of_finish" : "23:59",
+        "time_of_finish" : "1999/12/31 23:59:59.999999",
         "role_requirement_type" : "", 
         "required_roles" : "[XXXXXXXXXXXXXXXXX, XXXXXXXXXXXXXXXXX]", 
         "required_gexp" : "XXXXXX",
