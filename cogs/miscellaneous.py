@@ -1,17 +1,12 @@
 import discord
-from discord import role
 from discord.ext import commands, tasks
 from cogs.utils import hypixel
 from datetime import datetime, timedelta
-import json
 import aiohttp
-from concurrent.futures import ThreadPoolExecutor
-import asyncio
-import requests
 import re
 import random
 import math
-import aiosqlite
+
 
 class miscellaneous(commands.Cog, name="Miscellaneous"):
     def __init__(self, bot):
@@ -22,13 +17,8 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
     @commands.command()
     @commands.has_role("Giveaway Creator")
     async def giveaway(self, ctx, action, message_ID=None, reroll_number=None):
-        # TODO: make a task that runs on startup to check all current giveaways. (end giveaway if past time). 
-        # Make a `,giveaway (create/end/reroll/list - start for quick setup) (messageID)` command
-
-        # TODO: Add datetime addition for giveaway duration. Keep the var seperate from the user's entry for later use in the announcement embed.
-
-        # ,giveaway create <channel> <prize> <no.winners> <duration> <role requirements> <gexp requirements> <sponsors>
-        
+        """Create, end, reroll, and list giveaways!
+        """
         if action.lower() in ["create", "make", "start", "add"]: # Create new giveaway
             while True:
                 await ctx.send("What is the channel you would want the giveaway to be held in?\n\n`Please enter the name of a channel in this server.` \n`Alternatively, you can enter the channel ID.` \n\n**At any time, you can cancel the giveaway by replying with `cancel` to one of the upcoming prompts.**")
@@ -321,6 +311,10 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                     embed.add_field(name=f"{prize}", value=f"Channel: <#{channel_id}> \nMessage ID: {message_id} \nNumber Of Winners: {number_winners} \nEnds At: {datetime_end_str} \nStatus: {status}")
                 await ctx.send(embed=embed)
 
+        else:
+            embed=discord.Embed(title="Invalid Command!", description="Use `,help giveaway` for more info on", color=0xFF0000)
+            await ctx.send(embed=embed)
+
     async def roll_giveaway(self, message_ID, reroll_number=None):
         cursor = await self.bot.db.execute("SELECT message_id, channel_id, prize, number_winners, role_requirement_type, required_roles, required_gexp FROM Giveaways WHERE message_id = (?)", (message_ID,))
         row = await cursor.fetchone()
@@ -442,7 +436,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
 
 
     
-    @tasks.loop(minutes=2)
+    @tasks.loop(minutes=1)
     async def check_giveaways(self):
         cursor = await self.bot.db.execute("SELECT message_id, status, time_of_finish FROM Giveaways")
         rows = await cursor.fetchall()
