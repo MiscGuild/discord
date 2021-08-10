@@ -29,8 +29,8 @@ bot.token = config['bot']['token']
 bot.api_tokens = config['hypixel']['api_keys']
 bot.owner_id = config['bot']['ownerID']
 bot.resident_req = int(50000)
-bot.active = int(280000)
-bot.inactive = int(105000)
+bot.active = int(285000)
+bot.inactive = int(110000)
 bot.dnkl = bot.inactive * 2
 bot.new_member = int(25000)
 
