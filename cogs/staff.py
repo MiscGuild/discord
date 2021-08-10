@@ -559,6 +559,24 @@ class staff(commands.Cog, name="Staff"):
             await ctx.channel.purge(limit=1)
             await ctx.send(embed=embed)
 
+
+    @commands.command()
+    @commands.has_role(522588118251995147)
+    async def partner(self,ctx):
+        await ctx.send("**What is the name of the guild/organization you wish to partner?**")
+        name = await self.bot.wait_for('message', check=lambda x: x.author == ctx.message.author)
+        name = name.content
+
+        await ctx.send("**Kindly provide a brief description of the guild/organization. ONE MESSAGE ONLY!!!**")
+        description = await self.bot.wait_for('message', check=lambda x: x.author == ctx.message.author)
+        description = description.content
+
+        embed = discord.Embed(title=name,
+                              url=f'https://plancke.io/hypixel/guild/name/{name.replace(" ","%20")}',
+                              description=description)
+        partner_channel = self.bot.get_channel(874725728397193436)
+        await partner_channel.send(embed=embed)
+
     @commands.command()
     @commands.has_role(538015368782807040)
     async def challenge(self, ctx, x):
@@ -646,6 +664,7 @@ class staff(commands.Cog, name="Staff"):
                 embed.add_field(name=challenge2, value=challenge2_prize, inline=False)
                 embed.set_footer(text="You can only do one challenge once.")
             await channel.send(embed=embed)
+
 
 
 def setup(bot):
