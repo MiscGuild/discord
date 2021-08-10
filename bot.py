@@ -548,7 +548,7 @@ async def on_guild_channel_create(channel):
 
                 while True:
                     click = await bot.wait_for("button_click",
-                                               check=lambda x: (x.author == author and x.channel == channel) or (bot.staff in (bot.get_user(x.author.id).roles) and x.channel == channel))
+                                               check=lambda x: (x.author == author and x.channel == channel) or (bot.staff in (bot.get_member(x.author.id).roles) and x.channel == channel))
 
                     if click.component.id == "yes":
                         success_embed = discord.Embed(title="Success", color=0x00A86B)
