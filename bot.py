@@ -8,6 +8,7 @@ import io
 import aiohttp
 import discord
 import toml
+import aiosqlite
 import chat_exporter
 from discord.ext import commands, tasks
 from discord_components import DiscordComponents, Button, ButtonStyle, InteractionType
@@ -55,7 +56,7 @@ class HelpCommand(commands.MinimalHelpCommand):
 
 bot.help_command = HelpCommand(command_attrs={'hidden': True})
 
-initial_extensions = ['cogs.fun', 'cogs.hypixel', 'cogs.mod', 'cogs.staff', 'cogs.ticket', 'cogs.owner']
+initial_extensions = ['cogs.fun', 'cogs.hypixel', 'cogs.mod', 'cogs.staff', 'cogs.ticket', 'cogs.owner', 'cogs.miscellaneous']
 
 if __name__ == '__main__':
     for extension in initial_extensions:
@@ -1276,15 +1277,19 @@ async def ticketer():
         await ticket_channel.send(f"{clicker.mention}")
 
 
+async def connect_db():
+  bot.db = await aiosqlite.connect("database.db")
+  print("db connected")
+bot.loop.run_until_complete(connect_db())
 
 @tasks.loop(count=1)
 async def after_cache_ready():
     # replace the below IDs in testing servers - make sure to revert before committing.
-    bot.error_channel = bot.get_channel(523743721443950612)
-    bot.dnkl_channel = bot.get_channel(629564802812870657)
-    bot.ticket_channel = bot.get_channel(650248396480970782)
-    bot.logs = bot.get_channel(714821811832881222)
-    bot.misc_guild = bot.get_guild(522586672148381726)
+    bot.error_channel = bot.get_channel(859916798111907875)
+    bot.dnkl_channel = bot.get_channel(859916798111907875)
+    bot.ticket_channel = bot.get_channel(859916798111907875)
+    bot.logs = bot.get_channel(859916798111907875)
+    bot.misc_guild = bot.get_guild(859916798111907871)
     bot.guild_master = discord.utils.get(bot.misc_guild.roles, name="Guild Master")
     bot.admin = discord.utils.get(bot.misc_guild.roles, name="Admin")
     bot.staff = discord.utils.get(bot.misc_guild.roles, name="Staff")
@@ -1298,6 +1303,7 @@ async def after_cache_ready():
     bot.awaiting_app = discord.utils.get(bot.misc_guild.roles, name="Awaiting Approval")
     bot.ally = discord.utils.get(bot.misc_guild.roles, name="Ally")
     bot.server_booster = discord.utils.get(bot.misc_guild.roles, name="Server Booster")
+    bot.giveaways_events = discord.utils.get(bot.misc_guild.roles, name="Giveaways/Events")
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster)
     bot.ticket_categories = ('RTickets', '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL')
     bot.misc_allies = ("XL", "Lucid", "Cronos", "OUT", "Betrayed")
