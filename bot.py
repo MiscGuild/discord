@@ -1279,6 +1279,20 @@ async def ticketer():
 
 async def connect_db():
   bot.db = await aiosqlite.connect("database.db")
+  cursor = bot.db.cursor()
+  cursor.execute('''CREATE TABLE IF NOT EXISTS Giveaways (
+    message_id integer NOT NULL PRIMARY KEY,
+    channel_id integer NOT NULL,
+    prize text NOT NULL,
+    number_winners integer NOT NULL,
+    time_of_finish text NOT NULL,
+    role_requirement_type text NOT NULL,
+    required_roles text,
+    required_gexp integer NOT NULL,
+    sponsors text NOT NULL,
+    status text NOT NULL,
+    )''')
+  bot.db.commit()
   print("db connected")
 bot.loop.run_until_complete(connect_db())
 
