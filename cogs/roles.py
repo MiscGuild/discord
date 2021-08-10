@@ -125,8 +125,6 @@ class Roles(commands.Cog):
             role = self.bot.misc_guild.get_role(int(res.component.id))
             if role in member.roles:
                 await member.remove_roles(role, reason="Pressed Button, removed role")
-                for x in role_ids:
-                    await member.remove_roles(self.bot.misc_guild.get_role(x), reason="Pronouns Duplicate Prevention")
                 await res.respond(type=InteractionType.ChannelMessageWithSource,
                                   content=f"Removed {res.component.label} role from you.", flags=64)
             elif role not in member.roles:
@@ -187,6 +185,8 @@ class Roles(commands.Cog):
                         await res.respond(type=InteractionType.ChannelMessageWithSource,
                                           content=f"Removed {role.label}", flags=64)
                     elif cached_role not in member.roles:
+                        for x in role_ids:
+                            await member.remove_roles(self.bot.misc_guild.get_role(x), reason="Pronouns Duplicate Prevention")
                         await member.add_roles(cached_role, reason=f"Pronoun role: {role.label} Given")
                         await res.respond(type=InteractionType.ChannelMessageWithSource,
                                           content=f"Added {role.label}", flags=64)
