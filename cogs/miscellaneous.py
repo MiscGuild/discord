@@ -11,6 +11,7 @@ import requests
 import re
 import random
 import math
+import aiosqlite
 
 class miscellaneous(commands.Cog, name="Miscellaneous"):
     def __init__(self, bot):
@@ -120,8 +121,9 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                     await ctx.send("Giveaway cancelled!")
                     return
                 elif required_roles == "none":
-                    required_roles = []
+                    r_requirements = None
                     role_requirement_type = "none"
+                    required_roles= []
                     break
                 else:
                     # Convert string to list of all required roles
@@ -133,15 +135,15 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                         required_roles = required_roles.split("&")
                     else: # Still turn string into list
                         role_requirement_type = "optional"
-                        required_roles = required_roles = [required_roles]
+                        required_roles = [required_roles]
 
-                    r_requirements = []
+                    r_requirements = ""
                     for required_role in required_roles:
                         required_role = required_role.title()
                         if re.search("[a-zA-Z]", required_role) != None: # Role name was passed
                             req_role = discord.utils.get(ctx.guild.roles, name=required_role)
                             if req_role != None:
-                                r_requirements.append(req_role.id)
+                                r_requirements += required_role
                             else: 
                                 await ctx.send(f"The role {required_role} does not exist!")
                                 for_broken = True
@@ -152,7 +154,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                             required_role = int(required_role)
                             req_role = ctx.guild.get_role(required_role)
                             if req_role != None:
-                                r_requirements.append(req_role.id)
+                                r_requirements += required_role
                             
                             else: 
                                 await ctx.send(f"The role {required_role} does not exist!")
@@ -162,7 +164,6 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                     if for_broken: 
                         continue
                     else:
-                        required_roles = r_requirements
                         break 
                 
                 
@@ -205,7 +206,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                 await ctx.send("Giveaway Cancelled!")
                 return
             elif sponsors.lower() == "none":
-                sponsors = ctx.author
+                sponsors = str(ctx.author)
 
 
             # Sponsors entered correctly
@@ -248,25 +249,9 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                     await giveaway_msg.add_reaction("\U0001F389")
                     await destination_channel.send(f"This giveaway was generously sponsored by {sponsors}.\nIf you win this giveaway, make a ticket to claim it!", color=0x8368ff)
                     
-                    giveaway_data = {
-                        "channelID" : f"{destination_channel.id}",
-                        "messageID" : f"{giveaway_msg.id}",
-                        "prize" : f"{prize}", 
-                        "number_winners" : f"{number_winners}",
-                        "time_of_finish" : f"{datetime_end}",
-                        "role_requirement_type" : f"{role_requirement_type}", 
-                        "required_roles" : f"{required_roles}", 
-                        "required_gexp" : f"{raw_required_gexp}",
-                        "sponsors" : f"{sponsors}", 
-                        "giveaway_author" : f"{ctx.message.author}",
-                        "status" : "active"
-                    }
-                
-                    with open("giveaways.json", "r+") as f:
-                        json_data = json.load(f)
-                        json_data[giveaway_msg.id] = giveaway_data
-                        f.seek(0)
-                        json.dump(json_data, f, indent=4)  
+                    await self.bot.db.execute("INSERT INTO Giveaways VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (giveaway_msg.id, destination_channel.id, prize, number_winners, datetime_end_str, role_requirement_type, r_requirements, raw_required_gexp, sponsors, "active"))
+                    await self.bot.db.commit() 
 
                     await ctx.send(f"Ok! The giveaway has been set up in <#{destination_channel.id}>.")
                     break
@@ -275,67 +260,73 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
             if message_ID == None:
                 await ctx.send("You must provide the message ID of a giveaway to end!")
             else:
-                with open("giveaways.json", "r") as f:
-                    json_data = json.load(f)
+                cursor = await self.bot.db.execute("SELECT status FROM Giveaways WHERE message_id = (?)", (message_ID,))
+                row = await cursor.fetchone()
+                await cursor.close()
 
-                if message_ID in json_data:
-                    entry = json_data[message_ID]
-                    if entry['status'] == "active":
-                        await self.roll_giveaway(entry)
-                        return
+                if row == None:
+                    await ctx.send("The specified giveaway doesn't seem to exist!\n`Either this giveaway never existed, or the data for the giveaway was deleted after 10 days of disuse.`")
+                else:
+                    status = "".join(row)
+                    if status == "active":
+                        await self.roll_giveaway(message_ID)
                     else:
                         await ctx.send("The giveaway specified has already ended!\n`To re-roll that giveaway, use the command ,giveaway reroll`")
                         return
-                else:
-                    await ctx.send("The specified giveaway doesn't seem to exist!\n`Either this giveaway never existed, or the data for the giveaway was deleted after 10 days of disuse.`")
+                    
 
 
         elif action.lower() == "reroll": # Reroll existent giveaway
             if message_ID == None:
                 await ctx.send("You must provide the message ID of a giveaway to reroll!")
             else:
-                with open("giveaways.json", "r") as f:
-                    json_data = json.load(f)
+                cursor = await self.bot.db.execute("SELECT number_winners, status FROM Giveaways WHERE message_id = (?)", (message_ID,))
+                row = await cursor.fetchone()
+                await cursor.close()
 
-                if message_ID in json_data:
-                    entry = json_data[message_ID]
-
-                    if entry['status'] == "active":
+                if row == None:
+                    await ctx.send("The specified giveaway doesn't seem to exist!\n`Either this giveaway never existed, or the data for the giveaway was deleted after 10 days of disuse.`")
+                else:
+                    status, number_winners = ",".join([str(value) for value in row]).split(",")
+                    if status == "active":
                         await ctx.send("You cannot reroll an on-going giveaway! \n`To end this giveaway, use ',giveaway end'`.")
                     if reroll_number == None: # Reroll whole giveaway
-                        await self.roll_giveaway(entry)
-                        return
-
-                    if reroll_number.isnumeric() == False:
+                        await self.roll_giveaway(message_ID)
+                    elif reroll_number.isnumeric() == False:
                         await ctx.send("The number of winners to reroll for must be numeric!")
-                        return
                     else:
                         reroll_number = math.floor(int(reroll_number))
-                        if reroll_number <= int(entry['number_winners']): # Reroll giveaway with only a certain number of new winners
-                            await self.roll_giveaway(entry, reroll_number)
+                        if reroll_number <= int(number_winners): # Reroll giveaway with only a certain number of new winners
+                            await self.roll_giveaway(message_ID, reroll_number)
                         else:
                             await ctx.send("You cannot reroll a giveaway for more winners than was originally intended!")
-                
-                else:
-                    await ctx.send("The specified giveaway doesn't seem to exist!\n`Either this giveaway never existed, or the data for the giveaway was deleted after 10 days of disuse.`")
-
+                    
 
         elif action.lower() == "list": # List all current giveaways
-            with open("giveaways.json", "r") as f:
-                json_data = json.load(f)
-            if len(json_data) == 0:
+            cursor = await self.bot.db.execute("SELECT prize, channel_id, message_id, number_winners, time_of_finish, status FROM Giveaways")
+            rows = cursor.fetchall()
+            await cursor.close()
+
+            if rows == None:
                 embed = discord.Embed(title="There have been no giveaways in the last 10 days!", description="To make a new giveaway, use the command `,giveaway create`", color=0xFF0000)
                 await ctx.send(embed=embed)
             else:
-                embed = discord.Embed(title="Giveaways:", description="Listed below are all active giveaways.", color=0x8368ff)
-                for entry in json_data:
-                    entry = json_data[entry]
-                    embed.add_field(name=f"{entry['prize']}", value=f"Channel: <#{entry['channelID']}> \nMessage ID: {entry['messageID']} \nNumber Of Winners: {entry['number_winners']} \nEnds At: {entry['time_of_finish']} \nStatus: {entry['status']}")
+                embed = discord.Embed(title="Giveaways:", description="Listed below are all giveaways from the last 10 days.", color=0x8368ff)
+                for row in rows:
+                    prize, channel_id, message_id, number_winners, datetime_end_str, status = ",".join([str(value) for value in row]).split(",")
+
+                    embed.add_field(name=f"{prize}", value=f"Channel: <#{channel_id}> \nMessage ID: {message_id} \nNumber Of Winners: {number_winners} \nEnds At: {datetime_end_str} \nStatus: {status}")
                 await ctx.send(embed=embed)
 
-    async def roll_giveaway(self, entry, reroll_number=None):
-        message = await self.bot.get_channel(int(entry['channelID'])).fetch_message(int(entry['messageID']))
-        message_channel = self.bot.get_channel(int(entry['channelID']))
+    async def roll_giveaway(self, message_ID, reroll_number=None):
+        cursor = await self.bot.db.execute("SELECT message_id, channel_id, prize, number_winners, role_requirement_type, required_roles, required_gexp FROM Giveaways WHERE message_id = (?)", (message_ID,))
+        row = await cursor.fetchone()
+        await cursor.close()
+        message_id, channel_id, prize, number_winners, role_requirement_type, required_roles, required_gexp = ",".join([str(value) for value in row]).split(",")
+
+        message = await self.bot.get_channel(int(channel_id)).fetch_message(int(message_id))
+        message_channel = self.bot.get_channel(int(channel_id))
+
         reactions = message.reactions
         entrants = []
         winners = []
@@ -348,28 +339,22 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                 break
             
         if has_reaction != True: # Giveaway message does not have the :tada: reaction
-            await message_channel.send(f"Yikes! The giveaway for {entry['prize']} doesn't seem to have the :tada: reaction :(")
-            with open("giveaways.json", "r") as f:
-                json_data = json.load(f)
-            json_data[entry["messageID"]]["status"] = "inactive"
-            with open("giveaways.json", "w") as f:
-                json.dump(json_data, f, indent=4)
+            await message_channel.send(f"Yikes! The giveaway for {prize} doesn't seem to have the :tada: reaction :(")
+            await self.bot.db.execute("UPDATE Giveaways SET status = 'inactive' WHERE message_id = (?)", (message_id,))
+            await self.bot.db.commit()
             return
         
         if reroll_number == None:
-            number_winners = int(entry['number_winners'])
+            number_winners = int(number_winners)
         else:
             number_winners = reroll_number
 
         while len(winners) < number_winners: # Pick a random winner
             while True: # Protection from infinite picking of winner
                 if len(entrants) == 0 and len(winners) == 0: # No eligible winners
-                    await message_channel.send(f"There were no eligible winners for `{entry['prize']}` - message ID `{entry['messageID']}`.")
-                    with open("giveaways.json", "r") as f:
-                        json_data = json.load(f)
-                    json_data[entry["messageID"]]["status"] = "inactive"
-                    with open("giveaways.json", "w") as f:
-                        json.dump(json_data, f, indent=4)
+                    await message_channel.send(f"There were no eligible winners for `{prize}` - message ID `{message_id}`.")
+                    await self.bot.db.execute("UPDATE Giveaways SET status = 'inactive' WHERE message_id = (?)", (message_id,))
+                    await self.bot.db.commit()
                     return
 
                 elif len(entrants) == 0: # Less eligible winners that number_winners
@@ -377,12 +362,9 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                     for winner in winners:
                         announcement = announcement + f"{winner.mention},"
                     
-                    await message_channel.send(f":tada: Congratulations {announcement} you won the giveaway for {entry['prize']}\nMake a ticket to claim!\n`There were less eligible winners for this giveaway than the expected number.`")
-                    with open("giveaways.json", "r") as f:
-                        json_data = json.load(f)
-                    json_data[entry["messageID"]]["status"] = "inactive"
-                    with open("giveaways.json", "w") as f:
-                        json.dump(json_data, f, indent=4)
+                    await message_channel.send(f":tada: Congratulations {announcement} you won the giveaway for {prize}\nMake a ticket to claim!\n`There were less eligible winners for this giveaway than the expected number.`")
+                    await self.bot.db.execute("UPDATE Giveaways SET status = 'inactive' WHERE message_id = (?)", (message_id,))
+                    await self.bot.db.commit()
                     return
 
                 else:
@@ -391,12 +373,13 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
             name = await hypixel.name_grabber(winner)
 
             # ROLE REQUIREMENTS
-            if entry['required_roles'] != '[]':
+            if not len(required_roles):
                 print("There are some role reqs")
                 break
 
             else:  # No required roles - GEXP REQUIREMENTS
-                if entry['required_gexp'] != "0": # There is a gexp requirement
+                required_gexp = int(required_gexp)
+                if required_gexp != 0: # There is a gexp requirement
                     async with aiohttp.ClientSession() as session: # Get winner profile info
                         async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
                             request = await resp.json(content_type=None)
@@ -420,9 +403,9 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                                 entrants.remove(winner)
 
                             else: 
-                                for member in req['guild']["members"]:
+                                for member in req["guild"]["members"]:
                                     if uuid == member["uuid"]:
-                                        if sum(member['expHistory'].values()) >= int(entry['required_gexp']): # Winner meets the gexp requirement
+                                        if sum(member["expHistory"].values()) >= required_gexp: # Winner meets the gexp requirement
                                             entrants.remove(winner)
                                             winners.append(winner)
                                             break
@@ -435,39 +418,31 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                     entrants.remove(winner)
                     winners.append(winner)
 
-        with open("giveaways.json", "r") as f:
-            json_data = json.load(f)
-        json_data[entry["messageID"]]["status"] = "inactive"
-        with open("giveaways.json", "w") as f:
-            json.dump(json_data, f, indent=4)
+        await self.bot.db.execute("UPDATE Giveaways SET status = 'inactive' WHERE message_id = (?)", (message_id,))
+        await self.bot.db.commit()
 
         announcement = ""
         for winner in winners:
-            announcement = announcement + f"{winner.mention},"
-        await message_channel.send(f":tada: Congratulations {announcement} you won the giveaway for {entry['prize']}!\nMake a ticket to claim!")
+            announcement += f"{winner.mention},"
+        await message_channel.send(f":tada: Congratulations {announcement} you won the giveaway for {prize}!\nMake a ticket to claim!")
 
 
     
     @tasks.loop(minutes=2)
     async def check_giveaways(self):
-        with open("giveaways.json", "r+") as f:
-            json_data = json.load(f)
-            giveaways_to_delete = []
-            for entry in json_data:
-                entry = json_data[entry]
-                datetime_end = datetime.strptime(entry['time_of_finish'], "%Y-%m-%d %H:%M:%S.%f")
-                if entry['status'] == "active" and datetime_end < datetime.utcnow(): # Giveaway needs to be ended
-                    await self.roll_giveaway(entry)
+        cursor = await self.bot.db.execute("SELECT message_id, status, time_of_finish FROM Giveaways")
+        rows = await cursor.fetchall()
+        await cursor.close()
 
-                elif entry['status'] == "inactive": # If giveaway ended more than 10 days ago, delete it
-                    if datetime.utcnow() > datetime_end + timedelta(days=10):
-                        giveaways_to_delete.append(entry['messageID'])
+        for row in rows:
+            message_id, status, datetime_end_str = ",".join([str(value) for value in row]).split(",")
+            datetime_end = datetime.strptime(datetime_end_str, "%Y-%m-%d %H:%M:%S")
 
-            for giveaway in giveaways_to_delete: # Seperate loop to avoid change in size during iteration
-                del json_data[giveaway]
-            f.seek(0)
-            f.truncate()
-            json.dump(json_data, f, indent=4)
+            if status == "active" and datetime_end < datetime.utcnow(): # Giveaway needs to be ended
+                await self.roll_giveaway(message_id)
+            elif status == "inactive" and datetime.utcnow() > datetime_end + timedelta(days=10): # If giveaway ended more than 10 days ago, delete it
+                await self.bot.db.execute("DELETE FROM Giveaways WHERE message_id = (?)", (message_id,))
+                await self.bot.db.commit()
 
     @check_giveaways.before_loop
     async def before_giveaway_check(self):
