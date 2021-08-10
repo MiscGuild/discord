@@ -123,7 +123,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                 elif required_roles == "none":
                     r_requirements = None
                     role_requirement_type = "none"
-                    required_roles= []
+                    required_roles= ""
                     break
                 else:
                     # Convert string to list of all required roles
@@ -137,13 +137,13 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                         role_requirement_type = "optional"
                         required_roles = [required_roles]
 
-                    r_requirements = ""
+                    r_requirements = []
                     for required_role in required_roles:
                         required_role = required_role.title()
                         if re.search("[a-zA-Z]", required_role) != None: # Role name was passed
                             req_role = discord.utils.get(ctx.guild.roles, name=required_role)
                             if req_role != None:
-                                r_requirements += required_role
+                                r_requirements.append(req_role.id)
                             else: 
                                 await ctx.send(f"The role {required_role} does not exist!")
                                 for_broken = True
@@ -154,7 +154,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                             required_role = int(required_role)
                             req_role = ctx.guild.get_role(required_role)
                             if req_role != None:
-                                r_requirements += required_role
+                                r_requirements.append(req_role.id)
                             
                             else: 
                                 await ctx.send(f"The role {required_role} does not exist!")
@@ -205,8 +205,6 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
             if sponsors.lower() == "cancel":
                 await ctx.send("Giveaway Cancelled!")
                 return
-            elif sponsors.lower() == "none":
-                sponsors = str(ctx.author)
 
 
             # Sponsors entered correctly
@@ -214,13 +212,13 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                 # Check if user needs one, all, or none of the required roles. Formulate message accordingly
                 if role_requirement_type == "optional":
                     role_requirement_type_message = "You must have at least one of the following roles:"
-                    for required_role in required_roles:
+                    for required_role in r_requirements:
                         role_requirement_type_message = role_requirement_type_message + f"\n- <@&{required_role}>"
                 elif role_requirement_type == "none":
                     role_requirement_type_message = "There are no required roles."
                 else:
                     role_requirement_type_message = "You must have all of the following roles:"
-                    for required_role in required_roles:
+                    for required_role in r_requirements:
                         role_requirement_type_message = role_requirement_type_message + f"\n- <@&{required_role}>"
 
                 # Confirmation message
@@ -249,8 +247,13 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                     await giveaway_msg.add_reaction("\U0001F389")
                     await destination_channel.send(f"This giveaway was generously sponsored by {sponsors}.\nIf you win this giveaway, make a ticket to claim it!", color=0x8368ff)
                     
+                    if required_roles != "": # Convert list to str for db
+                        required_roles = ""
+                        required_roles = ' '.join([str(elem) for elem in r_requirements])
+
+                    # Enter data into db
                     await self.bot.db.execute("INSERT INTO Giveaways VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    (giveaway_msg.id, destination_channel.id, prize, number_winners, datetime_end_str, role_requirement_type, r_requirements, raw_required_gexp, sponsors, "active"))
+                    (giveaway_msg.id, destination_channel.id, prize, number_winners, datetime_end_str, role_requirement_type, required_roles, raw_required_gexp, sponsors, "active"))
                     await self.bot.db.commit() 
 
                     await ctx.send(f"Ok! The giveaway has been set up in <#{destination_channel.id}>.")
@@ -323,6 +326,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
         row = await cursor.fetchone()
         await cursor.close()
         message_id, channel_id, prize, number_winners, role_requirement_type, required_roles, required_gexp = ",".join([str(value) for value in row]).split(",")
+        required_roles = required_roles.split(" ")
 
         message = await self.bot.get_channel(int(channel_id)).fetch_message(int(message_id))
         message_channel = self.bot.get_channel(int(channel_id))
@@ -352,7 +356,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
         while len(winners) < number_winners: # Pick a random winner
             while True: # Protection from infinite picking of winner
                 if len(entrants) == 0 and len(winners) == 0: # No eligible winners
-                    await message_channel.send(f"There were no eligible winners for `{prize}` - message ID `{message_id}`.")
+                    await message_channel.send(f"There were no eligible winners for `{prize}`, the giveaway has still been ended - message ID `{message_id}`.")
                     await self.bot.db.execute("UPDATE Giveaways SET status = 'inactive' WHERE message_id = (?)", (message_id,))
                     await self.bot.db.commit()
                     return
@@ -373,50 +377,60 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
             name = await hypixel.name_grabber(winner)
 
             # ROLE REQUIREMENTS
-            if not len(required_roles):
-                print("There are some role reqs")
-                break
+            if len(required_roles) and role_requirement_type != "none":
+                if role_requirement_type == "optional": # Needs ONE of the required roles
+                    if not any(role.id in required_roles for role in winner.roles):
+                        entrants.remove(winner)
+                        continue
+                
+                elif role_requirement_type == "required": # Needs ALL of the required roles
+                    for req in required_roles:
+                        if discord.utils.get(self.bot.misc_guild.roles, id=req) not in winner.roles:
+                           for_broken = True
+                    if for_broken:
+                        entrants.remove(winner)
+                        continue
+                        
+            # GEXP REQUIREMENTS
+            required_gexp = int(required_gexp)
+            if required_gexp != 0: # There is a gexp requirement
+                async with aiohttp.ClientSession() as session: # Get winner profile info
+                    async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
+                        request = await resp.json(content_type=None)
+                        await session.close()
+                if resp.status != 200:
+                    entrants.remove(winner)
 
-            else:  # No required roles - GEXP REQUIREMENTS
-                required_gexp = int(required_gexp)
-                if required_gexp != 0: # There is a gexp requirement
-                    async with aiohttp.ClientSession() as session: # Get winner profile info
-                        async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-                            request = await resp.json(content_type=None)
+                else:
+                    name = request['name']
+                    uuid = request['id']
+                    api = hypixel.get_api()
+                    async with aiohttp.ClientSession() as session: # Get winner's weekly GEXP
+                        async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
+                            req = await resp.json(content_type=None)
                             await session.close()
                     if resp.status != 200:
                         entrants.remove(winner)
 
-                    else:
-                        name = request['name']
-                        uuid = request['id']
-                        api = hypixel.get_api()
-                        async with aiohttp.ClientSession() as session: # Get winner's weekly GEXP
-                            async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
-                                req = await resp.json(content_type=None)
-                                await session.close()
-                        if resp.status != 200:
+                    else: 
+                        if "guild" not in req or req['guild'] is None or req['guild']['_id'] != "53bd1b3aed503e868873e8f1": # Winner is guildless/Not in misc
                             entrants.remove(winner)
 
                         else: 
-                            if "guild" not in req or req['guild'] is None or req['guild']['_id'] != "53bd1b3aed503e868873e8f1": # Winner is guildless/Not in misc
-                                entrants.remove(winner)
-
-                            else: 
-                                for member in req["guild"]["members"]:
-                                    if uuid == member["uuid"]:
-                                        if sum(member["expHistory"].values()) >= required_gexp: # Winner meets the gexp requirement
-                                            entrants.remove(winner)
-                                            winners.append(winner)
-                                            break
-                                            
-                                        else:
-                                            entrants.remove(winner)
-                                            break
-                                            
-                else: # There is no gexp requirement
-                    entrants.remove(winner)
-                    winners.append(winner)
+                            for member in req["guild"]["members"]:
+                                if uuid == member["uuid"]:
+                                    if sum(member["expHistory"].values()) >= required_gexp: # Winner meets the gexp requirement
+                                        entrants.remove(winner)
+                                        winners.append(winner)
+                                        break
+                                        
+                                    else:
+                                        entrants.remove(winner)
+                                        break
+                                        
+            else: # There is no gexp requirement
+                entrants.remove(winner)
+                winners.append(winner)
 
         await self.bot.db.execute("UPDATE Giveaways SET status = 'inactive' WHERE message_id = (?)", (message_id,))
         await self.bot.db.commit()
