@@ -30,8 +30,8 @@ bot.token = config['bot']['token']
 bot.api_tokens = config['hypixel']['api_keys']
 bot.owner_id = config['bot']['ownerID']
 bot.resident_req = int(50000)
-bot.active = int(280000)
-bot.inactive = int(105000)
+bot.active = int(285000)
+bot.inactive = int(110000)
 bot.dnkl = bot.inactive * 2
 bot.new_member = int(25000)
 
@@ -56,7 +56,7 @@ class HelpCommand(commands.MinimalHelpCommand):
 
 bot.help_command = HelpCommand(command_attrs={'hidden': True})
 
-initial_extensions = ['cogs.fun', 'cogs.hypixel', 'cogs.mod', 'cogs.staff', 'cogs.ticket', 'cogs.owner', 'cogs.miscellaneous']
+
 
 if __name__ == '__main__':
     for extension in initial_extensions:
@@ -549,7 +549,7 @@ async def on_guild_channel_create(channel):
 
                 while True:
                     click = await bot.wait_for("button_click",
-                                               check=lambda x: (x.author == author and x.channel == channel) or (bot.staff in (bot.get_user(x.author.id).roles) and x.channel == channel))
+                                               check=lambda x: (x.author == author and x.channel == channel) or (bot.staff in (bot.get_member(x.author.id).roles) and x.channel == channel))
 
                     if click.component.id == "yes":
                         success_embed = discord.Embed(title="Success", color=0x00A86B)
@@ -586,7 +586,7 @@ async def on_guild_channel_create(channel):
                     elif click.component.id == "restart":
                         embed = discord.Embed(title="Restarting", description="The ticket process will restart in 5 seconds!",
                                               color=0x00a86b)
-                        asyncio.sleep(2)
+                        await asyncio.sleep(2)
 
             elif reply in ("Role", "Username", "Name", "Tag"):
                 await channel.edit(name=f"Role/NameChange-{name}",
@@ -641,7 +641,7 @@ async def on_guild_channel_create(channel):
                                     await author.edit(nick=new_nick)
                                     break
 
-                        await author.add_roles(bot.member_role)
+                        await author.add_roles(bot.member_role, reason="Ticket Sync")
                         embed = discord.Embed(title="Your nick and role was successfully changed!",
                                               description="await staff assistance.",
                                               color=0x8368ff)
@@ -659,8 +659,8 @@ async def on_guild_channel_create(channel):
                                     ign = ign + " " + str(gtag)
 
                                 await author.remove_roles(bot.new_member_role, bot.awaiting_app,
-                                                          bot.member_role)
-                                await author.add_roles(bot.guest, bot.ally)
+                                                          bot.member_role, reason="Ticket Sync")
+                                await author.add_roles(bot.guest, bot.ally, reason="Ticket Sync")
 
                                 embed = discord.Embed(title="Your nick, role and tag were successfully changed!",
                                                       description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
@@ -674,8 +674,8 @@ async def on_guild_channel_create(channel):
                         if str(channel.channel.category.name) == "RTickets":
                             await channel.send("You aren't in Miscellaneous in-game. Kindly await staff assistance!")
                         else:
-                            await author.remove_roles(bot.member_role, bot.awaiting_app)
-                            await author.add_roles(bot.guest)
+                            await author.remove_roles(bot.member_role, bot.awaiting_app, reason="Ticket Sync")
+                            await author.add_roles(bot.guest, reason="Ticket Sync")
                             embed = discord.Embed(title="Your nick and role was successfully changed!",
                                                   description="If this wasn't the change you anticipated, "
                                                               "await staff assistance.",
@@ -735,7 +735,7 @@ async def on_guild_channel_create(channel):
                         embed = discord.Embed(title="Restarting",
                                               description="The ticket process will restart in 5 seconds!",
                                               color=0x00a86b)
-                        asyncio.sleep(2)
+                        await asyncio.sleep(2)
 
 
             elif reply in "Report":
@@ -1222,59 +1222,6 @@ async def on_guild_channel_create(channel):
                     break
 
 
-@tasks.loop(count=1)
-async def ticketer():
-    print("ticketer was started!")
-    await bot.ticket_channel.purge(limit=1)
-
-    ticket_embed = discord.Embed(title="Click the following button to create a ticket!",
-                                 description="If you're facing any issues, message a staff member!\n\nOnce you create the ticket, you'll see the bot's prompt. Respond appropriately.",
-                                 color=0x8368ff)
-
-
-    ticket_creation = Button(style=ButtonStyle.blue, label="✉️Create Ticket", id="embed")
-
-    await bot.ticket_channel.send(embed=ticket_embed, components=[ticket_creation])
-
-    while True:
-        click = await bot.wait_for("button_click",
-                                   check=lambda x: x.channel == bot.ticket_channel)
-        clicker_id = click.author.id
-        clicker = bot.misc_guild.get_member(clicker_id)
-
-
-        name = await hypixel.name_grabber(clicker)
-
-        category = discord.utils.get(bot.misc_guild.categories, name="🎫 Ticket Section")
-        ticket_channel = await bot.misc_guild.create_text_channel(f"ticket-{name}",
-                                                                  category=category,
-                                                                  topic="<:t:869239368060112906><:i:869239367942697010><:c:869239368383074414>"
-                                                                        "<:k:869239367854612480><:e:869239368517287936><:t:869239368060112906>")
-        creating_ticket = discord.Embed(title="Click here to go to your ticket!", url=f"https://discord.com/channels/522586672148381726/{ticket_channel.id}", color=0x00A86B)
-        creating_ticket.set_author(name="Ticket successfully created!")
-
-        await click.respond(type=InteractionType.ChannelMessageWithSource, embed=creating_ticket)
-
-        await ticket_channel.set_permissions(bot.misc_guild.get_role(bot.misc_guild.id), send_messages=False,
-                                             read_messages=False)
-        await ticket_channel.set_permissions(bot.staff, send_messages=True, read_messages=True,
-                                             add_reactions=True, embed_links=True,
-                                             attach_files=True,
-                                             read_message_history=True, external_emojis=True)
-        await ticket_channel.set_permissions(bot.t_officer, send_messages=True, read_messages=True,
-                                             add_reactions=True, embed_links=True,
-                                             attach_files=True,
-                                             read_message_history=True, external_emojis=True)
-        await ticket_channel.set_permissions(clicker, send_messages=True, read_messages=True,
-                                             add_reactions=True, embed_links=True,
-                                             attach_files=True,
-                                             read_message_history=True, external_emojis=True)
-        await ticket_channel.set_permissions(bot.new_member_role, send_messages=False,
-                                             read_messages=False,
-                                             add_reactions=True, embed_links=True,
-                                             attach_files=True,
-                                             read_message_history=True, external_emojis=True)
-        await ticket_channel.send(f"{clicker.mention}")
 
 
 async def connect_db():
@@ -1320,14 +1267,11 @@ async def after_cache_ready():
     bot.giveaways_events = discord.utils.get(bot.misc_guild.roles, name="Giveaways/Events")
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster)
     bot.ticket_categories = ('RTickets', '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL')
-    bot.misc_allies = ("XL", "Lucid", "Cronos", "OUT", "Betrayed")
+    bot.misc_allies = ("XL", "Lucid", "Cronos", "OUT", "Betrayed","Blight")
     bot.adminids = [x.id for x in bot.admin.members]
     bot.staff_names = [await hypixel.name_grabber(member) for member in bot.staff.members]
 
-    DiscordComponents(bot)
     chat_exporter.init_exporter(bot)
-
-    ticketer.start()
 
     print("Cache filled and task complete.")
 
