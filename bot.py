@@ -1226,8 +1226,7 @@ async def on_guild_channel_create(channel):
 
 async def connect_db():
   bot.db = await aiosqlite.connect("database.db")
-  cursor = bot.db.cursor()
-  cursor.execute('''CREATE TABLE IF NOT EXISTS Giveaways (
+  bot.db.execute('''CREATE TABLE IF NOT EXISTS Giveaways (
     message_id integer NOT NULL PRIMARY KEY,
     channel_id integer NOT NULL,
     prize text NOT NULL,
