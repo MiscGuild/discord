@@ -573,7 +573,8 @@ class staff(commands.Cog, name="Staff"):
 
         embed = discord.Embed(title=name,
                               url=f'https://plancke.io/hypixel/guild/name/{name.replace(" ","%20")}',
-                              description=description)
+                              description=description,
+                              color=0x8368ff)
         partner_channel = self.bot.get_channel(874725728397193436)
         await partner_channel.send(embed=embed)
 
