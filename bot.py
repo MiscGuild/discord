@@ -8,6 +8,7 @@ import io
 import aiohttp
 import discord
 import toml
+import aiosqlite
 import chat_exporter
 from discord.ext import commands, tasks
 from discord_components import DiscordComponents, Button, ButtonStyle, InteractionType
@@ -1223,6 +1224,24 @@ async def on_guild_channel_create(channel):
 
 
 
+async def connect_db():
+  bot.db = await aiosqlite.connect("database.db")
+  cursor = bot.db.cursor()
+  cursor.execute('''CREATE TABLE IF NOT EXISTS Giveaways (
+    message_id integer NOT NULL PRIMARY KEY,
+    channel_id integer NOT NULL,
+    prize text NOT NULL,
+    number_winners integer NOT NULL,
+    time_of_finish text NOT NULL,
+    role_requirement_type text NOT NULL,
+    required_roles text,
+    required_gexp integer NOT NULL,
+    sponsors text NOT NULL,
+    status text NOT NULL,
+    )''')
+  bot.db.commit()
+  print("db connected")
+bot.loop.run_until_complete(connect_db())
 
 @tasks.loop(count=1)
 async def after_cache_ready():
@@ -1245,6 +1264,7 @@ async def after_cache_ready():
     bot.awaiting_app = discord.utils.get(bot.misc_guild.roles, name="Awaiting Approval")
     bot.ally = discord.utils.get(bot.misc_guild.roles, name="Ally")
     bot.server_booster = discord.utils.get(bot.misc_guild.roles, name="Server Booster")
+    bot.giveaways_events = discord.utils.get(bot.misc_guild.roles, name="Giveaways/Events")
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster)
     bot.ticket_categories = ('RTickets', '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL')
     bot.misc_allies = ("XL", "Lucid", "Cronos", "OUT", "Betrayed","Blight")
