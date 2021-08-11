@@ -66,6 +66,7 @@ class Moderation(commands.Cog, name="Moderation"):
                                            filename=f"purge-{ctx.channel.name}-by-{name}.html")
 
         if self.bot.staff in ctx.author.roles:
+            await ctx.message.delete()
             await ctx.channel.purge(limit=amount)
             embed = discord.Embed(title=f'{name} purged {amount} messages in {ctx.channel.name}',
                                   description=f"**Reason:** {reason}", color=0x8368ff)
