@@ -187,9 +187,10 @@ class Tickets(commands.Cog, name="Tickets"):
 
     @commands.command()
     @commands.has_any_role(538015368782807040, 522588122807271424)
-    async def rename(self, ctx, channel_name):
+    async def rename(self, ctx, *, channel_name):
         """Renames the channel
         """
+        await ctx.message.delete()
         if ctx.channel.category.name in self.bot.ticket_categories:
             channel_name = channel_name.replace(" ", "-")
             await ctx.channel.edit(name=f"{channel_name}")

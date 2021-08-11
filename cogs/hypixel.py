@@ -1015,6 +1015,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
     async def gtop(self, ctx):
         """Gives the weekly guild experience leaderboard!
         """
+        await ctx.message.delete()
         msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
         api = hypixel.get_api()
         async with aiohttp.ClientSession() as session:
