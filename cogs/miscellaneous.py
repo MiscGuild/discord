@@ -407,7 +407,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                         entrants.remove(winner)
 
                     else: 
-                        if "guild" not in req or req['guild'] is None or req['guild']['_id'] != "53bd1b3aed503e868873e8f1": # Winner is guildless/Not in misc
+                        if "guild" not in req or req['guild'] is None: # Winner is guildless
                             entrants.remove(winner)
 
                         else: 
