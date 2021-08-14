@@ -874,16 +874,16 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                 colour, GraphColor, GraphBorder = 0x36393f, rainbow_bg, rainbow_border
                             elif rank == "Resident":
                                 if totalexp > self.bot.resident_req:
-                                    colour, GraphColor, GraphBorder = await hypixel.get_color("res_met")
+                                    colour, GraphColor, GraphBorder = await hypixel.get_color("res_met", totalexp, self.bot.resident_req)
                                 else:
-                                    colour, GraphColor, GraphBorder = await hypixel.get_color("res_not_met")
+                                    colour, GraphColor, GraphBorder = await hypixel.get_color("res_not_met", totalexp, self.bot.resident_req)
                             else:
                                 if totalexp > self.bot.active:
-                                    colour, GraphColor, GraphBorder = await hypixel.get_color("active")
+                                    colour, GraphColor, GraphBorder = await hypixel.get_color("active", totalexp, self.bot.active)
                                 elif totalexp > self.bot.inactive:
-                                    colour, GraphColor, GraphBorder = await hypixel.get_color("member")
+                                    colour, GraphColor, GraphBorder = await hypixel.get_color("member", totalexp, self.bot.inactive)
                                 else:
-                                    colour, GraphColor, GraphBorder = await hypixel.get_color("inactive")
+                                    colour, GraphColor, GraphBorder = await hypixel.get_color("inactive", totalexp, self.bot.inactive)
 
                             totalexp = (format(totalexp, ',d'))
                             for key, value in expHistory.items():
