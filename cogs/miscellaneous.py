@@ -350,7 +350,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
         while len(winners) < number_winners: # Pick a random winner
             while True: # Protection from infinite picking of winner
                 if len(entrants) == 0 and len(winners) == 0: # No eligible winners
-                    await message_channel.send(f"There were no eligible winners for `{prize}`, the giveaway has still been ended - message ID `{message_id}`.")
+                    await message_channel.send(f"There were no eligible winners for `{prize}`, the giveaway has been ended - message ID `{message_id}`.")
                     await self.bot.db.execute("UPDATE Giveaways SET status = 'inactive' WHERE message_id = (?)", (message_id,))
                     await self.bot.db.commit()
                     return
@@ -358,6 +358,8 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                 elif len(entrants) == 0: # Less eligible winners that number_winners
                     announcement = ""
                     for winner in winners:
+                        
+
                         announcement = announcement + f"{winner.mention},"
                     
                     await message_channel.send(f":tada: Congratulations {announcement} you won the giveaway for {prize}\nMake a ticket to claim!\n`There were less eligible winners for this giveaway than the expected number.`")
@@ -431,6 +433,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
 
         announcement = ""
         for winner in winners:
+
             announcement += f"{winner.mention},"
         await message_channel.send(f":tada: Congratulations {announcement} you won the giveaway for {prize}!\nMake a ticket to claim!")
 

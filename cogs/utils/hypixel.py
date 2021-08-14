@@ -4,6 +4,7 @@ import datetime
 import math
 import random
 import toml
+import discord
 from datetime import datetime
 
 configFile = toml.load('config.toml')
@@ -427,4 +428,9 @@ async def get_color(color):
 
         return l1[index], l2[index], l3[index]
 
-
+def discord_verification(name,member: discord.Member):
+    req = get_data1(name)
+    if member.name == req['player']['socialMedia']['links']['DISCORD']:
+        return True
+    else:
+        return False

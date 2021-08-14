@@ -17,7 +17,7 @@ class Tickets(commands.Cog, name="Tickets"):
     async def register(self, ctx, name):
         async with ctx.channel.typing():
             author = ctx.author
-            if str(ctx.channel) == "register":
+            if ctx.channel.id == 714882620001091585:
                 async with aiohttp.ClientSession() as session:
                     async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
                         request = await resp.json(content_type=None)

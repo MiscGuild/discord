@@ -239,7 +239,7 @@ async def on_guild_channel_create(channel):
                     title="Alright! Kindly specify why you joined the discord and await staff assistance!",
                     color=0x8368ff)
                 await channel.send(embed=embed)
-    elif channel.category.name == '🎫 Ticket Section':
+    elif channel.category.name == '🎫 Ticket Section' and 'winner' not in channel.name:
         while True:
             await asyncio.sleep(3)
             embed = discord.Embed(title="What did you make this ticket?",
