@@ -866,8 +866,58 @@ class Tickets(commands.Cog, name="Tickets"):
                         break
 
                     else:
-                        await channel.send(
-                            "Since you don't meet the requirements, there's no point proceeding with the application. Kindly reapply once you meet all the requirements.")
+                        stop_embed = discord.Embed(title="Since you don't meet the requirements, can this ticket be closed?",
+                                                   description="Click `Yes` if you wish to delete the ticket.\n Click `No` if you wish to wait for staff assistance\nClick `Restart` if you wish to restart the ticket process",
+                                                   color=0x8368ff)
+                        yes = Button(style=ButtonStyle.blue, label="Yes", id="yes")
+                        no = Button(style=ButtonStyle.red, label="No", id="no")
+                        restart = Button(style=ButtonStyle.grey, label="Restart", id="restart")
+
+                        await channel.send(embed=stop_embed, components=[[yes, no], [restart]])
+
+                        while True:
+                            click = await self.bot.wait_for("button_click",
+                                                            check=lambda x: (
+                                                                                    x.author == author and x.channel == channel) or (
+                                                                                    self.bot.staff in x.author.roles and x.channel == channel))
+
+                            if click.component.id == "yes":
+                                success_embed = discord.Embed(title="Success", color=0x00A86B)
+                                await click.respond(embed=success_embed)
+                                transcript = await chat_exporter.export(channel)
+                                if transcript is None:
+                                    pass
+                                else:
+                                    transcript_file = discord.File(io.BytesIO(transcript.encode()),
+                                                                   filename=f"deleted-{channel.name}.html")
+
+                                if channel.category.name in self.bot.ticket_categories:
+                                    name = channel.name
+                                    embed = discord.Embed(title='This ticket will be deleted in 10 seconds!',
+                                                          description='',
+                                                          color=0xDE3163)
+                                    msg = await channel.send(embed=embed)
+                                    await asyncio.sleep(10)
+                                    await discord.TextChannel.delete(channel)
+
+                                    name = await hypixel.name_grabber(author)
+                                    embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
+                                                          description="They deleted their own ticket.", color=0x8368ff)
+                                    await self.bot.logs.send(embed=embed)
+                                    await self.bot.logs.send(file=transcript_file)
+                                    break
+                            elif click.component.id == "no":
+                                success_embed = discord.Embed(title="Success", color=0x00A86B)
+                                await click.respond(embed=success_embed)
+                                embed = discord.Embed(title="The ticket will not be closed. ",
+                                                      description="Kindly await staff assistance!", color=0xde3163)
+                                await channel.send(embed=embed)
+                                break
+                            elif click.component.id == "restart":
+                                embed = discord.Embed(title="Restarting",
+                                                      description="The ticket process will restart in 5 seconds!",
+                                                      color=0x00a86b)
+                                await asyncio.sleep(2)
                         break
                 elif reply in ("Gvg", "Gvg application"):
                     await channel.edit(name=f"GvG-Application-{name}",
@@ -936,7 +986,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         if x >= 2 and y >= 2 and z >= 2:
                             embed1 = discord.Embed(title="You're eligible for the Polyvalent GvG Team!",
                                                    description="Kindly await staff assistance for further information!",
-                                                   color=0xff00f6)
+                                                   color=0x8368ff)
                             embed1.add_field(name="Bedwars Wins", value=f'`{bw_wins}`')
                             embed1.add_field(name="Bedwars FKDR", value=f'`{bw_fkdr}`')
                             embed1.add_field(name="Skywars Wins (Overall)", value=f'`{sw_wins_overall}`')
@@ -952,7 +1002,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             embed1 = discord.Embed(
                                 title="You're eligible for any two of the teams!\n You will be assigned to any two teams on the basis of your stats!",
                                 description="Kindly await staff assistance for further information!",
-                                color=0xff00f6)
+                                color=0x8368ff)
                             embed1.add_field(name="Bedwars Wins", value=f'`{bw_wins}`')
                             embed1.add_field(name="Bedwars FKDR", value=f'`{bw_fkdr}`')
                             embed1.add_field(name="Skywars Wins (Overall)", value=f'`{sw_wins_overall}`')
@@ -967,7 +1017,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         elif x >= 1 and y >= 1:
                             embed1 = discord.Embed(title="You're eligible for the Bedwars and Skywars GvG Teams!",
                                                    description="Kindly await staff assistance for further information!",
-                                                   color=0xff00f6)
+                                                   color=0x8368ff)
                             embed1.add_field(name="Bedwars Wins", value=f'`{bw_wins}`')
                             embed1.add_field(name="Bedwars FKDR", value=f'`{bw_fkdr}`')
                             embed1.add_field(name="Skywars Wins (Overall)", value=f'`{sw_wins_overall}`')
@@ -981,7 +1031,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         elif x >= 1 and z >= 1:
                             embed1 = discord.Embed(title="You're eligible for the Bedwars and Duels GvG Teams!",
                                                    description="Kindly await staff assistance for further information!",
-                                                   color=0xff00f6)
+                                                   color=0x8368ff)
                             embed1.add_field(name="Bedwars Wins", value=f'`{bw_wins}`')
                             embed1.add_field(name="Bedwars FKDR", value=f'`{bw_fkdr}`')
                             embed1.add_field(name="Duels Wins", value=f'`{duels_wins}`')
@@ -994,7 +1044,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         elif y >= 1 and z >= 1:
                             embed1 = discord.Embed(title="You're eligible for the Skywars and Duels GvG Teams!",
                                                    description="Kindly await staff assistance for further information!",
-                                                   color=0xff00f6)
+                                                   color=0x8368ff)
                             embed1.add_field(name="Skywars Wins (Overall)", value=f'`{sw_wins_overall}`')
                             embed1.add_field(name="Skywars Wins (Solo)", value=f'`{sw_wins_solo}`')
                             embed1.add_field(name="Skywars Wins (doubles)", value=f'`{sw_wins_doubles}`')
@@ -1007,7 +1057,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         elif x >= 1:
                             embed1 = discord.Embed(title="You're eligible for the Bedwars GvG Team!",
                                                    description="Kindly await staff assistance for further information!",
-                                                   color=0xff00f6)
+                                                   color=0x8368ff)
                             embed1.add_field(name="Bedwars Wins", value=f'`{bw_wins}`')
                             embed1.add_field(name="Bedwars FKDR", value=f'`{bw_fkdr}`')
                             embed1.set_footer(
@@ -1017,7 +1067,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         elif y >= 1:
                             embed1 = discord.Embed(title="You're eligible for the Skywars GvG Team!",
                                                    description="Kindly await staff assistance for further information!",
-                                                   color=0xff00f6)
+                                                   color=0x8368ff)
                             embed1.add_field(name="Skywars Wins (Overall)", value=f'`{sw_wins_overall}`')
                             embed1.add_field(name="Skywars Wins (Solo)", value=f'`{sw_wins_solo}`')
                             embed1.add_field(name="Skywars Wins (doubles)", value=f'`{sw_wins_doubles}`')
@@ -1029,7 +1079,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         elif z >= 1:
                             embed1 = discord.Embed(title="You're eligible for the Duels GvG Team!",
                                                    description="Kindly await staff assistance for further information!",
-                                                   color=0xff00f6)
+                                                   color=0x8368ff)
                             embed1.add_field(name="Duels Wins", value=f'`{duels_wins}`')
                             embed1.add_field(name="Duels WLR", value=f'`{duels_wlr}`')
                             embed1.set_footer(
@@ -1043,6 +1093,60 @@ class Tickets(commands.Cog, name="Tickets"):
                             embed1.set_footer(
                                 text=f"Bedwars Wins - {bw_wins}\nBedwars FKDR - {bw_fkdr}\nSkywars Wins (Overall) - {sw_wins_overall}\nSkywars Wins (Solo) - {sw_wins_solo}\nSkywars Wins (Doubles) - {sw_wins_doubles}\nSkywars KDR - {sw_kdr}\nDuels wins - {duels_wins}\nDuels WLR - {duels_wlr}")
                             await channel.send(embed=embed1)
+                            stop_embed = discord.Embed(
+                                title="Since you don't meet the requirements, can this ticket be closed?",
+                                description="Click `Yes` if you wish to delete the ticket.\n Click `No` if you wish to wait for staff assistance\nClick `Restart` if you wish to restart the ticket process",
+                                color=0x8368ff)
+                            yes = Button(style=ButtonStyle.blue, label="Yes", id="yes")
+                            no = Button(style=ButtonStyle.red, label="No", id="no")
+                            restart = Button(style=ButtonStyle.grey, label="Restart", id="restart")
+
+                            await channel.send(embed=stop_embed, components=[[yes, no], [restart]])
+
+                            while True:
+                                click = await self.bot.wait_for("button_click",
+                                                                check=lambda x: (
+                                                                                        x.author == author and x.channel == channel) or (
+                                                                                        self.bot.staff in x.author.roles and x.channel == channel))
+
+                                if click.component.id == "yes":
+                                    success_embed = discord.Embed(title="Success", color=0x00A86B)
+                                    await click.respond(embed=success_embed)
+                                    transcript = await chat_exporter.export(channel)
+                                    if transcript is None:
+                                        pass
+                                    else:
+                                        transcript_file = discord.File(io.BytesIO(transcript.encode()),
+                                                                       filename=f"deleted-{channel.name}.html")
+
+                                    if channel.category.name in self.bot.ticket_categories:
+                                        name = channel.name
+                                        embed = discord.Embed(title='This ticket will be deleted in 10 seconds!',
+                                                              description='',
+                                                              color=0xDE3163)
+                                        msg = await channel.send(embed=embed)
+                                        await asyncio.sleep(10)
+                                        await discord.TextChannel.delete(channel)
+
+                                        name = await hypixel.name_grabber(author)
+                                        embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
+                                                              description="They deleted their own ticket.",
+                                                              color=0x8368ff)
+                                        await self.bot.logs.send(embed=embed)
+                                        await self.bot.logs.send(file=transcript_file)
+                                        break
+                                elif click.component.id == "no":
+                                    success_embed = discord.Embed(title="Success", color=0x00A86B)
+                                    await click.respond(embed=success_embed)
+                                    embed = discord.Embed(title="The ticket will not be closed. ",
+                                                          description="Kindly await staff assistance!", color=0xde3163)
+                                    await channel.send(embed=embed)
+                                    break
+                                elif click.component.id == "restart":
+                                    embed = discord.Embed(title="Restarting",
+                                                          description="The ticket process will restart in 5 seconds!",
+                                                          color=0x00a86b)
+                                    await asyncio.sleep(2)
                             break
 
                 elif reply == "Demotion":
