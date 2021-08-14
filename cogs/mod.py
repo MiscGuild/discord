@@ -1,6 +1,7 @@
-import discord
-import chat_exporter
 import io
+
+import chat_exporter
+import discord
 from discord.ext import commands
 
 from cogs.utils import hypixel
