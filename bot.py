@@ -239,19 +239,19 @@ async def on_guild_channel_create(channel):
                     title="Alright! Kindly specify why you joined the discord and await staff assistance!",
                     color=0x8368ff)
                 await channel.send(embed=embed)
-    elif channel.category.name == '🎫 Ticket Section' and 'winner' not in channel.name:
+    elif channel.category.name == '🎫 Ticket Section' and 'giveaway-winner' not in channel.name:
         while True:
             await asyncio.sleep(3)
             embed = discord.Embed(title="What did you make this ticket?",
                                   description="Please reply with your reason from the list given below!",
                                   color=0x8368ff)
-            embed.add_field(name="Do-Not-Kick-List", value="Reply with `DNKL`", inline=False)
-            embed.add_field(name="Role/Username/Tag Change", value="Reply with `Role`", inline=False)
-            embed.add_field(name="Report", value="Reply with `Report`", inline=False)
-            embed.add_field(name="Problem/Query/Complaint/Suggestion", value="Reply with `General`", inline=False)
-            embed.add_field(name="Milestone", value="Reply with `Milestone`", inline=False)
-            embed.add_field(name="Staff Application", value="Reply with `Staff`", inline=False)
-            embed.add_field(name="GvG Team Application", value="Reply with `GvG`", inline=False)
+            embed.add_field(name="Update your Role/Username/Tag", value="Reply with `Nick`", inline=False)
+            embed.add_field(name="Register a Milestone", value="Reply with `Milestone`", inline=False)
+            embed.add_field(name="Apply for the Do-Not-Kick-List", value="Reply with `DNKL`", inline=False)
+            embed.add_field(name="Report a player", value="Reply with `Report`", inline=False)
+            embed.add_field(name="Query/Problem", value="Reply with `General`", inline=False)
+            embed.add_field(name="Apply for staff", value="Reply with `Staff`", inline=False)
+            embed.add_field(name="Apply for the GvG Team", value="Reply with `GvG`", inline=False)
             embed.add_field(name="Other", value="Reply with `Other`", inline=False)
             await channel.send(embed=embed)
             reply = await bot.wait_for('message', check=lambda x: x.channel == channel)
@@ -262,7 +262,7 @@ async def on_guild_channel_create(channel):
             reply = reply.content
             reply = reply.capitalize()
 
-            if reply in ("Dnkl", "Do not kick list", "Do-not-kick-list"):
+            if reply in ("Dnkl", "Do not kick list", "Do-not-kick-list", "Apply for the do-not-kick-list"):
 
                 name = await hypixel.name_grabber(author)
 
@@ -588,7 +588,7 @@ async def on_guild_channel_create(channel):
                                               color=0x00a86b)
                         await asyncio.sleep(2)
 
-            elif reply in ("Role", "Username", "Name", "Tag"):
+            elif reply in ("Role", "Username", "Name", "Tag", "Nick"):
                 await channel.edit(name=f"Role/NameChange-{name}",
                                    category=discord.utils.get(channel.guild.categories, name="OTHER"))
                 embed = discord.Embed(title="What is your Minecraft username?",
@@ -738,13 +738,13 @@ async def on_guild_channel_create(channel):
                         await asyncio.sleep(2)
 
 
-            elif reply in "Report":
+            elif reply in ("Report","Player report","Report Player"):
                 await channel.edit(name=f"Report-{name}",
                                    category=discord.utils.get(channel.guild.categories, name="REPORTS"))
                 await channel.send(
                     "Alright. Please provide adequate details about the user and await staff assistance!")
                 break
-            elif reply in ("General", "Problem", "Query", "Complaint", "Suggestion"):
+            elif reply in ("General", "Problem", "Query", "Complaint"):
                 await channel.edit(name=f"General-{name}",
                                    category=discord.utils.get(channel.guild.categories, name="OTHER"))
                 await channel.send(
@@ -756,7 +756,7 @@ async def on_guild_channel_create(channel):
                 await channel.send(
                     "Kindly provide a screenshot followed by a message specifying your milestone and then await staff assistance!")
                 break
-            elif reply in ('Staff', 'Staff Application', 'Staff App'):
+            elif reply in ('Staff', 'Staff application', 'Staff app','Staff-application'):
                 embed = discord.Embed(title="To be eligible to apply for staff,"
                                             " you must meet the following requirements.",
                                       description="• You must be older than 13 years."
@@ -976,7 +976,7 @@ async def on_guild_channel_create(channel):
                     await channel.send(
                         "Since you don't meet the requirements, there's no point proceeding with the application. Kindly reapply once you meet all the requirements.")
                     break
-            elif reply == "Gvg":
+            elif reply in ("Gvg","Gvg application"):
                 await channel.edit(name=f"GvG-Application-{name}",
                                    category=discord.utils.get(channel.guild.categories, name="OTHER"))
                 embed = discord.Embed(
