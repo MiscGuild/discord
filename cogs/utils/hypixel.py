@@ -337,34 +337,29 @@ async def get_color(color, gexp, requirement):
     elif color == "res_not_met":
         if gexp * 2 < requirement:
             return 0xff6464, 'rgba(255, 100, 100,0.3)', 'rgba(255, 100, 100,0.3)'
-        elif gexp * 2 > requirement and gexp * 1.3 < requirement:
+        elif gexp * 2 > requirement:
             return 0xff8764, 'rgba(255, 135, 100,0.3)', 'rgba(255, 135, 100,0.3)'
-        elif gexp * 1.3 > requirement:
+        else:
             return 0xffb464, 'rgba(255, 180, 100,0.3)', 'rgba(255, 180, 100,0.3)'
 
     elif color == "active":
         if gexp * 2 < requirement:
             return 0xa064ff, 'rgba(160, 100, 255,0.3)', 'rgba(160, 100, 255,0.3)'
-        elif gexp * 2 > requirement and gexp * 1.3 < requirement:
+        elif gexp * 2 > requirement:
             return 0x6464ff, 'rgba(100, 100, 255,0.3)', 'rgba(100, 100, 255,0.3)'
-        elif gexp * 1.3 > requirement:
+        else:
             return 0x64b4ff, 'rgba(100, 180, 255,0.3)', 'rgba(100, 180, 255,0.3)'
 
     elif color == "member":
         if gexp * 2 < requirement:
             return 0x64c8ff, 'rgba(100, 200, 255,0.3)', 'rgba(100, 200, 255,0.3)'
-        elif gexp * 2 > requirement and gexp * 1.3 < requirement:
+        elif gexp * 2 > requirement:
             return 0x64e1ff, 'rgba(100, 225, 255,0.3)', 'rgba(100, 225, 255,0.3)'
-        elif gexp * 1.3 > requirement:
+        else:
             return 0x64ffff, 'rgba(100, 255, 255,0.3)', 'rgba(100, 255, 255,0.3)'
 
     elif color == "inactive":
-        if gexp * 2 < requirement:
-            return 0xffb464, 'rgba(255, 180, 100,0.3)', 'rgba(255, 180, 100,0.3)'
-        elif gexp * 2 > requirement and gexp * 1.3 < requirement:
-            return 0xff8764, 'rgba(255, 135, 100,0.3)', 'rgba(255, 135, 100,0.3)'
-        elif gexp * 1.3 > requirement:
-            return 0xff6464, 'rgba(255, 100, 100,0.3)', 'rgba(255, 100, 100,0.3)'
+        return 0xff6464, 'rgba(255, 100, 100,0.3)', 'rgba(255, 100, 100,0.3)'
 
 
 def discord_verification(name, member: discord.Member):
