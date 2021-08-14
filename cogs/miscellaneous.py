@@ -358,7 +358,31 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                 elif len(entrants) == 0: # Less eligible winners that number_winners
                     announcement = ""
                     for winner in winners:
-                        
+                        category = discord.utils.get(self.bot.guild.categories, name="🎫 Ticket Section")
+                        winner_ticket = await self.bot.guild.create_text_channel(f"giveaway-winner-{winner.nick}",
+                                                                                 category=category)
+                        await winner_ticket.set_permissions(self.botguild.get_role(self.bot.guild.id),
+                                                            send_messages=False,
+                                                            read_messages=False)
+                        await winner_ticket.set_permissions(self.bot.staff, send_messages=True, read_messages=True,
+                                                            add_reactions=True, embed_links=True,
+                                                            attach_files=True,
+                                                            read_message_history=True, external_emojis=True)
+                        await winner_ticket.set_permissions(self.bot.t_officer, send_messages=True,
+                                                            read_messages=True,
+                                                            add_reactions=True, embed_links=True,
+                                                            attach_files=True,
+                                                            read_message_history=True, external_emojis=True)
+                        await winner_ticket.set_permissions(winner, send_messages=True, read_messages=True,
+                                                            add_reactions=True, embed_links=True,
+                                                            attach_files=True,
+                                                            read_message_history=True, external_emojis=True)
+                        await winner_ticket.set_permissions(self.bot.new_member_role, send_messages=False,
+                                                            read_messages=False,
+                                                            add_reactions=True, embed_links=True,
+                                                            attach_files=True,
+                                                            read_message_history=True, external_emojis=True)
+                        await winner_ticket.send(f"{winner.mention}")
 
                         announcement = announcement + f"{winner.mention},"
                     
@@ -433,7 +457,30 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
 
         announcement = ""
         for winner in winners:
-
+            category = discord.utils.get(self.bot.guild.categories, name="🎫 Ticket Section")
+            winner_ticket = await self.bot.guild.create_text_channel(f"giveaway-winner-{winner.nick}",
+                                                                     category=category)
+            await winner_ticket.set_permissions(self.botguild.get_role(self.bot.guild.id), send_messages=False,
+                                                read_messages=False)
+            await winner_ticket.set_permissions(self.bot.staff, send_messages=True, read_messages=True,
+                                                add_reactions=True, embed_links=True,
+                                                attach_files=True,
+                                                read_message_history=True, external_emojis=True)
+            await winner_ticket.set_permissions(self.bot.t_officer, send_messages=True,
+                                                read_messages=True,
+                                                add_reactions=True, embed_links=True,
+                                                attach_files=True,
+                                                read_message_history=True, external_emojis=True)
+            await winner_ticket.set_permissions(winner, send_messages=True, read_messages=True,
+                                                add_reactions=True, embed_links=True,
+                                                attach_files=True,
+                                                read_message_history=True, external_emojis=True)
+            await winner_ticket.set_permissions(self.bot.new_member_role, send_messages=False,
+                                                read_messages=False,
+                                                add_reactions=True, embed_links=True,
+                                                attach_files=True,
+                                                read_message_history=True, external_emojis=True)
+            await winner_ticket.send(f"{winner.mention}")
             announcement += f"{winner.mention},"
         await message_channel.send(f":tada: Congratulations {announcement} you won the giveaway for {prize}!\nMake a ticket to claim!")
 
