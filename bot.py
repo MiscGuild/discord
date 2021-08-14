@@ -1205,21 +1205,28 @@ async def on_guild_channel_create(channel):
                     "Okay. Kindly specify your reason behind creating this ticket and wait for staff to help you!")
                 break
             else:
-                embed = discord.Embed(title="My massive computer brain thinks you made a mistake.", color=0xff0000)
-                embed.add_field(name="If this is true", value="Type `Yes`", inline=False)
-                embed.add_field(name="If this is false", value="Type `No`", inline=False)
-                await channel.send(embed=embed)
-                mistake = await bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
-                mistake = mistake.content
-                mistake = mistake.capitalize()
-                if mistake == "Yes":
-                    embed = discord.Embed(title="Great! Let's start over!",
-                                          color=0x8368ff)
-                    await channel.send(embed=embed)
-                else:
-                    await channel.send(
-                        "Hmm, seems like I'm dumb.\nKindly specify your reason behind creating this ticket and await staff assistance!")
-                    break
+                mistake = discord.Embed(title="Did you make a mistake while specifying why you created this ticket?",
+                                           description="Click `Yes` if you did. This will restart the ticketing process.\n Click `No` if you didn't make a mistake and wish to wait for staff assistance.",
+                                           color=0x8368ff)
+                yes = Button(style=ButtonStyle.blue, label="Yes", id="yes")
+                no = Button(style=ButtonStyle.red, label="No", id="no")
+
+                await channel.send(embed=mistake, components=[yes, no])
+
+                while True:
+                    click = await bot.wait_for("button_click",
+                                               check=lambda x: (x.author == author and x.channel == channel) or (
+                                                       bot.staff in x.author.roles and x.channel == channel))
+
+                    if click.component.id == "yes":
+                        embed = discord.Embed(title="Great! Restarting the ticketing process!",
+                                              color=0x00A86B)
+                        await click.respond(embed=embed)
+                    elif click.component.id == "no":
+                        embed = discord.Embed(title="Alright, kindly specify why you created this ticket and then await staff assistance!",
+                                              color=0x00A86B)
+                        await click.respond(embed=embed)
+                        break
 
 
 
