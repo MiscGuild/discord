@@ -1,11 +1,12 @@
 # hypixel.py
-import aiohttp
 import datetime
 import math
 import random
-import toml
-import discord
 from datetime import datetime
+
+import aiohttp
+import discord
+import toml
 
 configFile = toml.load('config.toml')
 
@@ -187,6 +188,7 @@ async def get_gtag(name):
     else:
         gtag = req["guild"]["tag"]
         return (f"[{gtag}]")
+
 
 async def get_dispnameID(name):
     async with aiohttp.ClientSession() as session:
@@ -428,7 +430,8 @@ async def get_color(color):
 
         return l1[index], l2[index], l3[index]
 
-def discord_verification(name,member: discord.Member):
+
+def discord_verification(name, member: discord.Member):
     req = get_data1(name)
     if member.name == req['player']['socialMedia']['links']['DISCORD']:
         return True

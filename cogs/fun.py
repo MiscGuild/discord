@@ -26,7 +26,6 @@ class Fun(commands.Cog, name="Fun"):
         embed.set_image(url=req['image'])
         await ctx.send(embed=embed)
 
-
     # Ping
     @commands.command()
     async def ping(self, ctx):
@@ -159,31 +158,33 @@ class Fun(commands.Cog, name="Fun"):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def horny(self,ctx, member: discord.User = None):
+    async def horny(self, ctx, member: discord.User = None):
         """Gives the mentioned member a horny card"""
         member = member or ctx.author
         await ctx.send(f"https://some-random-api.ml/canvas/horny?avatar={member.avatar_url}")
+
     @commands.command(aliases=['simp'])
     async def simpcard(self, ctx, member: discord.User = None):
         """Gives the mentioned member a simpcard"""
         member = member or ctx.author
         await ctx.send(f"https://some-random-api.ml/canvas/simpcard?avatar={member.avatar_url}")
+
     @commands.command()
     async def avatar(self, ctx, member: discord.User):
         """Sends the member's discord avatar
         """
-        embed=discord.Embed(title=f"{member.name}'s avatar:",color=0x8368ff)
+        embed = discord.Embed(title=f"{member.name}'s avatar:", color=0x8368ff)
         embed.set_image(url=member.avatar_url)
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def userinfo(self,ctx,member:discord.Member):
+    async def userinfo(self, ctx, member: discord.Member):
         """Sends an embed with the discord member's info
         """
         embed = discord.Embed(title=f"{member.name}", description=member.nick, color=member.color)
         embed.set_thumbnail(url=member.avatar_url)
         embed.add_field(name="Account created:", value=str(member.created_at)[:-7], inline=False)
-        embed.add_field(name="Joined this discord on:", value=str(member.joined_at)[:-7],inline=False)
+        embed.add_field(name="Joined this discord on:", value=str(member.joined_at)[:-7], inline=False)
         if member.premium_since is not None:
             embed.add_field(name="Server booster since:", value=str(member.premium_since)[:-7], inline=False)
         else:
@@ -202,8 +203,6 @@ class Fun(commands.Cog, name="Fun"):
             embed = discord.Embed(title="No search argument!",
                                   description="You have not entered a song name!", color=0xDE3163)
             await ctx.reply(embed=embed)
-
-
 
         song = search.replace(' ', '%20')
 
@@ -232,6 +231,7 @@ class Fun(commands.Cog, name="Fun"):
                 await lyricsSession.close()  # closing the session
 
                 await ctx.reply(embed=embed, mention_author=False)
+
 
 def setup(bot):
     bot.add_cog(Fun(bot))

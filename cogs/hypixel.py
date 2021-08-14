@@ -77,7 +77,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             if ctx.author.nick is None or str(gtag) not in ctx.author.nick:
                                 ign = ign + " " + str(gtag)
                             await ctx.author.edit(nick=ign)
-                            await ctx.author.remove_roles(self.bot.new_member_role,self.bot.awaiting_app,self.bot.member_role, reason="Sync")
+                            await ctx.author.remove_roles(self.bot.new_member_role, self.bot.awaiting_app,
+                                                          self.bot.member_role, reason="Sync")
                             await ctx.author.add_roles(self.bot.guest, self.bot.ally, reason="Sync")
 
                             embed = discord.Embed(title="Your nick, role and tag were successfully changed!",
