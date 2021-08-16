@@ -502,7 +502,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
 
         announcement = ""
         for winner in winners:
-            category = discord.utils.get(self.bot.guild.categories, name="🎫 Ticket Section")
+            category = discord.utils.get(self.bot.misc_guild.categories, name="🎫 Ticket Section")
             winner_ticket = await self.bot.guild.create_text_channel(f"giveaway-winner-{winner.nick}",
                                                                      category=category)
             await winner_ticket.set_permissions(self.botguild.get_role(self.bot.guild.id), send_messages=False,
