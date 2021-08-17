@@ -87,7 +87,7 @@ async def get_ap(name):
 
 
 async def get_rank(name):
-    if len(name) > 20:
+    if len(name) < 20 and name.isascii() is True:
         api = get_api()
         async with aiohttp.ClientSession() as session:
             async with session.get(f"https://api.hypixel.net/player?key={api}&name={name}") as resp:
