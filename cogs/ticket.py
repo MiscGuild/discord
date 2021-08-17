@@ -1215,7 +1215,7 @@ class Tickets(commands.Cog, name="Tickets"):
                     yes = Button(style=ButtonStyle.blue, label="Yes", id="yes")
                     no = Button(style=ButtonStyle.red, label="No", id="no")
 
-                    await channel.send(embed=mistake, components=[yes, no])
+                    await channel.send(embed=mistake, components=[[yes, no]])
 
                     while True:
                         click = await self.bot.wait_for("button_click",
