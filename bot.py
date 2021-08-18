@@ -52,7 +52,7 @@ class HelpCommand(commands.MinimalHelpCommand):
 
 bot.help_command = HelpCommand(command_attrs={'hidden': True})
 
-initial_extensions = ['cogs.fun', 'cogs.hypixel', 'cogs.mod', 'cogs.staff', 'cogs.ticket', 'cogs.owner', 'cogs.roles',
+initial_extensions = ['cogs.fun', 'cogs.hypixel', 'cogs.mod', 'cogs.staff', 'cogs.ticket', 'cogs.owner', 'cogs.discord_components',
                       'cogs.miscellaneous']
 
 if __name__ == '__main__':
@@ -66,7 +66,7 @@ if __name__ == '__main__':
 
 @bot.event
 async def on_ready():
-    print('The Miscellaneous Bot is ONLINE!')
+    print('The Miscellaneous Bot is ONLINE!\n\n')
 
 
 @bot.event

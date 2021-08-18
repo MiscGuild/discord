@@ -1,9 +1,8 @@
-from io import BytesIO
-
 import aiohttp
 import discord
 from discord.ext import commands
 from discord_components import DiscordComponents, Button, ButtonStyle, Select, SelectOption, InteractionType
+from io import BytesIO
 
 from cogs.utils import hypixel
 
