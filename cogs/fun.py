@@ -1,12 +1,10 @@
-import aiohttp
 import random
 
+import aiohttp
 import discord
-import datetime
 from discord.ext import commands
-from io import BytesIO
 
-from cogs.utils import hypixel
+from cogs.utils import utilities as hypixel
 
 
 class Fun(commands.Cog, name="Fun"):

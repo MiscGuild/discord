@@ -6,16 +6,16 @@ certifi==2021.5.30
 chardet==4.0.0
 DateTime==4.3
 discord.py==1.7.3
-idna==2.10
+idna==3.2
 multidict==5.1.0
 pytz==2021.1
-quickchart.io==0.2.0
-requests==2.25.1
+quickchart.io==1.0.0
+requests==2.26.0
 toml==0.10.2
 typing-extensions==3.10.0.0
-urllib3==1.26.5
+urllib3==1.26.6
 yarl==1.6.3
 zope.interface==5.4.0
-discord-components==1.1.4
+discord-components==2.0.1
 chat-exporter==1.6.2
 

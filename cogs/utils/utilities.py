@@ -1,4 +1,4 @@
-# hypixel.py
+# utilities.py
 import datetime
 import math
 import random
@@ -71,6 +71,8 @@ async def get_level(name):
 
 async def get_karma(name):
     data = await get_data(name)
+    if 'cause' in data:
+        print(data['cause'])
     if data["player"] is None:
         return None
     karma = int(data["player"]["karma"])
@@ -79,6 +81,8 @@ async def get_karma(name):
 
 async def get_ap(name):
     request = await get_data1(name)
+    if 'cause' in request:
+        print(request['cause'])
     if "achievement_points" in request:
         ap = int(request["achievement_points"])
         return (f"{ap:,d}")
@@ -95,6 +99,8 @@ async def get_rank(name):
                 await session.close()
     else:
         data = await get_data(name)
+    if 'cause' in data:
+        print(data['cause'])
     if data["player"] is None:
         return None
     if "prefix" in data["player"]:
@@ -152,7 +158,9 @@ async def get_guild(name):
             async with session.get(f"https://api.hypixel.net/guild?key={api}&player={uuid}") as resp:
                 req = await resp.json()
                 await session.close()
-    if req['guild'] is not None:
+    if 'cause' in req:
+        print(req['cause'])
+    elif req['guild'] is not None:
         gname = req["guild"]['name']
         return (f"{gname}")
     else:
@@ -224,8 +232,8 @@ async def get_guild_level(exp):
         2500000,
         2500000,
         2500000,
-        3000000,
-    ]
+        3000000, ]
+
     level = 0
 
     for i in range(0, 1000):
@@ -234,9 +242,12 @@ async def get_guild_level(exp):
             need = EXP_NEEDED[len(EXP_NEEDED) - 1]
         else:
             need = EXP_NEEDED[i]
+        i += 1
 
-        if ((exp - need) < 0):
-            return round((((level + (exp / need)) * 100) / 100), 2)
+        if (exp - need) < 0:
+            return round((level + (exp / need)) * 100) / 100
+        level += 1
+        exp -= need
 
 
 async def get_challenges_completed(name):

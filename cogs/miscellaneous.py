@@ -7,7 +7,7 @@ import aiohttp
 import discord
 from discord.ext import commands, tasks
 
-from cogs.utils import hypixel
+from cogs.utils import utilities as hypixel
 
 
 class miscellaneous(commands.Cog, name="Miscellaneous"):
@@ -504,8 +504,9 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
         for winner in winners:
             category = discord.utils.get(self.bot.misc_guild.categories, name="🎫 Ticket Section")
             winner_ticket = await self.bot.misc_guild.create_text_channel(f"giveaway-winner-{winner.nick}",
-                                                                     category=category)
-            await winner_ticket.set_permissions(self.bot.misc_guild.get_role(self.bot.misc_guild.id), send_messages=False,
+                                                                          category=category)
+            await winner_ticket.set_permissions(self.bot.misc_guild.get_role(self.bot.misc_guild.id),
+                                                send_messages=False,
                                                 read_messages=False)
             await winner_ticket.set_permissions(self.bot.staff, send_messages=True, read_messages=True,
                                                 add_reactions=True, embed_links=True,

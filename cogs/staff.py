@@ -8,7 +8,7 @@ import discord
 import requests
 from discord.ext import commands
 
-from cogs.utils import hypixel
+from cogs.utils import utilities as hypixel
 
 
 class staff(commands.Cog, name="Staff"):

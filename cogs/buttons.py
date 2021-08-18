@@ -1,13 +1,14 @@
+from io import BytesIO
+
 import aiohttp
 import discord
 from discord.ext import commands
-from discord_components import DiscordComponents, Button, ButtonStyle, Select, SelectOption, InteractionType
-from io import BytesIO
+from discord_components import DiscordComponents, Button, ButtonStyle, Select, SelectOption
 
-from cogs.utils import hypixel
+from cogs.utils import utilities as hypixel
 
 
-class Roles(commands.Cog):
+class Roles(commands.Cog, command_attrs=dict(hidden=True)):
     def __init__(self, bot):
         self.bot = bot
 
@@ -111,13 +112,13 @@ class Roles(commands.Cog):
             url=f"https://images-ext-1.discordapp.net/external/ziYSZZe7dPyKDYLxA1s2jqpKi-kdCvPFpPaz3zft-wo/%3Fwidth%3D671%26height%3D671/https/media.discordapp.net/attachments/523227151240134664/803843877999607818/misc.png")
         await ctx.channel.purge(limit=1)
 
-        url = f"https://media.discordapp.net/attachments/650248396480970782/868899782679216198/tickets.jpg"
+        url = f"https://media.discordapp.net/attachments/650248396480970782/873866686049189898/tickets.jpg"
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 image_data = BytesIO(await resp.read())
                 await session.close()
 
-        await ctx.send(file=discord.File(image_data, 'tickets.jpg'))
+        # await ctx.send(file=discord.File(image_data, 'tickets.jpg'))
 
         ticket_creation = Button(style=ButtonStyle.blue, label="✉️Create Ticket", id="ticketer")
 
@@ -131,17 +132,14 @@ class Roles(commands.Cog):
                     "780717935140012052",
                     "855657894518325258"]
         if res.component.id in role_ids:
-            guild = self.bot.get_guild(700419839092850698)
             member = self.bot.misc_guild.get_member(int(res.user.id))
             role = self.bot.misc_guild.get_role(int(res.component.id))
             if role in member.roles:
                 await member.remove_roles(role, reason="Pressed Button, removed role")
-                await res.respond(type=InteractionType.ChannelMessageWithSource,
-                                  content=f"Removed {res.component.label} role from you.", flags=64)
+                await res.respond(content=f"Removed {res.component.label} role from you.")
             elif role not in member.roles:
                 await member.add_roles(role, reason="Pressed Button, added role")
-                await res.respond(type=InteractionType.ChannelMessageWithSource,
-                                  content=f"Added {res.component.label} role to you.", flags=64)
+                await res.respond(content=f"Added {res.component.label} role to you.")
         elif res.component.id == "ticketer":
             member = self.bot.misc_guild.get_member(int(res.user.id))
 
@@ -157,7 +155,7 @@ class Roles(commands.Cog):
                                             color=0x00A86B)
             creating_ticket.set_author(name="Ticket successfully created!")
 
-            await res.respond(type=InteractionType.ChannelMessageWithSource, embed=creating_ticket)
+            await res.respond(embed=creating_ticket)
 
             await ticket_channel.set_permissions(self.bot.misc_guild.get_role(self.bot.misc_guild.id),
                                                  send_messages=False,
@@ -194,15 +192,13 @@ class Roles(commands.Cog):
                     cached_role = self.bot.misc_guild.get_role(int(role.value))
                     if cached_role in member.roles:
                         await member.remove_roles(cached_role, reason=f"Pronoun role: {role.label} Removed")
-                        await res.respond(type=InteractionType.ChannelMessageWithSource,
-                                          content=f"Removed {role.label}", flags=64)
+                        await res.respond(content=f"Removed {role.label}")
                     elif cached_role not in member.roles:
                         for x in role_ids:
                             await member.remove_roles(self.bot.misc_guild.get_role(x),
                                                       reason="Pronouns Duplicate Prevention")
                         await member.add_roles(cached_role, reason=f"Pronoun role: {role.label} Given")
-                        await res.respond(type=InteractionType.ChannelMessageWithSource,
-                                          content=f"Added {role.label}", flags=64)
+                        await res.respond(content=f"Added {role.label}")
 
 
         else:

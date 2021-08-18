@@ -8,7 +8,7 @@ import discord
 import toml
 from discord.ext import commands, tasks
 
-from cogs.utils import hypixel
+from cogs.utils import utilities as hypixel
 
 logging.basicConfig(level=logging.INFO)
 
@@ -28,7 +28,7 @@ bot.owner_id = config['bot']['ownerID']
 bot.resident_req = int(50000)
 bot.active = int(285000)
 bot.inactive = int(110000)
-bot.dnkl = bot.inactive * 2
+bot.dnkl = (bot.inactive * 2)
 bot.new_member = int(25000)
 
 
@@ -52,7 +52,8 @@ class HelpCommand(commands.MinimalHelpCommand):
 
 bot.help_command = HelpCommand(command_attrs={'hidden': True})
 
-initial_extensions = ['cogs.fun', 'cogs.hypixel', 'cogs.mod', 'cogs.staff', 'cogs.ticket', 'cogs.owner', 'cogs.discord_components',
+initial_extensions = ['cogs.fun', 'cogs.hypixel', 'cogs.mod', 'cogs.staff', 'cogs.tickets', 'cogs.owner',
+                      'cogs.buttons',
                       'cogs.miscellaneous']
 
 if __name__ == '__main__':

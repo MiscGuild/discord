@@ -4,7 +4,7 @@ import chat_exporter
 import discord
 from discord.ext import commands
 
-from cogs.utils import hypixel
+from cogs.utils import utilities as hypixel
 
 
 class Moderation(commands.Cog, name="Moderation"):
