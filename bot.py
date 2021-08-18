@@ -168,8 +168,9 @@ async def after_cache_ready():
     bot.awaiting_app = discord.utils.get(bot.misc_guild.roles, name="Awaiting Approval")
     bot.ally = discord.utils.get(bot.misc_guild.roles, name="Ally")
     bot.server_booster = discord.utils.get(bot.misc_guild.roles, name="Server Booster")
+    bot.rich_kid = discord.utils.get(bot.misc_guild.roles, name="Rich Kid")
     bot.giveaways_events = discord.utils.get(bot.misc_guild.roles, name="Giveaways/Events")
-    bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster)
+    bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster, bot.rich_kid)
     bot.ticket_categories = ('RTickets', '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL')
     bot.misc_allies = ("XL", "Lucid", "Cronos", "OUT", "Betrayed", "Blight")
     bot.adminids = [x.id for x in bot.admin.members]
