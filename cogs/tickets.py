@@ -273,7 +273,7 @@ class Tickets(commands.Cog, name="Tickets"):
                     embed=ticket_embed,
                     components=[
                         [
-                            Select(placeholder="Select you reason!", options=[
+                            Select(placeholder="Select your reason!", options=[
                                 SelectOption(label="Update your Role/Username/Tag", value="Discord Nick Change",
                                              emoji="👨"),
                                 SelectOption(label="Register a Milestone", value="Milestone Registration", emoji="🏆"),
