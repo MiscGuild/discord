@@ -698,7 +698,8 @@ class Tickets(commands.Cog, name="Tickets"):
                                 if guild == guild_name:
                                     gtag = await hypixel.get_gtag(guild)
                                     if author.nick is None or str(gtag) not in author.nick:
-                                        ign = ign + " " + str(gtag)
+                                        new_nick = ign + " " + str(gtag)
+                                        await author.edit(nick=new_nick)
 
                                     await author.remove_roles(self.bot.new_member_role, self.bot.awaiting_app,
                                                               self.bot.member_role, reason="Ticket Sync")
