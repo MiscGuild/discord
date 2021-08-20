@@ -59,6 +59,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         text="You are considered a New Member for the first 7 days after joining the guild"
                              "\nIf you fail to meet the New Member/Member requirements, you will be kicked!")
                     await channel.send(embed=embed1)
+                    break
                 elif click.component.id == "no":
                     embed = discord.Embed(title="Why did you join the Miscellaneous Discord?",
                                           description="Please select your reason from the dropdown list below!",
@@ -173,6 +174,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                 embed = discord.Embed(title="Great! Restarting the ticketing process!",
                                                       color=0x00A86B)
                                 await click.respond(embed=embed)
+                                break
                     elif reply == "GvG":
                         guildname_embed = discord.Embed(title="What is the name of your guild?",
                                                         description="Please reply with the name of your guild!",
@@ -226,6 +228,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                 embed = discord.Embed(title="Great! Restarting the ticketing process!",
                                                       color=0x00A86B)
                                 await click.respond(embed=embed)
+                                break
                     elif reply == "Exploring":
                         name = await hypixel.name_grabber(author)
                         await channel.edit(name=f"Guest-{name}")
@@ -294,7 +297,8 @@ class Tickets(commands.Cog, name="Tickets"):
                 author = self.bot.misc_guild.get_member(int(interaction.user.id))
                 response_embed = discord.Embed(title="Ticket Reason Selected!", color=0x00A86B)
                 response_embed.set_footer(text=interaction.values[0])
-                await interaction.respond(embed=response_embed)  # interaction.values is a list
+                await channel.send(embed=response_embed)
+                await interaction.respond(content="Great! Now answer the bot's prompts!")  # interaction.values is a list
                 reply = interaction.values[0]
 
                 author = self.bot.misc_guild.get_member(int(interaction.user.id))
