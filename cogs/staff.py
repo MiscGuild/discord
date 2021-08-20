@@ -377,6 +377,9 @@ class staff(commands.Cog, name="Staff"):
                                             await member.add_roles(self.bot.active_role, reason="Rolecheck")
                                             await message.edit(
                                                 content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
+                                            if has_tag_perms is False:
+                                                username = username + " [Spud ♥]"
+                                                await member.edit(nick=username)
 
                                         elif totalexp > self.bot.inactive:
                                             username = await hypixel.name_grabber(member)
@@ -405,6 +408,9 @@ class staff(commands.Cog, name="Staff"):
                                             await member.add_roles(self.bot.active_role, reason="Rolecheck")
                                             await message.edit(
                                                 content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
+                                            if has_tag_perms is False:
+                                                username = username + " [Spud ♥]"
+                                                await member.edit(nick=username)
 
                                         elif totalexp > self.bot.resident_req:
                                             username = await hypixel.name_grabber(member)
