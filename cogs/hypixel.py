@@ -69,6 +69,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
                     embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                     await ctx.reply(embed=embed)
+                elif tag.lower() == "spud<3":
+                    new_nick = ign + f' [{tag}]'
+                    await author.edit(nick=new_nick)
 
                 elif guild_name in self.bot.misc_allies:
                     for guild in self.bot.misc_allies:
@@ -200,6 +203,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             text=f"Member of {guild_name}\n• Nick Changed\n• Member & Awaiting Approval were removed\n• Guest was given")
                         embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                         await ctx.send(embed=embed)
+                elif tag.lower() == "spud<3":
+                    new_nick = ign + f' [{tag}]'
+                    await author.edit(nick=new_nick)
 
     @commands.command(aliases=["i"])
     async def info(self, ctx, name=None):

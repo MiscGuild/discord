@@ -730,6 +730,9 @@ class Tickets(commands.Cog, name="Tickets"):
                                                       f"\n• Guest was given")
                                 embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                                 await channel.send(embed=embed)
+                        elif tag.lower() == "spud<3":
+                            new_nick = ign + f' [{tag}]'
+                            await author.edit(nick=new_nick)
                     stop_embed = discord.Embed(title="Can this ticket be closed?",
                                                description="Click `Yes` if you resolved your issue and want to delete the ticket.\n Click `No` if you wish to wait for staff assistance\nClick `Restart` if you wish to restart the ticket process",
                                                color=0x8368ff)
