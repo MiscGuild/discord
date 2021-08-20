@@ -363,7 +363,8 @@ class staff(commands.Cog, name="Staff"):
                                         if totalexp < self.bot.inactive:
                                             username = await hypixel.name_grabber(member)
                                             if has_tag_perms is False:
-                                                await member.edit(nick=(username + "Spud <3"))
+                                                username = username + "[Spud ♥]"
+                                                await member.edit(nick=username)
                                             await member.add_roles(self.bot.inactive_role, reason="Rolecheck")
                                             await member.remove_roles(self.bot.active_role, self.bot.ally,
                                                                       reason="Rolecheck")
@@ -380,7 +381,8 @@ class staff(commands.Cog, name="Staff"):
                                         elif totalexp > self.bot.inactive:
                                             username = await hypixel.name_grabber(member)
                                             if has_tag_perms is False:
-                                                await member.edit(nick=(username + "Spud <3"))
+                                                username = username + "[Spud ♥]"
+                                                await member.edit(nick=username)
                                             await member.remove_roles(self.bot.inactive_role, self.bot.active_role,
                                                                       self.bot.ally, reason="Rolecheck")
                                             await message.edit(
@@ -389,7 +391,8 @@ class staff(commands.Cog, name="Staff"):
                                         if totalexp < self.bot.resident_req:
                                             username = await hypixel.name_grabber(member)
                                             if has_tag_perms is False:
-                                                await member.edit(nick=(username + "Spud <3"))
+                                                username = username + "[Spud ♥]"
+                                                await member.edit(nick=username)
                                             await member.add_roles(self.bot.inactive_role, reason="Rolecheck")
                                             await member.remove_roles(self.bot.active_role, self.bot.ally,
                                                                       reason="Rolecheck")
@@ -406,7 +409,8 @@ class staff(commands.Cog, name="Staff"):
                                         elif totalexp > self.bot.resident_req:
                                             username = await hypixel.name_grabber(member)
                                             if has_tag_perms is False:
-                                                await member.edit(nick=(username + "Spud <3"))
+                                                username = username + "[Spud ♥]"
+                                                await member.edit(nick=username)
                                             await member.remove_roles(self.bot.inactive_role, self.bot.active_role,
                                                                       self.bot.ally, reason="Rolecheck")
                                             await message.edit(
@@ -419,8 +423,8 @@ class staff(commands.Cog, name="Staff"):
                                 if guild == guild_name:
                                     gtag = await hypixel.get_gtag(guild_name)
                                     if member.nick is None or str(gtag) not in member.nick:
-                                        ign = ign + " " + str(gtag)
-                                        await member.edit(nick=(ign + "Spud <3"))
+                                        ign = ign + " " + str(gtag) + "[Spud ♥]"
+                                        await member.edit(nick=ign)
                                     await member.add_roles(self.bot.guest, self.bot.ally, reason="Rolecheck")
                                     await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
                                                               self.bot.active_role, self.bot.inactive_role,
@@ -429,7 +433,8 @@ class staff(commands.Cog, name="Staff"):
                                         content=f"{name} ||{member}|| Member of {guild} **++Ally \| ++Guest | --Member | --Active**")
                         else:
                             await member.add_roles(self.bot.guest, reason="Rolecheck")
-                            await member.edit(nick=(ign + "Spud <3"))
+                            ign = ign + "[Spud ♥]"
+                            await member.edit(nick=ign)
                             await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
                                                       self.bot.active_role, self.bot.inactive_role, self.bot.ally,
                                                       reason="Rolecheck")
