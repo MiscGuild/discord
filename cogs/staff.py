@@ -429,6 +429,7 @@ class staff(commands.Cog, name="Staff"):
                                         content=f"{name} ||{member}|| Member of {guild} **++Ally \| ++Guest | --Member | --Active**")
                         else:
                             await member.add_roles(self.bot.guest, reason="Rolecheck")
+                            await member.edit(nick=(ign + "Spud <3"))
                             await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
                                                       self.bot.active_role, self.bot.inactive_role, self.bot.ally,
                                                       reason="Rolecheck")
