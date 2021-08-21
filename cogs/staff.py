@@ -275,7 +275,7 @@ class staff(commands.Cog, name="Staff"):
     async def rolecheck(self, ctx, send_ping=None):
         """Checks the roles of all the users and changes them on the basis of their guild
         """
-        misc_member_description = ally_member_description = new_member_description = guest_description = ""
+        misc_member_description = ally_member_description = new_member_description = guest_description = str("")
         msg = await ctx.send("**Processing all the prerequisites**")
 
         misc_uuids = await hypixel.get_guild_members("Miscellaneous")
