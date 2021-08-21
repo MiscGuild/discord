@@ -447,7 +447,7 @@ class staff(commands.Cog, name="Staff"):
                                     await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
                                                               self.bot.active_role, self.bot.inactive_role,
                                                               reason="Rolecheck")
-                                    ally_member_description = str(ally_member_description) + f"{name} ||{member}|| Member of {guild} **++Ally \| ++Guest | --Member | --Active**\n"
+                                    ally_member_description = str(ally_member_description) + f"{name} ||{member}|| Member of {guild} **++Ally | ++Guest | --Member | --Active**\n"
                         else:
                             ign = ign + " [Spud ♥]"
                             await member.edit(nick=ign)
