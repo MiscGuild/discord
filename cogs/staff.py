@@ -385,7 +385,7 @@ class staff(commands.Cog, name="Staff"):
                                             await member.add_roles(self.bot.inactive_role, self.bot.member_role, reason="Rolecheck")
                                             await member.remove_roles(self.bot.active_role, self.bot.ally, self.bot.guest,
                                                                       reason="Rolecheck")
-                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**\n",
+                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | ++Inactive | --Active**\n",
 
                                         elif totalexp >= self.bot.active:  # If the member is active
                                             if has_tag_perms is False:
@@ -394,7 +394,7 @@ class staff(commands.Cog, name="Staff"):
                                             await member.remove_roles(self.bot.inactive_role, self.bot.new_member_role, self.bot.guest,
                                                                       self.bot.ally, reason="Rolecheck")
                                             await member.add_roles(self.bot.active_role, self.bot.member_role, reason="Rolecheck")
-                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**\n"
+                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | ++Active | --Inactive**\n"
 
                                         elif totalexp > self.bot.inactive:
                                             username = await hypixel.name_grabber(member)
@@ -404,7 +404,7 @@ class staff(commands.Cog, name="Staff"):
                                             await member.add_roles(self.bot.member_role, reason="Rolecheck") 
                                             await member.remove_roles(self.bot.inactive_role, self.bot.active_role, self.bot.guest,
                                                                       self.bot.ally, self.bot.guest, reason="Rolecheck")
-                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member \| --Inactive\| --Active**\n"
+                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | --Inactive| --Active**\n"
                                     else:  # For residents
                                         if totalexp < self.bot.resident_req:
                                             username = await hypixel.name_grabber(member)
@@ -413,7 +413,7 @@ class staff(commands.Cog, name="Staff"):
                                             await member.add_roles(self.bot.inactive_role, self.bot.member_role, reason="Rolecheck")
                                             await member.remove_roles(self.bot.active_role, self.bot.ally, self.bot.guest,
                                                                       reason="Rolecheck")
-                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**\n"
+                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | ++Inactive | --Active**\n"
 
                                         elif totalexp >= self.bot.active:  # If the member is active
                                             if has_tag_perms is False:
@@ -421,7 +421,7 @@ class staff(commands.Cog, name="Staff"):
                                             await member.remove_roles(self.bot.inactive_role, self.bot.new_member_role, self.bot.guest,
                                                                       self.bot.ally, reason="Rolecheck")
                                             await member.add_roles(self.bot.active_role, self.bot.member_role, reason="Rolecheck")
-                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**\n"
+                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | ++Active | --Inactive**\n"
 
                                         elif totalexp > self.bot.resident_req:
                                             username = await hypixel.name_grabber(member)
@@ -430,10 +430,10 @@ class staff(commands.Cog, name="Staff"):
                                             await member.add_roles(self.bot.member_role, reason="Rolecheck")    
                                             await member.remove_roles(self.bot.inactive_role, self.bot.active_role, self.bot.guest,
                                                                       self.bot.ally, reason="Rolecheck")
-                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member \| --Inactive\| --Active**\n"
-                            if has_tag_perms is False:
-                                ign = ign + " [Spud ♥]"
-                                await member.edit(nick=ign)
+                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | --Inactive| --Active**\n"
+                                if has_tag_perms is False:
+                                    ign = ign + " [Spud ♥]"
+                                    await member.edit(nick=ign)
                         # Ally
                         elif ign in ally_members:
                             guild_name = await hypixel.get_guild(name)
