@@ -441,7 +441,7 @@ class staff(commands.Cog, name="Staff"):
                                 if guild == guild_name:
                                     gtag = await hypixel.get_gtag(guild_name)
                                     username = await hypixel.name_grabber(member)
-                                    username = username + str(gtag) + " [Spud ♥]"
+                                    username = username + str(gtag)
                                     await member.edit(nick=username)
                                     await member.add_roles(self.bot.guest, self.bot.ally, reason="Rolecheck")
                                     await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
