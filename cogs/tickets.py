@@ -32,6 +32,7 @@ class Tickets(commands.Cog, name="Tickets"):
                 author = self.bot.misc_guild.get_member(int(click.user.id))
                 name = await hypixel.name_grabber(author)
                 if click.component.id == "yes":
+                    await channel.edit(name=f"join-request-{name}")
                     await channel.purge(limit=10)
                     embed = discord.Embed(title=f"{name} wishes to join Miscellaneous", description="Please wait until staff get in contact with you.\n\n"
                                                                                                     "You are recommended to leave your present guild (if any) so that staff can invite you to Miscellaneous ASAP\n\n"
