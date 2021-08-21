@@ -30,37 +30,26 @@ class Tickets(commands.Cog, name="Tickets"):
 
                 click = await self.bot.wait_for("button_click")
                 author = self.bot.misc_guild.get_member(int(click.user.id))
+                name = await hypixel.name_grabber(author)
                 if click.component.id == "yes":
-                    await channel.send(
-                        'Alright. Kindly wait until staff get in contact with you.'
-                        '\n`You are recommended to leave your present guild (if any) so that staff can invite you to Miscellaneous ASAP`'
-                        '\nIf you get in the guild and want the member role in the discord, use ,sync `Your Minecraft Name` ! ')
-                    await asyncio.sleep(3)
-                    embed1 = discord.Embed(title="Miscellaneous Guild Requirements",
-                                           description="These requirements are subject to change!",
-                                           color=0x8368ff)
-                    embed1.set_author(name="While you wait, kindly take a look a the guild requirements!")
-                    embed1.add_field(name="Active",
-                                     value=f"•  {format(self.bot.active, ',d')} Weekly Guild Experience",
-                                     inline=False)
-                    embed1.add_field(name="Do Not Kick List Eligibility",
-                                     value=f"•  {format(self.bot.dnkl, ',d')} Weekly Guild Experience",
-                                     inline=False)
-                    embed1.add_field(name="Resident",
-                                     value=f"•  {format(self.bot.resident_req, ',d')} Weekly Guild Experience",
-                                     inline=False)
-                    embed1.add_field(name="Member",
-                                     value=f"•  {format(self.bot.inactive, ',d')} Weekly Guild Experience",
-                                     inline=False)
-                    embed1.add_field(name="New Member",
-                                     value=f"•  {format(self.bot.new_member, ',d')} Daily Guild Experience",
-                                     inline=False)
-                    embed1.set_footer(
-                        text="You are considered a New Member for the first 7 days after joining the guild"
-                             "\nIf you fail to meet the New Member/Member requirements, you will be kicked!")
-                    await channel.send(embed=embed1)
+                    await channel.purge(limit=10)
+                    embed = discord.Embed(title=f"{name} wishes to join Miscellaneous", description="Please wait until staff get in contact with you.\n\n"
+                                                                                                    "You are recommended to leave your present guild (if any) so that staff can invite you to Miscellaneous ASAP\n\n"
+                                                                                                    "If you get in the guild and want the member role in the discord, use \n,sync `Your Minecraft Name`",
+                                          color=0x8368ff)
+                    embed.add_field(name="Miscellaneous Guild Requirements",
+                                    value=f"**Active**\n•  {format(self.bot.active, ',d')} Weekly Guild Experience\n\n"
+                                          f"**Do Not Kick List Eligibility**\n•  {format(self.bot.dnkl, ',d')} Weekly Guild Experience\n\n"
+                                          f"**Resident**\n•  {format(self.bot.resident_req, ',d')} Weekly Guild Experience\n\n"
+                                          f"**Member**\n•  {format(self.bot.inactive, ',d')} Weekly Guild Experience\n\n"
+                                          f"**New Member**\n•  {format(self.bot.new_member, ',d')} Daily Guild Experience")
+                    embed.set_footer(text="You are considered a New Member for the first 7 days after joining the guild"
+                                          "\nIf you fail to meet the New Member/Member requirements, you will be kicked!")
+
+                    await channel.send(embed=embed)
                     break
                 elif click.component.id == "no":
+                    await channel.purge(limit=10)
                     embed = discord.Embed(title="Why did you join the Miscellaneous Discord?",
                                           description="Please select your reason from the dropdown list below!",
                                           color=0x8368ff)
@@ -91,6 +80,10 @@ class Tickets(commands.Cog, name="Tickets"):
                     reply = interaction.values[0]
 
                     if reply == "Alliance":
+                        embed = discord.Embed(title=f"Alliance/Partner Request - {name}",
+                                              color=0x8368ff)
+                        await channel.purge(limit=10)
+                        await channel.send(embed=embed)
                         guildname_embed = discord.Embed(title="What is the name of your guild?",
                                                         description="Please reply with the name of your guild!",
                                                         color=0x8368ff)
@@ -108,7 +101,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                 x: x.author == author and x.channel == channel)
                             guildname = guildname.content
 
-                            await channel.edit(name=f"Alliance/Partner-{guildname.replace(' ', '-')}")
+                            await channel.edit(name=f"Partner-{guildname.replace(' ', '-')}")
 
                             position_embed = discord.Embed(title=f"What is your position in {guildname}?",
                                                            description="Staff Position\nExample:\n Admin, Officer, Co-Owner, Guild Master etc.",
@@ -118,18 +111,14 @@ class Tickets(commands.Cog, name="Tickets"):
                                 x: x.author == author and x.channel == channel)
                             position = position.content
 
-                            success_embed = discord.Embed(
-                                title=f"Great! Now you'll have to wait for the staff team to assist you!",
-                                description="The staff team will respond within 24 hours. You will be mentioned once you recieve a reply.",
-                                color=0x00A86B)
-                            embed = discord.Embed(title=guildname,
+                            embed = discord.Embed(title=f"Partner Request from {guildname} (Organization)",
+                                                  description="The application process has concluded. Please wait for staff assistance.",
                                                   color=0x8368ff)
                             embed.set_footer(text=f"Position of Applicant: **{position}**")
                             await channel.send(embed=embed)
-                            await channel.send(embed=success_embed)
                             break
 
-                        await channel.edit(name=f"Alliance/Partner-{guildname.replace(' ', '-')}")
+                        await channel.edit(name=f"Alliance-{guildname.replace(' ', '-')}")
                         guild_planke = f"https://plancke.io/hypixel/guild/name/{guildname.replace(' ', '%20')}"
                         api = hypixel.get_api()
                         async with aiohttp.ClientSession() as session:
@@ -146,17 +135,12 @@ class Tickets(commands.Cog, name="Tickets"):
                             position = await self.bot.wait_for('message', check=lambda
                                 x: x.author == author and x.channel == channel)
                             position = position.content
-                            success_embed = discord.Embed(
-                                title=f"Great! Now you'll have to wait for the staff team to assist you!",
-                                description="The staff team will respond within 24 hours. You will be mentioned once you recieve a reply.",
-                                color=0x00A86B)
-                            embed = discord.Embed(title=guildname,
-                                                  url=guild_planke,
+                            embed = discord.Embed(title=f"Partner Request from {guildname} (Organization)",
+                                                  description="The application process has concluded. Please wait for staff assistance.",
                                                   color=0x8368ff)
+                            embed.set_footer(text=f"Position of Applicant: **{position}**")
                             embed.add_field(name="Level:", value=level, inline=True)
-                            embed.set_footer(text=f"Position of Applicant: {position}")
                             await channel.send(embed=embed)
-                            await channel.send(embed=success_embed)
                             break
                         else:
                             failure_embed = discord.Embed(
@@ -164,7 +148,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                 description="If you wish to change our mind, you can convey your message through this ticket.\n"
                                             "If you made a mistake, click restart.",
                                 color=0x8368ff)
-                            failure_embed.set_footer("If you wish to join the discord, press restart!")
+                            failure_embed.set_footer(text="If you wish to join the discord, press restart!")
                             restart = Button(style=ButtonStyle.grey, label="Restart", id="restart")
 
                             await channel.send(embed=failure_embed, components=[restart])
@@ -174,8 +158,11 @@ class Tickets(commands.Cog, name="Tickets"):
                                 embed = discord.Embed(title="Great! Restarting the ticketing process!",
                                                       color=0x00A86B)
                                 await click.respond(embed=embed)
-                                break
                     elif reply == "GvG":
+                        embed = discord.Embed(title=f"GvG Request - {name}",
+                                              color=0x8368ff)
+                        await channel.purge(limit=10)
+                        await channel.send(embed=embed)
                         guildname_embed = discord.Embed(title="What is the name of your guild?",
                                                         description="Please reply with the name of your guild!",
                                                         color=0x8368ff)
@@ -200,17 +187,12 @@ class Tickets(commands.Cog, name="Tickets"):
                             position = await self.bot.wait_for('message', check=lambda
                                 x: x.author == author and x.channel == channel)
                             position = position.content
-                            success_embed = discord.Embed(
-                                title=f"Great! Now you'll have to wait for the staff team to assist you!",
-                                description="The staff team will respond within 24 hours. You will be mentioned once you recieve a reply.",
-                                color=0x00A86B)
-                            embed = discord.Embed(title=guildname,
-                                                  url=guild_planke,
+                            embed = discord.Embed(title=f"Partner Request from {guildname} (Organization)",
+                                                  description="The application process has concluded. Please wait for staff assistance.",
                                                   color=0x8368ff)
+                            embed.set_footer(text=f"Position of Applicant: **{position}**")
                             embed.add_field(name="Level:", value=level, inline=True)
-                            embed.set_footer(text=f"Position of Applicant: {position}")
                             await channel.send(embed=embed)
-                            await channel.send(embed=success_embed)
                             break
                         else:
                             failure_embed = discord.Embed(
@@ -218,7 +200,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                 description="If you wish to change our mind, you can convey your message through this ticket.\n"
                                             "If you made a mistake, click restart.",
                                 color=0x8368ff)
-                            failure_embed.set_footer("If you wish to join the discord, press restart!")
+                            failure_embed.set_footer(text="If you wish to join the discord, press restart!")
                             restart = Button(style=ButtonStyle.grey, label="Restart", id="restart")
 
                             await channel.send(embed=failure_embed, components=[restart])
@@ -228,43 +210,51 @@ class Tickets(commands.Cog, name="Tickets"):
                                 embed = discord.Embed(title="Great! Restarting the ticketing process!",
                                                       color=0x00A86B)
                                 await click.respond(embed=embed)
-                                break
                     elif reply == "Exploring":
-                        name = await hypixel.name_grabber(author)
                         await channel.edit(name=f"Guest-{name}")
-                        success_embed = discord.Embed(
-                            title=f"Great! Now you'll have to wait for the staff team to assist you!",
-                            description="The staff team will respond within 24 hours. You will be mentioned once you recieve a reply.",
-                            color=0x00A86B)
-                        await channel.send(embed=success_embed)
+                        embed = discord.Embed(title=f"{name} wishes to join the Miscellaneous Discord as a Guest",
+                                              description="Kindly await staff assistance!",
+                                              color=0x8368ff)
+                        await channel.purge(limit=10)
+                        await channel.send(embed=embed)
                         break
                     elif reply == "Other":
+                        embed = discord.Embed(title=f"Other - {name}",
+                                              color=0x8368ff)
+                        await channel.purge(limit=10)
+                        await channel.send(embed=embed)
                         embed = discord.Embed(
                             title="Alright! Kindly specify why you joined the discord and await staff assistance!",
                             color=0x8368ff)
                         await channel.send(embed=embed)
                         break
                     else:
-                        embed = discord.Embed(title="My massive computer brain thinks you made a mistake.",
-                                              color=0xff0000)
-                        embed.add_field(name="If this is true", value="Type `Yes`", inline=False)
-                        embed.add_field(name="If this is false", value="Type `No`", inline=False)
-                        await channel.send(embed=embed)
+                        await channel.purge(limit=10)
+                        mistake = discord.Embed(
+                            title="Did you make a mistake while specifying why you joined Miscellaneous?",
+                            description="Click `Yes` if you did. This will restart the registration process.\n Click `No` if you didn't make a mistake and wish to wait for staff assistance.",
+                            color=0x8368ff)
+                        yes = Button(style=ButtonStyle.blue, label="Yes", id="yes")
+                        no = Button(style=ButtonStyle.red, label="No", id="no")
 
-                        errorreply = await self.bot.wait_for('message', check=lambda x: x.channel == channel)
-                        errorreply = errorreply.content
-                        errorreply = errorreply.capitalize()
-                        if errorreply in ('Yes', 'Yeah', 'Ye', 'Yea'):
-                            embed = discord.Embed(title="Great! Let's start over!",
-                                                  color=0x8368ff)
-                            await channel.send(embed=embed)
-                        else:
-                            embed = discord.Embed(
-                                title="Alright! Kindly specify why you joined the discord and await staff assistance!",
-                                color=0x8368ff)
-                            await channel.send(embed=embed)
-                            break
+                        await channel.send(embed=mistake, components=[[yes, no]])
 
+                        while True:
+                            click = await self.bot.wait_for("button_click",
+                                                            check=lambda x: (
+                                                                                    x.author == author and x.channel == channel) or (
+                                                                                    self.bot.staff in x.author.roles and x.channel == channel))
+
+                            if click.component.id == "yes":
+                                embed = discord.Embed(title="Great! Restarting the registration process!",
+                                                      color=0x00A86B)
+                                await click.respond(embed=embed)
+                            elif click.component.id == "no":
+                                embed = discord.Embed(
+                                    title="Alright, kindly specify why you joined and then await staff assistance!",
+                                    color=0x00A86B)
+                                await click.respond(embed=embed)
+                                break
         elif channel.category.name == '🎫 Ticket Section' and 'giveaway-winner' not in channel.name:
             while True:
                 await asyncio.sleep(3)
@@ -350,7 +340,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                     embed.add_field(name="You are not eligible to apply for the do not kick list.",
                                                     value=f"You need a minimum of {format(self.bot.dnkl, ',d')} weekly guild experience."
                                                           f"\n You have {totalexp} weekly guild experience.",
-                                                    inline=True)
+                                                    inline=True),
                                     await channel.send(embed=embed)
                                 if eligiblity is True:
                                     embed = discord.Embed(title=name,
@@ -1610,7 +1600,7 @@ class Tickets(commands.Cog, name="Tickets"):
             embed = discord.Embed(title="Transcript creation successful!",
                                   color=0x00A86B)
             await ctx.send(embed=embed)
-            await ctx.send(file=discord.File(transcript_file))
+            await ctx.send(file=transcript_file)
 
     @commands.command()
     @commands.has_role(522588118251995147)

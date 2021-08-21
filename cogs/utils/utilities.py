@@ -159,7 +159,7 @@ async def get_guild(name):
                 req = await resp.json()
                 await session.close()
     if 'cause' in req:
-        print(req['cause'])
+        print(req['cause'], api)
     elif req['guild'] is not None:
         gname = req["guild"]['name']
         return (f"{gname}")
