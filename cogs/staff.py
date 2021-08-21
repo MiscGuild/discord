@@ -275,7 +275,7 @@ class staff(commands.Cog, name="Staff"):
     async def rolecheck(self, ctx, send_ping=None):
         """Checks the roles of all the users and changes them on the basis of their guild
         """
-        misc_member_description = ally_member_description = new_member_description = guest_description = ""
+        misc_member_description, ally_member_description, new_member_description, guest_description = "","","",""
         msg = await ctx.send("**Processing all the prerequisites**")
 
         misc_uuids = await hypixel.get_guild_members("Miscellaneous")
@@ -324,19 +324,19 @@ class staff(commands.Cog, name="Staff"):
                         name = await hypixel.name_grabber(member)
                         has_tag_perms = any(role in ctx.author.roles for role in self.bot.tag_allowed_roles)
 
-                        if len(misc_member_description) >= 3800:
+                        if len(misc_member_description) >= 3500:
                             embed = discord.Embed(title="Miscellaneous Members", description=misc_member_description, color=0x8368ff)
                             await ctx.send(embed=embed)
                             misc_member_description = ""
-                        if len(ally_member_description) >= 3800:
+                        if len(ally_member_description) >= 3500:
                             embed = discord.Embed(title="Ally Members", description=ally_member_description, color=0x8368ff)
                             await ctx.send(embed=embed)
                             ally_member_description = ""
-                        if len(new_member_description) >= 3800:
+                        if len(new_member_description) >= 3500:
                             embed = discord.Embed(title="New Member (Role)", description=new_member_description, color=0x8368ff)
                             await ctx.send(embed=embed)
                             new_member_description = ""
-                        if len(guest_description) >= 3800:
+                        if len(guest_description) >= 3500:
                             embed = discord.Embed(title="Guest (Role)", description=guest_description, color=0x8368ff)
                             await ctx.send(embed=embed)
                             guest_description = ""
@@ -355,9 +355,7 @@ class staff(commands.Cog, name="Staff"):
                                     mojang_json = await mojang.json()
                                     ign = mojang_json["name"]
                                     uuid = mojang_json['id']
-                                    if has_tag_perms is False:
-                                        ign = ign + " [Spud ♥]"
-                                        await member.edit(nick=ign)
+
                                 await session.close()
                             # Miscellaneous
                         if ign in misc_members and ign not in self.bot.adminnames:
@@ -433,7 +431,9 @@ class staff(commands.Cog, name="Staff"):
                                             await member.remove_roles(self.bot.inactive_role, self.bot.active_role, self.bot.guest,
                                                                       self.bot.ally, reason="Rolecheck")
                                             misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member \| --Inactive\| --Active**\n"
-
+                            if has_tag_perms is False:
+                                ign = ign + " [Spud ♥]"
+                                await member.edit(nick=ign)
                         # Ally
                         elif ign in ally_members:
                             guild_name = await hypixel.get_guild(name)
