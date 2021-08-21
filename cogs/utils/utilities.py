@@ -343,7 +343,7 @@ async def get_color(color, gexp, requirement):
         if gexp > requirement * 2:
             return 0x64ffdc, 'rgba(100, 255, 220,0.3)', 'rgba(100, 255, 220,0.3)'
         elif gexp > requirement:
-            return 0x64ffb44, 'rgba(100, 255, 180,0.3)', 'rgba(100, 255, 180,0.3)'
+            return 0x64ffb4, 'rgba(100, 255, 180,0.3)', 'rgba(100, 255, 180,0.3)'
 
     elif color == "res_not_met":
         if gexp * 2 < requirement:
