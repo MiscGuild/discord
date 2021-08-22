@@ -72,7 +72,7 @@ class Moderation(commands.Cog, name="Moderation"):
             embed = discord.Embed(title=f'{name} purged {amount} messages in {ctx.channel.name}',
                                   description=f"**Reason:** {reason}", color=0x8368ff)
             await self.bot.logs.send(embed=embed)
-            await self.bot.logs.send(file=transcript_file)
+            '''await self.bot.logs.send(file=transcript_file)'''
 
     # Kick
     @commands.command()

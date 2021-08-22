@@ -610,7 +610,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
                                                   description="They deleted their own ticket.", color=0x8368ff)
                             await self.bot.logs.send(embed=embed)
-                            await self.bot.logs.send(file=discord.File(transcript_file))
+                            '''await self.bot.logs.send(file=discord.File(transcript_file))'''
                             break
                     elif click.component.id == "no":
                         success_embed = discord.Embed(title="Success", color=0x00A86B)
@@ -765,7 +765,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
                                                   description="They deleted their own ticket.", color=0x8368ff)
                             await self.bot.logs.send(embed=embed)
-                            await self.bot.logs.send(file=discord.File(transcript_file))
+                            '''await self.bot.logs.send(file=discord.File(transcript_file))'''
                             break
                     elif click.component.id == "no":
                         success_embed = discord.Embed(title="Success", color=0x00A86B)
@@ -855,7 +855,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                 embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
                                                       description="They deleted their own ticket.", color=0x8368ff)
                                 await self.bot.logs.send(embed=embed)
-                                await self.bot.logs.send(file=discord.File(transcript_file))
+                                '''await self.bot.logs.send(file=discord.File(transcript_file))'''
                                 break
                         elif click.component.id == "no":
                             success_embed = discord.Embed(title="Success", color=0x00A86B)
@@ -1122,7 +1122,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                 embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
                                                       description="They deleted their own ticket.", color=0x8368ff)
                                 await self.bot.logs.send(embed=embed)
-                                await self.bot.logs.send(file=discord.File(transcript_file))
+                                '''await self.bot.logs.send(file=discord.File(transcript_file))'''
                                 break
                         elif click.component.id == "no":
                             success_embed = discord.Embed(title="Success", color=0x00A86B)
@@ -1351,7 +1351,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                               description="They deleted their own ticket.",
                                                               color=0x8368ff)
                                         await self.bot.logs.send(embed=embed)
-                                        await self.bot.logs.send(file=transcript_file)
+                                        '''await self.bot.logs.send(file=transcript_file)'''
                                         break
                                 elif click.component.id == "no":
                                     success_embed = discord.Embed(title="Success", color=0x00A86B)
@@ -1541,7 +1541,7 @@ class Tickets(commands.Cog, name="Tickets"):
                 embed = discord.Embed(title=f'{ctx.channel.name} was deleted by {name}',
                                       description="", color=0x8368ff)
                 await self.bot.logs.send(embed=embed)
-                await self.bot.logs.send(file=discord.File(transcript_file))
+                '''await self.bot.logs.send(file=discord.File(transcript_file))'''
 
     @commands.command()
     @commands.has_any_role(538015368782807040, 522588122807271424)
@@ -1598,7 +1598,7 @@ class Tickets(commands.Cog, name="Tickets"):
             transcript_file = discord.File(io.BytesIO(transcript.encode()),
                                            filename=f"transcript-{ctx.channel.name}.html")
 
-            embed = discord.Embed(title="Transcript creation successful!",
+            embed = discord.Embed(title="Transcript isn't working rn!",
                                   color=0x00A86B)
             await ctx.send(embed=embed)
             await ctx.send(file=transcript_file)
