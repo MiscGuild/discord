@@ -1,4 +1,3 @@
-import json
 import math
 from datetime import datetime
 from io import BytesIO
@@ -368,8 +367,6 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.send('Unknown IGN!')
             else:
                 uuid = request['id']
-                with open('dnkl.json') as f:
-                    data = json.load(f)
 
                 if start != None and "/" in start and end != None and "/" in end:
                     sd, sm, sy = start.split('/')
@@ -395,11 +392,15 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         await ctx.channel.purge(limit=1)
                         message = await self.bot.dnkl_channel.send(embed=embed)
 
-                        dnkl_dict = {ign: message.id}
+                        cursor = await self.bot.db.execute("SELECT message_id FROM DNKL WHERE username = (?)", (ign,))
+                        row = await cursor.fetchone()
+                        await cursor.close()
 
-                        data.update(dnkl_dict)
-                        with open('dnkl.json', 'w') as f:
-                            json.dump(data, f)
+                        if row == None:
+                            await self.bot.db.execute("INSERT INTO DNKL VALUES (?, ?)", (message.id, ign,))
+                        else:
+                            await self.bot.db.execute("UPDATE DNKL SET message_id = (?) WHERE username = (?)", (message.id, ign,))
+                        await self.bot.db.commit()
                     else:
                         embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`",
                                               color=0xff0000)
@@ -426,8 +427,6 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.send('Unknown IGN!')
             else:
                 uuid = request['id']
-                with open('dnkl.json') as f:
-                    data = json.load(f)
 
                 await ctx.send("**What is the start date?** (DD/MM/YYYY)")
                 start_date = await self.bot.wait_for('message',
@@ -469,11 +468,23 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
                         message = await self.bot.dnkl_channel.send(embed=embed)
 
-                        dnkl_dict = {ign: message.id}
+                        cursor = await self.bot.db.execute("SELECT message_id FROM DNKL WHERE username = (?)", (ign,))
+                        row = await cursor.fetchone()
+                        await cursor.close()
 
-                        data.update(dnkl_dict)
-                        with open('dnkl.json', 'w') as f:
-                            json.dump(data, f)
+                        if row == None:
+                            await self.bot.db.execute("INSERT INTO DNKL VALUES (?, ?)", (message.id, ign,))
+                        else:
+                            msg_id = row
+                            try:
+                                msg = await self.bot.dnkl_channel.fetch_message(msg_id)
+                                await msg.delete()
+                            except Exception:
+                                pass
+
+                            await self.bot.db.execute("UPDATE DNKL SET message_id = (?) WHERE username = (?)", (message.id, ign,))
+                            await ctx.send("Since this user was already on the do-not-kick-list, their entry has been updated.")
+                        await self.bot.db.commit()
                     else:
                         embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`",
                                               color=0xff0000)
@@ -496,40 +507,46 @@ class Hypixel(commands.Cog, name="Hypixel"):
             await ctx.send('Unknown IGN!')
         else:
             ign = request['name']
-            with open("dnkl.json", 'r') as f:
-                data = json.load(f)
 
-            if ign not in data.keys():
-                await ctx.send('This player is not on the Do-not-kick-list!')
+            cursor = await self.bot.db.execute("SELECT * FROM DNKL WHERE username = (?)", (ign,))
+            row = await cursor.fetchone()
+            await cursor.close()
 
-            msgid = f"{data[ign]}"
+            if row == None:
+                await ctx.send('This player is not on the do-not-kick-list!')
+            else:
+                message_id, username = row
+                await self.bot.db.execute("DELETE FROM DNKL WHERE username = (?)", (ign,))
+                await self.bot.db.commit()
 
-            data.pop(ign)
-            with open('dnkl.json', 'w') as f:
-                json.dump(data, f)
-
-            msg = await self.bot.dnkl_channel.fetch_message(msgid)
-            await msg.delete()
-
-            await ctx.send(f'{ign} has been removed from the do-not-kick-list!')
-        await session.close()
+                try:
+                    msg = await self.bot.dnkl_channel.fetch_message(message_id)
+                    await msg.delete()
+                except Exception:
+                    await ctx.send(f"{username} has been removed from the do-not-kick-list, except the message was not found.")
+                    return
+                await ctx.send(f'{username} has been removed from the do-not-kick-list!')
 
     @commands.command()
     async def dnkllist(self, ctx, raw=None):
-        name = ""
-        with open('dnkl.json') as f:
-            data = json.load(f)
+        content = ""
+        cursor = await self.bot.db.execute("SELECT * FROM DNKL")
+        rows = await cursor.fetchall()
+        await cursor.close()
         if raw is not None:
-            await ctx.author.send(data)
+            for tuple in rows:
+                message_id, username = tuple
+                content = content + f"{username}, {message_id}\n"
+            await ctx.author.send(content)
         else:
-            keys = data.keys()
-            for x in keys:
-                name = name + f"{x}\n"
+            for tuple in rows:
+                message_id, username = tuple
+                content = content + f"{username}\n"
 
             embed = discord.Embed(title='The people on the do not kick list are as follows',
-                                  description=name,
+                                  description=content,
                                   color=0x8368ff)
-            embed.set_footer(text=f'Total: {len(keys)}')
+            embed.set_footer(text=f'Total: {len(content.split())}')
             await ctx.send(embed=embed)
 
     @commands.command(aliases=["gi"])

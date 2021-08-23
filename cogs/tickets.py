@@ -451,13 +451,16 @@ class Tickets(commands.Cog, name="Tickets"):
                                         embed.set_author(name="Do not kick list")
                                         message = await self.bot.dnkl_channel.send(embed=embed)
 
-                                        with open('dnkl.json') as f:
-                                            data = json.load(f)
-                                        dnkl_dict = {ign: message.id}
+                                        cursor = await self.bot.db.execute("SELECT message_id FROM DNKL WHERE username = (?)", (ign,))
+                                        row = await cursor.fetchone()
+                                        await cursor.close()
 
-                                        data.update(dnkl_dict)
-                                        with open('dnkl.json', 'w') as f:
-                                            json.dump(data, f)
+                                        if row == None:
+                                            await self.bot.db.execute("INSERT INTO DNKL VALUES (?, ?)", (message.id, ign,))
+                                        else:
+                                            await self.bot.db.execute("UPDATE DNKL SET message_id = (?) WHERE username = (?)", (message.id, ign,))
+                                        await self.bot.db.commit()
+                                        
                                         embed = discord.Embed(title="This DNKL Application has been accepted!",
                                                               description="The DNKL Embed has been sent to <#629564802812870657>",
                                                               color=0x00A86B)
@@ -564,12 +567,16 @@ class Tickets(commands.Cog, name="Tickets"):
                                                         await channel.channel.purge(limit=1)
 
                                                         message = await self.bot.dnkl_channel.send(embed=embed)
+                                                        
+                                                        cursor = await self.bot.db.execute("SELECT message_id FROM DNKL WHERE username = (?)", (ign,))
+                                                        row = await cursor.fetchone()
+                                                        await cursor.close()
 
-                                                        dnkl_dict = {ign: message.id}
-
-                                                        data.update(dnkl_dict)
-                                                        with open('dnkl.json', 'w') as f:
-                                                            json.dump(data, f)
+                                                        if row == None:
+                                                            await self.bot.db.execute("INSERT INTO DNKL VALUES (?, ?)", (message.id, ign,))
+                                                        else:
+                                                            await self.bot.db.execute("UPDATE DNKL SET message_id = (?) WHERE username = (?)", (message.id, ign,))
+                                                        await self.bot.db.commit()
 
                                                         await session.close()
                                                         success_embed = discord.Embed(title="Success", color=0x00A86B)

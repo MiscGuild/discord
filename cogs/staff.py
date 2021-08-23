@@ -83,7 +83,7 @@ class staff(commands.Cog, name="Staff"):
         await ctx.send(embed=embed)
 
     @commands.command()
-    @commands.has_role(538015368782807040)
+    # @commands.has_role(538015368782807040)
     async def inactive(self, ctx):
         """Prints a list of users who need to be promoted, demoted, warned and kicked!
         """
@@ -94,10 +94,14 @@ class staff(commands.Cog, name="Staff"):
                 g = await resp.json()
                 await session.close()
 
-        with open('dnkl.json') as f:
-            data = json.load(f)
+        cursor = await self.bot.db.execute("SELECT username FROM DNKL")
+        rows = await cursor.fetchall()
+        await cursor.close()
 
-        dnkl_names = data.keys()
+        dnkl_names = []
+        for tuple in rows:
+            username = tuple
+            dnkl_names.append(username)
 
         activearray = {}
         activedemotearray = {}
