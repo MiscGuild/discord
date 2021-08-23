@@ -141,6 +141,10 @@ async def on_member_join(member):
 
 async def connect_db():
     bot.db = await aiosqlite.connect("database.db")
+    await bot.db.execute("""CREATE TABLE IF NOT EXISTS DNKL (
+	message_id integer NOT NULL,
+	username text NOT NULL)""")
+    await bot.db.commit()
     print("db connected")
 
 
@@ -150,11 +154,11 @@ bot.loop.run_until_complete(connect_db())
 @tasks.loop(count=1)
 async def after_cache_ready():
     # replace the below IDs in testing servers - make sure to revert before committing.
-    bot.error_channel = bot.get_channel(859916798111907875)
-    bot.dnkl_channel = bot.get_channel(859916798111907875)
-    bot.ticket_channel = bot.get_channel(859916798111907875)
-    bot.logs = bot.get_channel(859916798111907875)
-    bot.misc_guild = bot.get_guild(859916798111907871)
+    bot.error_channel = bot.get_channel(523743721443950612)
+    bot.dnkl_channel = bot.get_channel(629564802812870657)
+    bot.ticket_channel = bot.get_channel(650248396480970782)
+    bot.logs = bot.get_channel(714821811832881222)
+    bot.misc_guild = bot.get_guild(522586672148381726)
     bot.guild_master = discord.utils.get(bot.misc_guild.roles, name="Guild Master")
     bot.admin = discord.utils.get(bot.misc_guild.roles, name="Admin")
     bot.staff = discord.utils.get(bot.misc_guild.roles, name="Staff")

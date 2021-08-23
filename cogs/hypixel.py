@@ -386,16 +386,15 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         await ctx.channel.purge(limit=1)
                         message = await self.bot.dnkl_channel.send(embed=embed)
 
-                        cursor = await self.bot.db.execute("SELECT * FROM DNKL WHERE username = (?)", (ign,))
+                        cursor = await self.bot.db.execute("SELECT message_id FROM DNKL WHERE username = (?)", (ign,))
                         row = await cursor.fetchone()
                         await cursor.close()
 
                         if row == None:
                             await self.bot.db.execute("INSERT INTO DNKL VALUES (?, ?)", (message.id, ign,))
-                            await self.bot.db.commit()
                         else:
                             await self.bot.db.execute("UPDATE DNKL SET message_id = (?) WHERE username = (?)", (message.id, ign,))
-                            await self.bot.db.commit()
+                        await self.bot.db.commit()
                     else:
                         embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`",
                                               color=0xff0000)
@@ -463,15 +462,14 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
                         message = await self.bot.dnkl_channel.send(embed=embed)
 
-                        cursor = await self.bot.db.execute("SELECT * FROM DNKL WHERE username = (?)", (ign,))
+                        cursor = await self.bot.db.execute("SELECT message_id FROM DNKL WHERE username = (?)", (ign,))
                         row = await cursor.fetchone()
                         await cursor.close()
 
                         if row == None:
                             await self.bot.db.execute("INSERT INTO DNKL VALUES (?, ?)", (message.id, ign,))
-                            await self.bot.db.commit()
                         else:
-                            msg_id, username = row
+                            msg_id = row
                             try:
                                 msg = await self.bot.dnkl_channel.fetch_message(msg_id)
                                 await msg.delete()
@@ -479,8 +477,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                 pass
 
                             await self.bot.db.execute("UPDATE DNKL SET message_id = (?) WHERE username = (?)", (message.id, ign,))
-                            await self.bot.db.commit()
                             await ctx.send("Since this user was already on the do-not-kick-list, their entry has been updated.")
+                        await self.bot.db.commit()
                     else:
                         embed = discord.Embed(title='Please enter a valid date!', description="`DD/MM/YYYY`",
                                               color=0xff0000)
@@ -504,8 +502,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         else:
             ign = request['name']
 
-            # Get first entry if there are multiple for that user
-            cursor = await self.bot.db.execute("SELECT message_id, username FROM DNKL WHERE username = (?)", (ign,))
+            cursor = await self.bot.db.execute("SELECT * FROM DNKL WHERE username = (?)", (ign,))
             row = await cursor.fetchone()
             await cursor.close()
 
@@ -513,7 +510,6 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.send('This player is not on the do-not-kick-list!')
             else:
                 message_id, username = row
-                # Delete first occurence of that person
                 await self.bot.db.execute("DELETE FROM DNKL WHERE username = (?)", (ign,))
                 await self.bot.db.commit()
 
