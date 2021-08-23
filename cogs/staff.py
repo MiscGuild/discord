@@ -48,7 +48,7 @@ class staff(commands.Cog, name="Staff"):
         embed.add_field(name="Youtuber",
                         value="If you're a youtuber with more than 5,000 subscribers, you aren't subject to any guild requirements.",
                         inline=False)
-        embed.add_field(name="Sugar Daddy", value="Spend Money on the guild by doing giveaways, sponsoring events!",
+        embed.add_field(name="Rich Kid", value="Spend Money on the guild by doing giveaways, sponsoring events!",
                         inline=False)
         embed.add_field(name="GvG Team", value="Be an exceptional GvG player.",
                         inline=False)
