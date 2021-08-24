@@ -1,6 +1,5 @@
 import asyncio
 import io
-import json
 
 import aiohttp
 import chat_exporter
@@ -491,8 +490,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                 ign = request['name']
                                                 uuid = request['id']
                                                 rank = await hypixel.get_rank(name)
-                                                with open('dnkl.json') as f:
-                                                    data = json.load(f)
+
                                                 if resp.status_code != 200:
                                                     await channel.send('Unknown IGN!')
                                                 else:

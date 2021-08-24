@@ -1,5 +1,4 @@
 import asyncio
-import json
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
@@ -83,7 +82,7 @@ class staff(commands.Cog, name="Staff"):
         await ctx.send(embed=embed)
 
     @commands.command()
-    # @commands.has_role(538015368782807040)
+    @commands.has_role(538015368782807040)
     async def inactive(self, ctx):
         """Prints a list of users who need to be promoted, demoted, warned and kicked!
         """
