@@ -253,9 +253,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                     giveaway_msg = await destination_channel.send(
                         f"{self.bot.giveaways_events.mention} React with :tada: to enter!\n", embed=embed)
                     await giveaway_msg.add_reaction("\U0001F389")
-                    await destination_channel.send(
-                        f"This giveaway was generously sponsored by {sponsors}.\nIf you win this giveaway, make a ticket to claim it!",
-                        color=0x8368ff)
+                    await destination_channel.send(f"This giveaway was generously sponsored by {sponsors}.\nIf you win this giveaway, make a ticket to claim it!")
 
                     if required_roles != "":  # Convert list to str for db
                         required_roles = ""
