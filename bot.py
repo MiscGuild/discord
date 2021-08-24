@@ -142,10 +142,6 @@ async def on_member_join(member):
 
 async def connect_db():
     bot.db = await aiosqlite.connect("database.db")
-    await bot.db.execute("""CREATE TABLE IF NOT EXISTS DNKL (
-	message_id integer NOT NULL,
-	username text NOT NULL)""")
-    await bot.db.commit()
     print("db connected")
 
 
