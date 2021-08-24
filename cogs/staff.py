@@ -522,7 +522,7 @@ class staff(commands.Cog, name="Staff"):
                             gtag = await hypixel.get_gtag(guild)
                             if member.nick is None or str(gtag) not in member.nick:
                                 ign = ign + " " + str(gtag)
-                            await ctx.author.edit(nick=ign)
+                                await member.edit(nick=ign)
                             await member.remove_roles(self.bot.new_member_role)
 
                             await member.add_roles(self.bot.guest, self.bot.ally)
