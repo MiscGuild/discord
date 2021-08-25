@@ -5,7 +5,7 @@ import discord
 from discord.ext import commands
 from discord_components import DiscordComponents, Button, ButtonStyle, Select, SelectOption
 
-from cogs.utils import utilities as hypixel
+from cogs.utils import utilities as utils
 
 
 class Roles(commands.Cog, command_attrs=dict(hidden=True)):
@@ -143,7 +143,7 @@ class Roles(commands.Cog, command_attrs=dict(hidden=True)):
         elif res.component.id == "ticketer":
             member = self.bot.misc_guild.get_member(int(res.user.id))
 
-            name = await hypixel.name_grabber(member)
+            name = await utils.name_grabber(member)
 
             category = discord.utils.get(self.bot.misc_guild.categories, name="🎫 Ticket Section")
             ticket_channel = await self.bot.misc_guild.create_text_channel(f"ticket-{name}",

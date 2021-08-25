@@ -7,7 +7,7 @@ import discord
 from discord.ext import commands
 from discord_components import Button, ButtonStyle, Select, SelectOption
 
-from cogs.utils import utilities as hypixel
+from cogs.utils import utilities as utils
 
 
 class Tickets(commands.Cog, name="Tickets"):
@@ -29,7 +29,7 @@ class Tickets(commands.Cog, name="Tickets"):
 
                 click = await self.bot.wait_for("button_click")
                 author = self.bot.misc_guild.get_member(int(click.user.id))
-                name = await hypixel.name_grabber(author)
+                name = await utils.name_grabber(author)
                 if click.component.id == "yes":
                     await channel.edit(name=f"join-request-{name}")
                     await channel.purge(limit=10)
@@ -120,13 +120,13 @@ class Tickets(commands.Cog, name="Tickets"):
 
                         await channel.edit(name=f"Alliance-{guildname.replace(' ', '-')}")
                         guild_planke = f"https://plancke.io/hypixel/guild/name/{guildname.replace(' ', '%20')}"
-                        api = hypixel.get_api()
+                        api = utils.get_api()
                         async with aiohttp.ClientSession() as session:
                             async with session.get(
                                     f'https://api.hypixel.net/guild?key={api}&name={guildname.replace(" ", "%20")}') as resp:
                                 req = await resp.json()
                                 await session.close()
-                        level = await hypixel.get_guild_level(req['guild']['exp'])
+                        level = await utils.get_guild_level(req['guild']['exp'])
                         if level > 100:
                             position_embed = discord.Embed(title=f"What is your position in {guildname}?",
                                                            description="Staff Position\nExample:\n Admin, Officer, Co-Owner, Guild Master etc.",
@@ -172,13 +172,13 @@ class Tickets(commands.Cog, name="Tickets"):
                         guildname = guildname.content
                         await channel.edit(name=f"Gvg-Request-{guildname.replace(' ', '-')}")
                         guild_planke = f"https://plancke.io/hypixel/guild/name/{guildname.replace(' ', '%20')}"
-                        api = hypixel.get_api()
+                        api = utils.get_api()
                         async with aiohttp.ClientSession() as session:
                             async with session.get(
                                     f'https://api.hypixel.net/guild?key={api}&name={guildname.replace(" ", "%20")}') as resp:
                                 req = await resp.json()
                                 await session.close()
-                        level = await hypixel.get_guild_level(req['guild']['exp'])
+                        level = await utils.get_guild_level(req['guild']['exp'])
                         if level > 50:
                             position_embed = discord.Embed(title=f"What is your position in {guildname}?",
                                                            description="Staff Position\nExample:\n Admin, Officer, Co-Owner, Guild Master etc.",
@@ -292,7 +292,7 @@ class Tickets(commands.Cog, name="Tickets"):
                 reply = interaction.values[0]
 
                 author = self.bot.misc_guild.get_member(int(interaction.user.id))
-                name = await hypixel.name_grabber(author)
+                name = await utils.name_grabber(author)
 
                 if reply == "Do not kick list application":
 
@@ -308,7 +308,7 @@ class Tickets(commands.Cog, name="Tickets"):
 
                     name = request['name']
                     uuid = request['id']
-                    api = hypixel.get_api()
+                    api = utils.get_api()
                     async with aiohttp.ClientSession() as session:
                         async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
                             data = await resp.json()
@@ -427,8 +427,8 @@ class Tickets(commands.Cog, name="Tickets"):
                                     if click.component.id == "approve":
                                         a, b, c = start.split('/')
                                         p, q, r = end.split('/')
-                                        ign, uuid = await hypixel.get_dispnameID(name)
-                                        rank = await hypixel.get_rank(name)
+                                        ign, uuid = await utils.get_dispnameID(name)
+                                        rank = await utils.get_rank(name)
                                         dates = {1: "January", 2: "February", 3: "March", 4: "April",
                                                  5: "May",
                                                  6: "June", 7: "July", 8: "August", 9: "September",
@@ -489,7 +489,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                 request = await resp.json()
                                                 ign = request['name']
                                                 uuid = request['id']
-                                                rank = await hypixel.get_rank(name)
+                                                rank = await utils.get_rank(name)
 
                                                 if resp.status_code != 200:
                                                     await channel.send('Unknown IGN!')
@@ -622,7 +622,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             await asyncio.sleep(10)
                             await discord.TextChannel.delete(channel)
 
-                            name = await hypixel.name_grabber(author)
+                            name = await utils.name_grabber(author)
                             embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
                                                   description="They deleted their own ticket.", color=0x8368ff)
                             await self.bot.logs.send(embed=embed)
@@ -654,7 +654,7 @@ class Tickets(commands.Cog, name="Tickets"):
                     role_reply = await self.bot.wait_for('message',
                                                          check=lambda x: x.channel == channel and x.author == author)
                     name = role_reply.content
-                    ign, uuid = await hypixel.get_dispnameID(name)
+                    ign, uuid = await utils.get_dispnameID(name)
                     if ign is None:
                         embed = discord.Embed(title="Please enter a valid minecraft username!",
                                               description="The ticket process will be restarted so you can rectify your mistake!",
@@ -666,7 +666,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                               color=0xDE3163)
                         await channel.send(embed=embed)
                     else:
-                        guild_name = await hypixel.get_guild(ign)
+                        guild_name = await utils.get_guild(ign)
                         await author.edit(nick=ign)
 
                         has_tag_perms = any(role in author.roles for role in self.bot.tag_allowed_roles)
@@ -712,7 +712,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         elif guild_name in self.bot.misc_allies:
                             for guild in self.bot.misc_allies:
                                 if guild == guild_name:
-                                    gtag = await hypixel.get_gtag(guild)
+                                    gtag = await utils.get_gtag(guild)
                                     if author.nick is None or str(gtag) not in author.nick:
                                         new_nick = ign + " " + str(gtag)
                                         await author.edit(nick=new_nick)
@@ -746,9 +746,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                       f"\n• Guest was given")
                                 embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                                 await channel.send(embed=embed)
-                        elif tag.lower() == "spud<3":
-                            new_nick = ign + f' [{tag}]'
-                            await author.edit(nick=new_nick)
+                                
                     stop_embed = discord.Embed(title="Can this ticket be closed?",
                                                description="Click `Yes` if you resolved your issue and want to delete the ticket.\n Click `No` if you wish to wait for staff assistance\nClick `Restart` if you wish to restart the ticket process",
                                                color=0x8368ff)
@@ -782,7 +780,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             await asyncio.sleep(10)
                             await discord.TextChannel.delete(channel)
 
-                            name = await hypixel.name_grabber(author)
+                            name = await utils.name_grabber(author)
                             embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
                                                   description="They deleted their own ticket.", color=0x8368ff)
                             await self.bot.logs.send(embed=embed)
@@ -892,7 +890,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                 await asyncio.sleep(10)
                                 await discord.TextChannel.delete(channel)
 
-                                name = await hypixel.name_grabber(author)
+                                name = await utils.name_grabber(author)
                                 embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
                                                       description="They deleted their own ticket.", color=0x8368ff)
                                 await self.bot.logs.send(embed=embed)
@@ -928,7 +926,7 @@ class Tickets(commands.Cog, name="Tickets"):
 
                         if click.component.id == 'yes':
                             await click.respond(content=f"Alright let's proceed!")
-                            name = await hypixel.name_grabber(author)
+                            name = await utils.name_grabber(author)
                         else:
                             await click.respond(content=f"Alright let's proceed!")
                             embed = discord.Embed(title="What is your Minecraft Username?",
@@ -938,7 +936,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                check=lambda
                                                                    x: x.channel == channel and x.author == author)
                             name = username.content
-                            ign, uuid = await hypixel.get_dispnameID(name)
+                            ign, uuid = await utils.get_dispnameID(name)
 
                         async with aiohttp.ClientSession() as session:
                             async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
@@ -1145,14 +1143,14 @@ class Tickets(commands.Cog, name="Tickets"):
                     await channel.purge(limit=10)
                     await channel.send(embed=embed)
 
-                    req = await hypixel.get_data(name)
+                    req = await utils.get_data(name)
                     if req["player"] is None:
                         embed = discord.Embed(title='Unknown IGN',
                                               description='Kindly create a new ticket to sync your name and then create another ticket for the GvG Application!',
                                               color=0xff0000)
                         await channel.send(embed=embed)
                     else:
-                        req = await hypixel.get_data(name)
+                        req = await utils.get_data(name)
                         uuid = req['player']['uuid']
 
                         x = 0
@@ -1341,7 +1339,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                         await asyncio.sleep(10)
                                         await discord.TextChannel.delete(channel)
 
-                                        name = await hypixel.name_grabber(author)
+                                        name = await utils.name_grabber(author)
                                         embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
                                                               description="They deleted their own ticket.",
                                                               color=0x8368ff)
@@ -1417,7 +1415,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         ign = request['name']
                         uuid = request['id']
 
-                        guild_name = await hypixel.get_guild(name)
+                        guild_name = await utils.get_guild(name)
 
                         nick = await author.edit(nick=ign)
                         if guild_name == "Miscellaneous":
@@ -1435,7 +1433,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         elif guild_name in self.bot.misc_allies:
                             for guild in self.bot.misc_allies:
                                 if guild == guild_name:
-                                    gtag = await hypixel.get_gtag(guild)
+                                    gtag = await utils.get_gtag(guild)
                                     if ctx.author.nick is None or str(gtag) not in ctx.author.nick:
                                         ign = ign + " " + str(gtag)
                                     await ctx.author.edit(nick=ign)
@@ -1534,7 +1532,7 @@ class Tickets(commands.Cog, name="Tickets"):
                 await asyncio.sleep(10)
                 await discord.TextChannel.delete(ctx.channel)
 
-                name = await hypixel.name_grabber(ctx.author)
+                name = await utils.name_grabber(ctx.author)
                 embed = discord.Embed(title=f'{ctx.channel.name} was deleted by {name}',
                                       description="", color=0x8368ff)
                 await self.bot.logs.send(embed=embed)
@@ -1618,7 +1616,7 @@ class Tickets(commands.Cog, name="Tickets"):
     async def deny(self, ctx, member: discord.Member, channel: discord.TextChannel):
         """Used to deny staff applications. This command can be used in any channel, provided, the syntax is met.
         """
-        name = await hypixel.name_grabber(member)
+        name = await utils.name_grabber(member)
 
         embed = discord.Embed(title=f"{name}, your application has been denied!",
                               description="The reasons are listed below",
@@ -1696,7 +1694,7 @@ class Tickets(commands.Cog, name="Tickets"):
 
     @commands.command()
     async def new(self, ctx):
-        name = await hypixel.name_grabber(ctx.author)
+        name = await utils.name_grabber(ctx.author)
 
         category = discord.utils.get(self.bot.misc_guild.categories, name="🎫 Ticket Section")
         ticket_channel = await self.bot.misc_guild.create_text_channel(f"ticket-{name}",

@@ -7,7 +7,7 @@ import discord
 from discord.ext import commands
 from quickchart import QuickChart, QuickChartFunction
 
-from cogs.utils import utilities as hypixel
+from cogs.utils import utilities as utils
 
 
 class Hypixel(commands.Cog, name="Hypixel"):
@@ -21,7 +21,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         author = ctx.author
         if name is not None:
 
-            ign, uuid = await hypixel.get_dispnameID(name)
+            ign, uuid = await utils.get_dispnameID(name)
 
             if ign is None:
                 embed = discord.Embed(title="Please enter a valid minecraft username!",
@@ -32,7 +32,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                       color=0xDE3163)
                 await ctx.channel.send(embed=embed)
             else:
-                guild_name = await hypixel.get_guild(name)
+                guild_name = await utils.get_guild(name)
                 has_tag_perms = any(role in ctx.author.roles for role in self.bot.tag_allowed_roles)
 
                 await author.edit(nick=ign)
@@ -68,14 +68,11 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
                     embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                     await ctx.reply(embed=embed)
-                elif tag.lower() == "spud<3":
-                    new_nick = ign + f' [{tag}]'
-                    await author.edit(nick=new_nick)
 
                 elif guild_name in self.bot.misc_allies:
                     for guild in self.bot.misc_allies:
                         if guild == guild_name:
-                            gtag = await hypixel.get_gtag(guild)
+                            gtag = await utils.get_gtag(guild)
                             if ctx.author.nick is None or str(gtag) not in ctx.author.nick:
                                 ign = ign + " " + str(gtag)
                             await ctx.author.edit(nick=ign)
@@ -112,7 +109,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             name = await self.bot.wait_for('message',
                                            check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
             name = name.content
-            ign, uuid = await hypixel.get_dispnameID(name)
+            ign, uuid = await utils.get_dispnameID(name)
 
             if ign is None:
                 embed = discord.Embed(title="Please enter a valid minecraft username!",
@@ -124,7 +121,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 await ctx.channel.send(embed=embed)
             else:
                 await ctx.author.edit(nick=ign)
-                guild_name = await hypixel.get_guild(name)
+                guild_name = await utils.get_guild(name)
                 has_tag_perms = any(role in ctx.author.roles for role in self.bot.tag_allowed_roles)
                 if guild_name == "Miscellaneous" or has_tag_perms is True:
                     if has_tag_perms is True:
@@ -172,7 +169,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 elif guild_name in self.bot.misc_allies:
                     for guild in self.bot.misc_allies:
                         if guild == guild_name:
-                            gtag = await hypixel.get_gtag(guild)
+                            gtag = await utils.get_gtag(guild)
                             if ctx.author.nick is None or str(gtag) not in ctx.author.nick:
                                 ign = ign + " " + str(gtag)
 
@@ -202,9 +199,6 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             text=f"Member of {guild_name}\n• Nick Changed\n• Member & Awaiting Approval were removed\n• Guest was given")
                         embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                         await ctx.send(embed=embed)
-                elif tag.lower() == "spud<3":
-                    new_nick = ign + f' [{tag}]'
-                    await author.edit(nick=new_nick)
 
     @commands.command(aliases=["i"])
     async def info(self, ctx, name=None):
@@ -212,8 +206,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
         """
         async with ctx.channel.typing():
             if name is None:
-                name = await hypixel.name_grabber(ctx.author)
-            req = await hypixel.get_data(name)
+                name = await utils.name_grabber(ctx.author)
+            req = await utils.get_data(name)
             if req["player"] is None:
                 embed = discord.Embed(title="Your discord nick doesn't match your minecraft name",
                                       description=',sync `Your minecraft name`', color=0xff0000)
@@ -222,7 +216,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             else:
                 ign = req["player"]["displayname"]
                 uuid = req["player"]['uuid']
-                api = hypixel.get_api()
+                api = utils.get_api()
                 async with aiohttp.ClientSession() as session:
                     async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
                         req2 = await resp.json()
@@ -357,8 +351,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
             if len(name) < 3 or len(name) > 16:
                 await ctx.send('Unknown IGN!')
                 return
-            ign, uuid = await hypixel.get_dispnameID(name)
-            rank = await hypixel.get_rank(name)
+            ign, uuid = await utils.get_dispnameID(name)
+            rank = await utils.get_rank(name)
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{ign}') as resp:
                     request = await resp.json(content_type=None)
@@ -417,8 +411,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
             name = await self.bot.wait_for('message',
                                            check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
             name = name.content
-            ign, uuid = await hypixel.get_dispnameID(name)
-            rank = await hypixel.get_rank(name)
+            ign, uuid = await utils.get_dispnameID(name)
+            rank = await utils.get_rank(name)
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{ign}') as resp:
                     request = await resp.json(content_type=None)
@@ -553,12 +547,12 @@ class Hypixel(commands.Cog, name="Hypixel"):
     async def ginfo(self, ctx, *, name):
         """Gives the information of the requested user's guild.
         """
-        ign, uuid = await hypixel.get_dispnameID(name)
+        ign, uuid = await utils.get_dispnameID(name)
         if ign is None:
             await ctx.send('Invalid IGN')
         else:
             async with ctx.channel.typing():
-                api = hypixel.get_api()
+                api = utils.get_api()
                 async with aiohttp.ClientSession() as session:
                     async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as req:
                         req = await req.json()
@@ -575,7 +569,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     else:
                         gtag = ""
 
-                    glvl = await hypixel.get_guild_level(req["guild"]['exp'])
+                    glvl = await utils.get_guild_level(req["guild"]['exp'])
 
                     if 'description' in req["guild"]:
                         gdesc = req["guild"]['description']
@@ -622,7 +616,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         """Lists the guild experience of the requested guild!
         """
         msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
-        api = hypixel.get_api()
+        api = utils.get_api()
         async with aiohttp.ClientSession() as session:
             async with session.get(f'https://api.hypixel.net/guild?key={api}&name={gname}') as req:
                 req = await req.json()
@@ -842,7 +836,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         """Gives the guild experience earned by the user over the course of a week.
         """
         if name is None:
-            name = await hypixel.name_grabber(ctx.author)
+            name = await utils.name_grabber(ctx.author)
         results = []
         dates = []
         weeklyexp = []
@@ -859,7 +853,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             else:
                 name = request['name']
                 uuid = request['id']
-                api = hypixel.get_api()
+                api = utils.get_api()
                 async with aiohttp.ClientSession() as session:
                     async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
                         req = await resp.json()
@@ -897,20 +891,20 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                 colour, GraphColor, GraphBorder = 0x36393f, rainbow_bg, rainbow_border
                             elif rank == "Resident":
                                 if totalexp > self.bot.resident_req:
-                                    colour, GraphColor, GraphBorder = await hypixel.get_color("res_met", totalexp,
+                                    colour, GraphColor, GraphBorder = await utils.get_color("res_met", totalexp,
                                                                                               self.bot.resident_req)
                                 else:
-                                    colour, GraphColor, GraphBorder = await hypixel.get_color("res_not_met", totalexp,
+                                    colour, GraphColor, GraphBorder = await utils.get_color("res_not_met", totalexp,
                                                                                               self.bot.resident_req)
                             else:
                                 if totalexp > self.bot.active:
-                                    colour, GraphColor, GraphBorder = await hypixel.get_color("active", totalexp,
+                                    colour, GraphColor, GraphBorder = await utils.get_color("active", totalexp,
                                                                                               self.bot.active)
                                 elif totalexp > self.bot.inactive:
-                                    colour, GraphColor, GraphBorder = await hypixel.get_color("member", totalexp,
+                                    colour, GraphColor, GraphBorder = await utils.get_color("member", totalexp,
                                                                                               self.bot.inactive)
                                 else:
-                                    colour, GraphColor, GraphBorder = await hypixel.get_color("inactive", totalexp,
+                                    colour, GraphColor, GraphBorder = await utils.get_color("inactive", totalexp,
                                                                                               self.bot.inactive)
 
                             totalexp = (format(totalexp, ',d'))
@@ -984,7 +978,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         """A command to check whether or not you can apply for the do-not-kick-list.
         """
         if name is None:
-            name = await hypixel.name_grabber(ctx.author)
+            name = await utils.name_grabber(ctx.author)
         async with aiohttp.ClientSession() as session:
             async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
                 request = await resp.json(content_type=None)
@@ -994,7 +988,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         else:
             name = request['name']
             uuid = request['id']
-            api = hypixel.get_api()
+            api = utils.get_api()
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
                     data = await resp.json()
@@ -1046,7 +1040,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         """
         await ctx.message.delete()
         msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
-        api = hypixel.get_api()
+        api = utils.get_api()
         async with aiohttp.ClientSession() as session:
             async with session.get(f'https://api.hypixel.net/guild?key={api}&name=Miscellaneous') as resp:
                 req = await resp.json()
@@ -1212,7 +1206,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         """
         await ctx.channel.purge(limit=1)
         msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
-        api = hypixel.get_api()
+        api = utils.get_api()
         async with aiohttp.ClientSession() as session:
             async with session.get(f'https://api.hypixel.net/guild?key={api}&name=Miscellaneous') as resp:
                 req = await resp.json()
