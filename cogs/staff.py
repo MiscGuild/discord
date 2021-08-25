@@ -7,7 +7,7 @@ import discord
 import requests
 from discord.ext import commands
 
-from cogs.utils import utilities as hypixel
+from cogs.utils import utilities as utils
 
 
 class staff(commands.Cog, name="Staff"):
@@ -87,7 +87,7 @@ class staff(commands.Cog, name="Staff"):
         """Prints a list of users who need to be promoted, demoted, warned and kicked!
         """
         msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
-        api = hypixel.get_api()
+        api = utils.get_api()
         async with aiohttp.ClientSession() as session:
             async with session.get(f'https://api.hypixel.net/guild?key={api}&name=Miscellaneous') as resp:
                 g = await resp.json()
@@ -281,10 +281,10 @@ class staff(commands.Cog, name="Staff"):
         misc_member_description, ally_member_description, new_member_description, guest_description = "","","",""
         msg = await ctx.send("**Processing all the prerequisites**")
 
-        misc_uuids = await hypixel.get_guild_members("Miscellaneous")
+        misc_uuids = await utils.get_guild_members("Miscellaneous")
         misc_members, ally_members, ally_uuids = [], [], []
         for x in self.bot.misc_allies:
-            ally_uuids = ally_uuids + await hypixel.get_guild_members(x)
+            ally_uuids = ally_uuids + await utils.get_guild_members(x)
 
         # Miscellaneous Member Names
         await msg.edit(content="**Processing** - 1/2")
@@ -295,7 +295,7 @@ class staff(commands.Cog, name="Staff"):
                 tasks = [
                     loop.run_in_executor(
                         executor,
-                        hypixel.fetch,
+                        utils.fetch,
                         *(session, individual_misc_uuid)  # Allows us to pass in multiple arguments to `fetch`
                     )
                     for individual_misc_uuid in misc_uuids
@@ -312,7 +312,7 @@ class staff(commands.Cog, name="Staff"):
                 tasks = [
                     loop.run_in_executor(
                         executor,
-                        hypixel.fetch,
+                        utils.fetch,
                         *(session, individual_ally_uuid)  # Allows us to pass in multiple arguments to `fetch`
                     )
                     for individual_ally_uuid in ally_uuids
@@ -324,7 +324,7 @@ class staff(commands.Cog, name="Staff"):
             if str(guild) == "Miscellaneous [MISC]":  # Check if the Discord is Miscellaneous
                 for member in guild.members:  # For loop for all members in the Discord
                     if member.id not in self.bot.adminids and member.bot is False:
-                        name = await hypixel.name_grabber(member)
+                        name = await utils.name_grabber(member)
                         has_tag_perms = any(role in ctx.author.roles for role in self.bot.tag_allowed_roles)
 
                         if len(misc_member_description) >= 3500:
@@ -364,7 +364,7 @@ class staff(commands.Cog, name="Staff"):
                         if ign in misc_members and ign not in self.bot.adminnames:
                             async with aiohttp.ClientSession() as session:
                                 async with session.get(
-                                        f"https://api.hypixel.net/guild?key={hypixel.get_api()}&player={uuid}") as resp:
+                                        f"https://api.hypixel.net/guild?key={utils.get_api()}&player={uuid}") as resp:
                                     req = await resp.json()
                                     await session.close()
 
@@ -381,7 +381,7 @@ class staff(commands.Cog, name="Staff"):
 
                                     if usergrank != 'Resident':
                                         if totalexp < self.bot.inactive:
-                                            username = await hypixel.name_grabber(member)
+                                            username = await utils.name_grabber(member)
                                             if has_tag_perms is False:
                                                 await member.edit(nick=username)
                                             await member.add_roles(self.bot.inactive_role, self.bot.member_role, reason="Rolecheck")
@@ -398,7 +398,7 @@ class staff(commands.Cog, name="Staff"):
                                             misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | ++Active | --Inactive** \n"
 
                                         elif totalexp > self.bot.inactive:
-                                            username = await hypixel.name_grabber(member)
+                                            username = await utils.name_grabber(member)
                                             if has_tag_perms is False:
                                                 await member.edit(nick=username)
                                             await member.add_roles(self.bot.member_role, reason="Rolecheck") 
@@ -407,7 +407,7 @@ class staff(commands.Cog, name="Staff"):
                                             misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | --Inactive | --Active** \n"
                                     else:  # For residents
                                         if totalexp < self.bot.resident_req:
-                                            username = await hypixel.name_grabber(member)
+                                            username = await utils.name_grabber(member)
                                             if has_tag_perms is False:
                                                 await member.edit(nick=username)
                                             await member.add_roles(self.bot.inactive_role, self.bot.member_role, reason="Rolecheck")
@@ -424,7 +424,7 @@ class staff(commands.Cog, name="Staff"):
                                             misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | ++Active | --Inactive** \n"
 
                                         elif totalexp > self.bot.resident_req:
-                                            username = await hypixel.name_grabber(member)
+                                            username = await utils.name_grabber(member)
                                             if has_tag_perms is False:
                                                 await member.edit(nick=username)
                                             await member.add_roles(self.bot.member_role, reason="Rolecheck")    
@@ -435,10 +435,10 @@ class staff(commands.Cog, name="Staff"):
                                     await member.edit(nick=ign)
                         # Ally
                         elif ign in ally_members:
-                            guild_name = await hypixel.get_guild(name)
+                            guild_name = await utils.get_guild(name)
                             for guild in self.bot.misc_allies:
                                 if guild == guild_name:
-                                    gtag = await hypixel.get_gtag(guild_name)
+                                    gtag = await utils.get_gtag(guild_name)
                                     if member.nick is None or str(gtag) not in member.nick:
                                         username = ign + str(gtag)
                                         await member.edit(nick=username)
@@ -486,11 +486,11 @@ class staff(commands.Cog, name="Staff"):
         officer = discord.utils.get(ctx.guild.roles, name="Officer")
         admin = discord.utils.get(ctx.guild.roles, name="Admin")
         if officer or admin in ctx.author.roles:
-            ign, uuid = await hypixel.get_dispnameID(name)
+            ign, uuid = await utils.get_dispnameID(name)
             if ign is None:
                 await ctx.send('Please enter a valid ign!')
             else:
-                guild_name = await hypixel.get_guild(name)
+                guild_name = await utils.get_guild(name)
                 newmember = discord.utils.get(ctx.guild.roles, name="New Member")
                 guest = discord.utils.get(ctx.guild.roles, name="Guest")
                 member_ = discord.utils.get(ctx.guild.roles, name="Member")
@@ -514,7 +514,7 @@ class staff(commands.Cog, name="Staff"):
                 elif guild_name in self.bot.misc_allies:
                     for guild in self.bot.misc_allies:
                         if guild == guild_name:
-                            gtag = await hypixel.get_gtag(guild)
+                            gtag = await utils.get_gtag(guild)
                             if member.nick is None or str(gtag) not in member.nick:
                                 ign = ign + " " + str(gtag)
                                 await member.edit(nick=ign)

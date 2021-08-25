@@ -379,3 +379,28 @@ def discord_verification(name, member: discord.Member):
         return True
     else:
         return False
+
+async def check_tag(tag):
+    with open('badwords.txt', 'r') as f:
+        badwords = f.read()
+    if tag.isascii() is False:
+        return "invalid"
+    elif len(tag) > 6:
+        return "length"
+    elif tag.lower() in badwords.split('\n'):
+        return "profane"
+    else:
+        return True
+
+async def get_tag_message():
+    embed = discord.Embed(title="What would you like your tag to be? ",
+                                url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png",
+                                description="**Rules:**"
+                                            "\n• Tags can have a maximum length of 6 characters."
+                                            " \n• Tags cannot include special characters."
+                                            " \n• Tags cannot include profane language. ",
+                                color=0x8368ff)
+    embed.set_thumbnail(
+        url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png")
+    embed.set_footer(text="If you don't want a tag, type: None")
+    return embed

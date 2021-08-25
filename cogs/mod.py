@@ -4,7 +4,7 @@ import chat_exporter
 import discord
 from discord.ext import commands
 
-from cogs.utils import utilities as hypixel
+from cogs.utils import utilities as utils
 
 
 class Moderation(commands.Cog, name="Moderation"):
@@ -17,7 +17,7 @@ class Moderation(commands.Cog, name="Moderation"):
     async def mute(self, ctx, member: discord.Member, *, reason=None):
         """Mutes the mentioned user indefinately!
         """
-        name = await hypixel.name_grabber(ctx.author)
+        name = await utils.name_grabber(ctx.author)
         if reason is None:
             reason = f'Muted by: {name}'
 
@@ -37,7 +37,7 @@ class Moderation(commands.Cog, name="Moderation"):
     async def unmute(self, ctx, member: discord.Member, *, reason=None):
         """Mutes the mentioned user
         """
-        name = await hypixel.name_grabber(ctx.author)
+        name = await utils.name_grabber(ctx.author)
         if reason is None:
             reason = f'Unmuted by: {name}'
 
@@ -57,7 +57,7 @@ class Moderation(commands.Cog, name="Moderation"):
     async def clear(self, ctx, amount: int, *, reason=None):
         """Clears the chat based on the given amount!
         """
-        name = await hypixel.name_grabber(ctx.author)
+        name = await utils.name_grabber(ctx.author)
         transcript = await chat_exporter.export(ctx.channel, limit=amount)
         if transcript is None:
             print("transcript failed")
@@ -80,7 +80,7 @@ class Moderation(commands.Cog, name="Moderation"):
     async def kick(self, ctx, member: discord.Member, *, reason=None):
         """Kicks the mentioned user!
         """
-        name = await hypixel.name_grabber(ctx.author)
+        name = await utils.name_grabber(ctx.author)
         if reason is None:
             reason = f'Kicked by: {name}'
 
@@ -96,7 +96,7 @@ class Moderation(commands.Cog, name="Moderation"):
     async def ban(self, ctx, member: discord.Member, *, reason=None):
         """Bans the mentioned user!
         """
-        name = await hypixel.name_grabber(ctx.author)
+        name = await utils.name_grabber(ctx.author)
         if reason is None:
             reason = f'Banned by: {name}'
 
@@ -112,7 +112,7 @@ class Moderation(commands.Cog, name="Moderation"):
     async def unban(self, ctx, member: discord.User, *, reason=None):
         """Unbans the user!
         """
-        name = await hypixel.name_grabber(ctx.author)
+        name = await utils.name_grabber(ctx.author)
         if reason is None:
             reason = f'Unbanned by: {name}'
 
@@ -129,7 +129,7 @@ class Moderation(commands.Cog, name="Moderation"):
 
         Bans and then unbans a user to remove all of their messages
         """
-        name = await hypixel.name_grabber(ctx.author)
+        name = await utils.name_grabber(ctx.author)
         if reason is None:
             reason = f'Softbanned by: {name}'
 

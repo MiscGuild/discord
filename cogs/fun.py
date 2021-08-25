@@ -4,7 +4,7 @@ import aiohttp
 import discord
 from discord.ext import commands
 
-from cogs.utils import utilities as hypixel
+from cogs.utils import utilities as utils
 
 
 class Fun(commands.Cog, name="Fun"):
@@ -39,7 +39,7 @@ class Fun(commands.Cog, name="Fun"):
     async def _8ball(self, ctx, *, question):
         """Play with the magic 8ball
         """
-        user_name = await hypixel.name_grabber(ctx.author)
+        user_name = await utils.name_grabber(ctx.author)
 
         responses = ["As I see it, yes.", "Ask again later.", "Better not tell you now.", "Cannot predict now.",
                      "Concentrate and ask again.", "Don’t count on it.", "It is certain.", "It is decidedly so.",
@@ -125,7 +125,7 @@ class Fun(commands.Cog, name="Fun"):
     async def pat(self, ctx, user: discord.User = None):
         """Pat the specified user!
         """
-        author = await hypixel.name_grabber(ctx.author)
+        author = await utils.name_grabber(ctx.author)
         async with aiohttp.ClientSession() as session:
             async with session.get('https://some-random-api.ml/animu/pat') as resp:
                 req = await resp.json()
@@ -133,7 +133,7 @@ class Fun(commands.Cog, name="Fun"):
         if user is None or ctx.author == user:
             embed = discord.Embed(title=f"{author} pats themselves.", color=0x8368ff)
         else:
-            user = await hypixel.name_grabber(user)
+            user = await utils.name_grabber(user)
             embed = discord.Embed(title=f"{author} pats {user}.", color=0x8368ff)
         embed.set_image(url=req['link'])
         await ctx.send(embed=embed)
@@ -142,7 +142,7 @@ class Fun(commands.Cog, name="Fun"):
     async def hug(self, ctx, user: discord.User = None):
         """hug the specified user!
         """
-        author = await hypixel.name_grabber(ctx.author)
+        author = await utils.name_grabber(ctx.author)
         async with aiohttp.ClientSession() as session:
             async with session.get('https://some-random-api.ml/animu/hug') as resp:
                 req = await resp.json()
@@ -150,7 +150,7 @@ class Fun(commands.Cog, name="Fun"):
         if user is None or ctx.author == user:
             embed = discord.Embed(title=f"{author} hugs themselves.", color=0x8368ff)
         else:
-            user = await hypixel.name_grabber(user)
+            user = await utils.name_grabber(user)
             embed = discord.Embed(title=f"{author} hugs {user}.", color=0x8368ff)
         embed.set_image(url=req['link'])
         await ctx.send(embed=embed)

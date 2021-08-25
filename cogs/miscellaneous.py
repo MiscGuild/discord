@@ -7,7 +7,7 @@ import aiohttp
 import discord
 from discord.ext import commands, tasks
 
-from cogs.utils import utilities as hypixel
+from cogs.utils import utilities as utils
 
 
 class miscellaneous(commands.Cog, name="Miscellaneous"):
@@ -350,184 +350,184 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                                   color=0xFF0000)
             await ctx.send(embed=embed)
 
-    async def roll_giveaway(self, message_ID, reroll_number=None):
-        cursor = await self.bot.db.execute(
-            "SELECT message_id, channel_id, prize, number_winners, role_requirement_type, required_roles, required_gexp FROM Giveaways WHERE message_id = (?)",
-            (message_ID,))
-        row = await cursor.fetchone()
-        await cursor.close()
-        message_id, channel_id, prize, number_winners, role_requirement_type, required_roles, required_gexp = ",".join(
-            [str(value) for value in row]).split(",")
-        required_roles = required_roles.split(" ")
+async def roll_giveaway(self, message_ID, reroll_number=None):
+    cursor = await self.bot.db.execute(
+        "SELECT message_id, channel_id, prize, number_winners, role_requirement_type, required_roles, required_gexp FROM Giveaways WHERE message_id = (?)",
+        (message_ID,))
+    row = await cursor.fetchone()
+    await cursor.close()
+    message_id, channel_id, prize, number_winners, role_requirement_type, required_roles, required_gexp = ",".join(
+        [str(value) for value in row]).split(",")
+    required_roles = required_roles.split(" ")
 
-        message = await self.bot.get_channel(int(channel_id)).fetch_message(int(message_id))
-        message_channel = self.bot.get_channel(int(channel_id))
+    message = await self.bot.get_channel(int(channel_id)).fetch_message(int(message_id))
+    message_channel = self.bot.get_channel(int(channel_id))
 
-        reactions = message.reactions
-        entrants = []
-        winners = []
+    reactions = message.reactions
+    entrants = []
+    winners = []
 
-        for reaction in reactions:
-            if (reaction.emoji.encode("unicode-escape") == b'\\U0001f389'):  # If reaction is :tada:
-                has_reaction = True
-                entrants = await reaction.users().flatten()
-                del entrants[0]  # Remove bot's own reaction
+    for reaction in reactions:
+        if (reaction.emoji.encode("unicode-escape") == b'\\U0001f389'):  # If reaction is :tada:
+            has_reaction = True
+            entrants = await reaction.users().flatten()
+            del entrants[0]  # Remove bot's own reaction
+            break
+
+    if has_reaction != True:  # Giveaway message does not have the :tada: reaction
+        await message_channel.send(f"Yikes! The giveaway for {prize} doesn't seem to have the :tada: reaction :(")
+        await self.bot.db.execute("UPDATE Giveaways SET status = 'inactive' WHERE message_id = (?)", (message_id,))
+        await self.bot.db.commit()
+        return
+
+    if reroll_number == None:
+        number_winners = int(number_winners)
+    else:
+        number_winners = reroll_number
+
+    while len(winners) < number_winners:  # Pick a random winner
+        while True:  # Protection from infinite picking of winner
+            if len(entrants) == 0 and len(winners) == 0:  # No eligible winners
+                await message_channel.send(
+                    f"There were no eligible winners for `{prize}`, the giveaway has been ended - message ID `{message_id}`.")
+                await self.bot.db.execute("UPDATE Giveaways SET status = 'inactive' WHERE message_id = (?)",
+                                            (message_id,))
+                await self.bot.db.commit()
+                return
+
+            elif len(entrants) == 0:  # Less eligible winners that number_winners
+                announcement = ""
+                for winner in winners:
+                    category = discord.utils.get(self.bot.guild.categories, name="🎫 Ticket Section")
+                    winner_ticket = await self.bot.guild.create_text_channel(f"giveaway-winner-{winner.nick}",
+                                                                                category=category)
+                    await winner_ticket.set_permissions(self.botguild.get_role(self.bot.guild.id),
+                                                        send_messages=False,
+                                                        read_messages=False)
+                    await winner_ticket.set_permissions(self.bot.staff, send_messages=True, read_messages=True,
+                                                        add_reactions=True, embed_links=True,
+                                                        attach_files=True,
+                                                        read_message_history=True, external_emojis=True)
+                    await winner_ticket.set_permissions(self.bot.t_officer, send_messages=True,
+                                                        read_messages=True,
+                                                        add_reactions=True, embed_links=True,
+                                                        attach_files=True,
+                                                        read_message_history=True, external_emojis=True)
+                    await winner_ticket.set_permissions(winner, send_messages=True, read_messages=True,
+                                                        add_reactions=True, embed_links=True,
+                                                        attach_files=True,
+                                                        read_message_history=True, external_emojis=True)
+                    await winner_ticket.set_permissions(self.bot.new_member_role, send_messages=False,
+                                                        read_messages=False,
+                                                        add_reactions=True, embed_links=True,
+                                                        attach_files=True,
+                                                        read_message_history=True, external_emojis=True)
+                    await winner_ticket.send(f"{winner.mention}")
+
+                    announcement = announcement + f"{winner.mention},"
+
+                await message_channel.send(
+                    f":tada: Congratulations {announcement} you won the giveaway for {prize}\nMake a ticket to claim!\n`There were less eligible winners for this giveaway than the expected number.`")
+                await self.bot.db.execute("UPDATE Giveaways SET status = 'inactive' WHERE message_id = (?)",
+                                            (message_id,))
+                await self.bot.db.commit()
+                return
+
+            else:
+                winner = random.choice(entrants)
                 break
+        name = await utils.name_grabber(winner)
 
-        if has_reaction != True:  # Giveaway message does not have the :tada: reaction
-            await message_channel.send(f"Yikes! The giveaway for {prize} doesn't seem to have the :tada: reaction :(")
-            await self.bot.db.execute("UPDATE Giveaways SET status = 'inactive' WHERE message_id = (?)", (message_id,))
-            await self.bot.db.commit()
-            return
+        # ROLE REQUIREMENTS
+        if len(required_roles) and role_requirement_type != "none":
+            if role_requirement_type == "optional":  # Needs ONE of the required roles
+                if not any(role.id in required_roles for role in winner.roles):
+                    entrants.remove(winner)
+                    continue
 
-        if reroll_number == None:
-            number_winners = int(number_winners)
-        else:
-            number_winners = reroll_number
+            elif role_requirement_type == "required":  # Needs ALL of the required roles
+                for req in required_roles:
+                    if discord.utils.get(self.bot.misc_guild.roles, id=req) not in winner.roles:
+                        for_broken = True
+                if for_broken:
+                    entrants.remove(winner)
+                    continue
 
-        while len(winners) < number_winners:  # Pick a random winner
-            while True:  # Protection from infinite picking of winner
-                if len(entrants) == 0 and len(winners) == 0:  # No eligible winners
-                    await message_channel.send(
-                        f"There were no eligible winners for `{prize}`, the giveaway has been ended - message ID `{message_id}`.")
-                    await self.bot.db.execute("UPDATE Giveaways SET status = 'inactive' WHERE message_id = (?)",
-                                              (message_id,))
-                    await self.bot.db.commit()
-                    return
+        # GEXP REQUIREMENTS
+        required_gexp = int(required_gexp)
+        if required_gexp != 0:  # There is a gexp requirement
+            async with aiohttp.ClientSession() as session:  # Get winner profile info
+                async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
+                    request = await resp.json(content_type=None)
+                    await session.close()
+            if resp.status != 200:
+                entrants.remove(winner)
 
-                elif len(entrants) == 0:  # Less eligible winners that number_winners
-                    announcement = ""
-                    for winner in winners:
-                        category = discord.utils.get(self.bot.guild.categories, name="🎫 Ticket Section")
-                        winner_ticket = await self.bot.guild.create_text_channel(f"giveaway-winner-{winner.nick}",
-                                                                                 category=category)
-                        await winner_ticket.set_permissions(self.botguild.get_role(self.bot.guild.id),
-                                                            send_messages=False,
-                                                            read_messages=False)
-                        await winner_ticket.set_permissions(self.bot.staff, send_messages=True, read_messages=True,
-                                                            add_reactions=True, embed_links=True,
-                                                            attach_files=True,
-                                                            read_message_history=True, external_emojis=True)
-                        await winner_ticket.set_permissions(self.bot.t_officer, send_messages=True,
-                                                            read_messages=True,
-                                                            add_reactions=True, embed_links=True,
-                                                            attach_files=True,
-                                                            read_message_history=True, external_emojis=True)
-                        await winner_ticket.set_permissions(winner, send_messages=True, read_messages=True,
-                                                            add_reactions=True, embed_links=True,
-                                                            attach_files=True,
-                                                            read_message_history=True, external_emojis=True)
-                        await winner_ticket.set_permissions(self.bot.new_member_role, send_messages=False,
-                                                            read_messages=False,
-                                                            add_reactions=True, embed_links=True,
-                                                            attach_files=True,
-                                                            read_message_history=True, external_emojis=True)
-                        await winner_ticket.send(f"{winner.mention}")
-
-                        announcement = announcement + f"{winner.mention},"
-
-                    await message_channel.send(
-                        f":tada: Congratulations {announcement} you won the giveaway for {prize}\nMake a ticket to claim!\n`There were less eligible winners for this giveaway than the expected number.`")
-                    await self.bot.db.execute("UPDATE Giveaways SET status = 'inactive' WHERE message_id = (?)",
-                                              (message_id,))
-                    await self.bot.db.commit()
-                    return
-
-                else:
-                    winner = random.choice(entrants)
-                    break
-            name = await hypixel.name_grabber(winner)
-
-            # ROLE REQUIREMENTS
-            if len(required_roles) and role_requirement_type != "none":
-                if role_requirement_type == "optional":  # Needs ONE of the required roles
-                    if not any(role.id in required_roles for role in winner.roles):
-                        entrants.remove(winner)
-                        continue
-
-                elif role_requirement_type == "required":  # Needs ALL of the required roles
-                    for req in required_roles:
-                        if discord.utils.get(self.bot.misc_guild.roles, id=req) not in winner.roles:
-                            for_broken = True
-                    if for_broken:
-                        entrants.remove(winner)
-                        continue
-
-            # GEXP REQUIREMENTS
-            required_gexp = int(required_gexp)
-            if required_gexp != 0:  # There is a gexp requirement
-                async with aiohttp.ClientSession() as session:  # Get winner profile info
-                    async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-                        request = await resp.json(content_type=None)
+            else:
+                name = request['name']
+                uuid = request['id']
+                api = utils.get_api()
+                async with aiohttp.ClientSession() as session:  # Get winner's weekly GEXP
+                    async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
+                        req = await resp.json(content_type=None)
                         await session.close()
                 if resp.status != 200:
                     entrants.remove(winner)
 
                 else:
-                    name = request['name']
-                    uuid = request['id']
-                    api = hypixel.get_api()
-                    async with aiohttp.ClientSession() as session:  # Get winner's weekly GEXP
-                        async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
-                            req = await resp.json(content_type=None)
-                            await session.close()
-                    if resp.status != 200:
+                    if "guild" not in req or req['guild'] is None:  # Winner is guildless
                         entrants.remove(winner)
 
                     else:
-                        if "guild" not in req or req['guild'] is None:  # Winner is guildless
-                            entrants.remove(winner)
+                        for member in req["guild"]["members"]:
+                            if uuid == member["uuid"]:
+                                if sum(member[
+                                            "expHistory"].values()) >= required_gexp:  # Winner meets the gexp requirement
+                                    entrants.remove(winner)
+                                    winners.append(winner)
+                                    break
 
-                        else:
-                            for member in req["guild"]["members"]:
-                                if uuid == member["uuid"]:
-                                    if sum(member[
-                                               "expHistory"].values()) >= required_gexp:  # Winner meets the gexp requirement
-                                        entrants.remove(winner)
-                                        winners.append(winner)
-                                        break
+                                else:
+                                    entrants.remove(winner)
+                                    break
 
-                                    else:
-                                        entrants.remove(winner)
-                                        break
+        else:  # There is no gexp requirement
+            entrants.remove(winner)
+            winners.append(winner)
 
-            else:  # There is no gexp requirement
-                entrants.remove(winner)
-                winners.append(winner)
+    await self.bot.db.execute("UPDATE Giveaways SET status = 'inactive' WHERE message_id = (?)", (message_id,))
+    await self.bot.db.commit()
 
-        await self.bot.db.execute("UPDATE Giveaways SET status = 'inactive' WHERE message_id = (?)", (message_id,))
-        await self.bot.db.commit()
-
-        announcement = ""
-        for winner in winners:
-            category = discord.utils.get(self.bot.misc_guild.categories, name="🎫 Ticket Section")
-            winner_ticket = await self.bot.misc_guild.create_text_channel(f"giveaway-winner-{winner.nick}",
-                                                                          category=category)
-            await winner_ticket.set_permissions(self.bot.misc_guild.get_role(self.bot.misc_guild.id),
-                                                send_messages=False,
-                                                read_messages=False)
-            await winner_ticket.set_permissions(self.bot.staff, send_messages=True, read_messages=True,
-                                                add_reactions=True, embed_links=True,
-                                                attach_files=True,
-                                                read_message_history=True, external_emojis=True)
-            await winner_ticket.set_permissions(self.bot.t_officer, send_messages=True,
-                                                read_messages=True,
-                                                add_reactions=True, embed_links=True,
-                                                attach_files=True,
-                                                read_message_history=True, external_emojis=True)
-            await winner_ticket.set_permissions(winner, send_messages=True, read_messages=True,
-                                                add_reactions=True, embed_links=True,
-                                                attach_files=True,
-                                                read_message_history=True, external_emojis=True)
-            await winner_ticket.set_permissions(self.bot.new_member_role, send_messages=False,
-                                                read_messages=False,
-                                                add_reactions=True, embed_links=True,
-                                                attach_files=True,
-                                                read_message_history=True, external_emojis=True)
-            await winner_ticket.send(f"{winner.mention}")
-            announcement += f"{winner.mention},"
-        await message_channel.send(
-            f":tada: Congratulations {announcement} you won the giveaway for {prize}!\nMake a ticket to claim!")
+    announcement = ""
+    for winner in winners:
+        category = discord.utils.get(self.bot.misc_guild.categories, name="🎫 Ticket Section")
+        winner_ticket = await self.bot.misc_guild.create_text_channel(f"giveaway-winner-{winner.nick}",
+                                                                        category=category)
+        await winner_ticket.set_permissions(self.bot.misc_guild.get_role(self.bot.misc_guild.id),
+                                            send_messages=False,
+                                            read_messages=False)
+        await winner_ticket.set_permissions(self.bot.staff, send_messages=True, read_messages=True,
+                                            add_reactions=True, embed_links=True,
+                                            attach_files=True,
+                                            read_message_history=True, external_emojis=True)
+        await winner_ticket.set_permissions(self.bot.t_officer, send_messages=True,
+                                            read_messages=True,
+                                            add_reactions=True, embed_links=True,
+                                            attach_files=True,
+                                            read_message_history=True, external_emojis=True)
+        await winner_ticket.set_permissions(winner, send_messages=True, read_messages=True,
+                                            add_reactions=True, embed_links=True,
+                                            attach_files=True,
+                                            read_message_history=True, external_emojis=True)
+        await winner_ticket.set_permissions(self.bot.new_member_role, send_messages=False,
+                                            read_messages=False,
+                                            add_reactions=True, embed_links=True,
+                                            attach_files=True,
+                                            read_message_history=True, external_emojis=True)
+        await winner_ticket.send(f"{winner.mention}")
+        announcement += f"{winner.mention},"
+    await message_channel.send(
+        f":tada: Congratulations {announcement} you won the giveaway for {prize}!\nMake a ticket to claim!")
 
     @tasks.loop(minutes=1)
     async def check_giveaways(self):
@@ -541,8 +541,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
 
             if status == "active" and datetime_end < datetime.utcnow():  # Giveaway needs to be ended
                 await self.roll_giveaway(message_id)
-            elif status == "inactive" and datetime.utcnow() > datetime_end + timedelta(
-                    days=10):  # If giveaway ended more than 10 days ago, delete it
+            elif status == "inactive" and datetime.utcnow() > datetime_end + timedelta(days=10):  # If giveaway ended more than 10 days ago, delete it
                 await self.bot.db.execute("DELETE FROM Giveaways WHERE message_id = (?)", (message_id,))
                 await self.bot.db.commit()
 
