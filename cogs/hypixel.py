@@ -34,23 +34,18 @@ class Hypixel(commands.Cog, name="Hypixel"):
             else:
                 guild_name = await utils.get_guild(name)
                 has_tag_perms = any(role in ctx.author.roles for role in self.bot.tag_allowed_roles)
-
                 await author.edit(nick=ign)
-                if guild_name == "Miscellaneous" or has_tag_perms is True:
 
+                if guild_name == "Miscellaneous" or has_tag_perms is True:
                     if tag != None and has_tag_perms is True:
-                        with open('badwords.txt', 'r') as f:
-                            badwords = f.read()
-                        if tag.isascii() is False:
-                            await ctx.send(
-                                "The tag may not include special characters unless it's the tag of an ally guild. Re-run the command if you wish to add a tag!")
-                        elif len(tag) > 6:
-                            await ctx.send(
-                                "The tag may not be longer than 6 characters. Re-run the command if you wish to add a tag!")
-                        elif tag.lower() in badwords.split('\n'):
-                            await ctx.send(
-                                "The tag may not include profanity. Re-run the command if you wish to add a tag!")
-                        else:  # Set user's tag
+                        tag_check = await utils.check_tag(tag)
+                        if tag_check == "invalid":
+                            await ctx.send("The tag may not include special characters unless it's the tag of an ally guild.")
+                        elif tag_check == "length":
+                            await ctx.send("The tag may not be longer than 6 characters.")
+                        elif tag_check == "profane":
+                            await ctx.send("The tag may not include profanity.")
+                        else:
                             new_nick = ign + f' [{tag}]'
                             await author.edit(nick=new_nick)
                     elif tag == None:
@@ -126,29 +121,19 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 if guild_name == "Miscellaneous" or has_tag_perms is True:
                     if has_tag_perms is True:
                         while True:
-                            embed = discord.Embed(title="What would you like your tag to be? ",
-                                                  url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png",
-                                                  description="**Rules:**"
-                                                              "\n• Tags can have a maximum length of 6 characters."
-                                                              " \n• Tags cannot include special characters."
-                                                              " \n• Tags cannot include profane language. ",
-                                                  color=0x8368ff)
-                            embed.set_thumbnail(
-                                url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png")
-                            embed.set_footer(text="If you don't want a tag, type: None")
+                            embed = await utils.get_tag_message()
                             await ctx.send(embed=embed)
                             tag = await self.bot.wait_for('message',
-                                                          check=lambda
-                                                              x: x.channel == ctx.channel and x.author == author)
+                                                            check=lambda
+                                                                x: x.channel == ctx.channel and x.author == author)
                             tag = tag.content
-                            with open('badwords.txt', 'r') as f:
-                                badwords = f.read()
-                            if tag.isascii() is False:
-                                await ctx.send(
-                                    "The tag may not include special characters unless it's the tag of an ally guild.")
-                            elif len(tag) > 6:
+                            tag_check = await utils.check_tag(tag)
+
+                            if tag_check == "invalid":
+                                await ctx.send("The tag may not include special characters unless it's the tag of an ally guild.")
+                            elif tag_check == "length":
                                 await ctx.send("The tag may not be longer than 6 characters.")
-                            elif tag.lower() in badwords.split('\n'):
+                            elif tag_check == "profane":
                                 await ctx.send("The tag may not include profanity.")
                             else:
                                 new_nick = ign + f' [{tag}]'
