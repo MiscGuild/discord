@@ -236,12 +236,6 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             if rank == 'ADMIN':
                                 print('Rank acquired- Admin')
                                 rank = '[ADMIN]'
-                            if rank == 'MODERATOR':
-                                print('Rank acquired- Moderator')
-                                rank = '[MOD]'
-                            if rank == 'HELPER':
-                                print('Rank acquired- Helper')
-                                rank = '[HELPER]'
                         else:
                             rank = (req["player"]["newPackageRank"])
                             if rank == 'MVP_PLUS':
@@ -1239,7 +1233,6 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             data = await resp.json()
                             await session.close()
 
-                    print(name)
                     if data["player"] is None:
                         return None
                     if "prefix" in data["player"]:
@@ -1262,12 +1255,6 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             if rank == 'ADMIN':  # Admin
                                 print('Rank acquired- Admin')
                                 playerrank = '&c[ADMIN]'
-                            if rank == 'MODERATOR':  # Moderator
-                                print('Rank acquired- Moderator')
-                                playerrank = '&2[MOD]'
-                            if rank == 'HELPER':  # Helper
-                                print('Rank acquired- Helper')
-                                playerrank = '&9[HELPER]'
 
 
 

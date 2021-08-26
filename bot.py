@@ -113,7 +113,12 @@ async def on_command_error(ctx, error):
     else:
         # All other errors get sent to the error channel
         tb = ''.join(traceback.format_exception(type(error), error, error.__traceback__))
-        await bot.error_channel.send(f"Ignoring exception in command {ctx.command}:\n```py\n{tb}\n```")
+        if len(tb) <= 2000:
+            await bot.error_channel.send(f"Ignoring exception in command {ctx.command}:\n```py\n{tb}\n```")
+        else:
+            await bot.error_channel.send(f"```An error occurred in command '{ctx.command}' that could not be sent in this channel, check the console for the traceback. \n\n'{error}'```")
+            print("The below exception could not be sent to the error channel.")
+            print(tb)
 
 
 @bot.event
