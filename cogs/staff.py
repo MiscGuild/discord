@@ -440,9 +440,8 @@ class staff(commands.Cog, name="Staff"):
                             for guild in self.bot.misc_allies:
                                 if guild == guild_name:
                                     gtag = await utils.get_gtag(guild_name)
-                                    if member.nick is None or str(gtag) not in member.nick:
-                                        username = ign + " " + str(gtag)
-                                        await member.edit(nick=username)
+                                    username = ign + " " + str(gtag)
+                                    await member.edit(nick=username)
                                     await member.add_roles(self.bot.guest, self.bot.ally, reason="Rolecheck")
                                     await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
                                                               self.bot.active_role, self.bot.inactive_role,
