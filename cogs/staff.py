@@ -326,24 +326,25 @@ class staff(commands.Cog, name="Staff"):
                     if member.id not in self.bot.adminids and member.bot is False:
                         name = await utils.name_grabber(member)
                         has_tag_perms = any(role in ctx.author.roles for role in self.bot.tag_allowed_roles)
-
-                        if len(misc_member_description) >= 3500:
-                            embed = discord.Embed(title="Miscellaneous Members", description=misc_member_description, color=0x8368ff)
-                            await ctx.send(embed=embed)
-                            misc_member_description = ""
-                        if len(ally_member_description) >= 3500:
-                            embed = discord.Embed(title="Ally Members", description=ally_member_description, color=0x8368ff)
-                            await ctx.send(embed=embed)
-                            ally_member_description = ""
-                        if len(new_member_description) >= 3500:
-                            embed = discord.Embed(title="New Member (Role)", description=new_member_description, color=0x8368ff)
-                            await ctx.send(embed=embed)
-                            new_member_description = ""
-                        if len(guest_description) >= 3500:
-                            embed = discord.Embed(title="Guest (Role)", description=guest_description, color=0x8368ff)
-                            await ctx.send(embed=embed)
-                            guest_description = ""
-
+                        try:
+                            if len(misc_member_description) >= 2048:
+                                embed = discord.Embed(title="Miscellaneous Members", description=misc_member_description, color=0x8368ff)
+                                await ctx.send(embed=embed)
+                                misc_member_description = ""
+                            if len(ally_member_description) >= 2048:
+                                embed = discord.Embed(title="Ally Members", description=ally_member_description, color=0x8368ff)
+                                await ctx.send(embed=embed)
+                                ally_member_description = ""
+                            if len(new_member_description) >= 2048:
+                                embed = discord.Embed(title="New Member (Role)", description=new_member_description, color=0x8368ff)
+                                await ctx.send(embed=embed)
+                                new_member_description = ""
+                            if len(guest_description) >= 2048:
+                                embed = discord.Embed(title="Guest (Role)", description=guest_description, color=0x8368ff)
+                                await ctx.send(embed=embed)
+                                guest_description = ""
+                        except:
+                            await ctx.send("Embed sending error")
 
                         await msg.edit(content=f"**Checking** {name}")
                         async with aiohttp.ClientSession() as session:
@@ -455,19 +456,22 @@ class staff(commands.Cog, name="Staff"):
                                                       reason="Rolecheck")
 
                             guest_description = str(guest_description) + f"{name} ||{member}|| **++Guest | --Member | --Active** \n"
-                if misc_member_description != "":
-                    embed = discord.Embed(title="Miscellaneous Members", description=misc_member_description,
-                                          color=0x8368ff)
-                    await ctx.send(embed=embed)
-                if ally_member_description != "":
-                    embed = discord.Embed(title="Ally Members", description=ally_member_description, color=0x8368ff)
-                    await ctx.send(embed=embed)
-                if new_member_description != "":
-                    embed = discord.Embed(title="New Member (Role)", description=new_member_description, color=0x8368ff)
-                    await ctx.send(embed=embed)
-                if guest_description != "":
-                    embed = discord.Embed(title="Guest (Role)", description=guest_description, color=0x8368ff)
-                    await ctx.send(embed=embed)
+                try:    
+                    if misc_member_description != "":
+                        embed = discord.Embed(title="Miscellaneous Members", description=misc_member_description,
+                                              color=0x8368ff)
+                        await ctx.send(embed=embed)
+                    if ally_member_description != "":
+                        embed = discord.Embed(title="Ally Members", description=ally_member_description, color=0x8368ff)
+                        await ctx.send(embed=embed)
+                    if new_member_description != "":
+                        embed = discord.Embed(title="New Member (Role)", description=new_member_description, color=0x8368ff)
+                        await ctx.send(embed=embed)
+                    if guest_description != "":
+                        embed = discord.Embed(title="Guest (Role)", description=guest_description, color=0x8368ff)
+                        await ctx.send(embed=embed)
+                except:
+                    await ctx.send("embed sending erorr")
                 await ctx.send('**Rolecheck completed**')
         if send_ping is None:
             inactivity_channel = self.bot.get_channel(848067712156434462)
