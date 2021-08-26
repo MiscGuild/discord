@@ -383,12 +383,16 @@ def discord_verification(name, member: discord.Member):
 async def check_tag(tag):
     with open('badwords.txt', 'r') as f:
         badwords = f.read()
+    if tag.isalpha() is True:
+        if tag.lower() in badwords.split('\n'):
+            return "profane"
+    else: 
+         if tag in badwords.split('\n'):
+            return "profane"
     if tag.isascii() is False:
         return "invalid"
-    elif len(tag) > 6:
+    if len(tag) > 6:
         return "length"
-    elif tag.lower() in badwords.split('\n'):
-        return "profane"
     else:
         return True
 
