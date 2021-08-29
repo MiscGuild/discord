@@ -328,8 +328,10 @@ class Tickets(commands.Cog, name="Tickets"):
                                     totalexp = int(sum(totalexp.values()))
                                     if totalexp >= self.bot.dnkl:
                                         eligiblity = True
+                                        footer_text = f"{name} meets the DNKL Requirements!"
                                     else:
                                         eligiblity = False
+                                        footer_text = f"{name} doesn't meet the DNKL Requirements!"
                                     totalexp = (format(totalexp, ',d'))
                                     if eligiblity is False:
                                         embed = discord.Embed(title=f"{name} wishes to apply for the do-not-kick-list!",
@@ -396,14 +398,34 @@ class Tickets(commands.Cog, name="Tickets"):
                                         end = newdate
                                         await channel.send(
                                             "You entered the end date incorrectly. This was automatically corrected.")
-                                    await channel.send(
-                                        f"Alright! Kindly await staff assistance!"
-                                        f"\n**Start:** {start}"
-                                        f"\n**End:** {end}"
-                                        f"\n**Reason:** {reason}"
-                                        f"\n*If you made an error, kindly notify staff by typing after this message*"
-                                        f"\n\n||,dnkladd {name} {author.mention} {start} {end} {reason}||"
-                                    )
+
+                                    a, b, c = start.split('/')
+                                    p, q, r = end.split('/')
+                                    ign, uuid = await utils.get_dispnameID(name)
+                                    rank = await utils.get_rank(name)
+                                    dates = {1: "January", 2: "February", 3: "March", 4: "April",
+                                             5: "May",
+                                             6: "June", 7: "July", 8: "August", 9: "September",
+                                             10: "October", 11: "November", 12: "December"}
+                                    start_month = dates.get(int(b))
+                                    end_month = dates.get(int(q))
+
+                                    dnkl_staff_embed = discord.Embed(title=f"{rank} {ign}",
+                                                          url=f'https://plancke.io/hypixel/player/stats/{ign}',
+                                                          color=0x0ffff)
+                                    dnkl_staff_embed.set_thumbnail(
+                                        url=f'https://crafatar.com/renders/body/{uuid}')
+                                    dnkl_staff_embed.add_field(name="IGN:", value=f"{ign}", inline=False)
+                                    dnkl_staff_embed.add_field(name="Start:", value=f"{a} {start_month} {c}",
+                                                    inline=False)
+                                    dnkl_staff_embed.add_field(name="End:", value=f"{p} {end_month} {r}",
+                                                    inline=False)
+                                    dnkl_staff_embed.add_field(name="Reason", value=f"{reason}", inline=False)
+                                    dnkl_staff_embed.set_author(name="Do not kick list")
+                                    dnkl_embed = dnkl_staff_embed
+                                    dnkl_staff_embed.set_footer(text=footer_text)
+                                    await self.bot.dnkl_channel.send(embed=dnkl_staff_embed)
+
 
                                     dnkl_decision = discord.Embed(
                                         title="Staff, what do you wish to do with this dnkl request?",
@@ -411,7 +433,8 @@ class Tickets(commands.Cog, name="Tickets"):
                                                     f"\nClick `Deny` to deny the do-not-kick-list request"
                                                     f"\nClick `Error` if the user made an error while applying for the do not kick list",
                                         color=0x8368ff)
-
+                                    dnkl_decision.set_footer(text="This embed is for the Miscellaneous staff team!\n"
+                                                                  "Please wait for the Miscellaneous staff team to respond!")
                                     approve = Button(style=ButtonStyle.blue, label="Approve", id="approve")
                                     deny = Button(style=ButtonStyle.red, label="Deny", id="deny")
                                     error = Button(style=ButtonStyle.grey, label="Error", id="error")
@@ -425,30 +448,8 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                         x.author.id).roles))
 
                                     if click.component.id == "approve":
-                                        a, b, c = start.split('/')
-                                        p, q, r = end.split('/')
-                                        ign, uuid = await utils.get_dispnameID(name)
-                                        rank = await utils.get_rank(name)
-                                        dates = {1: "January", 2: "February", 3: "March", 4: "April",
-                                                 5: "May",
-                                                 6: "June", 7: "July", 8: "August", 9: "September",
-                                                 10: "October", 11: "November", 12: "December"}
-                                        start_month = dates.get(int(b))
-                                        end_month = dates.get(int(q))
 
-                                        embed = discord.Embed(title=f"{rank} {ign}",
-                                                              url=f'https://plancke.io/hypixel/player/stats/{ign}',
-                                                              color=0x0ffff)
-                                        embed.set_thumbnail(
-                                            url=f'https://crafatar.com/renders/body/{uuid}')
-                                        embed.add_field(name="IGN:", value=f"{ign}", inline=False)
-                                        embed.add_field(name="Start:", value=f"{a} {start_month} {c}",
-                                                        inline=False)
-                                        embed.add_field(name="End:", value=f"{p} {end_month} {r}",
-                                                        inline=False)
-                                        embed.add_field(name="Reason", value=f"{reason}", inline=False)
-                                        embed.set_author(name="Do not kick list")
-                                        message = await self.bot.dnkl_channel.send(embed=embed)
+                                        message = await self.bot.dnkl_channel.send(embed=dnkl_embed)
 
                                         cursor = await self.bot.db.execute("SELECT message_id FROM DNKL WHERE username = (?)", (ign,))
                                         row = await cursor.fetchone()
@@ -512,7 +513,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                     await channel.send(embed=embed)
                                                     end_date = await self.bot.wait_for('message',
                                                                                        check=lambda
-                                                                                           x: x.channel == channel.channel)
+                                                                                           x: x.channel == channel)
                                                     end_date = end_date.content
                                                     a, b, c = start_date.split('/')
                                                     p, q, r = end_date.split('/')
@@ -522,7 +523,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                         color=0x8368ff)
                                                     reason = await self.bot.wait_for('message',
                                                                                      check=lambda
-                                                                                         x: x.channel == channel.channel)
+                                                                                         x: x.channel == channel)
                                                     reason = reason.content
 
                                                     if int(b) > 12:
@@ -562,7 +563,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                         embed.add_field(name="Reason", value=f"{reason}",
                                                                         inline=False)
                                                         embed.set_author(name="Do not kick list")
-                                                        await channel.channel.purge(limit=1)
+                                                        await channel.purge(limit=1)
 
                                                         message = await self.bot.dnkl_channel.send(embed=embed)
                                                         
@@ -600,7 +601,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                     check=lambda x: (
                                                                             x.author == author and x.channel == channel) or (
                                                                             self.bot.staff in (
-                                                                        self.bot.get_member(
+                                                                        self.bot.misc_guild.get_member(
                                                                             x.author.id).roles) and x.channel == channel))
 
                     if click.component.id == "yes":
@@ -723,7 +724,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                     await channel.send(embed=embed)
 
                         elif guild_name != "Miscellaneous" and guild_name not in self.bot.misc_allies:
-                            if str(channel.channel.category.name) == "RTickets":
+                            if str(channel.category.name) == "RTickets":
                                 await channel.send(
                                     "You aren't in Miscellaneous in-game. Kindly await staff assistance!")
                             else:

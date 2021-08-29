@@ -187,7 +187,7 @@ async def get_dispnameID(name):
         async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
             request = await resp.json(content_type=None)
             await session.close()
-    if 'error' not in request:
+    if 'error' not in request and request is not None:
         ign = request["name"]
         id = request["id"]
         return ign, id
