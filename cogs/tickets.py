@@ -659,7 +659,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         embed = discord.Embed(title="Please enter a valid minecraft username!",
                                               description="The ticket process will be restarted so you can rectify your mistake!",
                                               color=0xDE3163)
-                        await channel.channel.send(embed=embed)
+                        await channel.send(embed=embed)
                     elif ign in self.bot.staff_names and self.bot.staff not in author.roles:
                         embed = discord.Embed(title="Staff impersonation is a punishable offense!",
                                               description="The ticket process will be restarted!",
