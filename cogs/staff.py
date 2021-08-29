@@ -237,12 +237,12 @@ class staff(commands.Cog, name="Staff"):
             w = 0
             if len(VeteransortedList) <= 25:
                 for user in VeteransortedList:
-                    embed.add_field(name=f"{user[0]}", value=f"```\n{format(user[1], ',d')}```", inline=True)
+                    embed.add_field(name=f"{user[0]}", value=f"```cs\n{format(user[1], ',d')}```", inline=True)
                 await ctx.send(embed=embed)
             else:
                 for user in VeteransortedList:
                     w = w + 1
-                    embed.add_field(name=f"{user[0]}", value=f"```\n{format(user[1], ',d')}```", inline=True)
+                    embed.add_field(name=f"{user[0]}", value=f"```cs\n{format(user[1], ',d')}```", inline=True)
 
                     if len(embed.fields) >= 25:
                         await ctx.send(embed=embed)

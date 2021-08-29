@@ -340,7 +340,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                               color=0xDE3163)
                                         embed.set_thumbnail(
                                             url=f'https://visage.surgeplay.com/full/832/{uuid}')
-                                        embed.set_author(name="Do-not-kick-list: Eligibility Check")
+                                        embed.set_author(name="Do-not-kick-list: Ineligible")
                                         embed.set_footer(text="Even though you do not meet the requirements,"
                                                               " you might still be accepted so we shall proceed with the application process!")
                                         embed.add_field(name="You are not eligible to apply for the do not kick list.",
@@ -355,7 +355,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                               color=0x333cff)
                                         embed.set_thumbnail(
                                             url=f'https://visage.surgeplay.com/full/832/{uuid}')
-                                        embed.set_author(name='Do-not-kick-list: Eligibility Check')
+                                        embed.set_author(name='Do-not-kick-list: Eligible')
                                         embed.add_field(name="You are eligible to apply for the do not kick list.",
                                                         value=f"You meet the minimum of {format(self.bot.dnkl, ',d')} weekly guild experience."
                                                               f"\n You have {totalexp} weekly guild experience.",
@@ -469,7 +469,12 @@ class Tickets(commands.Cog, name="Tickets"):
                                         await click.respond(embed=success_embed)
                                         break
                                     elif click.component.id == "deny":
+                                        if eligiblity is False:
+                                            description = "Your DNKL request was denied because of your inability to meet the guild requirements!"
+                                        else:
+                                            description = None
                                         embed = discord.Embed(title="This do not kick list request has been denied",
+                                                              description=description,
                                                               color=0xDE3163)
                                         await channel.send(embed=embed)
                                         success_embed = discord.Embed(title="Success", color=0x00A86B)
