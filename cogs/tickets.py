@@ -286,7 +286,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                 await channel.purge(limit=10)
                                 embed = discord.Embed(title = "Entry Denied!",
                                                         description = "Your entry to the server has been denied!",
-                                                        color = 0xFF0000)
+                                                        color = 0xDE3163)
                                 await channel.send(embed=embed)
                                 success_embed = discord.Embed(title="Success",
                                                               description="Please specify why you denied entry to this member!",
