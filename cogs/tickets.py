@@ -281,10 +281,12 @@ class Tickets(commands.Cog, name="Tickets"):
                                     await channel.send(embed=embed)
                                     break
                                 break
-                            if click.component.id == "deny":
-                                
-
-
+                            elif click.component.id == "deny":
+                                success_embed = discord.Embed(title="Success",
+                                                              description="Please specify why you denied entry to this member!",
+                                                              color=0x00A86B)
+                                await click.respond(embed=success_embed)
+                                break
                         break
                     elif reply == "Other":
                         embed = discord.Embed(title=f"Other - {name}",
