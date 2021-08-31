@@ -213,10 +213,78 @@ class Tickets(commands.Cog, name="Tickets"):
                     elif reply == "Exploring":
                         await channel.edit(name=f"Guest-{name}")
                         embed = discord.Embed(title=f"{name} wishes to join the Miscellaneous Discord as a Guest",
-                                              description="Kindly await staff assistance!",
+                                              description="Kindly await staff assistance!\n\n"
+                                                          "Staff, if you wish to let him in, hit approve, else, hit deny.",
                                               color=0x8368ff)
+                        approve = Button(style=ButtonStyle.blue, label="Approve", id="approve")
+                        deny = Button(style=ButtonStyle.blue, label="Deny", id="deny")
+
                         await channel.purge(limit=10)
-                        await channel.send(embed=embed)
+                        await channel.send(embed=embed, components=[[approve, deny]])
+                        while True:
+                            click = await self.bot.wait_for("button_click", check=lambda x: x.channel == channel and self.bot.staff in x.author.roles)
+                            if click.component.id == "approve":
+                                await author.add_roles(self.bot.guest, reason="Registration")
+                                await author.remove_roles(self.bot.awaiting_app, self.bot.new_member_role,
+                                                          reason="Registration")
+                                success_embed = discord.Embed(title="Success", color=0x00A86B)
+                                await click.respond(embed=success_embed)
+
+                                embed = discord.Embed(title=f"{author}, welcome to the Miscellaneous discord!",
+                                                      description="If you have any queries, you ask ask them in this ticket!\n"
+                                                                  "If you don't and wish to close this ticket, click `Close Ticket`",
+                                                      color=0x8368ff)
+
+                                yes = Button(style=ButtonStyle.blue, label="Close Ticket", id="yes")
+                                no = Button(style=ButtonStyle.red, label="Don't Close", id="no")
+
+                                await channel.send(embed=embed, components=[[yes, no]])
+
+                                click = await self.bot.wait_for("button_click",
+                                                                check=lambda x: (
+                                                                                        x.author == author and x.channel == channel) or (
+                                                                                        self.bot.staff in (
+                                                                                    self.bot.misc_guild.get_member(
+                                                                                        x.author.id).roles) and x.channel == channel))
+
+                                if click.component.id == "yes":
+                                    success_embed = discord.Embed(title="Success", color=0x00A86B)
+                                    await click.respond(embed=success_embed)
+                                    transcript = await chat_exporter.export(channel)
+                                    if transcript is None:
+                                        pass
+                                    else:
+                                        transcript_file = discord.File(io.BytesIO(transcript.encode()),
+                                                                       filename=f"deleted-{channel.name}.html")
+
+                                    if channel.category.name in self.bot.ticket_categories:
+                                        name = channel.name
+                                        embed = discord.Embed(title='This registration ticket will be deleted in 10 seconds!',
+                                                              description='',
+                                                              color=0xDE3163)
+                                        msg = await channel.send(embed=embed)
+                                        await asyncio.sleep(10)
+                                        await discord.TextChannel.delete(channel)
+
+                                        name = await utils.name_grabber(author)
+                                        embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
+                                                              description="They deleted their own ticket.",
+                                                              color=0x8368ff)
+                                        await self.bot.logs.send(embed=embed)
+                                        '''await self.bot.logs.send(file=discord.File(transcript_file))'''
+                                        break
+                                elif click.component.id == "no":
+                                    success_embed = discord.Embed(title="Success", color=0x00A86B)
+                                    await click.respond(embed=success_embed)
+                                    embed = discord.Embed(title="The ticket will not be closed. ",
+                                                          description="Kindly await staff assistance!", color=0xde3163)
+                                    await channel.send(embed=embed)
+                                    break
+                                break
+                            if click.component.id == "deny":
+                                
+
+
                         break
                     elif reply == "Other":
                         embed = discord.Embed(title=f"Other - {name}",
@@ -424,7 +492,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                     dnkl_staff_embed.set_author(name="Do not kick list")
                                     dnkl_embed = dnkl_staff_embed
                                     dnkl_staff_embed.set_footer(text=footer_text)
-                                    await self.bot.dnkl_channel.send(embed=dnkl_staff_embed)
+                                    await channel.send(embed=dnkl_staff_embed)
 
 
                                     dnkl_decision = discord.Embed(
