@@ -214,10 +214,10 @@ class Tickets(commands.Cog, name="Tickets"):
                         await channel.edit(name=f"Guest-{name}")
                         embed = discord.Embed(title=f"{name} wishes to join the Miscellaneous Discord as a Guest",
                                               description="Kindly await staff assistance!\n\n"
-                                                          "Staff, if you wish to let him in, hit approve, else, hit deny.",
+                                                          "Staff, if you wish to let them in, hit approve, else, hit deny.",
                                               color=0x8368ff)
                         approve = Button(style=ButtonStyle.blue, label="Approve", id="approve")
-                        deny = Button(style=ButtonStyle.blue, label="Deny", id="deny")
+                        deny = Button(style=ButtonStyle.red, label="Deny", id="deny")
 
                         await channel.purge(limit=10)
                         await channel.send(embed=embed, components=[[approve, deny]])
@@ -237,6 +237,7 @@ class Tickets(commands.Cog, name="Tickets"):
 
                                 yes = Button(style=ButtonStyle.blue, label="Close Ticket", id="yes")
                                 no = Button(style=ButtonStyle.red, label="Don't Close", id="no")
+                                await channel.purge(limit=10)
 
                                 await channel.send(embed=embed, components=[[yes, no]])
 
@@ -282,6 +283,11 @@ class Tickets(commands.Cog, name="Tickets"):
                                     break
                                 break
                             elif click.component.id == "deny":
+                                await channel.purge(limit=10)
+                                embed = discord.Embed(title = "Entry Denied!",
+                                                        description = "Your entry to the server has been denied!",
+                                                        color = 0xFF0000)
+                                await channel.send(embed=embed)
                                 success_embed = discord.Embed(title="Success",
                                                               description="Please specify why you denied entry to this member!",
                                                               color=0x00A86B)
