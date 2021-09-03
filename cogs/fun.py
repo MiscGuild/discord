@@ -122,7 +122,7 @@ class Fun(commands.Cog, name="Fun"):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def pat(self, ctx, user: discord.User = None):
+    async def pat(self, ctx, user: discord.Member = None):
         """Pat the specified user!
         """
         author = await utils.name_grabber(ctx.author)
@@ -139,7 +139,7 @@ class Fun(commands.Cog, name="Fun"):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def hug(self, ctx, user: discord.User = None):
+    async def hug(self, ctx, user: discord.Member = None):
         """hug the specified user!
         """
         author = await utils.name_grabber(ctx.author)

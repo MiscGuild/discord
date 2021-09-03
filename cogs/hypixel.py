@@ -310,7 +310,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 embed = discord.Embed(title=f"{rank} {ign} {gtag}",
                                       url=f'https://plancke.io/hypixel/player/stats/{name}',
                                       color=0x8368ff)
-                embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
+                embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
                 embed.add_field(name="Network Level:", value=f"`{level}`", inline=True)
                 embed.add_field(name="Karma:", value=f"`{karma}`", inline=True)
                 embed.add_field(name="Achievement Points:", value=f"`{ap}`", inline=False)
@@ -841,12 +841,13 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 if "guild" not in req or req['guild'] is None:
                     embed = discord.Embed(title=f"{name}", url=f'https://plancke.io/hypixel/player/stats/{name}',
                                           color=0xf04747)
-                    embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
+                    embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
                     embed.add_field(name="Guildless!",
                                     value="You must be in a guild for the command to work!")
                     await ctx.send(embed=embed)
                 else:
                     gname = req['guild']['name']
+                    gtag = req['guild']['tag']
                     for member in req['guild']["members"]:
                         if uuid == member["uuid"]:
                             joined = member['joined']
@@ -906,7 +907,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             for x in results:
                                 if z < 7:
                                     date = dictionary.get(z, "None")
-                                    gexphistory = gexphistory + f"➤ {date} **{format(weeklyexp[z], ',d')}**\n"
+                                    gexphistory = gexphistory + f"**▸** {date} **{format(weeklyexp[z], ',d')}**\n"
                                     z = z + 1
 
                                 else:
@@ -919,14 +920,21 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                 embed = discord.Embed(title=f"{name}",
                                                       url=f'https://plancke.io/hypixel/player/stats/{name}',
                                                       color=colour)
-                                embed.set_author(name=gname, url=f'https://plancke.io/hypixel/guild/player/{name}')
-                                embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
-                                embed.add_field(name="Rank:", value=rank, inline=True)
+                                embed.set_author(name=f"{gname} [{gtag}]", url=f'https://plancke.io/hypixel/guild/player/{name}')
+                                embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
+                                '''embed.add_field(name="Rank:", value=rank, inline=True)
                                 embed.add_field(name="Joined:", value=dt, inline=True)
                                 embed.add_field(name="Quests Completed:", value=cq, inline=True)
                                 embed.add_field(name="Overall Exp:", value=f"`{totalexp}`", inline=False)
                                 embed.add_field(name="GEXP History", value=gexphistory, inline=False)
-
+'''
+                                embed.add_field(name="General Information:",
+                                                value=f"`✚` **Rank**: `{rank}`\n"
+                                                      f"`✚` **Joined**: `{dt}`\n"
+                                                      f"`✚` **Quests Completed**: `{cq}`\n",inline=False)
+                                embed.add_field(name="Guild Experience",
+                                                value=f"**Overall Guild Experience**: `{totalexp}`\n\n"
+                                                      f"{gexphistory}")
                                 weeklyexp.reverse()
                                 dates.reverse()
                                 chart = QuickChart()
@@ -994,18 +1002,18 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         totalexp = (format(totalexp, ',d'))
                         if eligiblity is False:
                             embed = discord.Embed(title=name,
-                                                  url=f'https://visage.surgeplay.com/full/832/{uuid}',
+                                                  url=f'https://plancke.io/hypixel/guild/player/{name}',
                                                   color=0xff3333)
-                            embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
+                            embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
                             embed.set_author(name="Do-not-kick-list: Eligibility Check")
                             embed.add_field(name="You are not eligible to apply for the do not kick list.",
                                             value=f"You need a minimum of {format(self.bot.dnkl, ',d')} weekly guild experience.\n You have {totalexp} weekly guild experience.",
                                             inline=True)
                         else:
                             embed = discord.Embed(title=name,
-                                                  url=f'https://visage.surgeplay.com/full/832/{uuid}',
+                                                  url=f'https://plancke.io/hypixel/guild/player/{name}',
                                                   color=0x333cff)
-                            embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
+                            embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
                             embed.set_author(name='Do-not-kick-list: Eligibility Check')
                             embed.add_field(name="You are eligible to apply for the do not kick list.",
                                             value=f"You meet the minimum of {format(self.bot.dnkl, ',d')} weekly guild experience.\n You have {totalexp} weekly guild experience.",

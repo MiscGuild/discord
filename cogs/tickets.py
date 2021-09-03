@@ -412,10 +412,10 @@ class Tickets(commands.Cog, name="Tickets"):
                                     if eligiblity is False:
                                         embed = discord.Embed(title=f"{name} wishes to apply for the do-not-kick-list!",
                                                               description="They **DO NOT MEET** the requirements!",
-                                                              url=f'https://visage.surgeplay.com/full/832/{uuid}',
+                                                              url=f'https://minotar.net/helm/{uuid}/512.png',
                                                               color=0xDE3163)
                                         embed.set_thumbnail(
-                                            url=f'https://visage.surgeplay.com/full/832/{uuid}')
+                                            url=f'https://minotar.net/helm/{uuid}/512.png')
                                         embed.set_author(name="Do-not-kick-list: Ineligible")
                                         embed.set_footer(text="Even though you do not meet the requirements,"
                                                               " you might still be accepted so we shall proceed with the application process!")
@@ -427,10 +427,10 @@ class Tickets(commands.Cog, name="Tickets"):
                                     if eligiblity is True:
                                         embed = discord.Embed(title=f"{name} wishes to apply for the do-not-kick-list!",
                                                               description="They **MEET** the requirements!",
-                                                              url=f'https://visage.surgeplay.com/full/832/{uuid}',
+                                                              url=f'https://minotar.net/helm/{uuid}/512.png',
                                                               color=0x333cff)
                                         embed.set_thumbnail(
-                                            url=f'https://visage.surgeplay.com/full/832/{uuid}')
+                                            url=f'https://minotar.net/helm/{uuid}/512.png')
                                         embed.set_author(name='Do-not-kick-list: Eligible')
                                         embed.add_field(name="You are eligible to apply for the do not kick list.",
                                                         value=f"You meet the minimum of {format(self.bot.dnkl, ',d')} weekly guild experience."
@@ -1162,7 +1162,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                            "\nI'm working on compiling the application and I'll send it once I'm done compiling!")
 
                         embed = discord.Embed(title=f"{name}'s Staff Application", color=0x4b89e4)
-                        embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
+                        embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
                         embed.add_field(name="1) What is your age?", value=age, inline=False)
                         embed.add_field(name="2) How long have you been in the guild for?", value=veterency,
                                         inline=False)
@@ -1501,7 +1501,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             embed.add_field(name=ign,
                                             value="Member of Miscellaneous")
 
-                            embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
+                            embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
                             await ctx.send(embed=embed)
                             await ctx.author.add_roles(self.bot.member_role, reason="Register")
 
@@ -1517,7 +1517,7 @@ class Tickets(commands.Cog, name="Tickets"):
 
                                     await ctx.channel.purge(limit=1)
                                     embed = discord.Embed(title="Registration successful!")
-                                    embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
+                                    embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
                                     embed.add_field(name=ign, value=f"Member of {guild}")
                                     await ctx.send(embed=embed)
 
@@ -1529,7 +1529,7 @@ class Tickets(commands.Cog, name="Tickets"):
 
                             await ctx.channel.purge(limit=1)
                             embed = discord.Embed(title="Registration successful!")
-                            embed.set_thumbnail(url=f'https://visage.surgeplay.com/full/832/{uuid}')
+                            embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
                             embed.add_field(name=ign, value="New Member")
                             await ctx.send(embed=embed)
 
