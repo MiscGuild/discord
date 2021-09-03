@@ -766,7 +766,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             time = "5 Seconds"
         elif reqrank == "Admin":
             time = "5 Seconds"
-        elif reqrank == "Officer":
+        elif reqrank == "Moderator":
             time = "5 Seconds"
         else:
             time = "10 Seconds"

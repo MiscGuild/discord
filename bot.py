@@ -164,7 +164,7 @@ async def after_cache_ready():
     bot.guild_master = discord.utils.get(bot.misc_guild.roles, name="Guild Master")
     bot.admin = discord.utils.get(bot.misc_guild.roles, name="Admin")
     bot.staff = discord.utils.get(bot.misc_guild.roles, name="Staff")
-    bot.t_officer = discord.utils.get(bot.misc_guild.roles, name="Trial Officer")
+    bot.helper = discord.utils.get(bot.misc_guild.roles, name="Helper")
     bot.former_staff = discord.utils.get(bot.misc_guild.roles, name="Former Staff")
     bot.new_member_role = discord.utils.get(bot.misc_guild.roles, name="New Member")
     bot.guest = discord.utils.get(bot.misc_guild.roles, name="Guest")

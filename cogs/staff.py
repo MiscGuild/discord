@@ -486,9 +486,9 @@ class staff(commands.Cog, name="Staff"):
     async def forcesync(self, ctx, member: discord.Member, name):
         """Used to forcefully sync a player's IGN
         """
-        officer = discord.utils.get(ctx.guild.roles, name="Officer")
+        moderator = discord.utils.get(ctx.guild.roles, name="Moderator")
         admin = discord.utils.get(ctx.guild.roles, name="Admin")
-        if officer or admin in ctx.author.roles:
+        if moderator or admin in ctx.author.roles:
             ign, uuid = await utils.get_dispnameID(name)
             if ign is None:
                 await ctx.send('Please enter a valid ign!')

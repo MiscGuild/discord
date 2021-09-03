@@ -408,7 +408,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                                                             add_reactions=True, embed_links=True,
                                                             attach_files=True,
                                                             read_message_history=True, external_emojis=True)
-                        await winner_ticket.set_permissions(self.bot.t_officer, send_messages=True,
+                        await winner_ticket.set_permissions(self.bot.helper, send_messages=True,
                                                             read_messages=True,
                                                             add_reactions=True, embed_links=True,
                                                             attach_files=True,
@@ -510,7 +510,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                                                 add_reactions=True, embed_links=True,
                                                 attach_files=True,
                                                 read_message_history=True, external_emojis=True)
-            await winner_ticket.set_permissions(self.bot.t_officer, send_messages=True,
+            await winner_ticket.set_permissions(self.bot.helper, send_messages=True,
                                                 read_messages=True,
                                                 add_reactions=True, embed_links=True,
                                                 attach_files=True,

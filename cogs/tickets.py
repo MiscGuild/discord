@@ -104,7 +104,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             await channel.edit(name=f"Partner-{guildname.replace(' ', '-')}")
 
                             position_embed = discord.Embed(title=f"What is your position in {guildname}?",
-                                                           description="Staff Position\nExample:\n Admin, Officer, Co-Owner, Guild Master etc.",
+                                                           description="Staff Position\nExample:\n Admin, Moderator, Co-Owner, Guild Master etc.",
                                                            color=0x8368ff)
                             await channel.send(embed=position_embed)
                             position = await self.bot.wait_for('message', check=lambda
@@ -129,7 +129,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         level = await utils.get_guild_level(req['guild']['exp'])
                         if level > 100:
                             position_embed = discord.Embed(title=f"What is your position in {guildname}?",
-                                                           description="Staff Position\nExample:\n Admin, Officer, Co-Owner, Guild Master etc.",
+                                                           description="Staff Position\nExample:\n Admin, Moderator, Co-Owner, Guild Master etc.",
                                                            color=0x8368ff)
                             await channel.send(embed=position_embed)
                             position = await self.bot.wait_for('message', check=lambda
@@ -181,7 +181,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         level = await utils.get_guild_level(req['guild']['exp'])
                         if level > 50:
                             position_embed = discord.Embed(title=f"What is your position in {guildname}?",
-                                                           description="Staff Position\nExample:\n Admin, Officer, Co-Owner, Guild Master etc.",
+                                                           description="Staff Position\nExample:\n Admin, Moderator, Co-Owner, Guild Master etc.",
                                                            color=0x8368ff)
                             await channel.send(embed=position_embed)
                             position = await self.bot.wait_for('message', check=lambda
@@ -520,7 +520,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                     click = await self.bot.wait_for("button_click",
                                                                     check=lambda x: x.channel == channel and (
                                                                             self.bot.staff in self.bot.misc_guild.get_member(
-                                                                        x.author.id).roles or self.bot.t_officer in self.bot.misc_guild.get_member(
+                                                                        x.author.id).roles or self.bot.helper in self.bot.misc_guild.get_member(
                                                                         x.author.id).roles))
 
                                     if click.component.id == "approve":
@@ -916,7 +916,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                               "\n• You must have enough knowledge about the bots in this Discord."
                                               "\n• You must be active both on Hypixel and in the guild Discord."
                                               "\n• You must have a good reputation amongst guild members.",
-                                        inine=False)
+                                        inline=False)
                     await channel.purge(limit=10)
 
 
@@ -1089,7 +1089,7 @@ class Tickets(commands.Cog, name="Tickets"):
 
                         '''SCENARIO 1'''
                         embed = discord.Embed(
-                            title="You have just started as a trial officer and an officer starts arguing with another member. "
+                            title="You have just started as a helper and a moderator starts arguing with another member. "
                                   "This argument starts to get serious quite quickly. What do you do? ",
                             description="Make your answer as detailed as possible!",
                             color=0x4b89e4)
@@ -1100,8 +1100,8 @@ class Tickets(commands.Cog, name="Tickets"):
 
                         '''SCENARIO 2'''
                         embed = discord.Embed(
-                            title="Suppose it's your first week of being a trial officer and you guild-mute a well-known player. "
-                                  "Your guildmates start spamming you calling you a bad officer and telling you to unmute them. "
+                            title="Suppose it's your first week of being a helper and you guild-mute a well-known player. "
+                                  "Your guildmates start spamming you calling you a bad moderator and telling you to unmute them. "
                                   "What would you do?",
                             description="Make your answer as detailed as possible!",
                             color=0x4b89e4)
@@ -1175,10 +1175,10 @@ class Tickets(commands.Cog, name="Tickets"):
                         embed.add_field(name="6) What is something you could suggest that would improve the guild?",
                                         value=suggestion, inline=False)
                         embed.add_field(
-                            name="7) You have just started as a trial officer and an officer starts arguing with another member. This argument starts to get serious quite quickly. What do you do?",
+                            name="7) You have just started as a helper and a moderator starts arguing with another member. This argument starts to get serious quite quickly. What do you do?",
                             value=scen1, inline=False)
                         embed.add_field(
-                            name="8) Suppose it's your first week of being a trial officer and you guild-mute a well-known player. Your guildmates start spamming you calling you a bad officer and telling you to unmute them. What would you do?",
+                            name="8) Suppose it's your first week of being a helper and you guild-mute a well-known player. Your guildmates start spamming you calling you a bad moderator and telling you to unmute them. What would you do?",
                             value=scen2, inline=False)
                         embed.add_field(
                             name="9) Upon joining a game and you discover that a guild member is in your game and is hacking. What do you do?",
@@ -1542,7 +1542,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                  add_reactions=True, embed_links=True,
                                                                  attach_files=True,
                                                                  read_message_history=True, external_emojis=True)
-                            await ticket_channel.set_permissions(self.bot.t_officer, send_messages=True,
+                            await ticket_channel.set_permissions(self.bot.helper, send_messages=True,
                                                                  read_messages=True,
                                                                  add_reactions=True, embed_links=True,
                                                                  attach_files=True,
@@ -1707,8 +1707,8 @@ class Tickets(commands.Cog, name="Tickets"):
             4: 'Why have you decided to apply for staff?',
             5: 'What has brought you to Miscellaneous, and what has kept you here?',
             6: 'What is something you could suggest that would improve the guild?',
-            7: 'You have just started as a trial officer and an officer starts arguing with another member. This argument starts to get serious quite quickly. What do you do?',
-            8: 'Suppose it\'s your first week of being a trial officer and you guild-mute a well-known player. Your guildmates start spamming you calling you a bad officer and telling you to unmute them. What would you do?',
+            7: 'You have just started as a helper and a moderator starts arguing with another member. This argument starts to get serious quite quickly. What do you do?',
+            8: 'Suppose it\'s your first week of being a helper and you guild-mute a well-known player. Your guildmates start spamming you calling you a bad moderator and telling you to unmute them. What would you do?',
             9: 'Upon joining a game and you discover that a guild member is in your game and is hacking. What do you do?',
             10: 'Have you been staff in any other guild or on any server? If yes, which one?',
             11: 'How much time do you have to contribute to the role? (Per day)',
@@ -1789,7 +1789,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                              add_reactions=True, embed_links=True,
                                              attach_files=True,
                                              read_message_history=True, external_emojis=True)
-        await ticket_channel.set_permissions(self.bot.t_officer, send_messages=True, read_messages=True,
+        await ticket_channel.set_permissions(self.bot.helper, send_messages=True, read_messages=True,
                                              add_reactions=True, embed_links=True,
                                              attach_files=True,
                                              read_message_history=True, external_emojis=True)
