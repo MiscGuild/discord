@@ -1,6 +1,7 @@
 import math
 from datetime import datetime
 from io import BytesIO
+import requests
 
 import aiohttp
 import discord
@@ -1180,12 +1181,18 @@ class Hypixel(commands.Cog, name="Hypixel"):
             weeklygexp = weeklygexp.replace(',', '%2C')
 
             url = f"https://chat.miscguild.xyz/render.png?m=custom&d={weeklygexp}&t=1"
-            async with aiohttp.ClientSession() as session:
+            '''async with aiohttp.ClientSession() as session:
                 async with session.get(url) as resp:
                     image_data = BytesIO(await resp.read())
                     await session.close()
 
-            await ctx.send(file=discord.File(image_data, 'gtop.jpg'))
+            await ctx.send(file=discord.File(image_data, 'gtop.jpg'))'''
+
+            image = requests.get(url)
+
+            with open('temppicture.jpg', 'wb') as f:
+                f.write(image.content)
+            await ctx.send(file=discord.File('temppicture.jpg'))
 
     @commands.command()
     async def dailylb(self, ctx, x=1):
@@ -1339,12 +1346,17 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
             url = f"https://chat.miscguild.xyz/render.png?m=custom&d={dailygexp}&t=1"
 
-            async with aiohttp.ClientSession() as session:
+            '''async with aiohttp.ClientSession() as session:
                 async with session.get(url) as resp:
                     image_data = BytesIO(await resp.read())
                     await session.close()
 
-            await ctx.send(file=discord.File(image_data, 'dailylb.jpg'))
+            await ctx.send(file=discord.File(image_data, 'dailylb.jpg'))'''
+            image = requests.get(url)
+
+            with open('temppicture.jpg', 'wb') as f:
+                f.write(image.content)
+            await ctx.send(file=discord.File('temppicture.jpg'))
 
 
 def setup(bot):
