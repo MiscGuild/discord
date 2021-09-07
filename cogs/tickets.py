@@ -1675,11 +1675,11 @@ class Tickets(commands.Cog, name="Tickets"):
 
     @commands.command()
     @commands.has_role(522588118251995147)
-    async def accept(self, ctx, member: discord.Member):
+    async def accept(self, ctx, member):
         """Used to accept staff applications. This command must be typed in the application channel. It doesn't work elsewhere.
         """
         if ctx.channel.category.name in self.bot.ticket_categories:
-            embed = discord.Embed(title=f"Congratulations {member.name}, your staff application has been accepted!",
+            embed = discord.Embed(title=f"Congratulations {member}, your staff application has been accepted!",
                                   description="Please view the following as they'll help you become a better staff member!",
                                   color=0x8368ff)
             embed.set_footer(text="https://bit.ly/MiscStaffGuide\n"
@@ -1688,12 +1688,10 @@ class Tickets(commands.Cog, name="Tickets"):
 
     @commands.command()
     @commands.has_any_role(522588118251995147, 522590574734213120)
-    async def deny(self, ctx, member: discord.Member, channel: discord.TextChannel):
-        """Used to deny staff applications. This command can be used in any channel, provided, the syntax is met.
+    async def deny(self, ctx, channel: discord.TextChannel):
+        """Used to deny staff applications. This command can be used in any channel provided, the syntax is met.
         """
-        name = await utils.name_grabber(member)
-
-        embed = discord.Embed(title=f"{name}, your application has been denied!",
+        embed = discord.Embed(title="Your staff application has been denied!",
                               description="The reasons are listed below",
                               color=0xDE3163)
 
@@ -1756,16 +1754,16 @@ class Tickets(commands.Cog, name="Tickets"):
             embed1.add_field(name="If not:", value="Reply with `No`")
             await ctx.send(embed=embed1)
 
-            more = await self.bot.wait_for('message',
-                                           check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
-            more = more.content
-            more = more.capitalize()
+            while True:
+                more = await self.bot.wait_for('message',
+                                            check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+                more = more.content
+                more = more.capitalize()
 
-            if more in ('Yes', 'Yeah', 'Ye', 'Yea'):
-                continue
-            else:
-                await channel.send(embed=embed)
-                break
+                if more in ('Yes', 'Yeah', 'Ye', 'Yea'):
+                    break
+                elif more in ('No', 'Nah', 'Nope'):
+                    await channel.send(embed=embed)
 
     @commands.command()
     async def new(self, ctx):
