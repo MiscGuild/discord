@@ -1675,7 +1675,7 @@ class Tickets(commands.Cog, name="Tickets"):
 
     @commands.command()
     @commands.has_role(522588118251995147)
-    async def accept(self, ctx, member):
+    async def accept(self, ctx, member: discord.Member):
         """Used to accept staff applications. This command must be typed in the application channel. It doesn't work elsewhere.
         """
         if ctx.channel.category.name in self.bot.ticket_categories:
