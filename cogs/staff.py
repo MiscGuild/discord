@@ -273,213 +273,7 @@ class staff(commands.Cog, name="Staff"):
 
             await msg.delete()
 
-    @commands.command()
-    @commands.has_role(538015368782807040)
-    async def rolecheck(self, ctx, send_ping=None):
-        """Checks the roles of all the users and changes them on the basis of their guild
-        """
-        misc_member_description, ally_member_description, new_member_description, guest_description = "","","",""
-        msg = await ctx.send("**Processing all the prerequisites**")
 
-        misc_uuids = await utils.get_guild_members("Miscellaneous")
-        misc_members, ally_members, ally_uuids = [], [], []
-        for x in self.bot.misc_allies:
-            ally_uuids = ally_uuids + await utils.get_guild_members(x)
-
-        # Miscellaneous Member Names
-        await msg.edit(content="**Processing** - 1/2")
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            with requests.Session() as session:
-                # Set any session parameters here before calling `fetch`
-                loop = asyncio.get_event_loop()
-                tasks = [
-                    loop.run_in_executor(
-                        executor,
-                        utils.fetch,
-                        *(session, individual_misc_uuid)  # Allows us to pass in multiple arguments to `fetch`
-                    )
-                    for individual_misc_uuid in misc_uuids
-                ]
-                for response in await asyncio.gather(*tasks):  # Puts the result into a list
-                    misc_members.append(response)
-
-        # Ally Member Names
-        await msg.edit(content="**Processing** - 2/2")
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            with requests.Session() as session:
-                # Set any session parameters here before calling `fetch`
-                loop = asyncio.get_event_loop()
-                tasks = [
-                    loop.run_in_executor(
-                        executor,
-                        utils.fetch,
-                        *(session, individual_ally_uuid)  # Allows us to pass in multiple arguments to `fetch`
-                    )
-                    for individual_ally_uuid in ally_uuids
-                ]
-                for response in await asyncio.gather(*tasks):  # Puts the result into a list
-                    ally_members.append(response)
-
-        for guild in self.bot.guilds:
-            if str(guild) == "Miscellaneous [MISC]":  # Check if the Discord is Miscellaneous
-                for member in guild.members:  # For loop for all members in the Discord
-                    if member.id not in self.bot.adminids and member.bot is False:
-                        name = await utils.name_grabber(member)
-                        has_tag_perms = any(role in ctx.author.roles for role in self.bot.tag_allowed_roles)
-                        try:
-                            if len(misc_member_description) >= 2048:
-                                embed = discord.Embed(title="Miscellaneous Members", description=misc_member_description, color=0x8368ff)
-                                await ctx.send(embed=embed)
-                                misc_member_description = ""
-                            if len(ally_member_description) >= 2048:
-                                embed = discord.Embed(title="Ally Members", description=ally_member_description, color=0x8368ff)
-                                await ctx.send(embed=embed)
-                                ally_member_description = ""
-                            if len(new_member_description) >= 2048:
-                                embed = discord.Embed(title="New Member (Role)", description=new_member_description, color=0x8368ff)
-                                await ctx.send(embed=embed)
-                                new_member_description = ""
-                            if len(guest_description) >= 2048:
-                                embed = discord.Embed(title="Guest (Role)", description=guest_description, color=0x8368ff)
-                                await ctx.send(embed=embed)
-                                guest_description = ""
-                        except:
-                            await ctx.send("Embed sending error")
-
-                        await msg.edit(content=f"**Checking** {name}")
-                        async with aiohttp.ClientSession() as session:
-                            async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as mojang:
-
-                                if mojang.status != 200:  # If the IGN is invalid
-                                    await member.remove_roles(self.bot.member_role, self.bot.guest, reason="Rolecheck")
-                                    await member.add_roles(self.bot.new_member_role, reason="Rolecheck")
-                                    new_member_description = str(new_member_description) + f"{name} ||{member}|| Player doesn't exist. **++New Member | --Member | -- Guest**\n"
-                                    continue
-                                else:
-                                    mojang_json = await mojang.json()
-                                    ign = mojang_json["name"]
-                                    uuid = mojang_json['id']
-
-                                await session.close()
-                            # Miscellaneous
-                        if ign in misc_members and ign not in self.bot.adminnames:
-                            async with aiohttp.ClientSession() as session:
-                                async with session.get(
-                                        f"https://api.hypixel.net/guild?key={utils.get_api()}&player={uuid}") as resp:
-                                    req = await resp.json()
-                                    await session.close()
-
-                            if self.bot.member_role not in member.roles:
-                                await member.add_roles(self.bot.member_role, reason="Rolecheck")
-                                await member.remove_roles(self.bot.new_member_role, self.bot.guest, reason="Rolecheck")
-
-
-                            for user in req['guild']["members"]:
-                                if uuid == user["uuid"]:
-                                    totalexp = user['expHistory']
-                                    totalexp = sum(totalexp.values())
-                                    usergrank = user['rank']
-
-                                    if usergrank != 'Resident':
-                                        if totalexp < self.bot.inactive:
-                                            username = await utils.name_grabber(member)
-                                            if has_tag_perms is False:
-                                                await member.edit(nick=username)
-                                            await member.add_roles(self.bot.inactive_role, self.bot.member_role, reason="Rolecheck")
-                                            await member.remove_roles(self.bot.active_role, self.bot.ally, self.bot.guest,
-                                                                      reason="Rolecheck")
-                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | ++Inactive | --Active** \n",
-
-                                        elif totalexp >= self.bot.active:  # If the member is active
-                                            if has_tag_perms is False:
-                                                await member.edit(nick=username)
-                                            await member.remove_roles(self.bot.inactive_role, self.bot.new_member_role, self.bot.guest,
-                                                                      self.bot.ally, reason="Rolecheck")
-                                            await member.add_roles(self.bot.active_role, self.bot.member_role, reason="Rolecheck")
-                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | ++Active | --Inactive** \n"
-
-                                        elif totalexp > self.bot.inactive:
-                                            username = await utils.name_grabber(member)
-                                            if has_tag_perms is False:
-                                                await member.edit(nick=username)
-                                            await member.add_roles(self.bot.member_role, reason="Rolecheck") 
-                                            await member.remove_roles(self.bot.inactive_role, self.bot.active_role, self.bot.guest,
-                                                                      self.bot.ally, self.bot.guest, reason="Rolecheck")
-                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | --Inactive | --Active** \n"
-                                    else:  # For residents
-                                        if totalexp < self.bot.resident_req:
-                                            username = await utils.name_grabber(member)
-                                            if has_tag_perms is False:
-                                                await member.edit(nick=username)
-                                            await member.add_roles(self.bot.inactive_role, self.bot.member_role, reason="Rolecheck")
-                                            await member.remove_roles(self.bot.active_role, self.bot.ally, self.bot.guest,
-                                                                      reason="Rolecheck")
-                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | ++Inactive | --Active** \n"
-
-                                        elif totalexp >= self.bot.active:  # If the member is active
-                                            if has_tag_perms is False:
-                                                await member.edit(nick=username)
-                                            await member.remove_roles(self.bot.inactive_role, self.bot.new_member_role, self.bot.guest,
-                                                                      self.bot.ally, reason="Rolecheck")
-                                            await member.add_roles(self.bot.active_role, self.bot.member_role, reason="Rolecheck")
-                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | ++Active | --Inactive** \n"
-
-                                        elif totalexp > self.bot.resident_req:
-                                            username = await utils.name_grabber(member)
-                                            if has_tag_perms is False:
-                                                await member.edit(nick=username)
-                                            await member.add_roles(self.bot.member_role, reason="Rolecheck")    
-                                            await member.remove_roles(self.bot.inactive_role, self.bot.active_role, self.bot.guest,
-                                                                      self.bot.ally, reason="Rolecheck")
-                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | --Inactive| --Active** \n"
-                                if has_tag_perms is False:
-                                    await member.edit(nick=ign)
-                        # Ally
-                        elif ign in ally_members:
-                            guild_name = await utils.get_guild(name)
-                            for guild in self.bot.misc_allies:
-                                if guild == guild_name:
-                                    gtag = await utils.get_gtag(guild_name)
-                                    username = ign + " " + str(gtag)
-                                    await member.edit(nick=username)
-                                    await member.add_roles(self.bot.guest, self.bot.ally, reason="Rolecheck")
-                                    await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
-                                                              self.bot.active_role, self.bot.inactive_role,
-                                                              reason="Rolecheck")
-                                    ally_member_description = str(ally_member_description) + f"{name} ||{member}|| Member of {guild} **++Ally | ++Guest | --Member | --Active** \n"
-                        else:
-                            await member.edit(nick=ign)
-                            await member.add_roles(self.bot.guest, reason="Rolecheck")
-                            await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
-                                                      self.bot.active_role, self.bot.inactive_role, self.bot.ally,
-                                                      reason="Rolecheck")
-
-                            guest_description = str(guest_description) + f"{name} ||{member}|| **++Guest | --Member | --Active** \n"
-                try:    
-                    if misc_member_description != "":
-                        embed = discord.Embed(title="Miscellaneous Members", description=misc_member_description,
-                                              color=0x8368ff)
-                        await ctx.send(embed=embed)
-                    if ally_member_description != "":
-                        embed = discord.Embed(title="Ally Members", description=ally_member_description, color=0x8368ff)
-                        await ctx.send(embed=embed)
-                    if new_member_description != "":
-                        embed = discord.Embed(title="New Member (Role)", description=new_member_description, color=0x8368ff)
-                        await ctx.send(embed=embed)
-                    if guest_description != "":
-                        embed = discord.Embed(title="Guest (Role)", description=guest_description, color=0x8368ff)
-                        await ctx.send(embed=embed)
-                except:
-                    await ctx.send("embed sending erorr")
-                await ctx.send('**Rolecheck completed**')
-        if send_ping is None:
-            inactivity_channel = self.bot.get_channel(848067712156434462)
-
-            embed = discord.Embed(title="You do not meet the guild requirements!",
-                                  description=f"Member requirement - **{format(self.bot.inactive, ',d')}** Weekly Guild Experience\nResident requirement - **{format(self.bot.resident_req, ',d')}** Weekly Guild Experience",
-                                  color=0xDC143C)
-            await inactivity_channel.send(f"<@&848051215287058443>")
-            await inactivity_channel.send(embed=embed)
 
     @commands.command(aliases=['fs'])
     @commands.has_role(538015368782807040)
@@ -712,6 +506,217 @@ class staff(commands.Cog, name="Staff"):
                 embed.add_field(name=challenge2, value=challenge2_prize, inline=False)
                 embed.set_footer(text="You can only do one challenge once.")
             await channel.send(embed=embed)
+
+    @commands.command()
+    @commands.has_role(538015368782807040)
+    async def rolecheck(self, ctx, send_ping=None):
+        """Checks the roles of all the users and changes them on the basis of their guild
+        """
+        msg = await ctx.send("**Processing all the prerequisites**")
+
+
+        misc_members = ally_members = ally_uuids = []
+        misc_member_description = ally_member_description = new_member_description = guest_description = ""
+
+        misc_uuids = await utils.get_guild_members("Miscellaneous")
+        for ally in self.bot.misc_allies:
+            ally_uuids = ally_uuids + await utils.get_guild_members(ally)
+
+        # Miscellaneous Member Names
+        await msg.edit(content="**Processing** - 1/2")
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            with requests.Session() as session:
+                # Set any session parameters here before calling `fetch`
+                loop = asyncio.get_event_loop()
+                tasks = [
+                    loop.run_in_executor(
+                        executor,
+                        utils.fetch,
+                        *(session, individual_misc_uuid)  # Allows us to pass in multiple arguments to `fetch`
+                    )
+                    for individual_misc_uuid in misc_uuids
+                ]
+                for response in await asyncio.gather(*tasks):  # Puts the result into a list
+                    misc_members.append(response)
+
+        # Ally Member Names
+        await msg.edit(content="**Processing** - 2/2")
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            with requests.Session() as session:
+                # Set any session parameters here before calling `fetch`
+                loop = asyncio.get_event_loop()
+                tasks = [
+                    loop.run_in_executor(
+                        executor,
+                        utils.fetch,
+                        *(session, individual_ally_uuid)  # Allows us to pass in multiple arguments to `fetch`
+                    )
+                    for individual_ally_uuid in ally_uuids
+                ]
+                for response in await asyncio.gather(*tasks):  # Puts the result into a list
+                    ally_members.append(response)
+
+        for guild in self.bot.guilds:
+            if str(guild) == "Miscellaneous [MISC]":  # Check if the Discord is Miscellaneous
+                for member in guild.members:  # For loop for all members in the Discord
+
+                    if len(misc_member_description) > 2096:
+                        embed = discord.Embed(title="Miscellaneous Members", description=misc_member_description,
+                                              color=0x8368ff)
+                        await ctx.send(embed=embed)
+                        misc_member_description = ""
+                    if len(ally_member_description) > 2096:
+                        embed = discord.Embed(title="Ally Members", description=ally_member_description, color=0x8368ff)
+                        await ctx.send(embed=embed)
+                        ally_member_description = ""
+                    if len(new_member_description) > 2096:
+                        embed = discord.Embed(title="New Member (Role)", description=new_member_description,
+                                              color=0x8368ff)
+                        await ctx.send(embed=embed)
+                        new_member_description = ""
+                    if len(guest_description) > 2096:
+                        embed = discord.Embed(title="Guest (Role)", description=guest_description, color=0x8368ff)
+                        await ctx.send(embed=embed)
+                        guest_description = ""
+
+
+
+                    if member.id not in self.bot.adminids and member.bot is False:
+                        name = await utils.name_grabber_rolecheck(member)
+                        has_tag_perms = any(role in ctx.author.roles for role in self.bot.tag_allowed_roles)
+
+                        await msg.edit(content=f"**Checking** {name}")
+                        async with aiohttp.ClientSession() as session:
+                            async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as mojang:
+
+                                if mojang.status != 200:  # If the IGN is invalid
+                                    await member.remove_roles(self.bot.member_role, self.bot.guest, reason="Rolecheck")
+                                    await member.add_roles(self.bot.new_member_role, reason="Rolecheck")
+                                    new_member_description = str(new_member_description) + f"{name} ||{member}|| Player doesn't exist. **++New Member | --Member | -- Guest**\n"
+                                    continue
+                                else:
+                                    mojang_json = await mojang.json()
+                                    ign = mojang_json["name"]
+                                    uuid = mojang_json['id']
+
+                                await session.close()
+                            # Miscellaneous
+                        if ign in misc_members and ign not in self.bot.adminnames:
+                            async with aiohttp.ClientSession() as session:
+                                async with session.get(
+                                        f"https://api.hypixel.net/guild?key={utils.get_api()}&player={uuid}") as resp:
+                                    req = await resp.json()
+                                    await session.close()
+
+                            if self.bot.member_role not in member.roles:
+                                await member.add_roles(self.bot.member_role, reason="Rolecheck")
+                                await member.remove_roles(self.bot.new_member_role, self.bot.guest, reason="Rolecheck")
+
+
+                            for user in req['guild']["members"]:
+                                if uuid == user["uuid"]:
+                                    totalexp = user['expHistory']
+                                    totalexp = sum(totalexp.values())
+                                    usergrank = user['rank']
+
+                                    if usergrank != 'Resident':
+                                        if totalexp < self.bot.inactive:
+                                            username = await utils.name_grabber(member)
+                                            if has_tag_perms is False:
+                                                await member.edit(nick=username)
+                                            await member.add_roles(self.bot.inactive_role, self.bot.member_role, reason="Rolecheck")
+                                            await member.remove_roles(self.bot.active_role, self.bot.ally, self.bot.guest,
+                                                                      reason="Rolecheck")
+                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | ++Inactive | --Active** \n",
+
+                                        elif totalexp >= self.bot.active:  # If the member is active
+                                            if has_tag_perms is False:
+                                                await member.edit(nick=username)
+                                            await member.remove_roles(self.bot.inactive_role, self.bot.new_member_role, self.bot.guest,
+                                                                      self.bot.ally, reason="Rolecheck")
+                                            await member.add_roles(self.bot.active_role, self.bot.member_role, reason="Rolecheck")
+                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | ++Active | --Inactive** \n"
+
+                                        elif totalexp > self.bot.inactive:
+                                            username = await utils.name_grabber(member)
+                                            if has_tag_perms is False:
+                                                await member.edit(nick=username)
+                                            await member.add_roles(self.bot.member_role, reason="Rolecheck")
+                                            await member.remove_roles(self.bot.inactive_role, self.bot.active_role, self.bot.guest,
+                                                                      self.bot.ally, self.bot.guest, reason="Rolecheck")
+                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | --Inactive | --Active** \n"
+                                    else:  # For residents
+                                        if totalexp < self.bot.resident_req:
+                                            username = await utils.name_grabber(member)
+                                            if has_tag_perms is False:
+                                                await member.edit(nick=username)
+                                            await member.add_roles(self.bot.inactive_role, self.bot.member_role, reason="Rolecheck")
+                                            await member.remove_roles(self.bot.active_role, self.bot.ally, self.bot.guest,
+                                                                      reason="Rolecheck")
+                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | ++Inactive | --Active** \n"
+
+                                        elif totalexp >= self.bot.active:  # If the member is active
+                                            if has_tag_perms is False:
+                                                await member.edit(nick=username)
+                                            await member.remove_roles(self.bot.inactive_role, self.bot.new_member_role, self.bot.guest,
+                                                                      self.bot.ally, reason="Rolecheck")
+                                            await member.add_roles(self.bot.active_role, self.bot.member_role, reason="Rolecheck")
+                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | ++Active | --Inactive** \n"
+
+                                        elif totalexp > self.bot.resident_req:
+                                            username = await utils.name_grabber(member)
+                                            if has_tag_perms is False:
+                                                await member.edit(nick=username)
+                                            await member.add_roles(self.bot.member_role, reason="Rolecheck")
+                                            await member.remove_roles(self.bot.inactive_role, self.bot.active_role, self.bot.guest,
+                                                                      self.bot.ally, reason="Rolecheck")
+                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | --Inactive| --Active** \n"
+                        # Ally
+                        elif ign in ally_members:
+                            guild_name = await utils.get_guild(name)
+                            for guild in self.bot.misc_allies:
+                                if guild == guild_name:
+                                    gtag = await utils.get_gtag(guild_name)
+                                    username = ign + " " + str(gtag)
+                                    await member.edit(nick=username)
+                                    await member.add_roles(self.bot.guest, self.bot.ally, reason="Rolecheck")
+                                    await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
+                                                              self.bot.active_role, self.bot.inactive_role,
+                                                              reason="Rolecheck")
+                                    ally_member_description = str(ally_member_description) + f"{name} ||{member}|| Member of {guild} **++Ally | ++Guest | --Member | --Active** \n"
+                        else:
+                            await member.edit(nick=ign)
+                            await member.add_roles(self.bot.guest, reason="Rolecheck")
+                            await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
+                                                      self.bot.active_role, self.bot.inactive_role, self.bot.ally,
+                                                      reason="Rolecheck")
+
+                            guest_description = str(guest_description) + f"{name} ||{member}|| **++Guest | --Member | --Active** \n"
+                try:
+                    if misc_member_description != "":
+                        embed = discord.Embed(title="Miscellaneous Members", description=misc_member_description,
+                                              color=0x8368ff)
+                        await ctx.send(embed=embed)
+                    if ally_member_description != "":
+                        embed = discord.Embed(title="Ally Members", description=ally_member_description, color=0x8368ff)
+                        await ctx.send(embed=embed)
+                    if new_member_description != "":
+                        embed = discord.Embed(title="New Member (Role)", description=new_member_description, color=0x8368ff)
+                        await ctx.send(embed=embed)
+                    if guest_description != "":
+                        embed = discord.Embed(title="Guest (Role)", description=guest_description, color=0x8368ff)
+                        await ctx.send(embed=embed)
+                except:
+                    await ctx.send("embed sending erorr")
+                await ctx.send('**Rolecheck completed**')
+        if send_ping is None:
+            inactivity_channel = self.bot.get_channel(848067712156434462)
+
+            embed = discord.Embed(title="You do not meet the guild requirements!",
+                                  description=f"Member requirement - **{format(self.bot.inactive, ',d')}** Weekly Guild Experience\nResident requirement - **{format(self.bot.resident_req, ',d')}** Weekly Guild Experience",
+                                  color=0xDC143C)
+            await inactivity_channel.send(f"<@&848051215287058443>")
+            await inactivity_channel.send(embed=embed)
 
 
 def setup(bot):
