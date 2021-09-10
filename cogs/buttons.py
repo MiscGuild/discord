@@ -181,28 +181,24 @@ class Roles(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.Cog.listener()
     async def on_select_option(self, res):
+
         role_ids = [849830869036040212,
                     849830936434704404,
                     849831004310077441,
                     855598846843551744]
-        if type(res.component) == list:
-            member = self.bot.misc_guild.get_member(int(res.user.id))
-            for role in res.component:
-                if int(role.value) in role_ids:
-                    cached_role = self.bot.misc_guild.get_role(int(role.value))
-                    if cached_role in member.roles:
-                        await member.remove_roles(cached_role, reason=f"Pronoun role: {role.label} Removed")
-                        await res.respond(content=f"Removed {role.label}")
-                    elif cached_role not in member.roles:
-                        for x in role_ids:
-                            await member.remove_roles(self.bot.misc_guild.get_role(x),
-                                                      reason="Pronouns Duplicate Prevention")
-                        await member.add_roles(cached_role, reason=f"Pronoun role: {role.label} Given")
-                        await res.respond(content=f"Added {role.label}")
-
-
-        else:
-            pass
+        member = self.bot.misc_guild.get_member(int(res.user.id))
+        for role in res.component.options:
+            if int(role.value) in role_ids:
+                cached_role = self.bot.misc_guild.get_role(int(role.value))
+                if cached_role in member.roles:
+                    await member.remove_roles(cached_role, reason=f"Pronoun role: {role.label} Removed")
+                    await res.respond(content=f"Removed {role.label}")
+                elif cached_role not in member.roles:
+                    for x in role_ids:
+                        await member.remove_roles(self.bot.misc_guild.get_role(x),
+                                                  reason="Pronouns Duplicate Prevention")
+                    await member.add_roles(cached_role, reason=f"Pronoun role: {role.label} Given")
+                    await res.respond(content=f"Added {role.label}")
 
 
 def setup(bot):
