@@ -181,30 +181,34 @@ class Roles(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.Cog.listener()
     async def on_select_option(self, res):
+        if res.channel.id == 732615233767604234:
+            role_ids = [849830869036040212,
+                        849830936434704404,
+                        849831004310077441,
+                        855598846843551744]
 
-        role_ids = [849830869036040212,
-                    849830936434704404,
-                    849831004310077441,
-                    855598846843551744]
-
-        labels = {849830869036040212: "He/Him",
-                  849830936434704404: "She/Her",
-                  849831004310077441: "They/Them",
-                  855598846843551744: "Other"}
-        member = self.bot.misc_guild.get_member(int(res.user.id))
-        if int(res.values[0]) in role_ids:
-            cached_role = self.bot.misc_guild.get_role(int(res.values[0]))
-            if cached_role in member.roles:
-                await member.remove_roles(cached_role, reason=f"Pronoun role: {labels.get(int(res.values[0]))} Removed")
-                await res.respond(content=f"Removed {labels.get(int(res.values[0]))}")
-            elif cached_role not in member.roles:
+            labels = {849830869036040212: "He/Him",
+                      849830936434704404: "She/Her",
+                      849831004310077441: "They/Them",
+                      855598846843551744: "Other"}
+            member = self.bot.misc_guild.get_member(int(res.user.id))
+            if res.values != []:
+                if int(res.values[0]) in role_ids:
+                    cached_role = self.bot.misc_guild.get_role(int(res.values[0]))
+                    if cached_role in member.roles:
+                        await member.remove_roles(cached_role, reason=f"Pronoun role: {labels.get(int(res.values[0]))} Removed")
+                        await res.respond(content=f"Removed {labels.get(int(res.values[0]))}")
+                    elif cached_role not in member.roles:
+                        for x in role_ids:
+                            await member.remove_roles(self.bot.misc_guild.get_role(x),
+                                                      reason="Pronouns Duplicate Prevention")
+                        await member.add_roles(cached_role, reason=f"Pronoun role: {labels.get(int(res.values[0]))} Given")
+                        await res.respond(content=f"Added {labels.get(int(res.values[0]))}")
+            else:
                 for x in role_ids:
                     await member.remove_roles(self.bot.misc_guild.get_role(x),
                                               reason="Pronouns Duplicate Prevention")
-                await member.add_roles(cached_role, reason=f"Pronoun role: {labels.get(int(res.values[0]))} Given")
-                await res.respond(content=f"Added {labels.get(int(res.values[0]))}")
-
-
+                await res.respond(content=f"Removed all pronoun roles!")
 def setup(bot):
     DiscordComponents(bot)
     bot.add_cog(Roles(bot))
