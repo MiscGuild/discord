@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import aiohttp
 import discord
 from discord.ext import commands, tasks
+from discord.ext.commands.core import command
 
 from cogs.utils import utilities as utils
 
@@ -15,36 +16,38 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
         self.bot = bot
         self.check_giveaways.start()
 
-    @commands.command()
+    
+
+    @commands.command(aliases=["gcreate"])
     @commands.has_role("Giveaway Creator")
-    async def giveaway(self, ctx, action, message_ID=None, reroll_number=None):
-        """Create, end, reroll, and list giveaways!
+    async def giveawaycreate(self, ctx):
         """
-        if action.lower() in ["create", "make", "start", "add"]:  # Create new giveaway
-            while True:
-                await ctx.send(
-                    "What is the channel you would want the giveaway to be held in?\n\n`Please enter the name of a channel in this server.` \n`Alternatively, you can enter the channel ID.` \n\n**At any time, you can cancel the giveaway by replying with `cancel` to one of the upcoming prompts.**")
-                destination = await self.bot.wait_for('message',
-                                                      check=lambda
-                                                          x: x.channel == ctx.channel and x.author == ctx.author)
-                destination = destination.content.lower()
+        Create a giveaway!
+        """
+        while True:
+            await ctx.send(
+                "What is the channel you would want the giveaway to be held in?\n\n`Please enter the name of a channel in this server.` \n`Alternatively, you can enter the channel ID.` \n\n**At any time, you can cancel the giveaway by replying with `cancel` to one of the upcoming prompts.**")
+            destination = await self.bot.wait_for('message',
+                                                    check=lambda
+                                                        x: x.channel == ctx.channel and x.author == ctx.author)
+            destination = destination.content.lower()
 
-                if destination == "cancel":
-                    await ctx.send("Giveaway cancelled!")
-                    return
-                elif destination[0] == "<":  # Channel shortcut was passed
-                    destination = int(re.sub(r'[\W_]+', '', destination))
-                    destination_channel = self.bot.get_channel(destination)
-                elif destination.isnumeric() == True:  # Channel ID was passed
-                    destination_channel = self.bot.get_channel(int(destination))
-                else:  # Channel name was passed
-                    destination = re.sub(r"\s+", "-", destination)
-                    destination_channel = discord.utils.get(ctx.guild.channels, name=destination)
+            if destination == "cancel":
+                await ctx.send("Giveaway cancelled!")
+                return
+            elif destination[0] == "<":  # Channel shortcut was passed
+                destination = int(re.sub(r'[\W_]+', '', destination))
+                destination_channel = self.bot.get_channel(destination)
+            elif destination.isnumeric() == True:  # Channel ID was passed
+                destination_channel = self.bot.get_channel(int(destination))
+            else:  # Channel name was passed
+                destination = re.sub(r"\s+", "-", destination)
+                destination_channel = discord.utils.get(ctx.guild.channels, name=destination)
 
-                if destination_channel != None:  # Channel exists
-                    break
-                else:  # Channel is non-existent - Redo step.
-                    await ctx.send(f"The channel {destination} is invalid!")
+            if destination_channel != None:  # Channel exists
+                break
+            else:  # Channel is non-existent - Redo step.
+                await ctx.send(f"The channel {destination} is invalid!")
 
             # Channel entered correctly
             await ctx.send(
@@ -269,86 +272,102 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                     await ctx.send(f"Ok! The giveaway has been set up in <#{destination_channel.id}>.")
                     break
 
-        elif action.lower() in ["end", "finish"]:  # End existing giveaway
-            if message_ID == None:
-                await ctx.send("You must provide the message ID of a giveaway to end!")
-            else:
-                cursor = await self.bot.db.execute("SELECT status FROM Giveaways WHERE message_id = (?)", (message_ID,))
-                row = await cursor.fetchone()
-                await cursor.close()
+    
 
-                if row == None:
-                    await ctx.send(
-                        "The specified giveaway doesn't seem to exist!\n`Either this giveaway never existed, or the data for the giveaway was deleted after 10 days of disuse.`")
-                else:
-                    status = "".join(row)
-                    if status == "active":
-                        await self.roll_giveaway(message_ID)
-                    else:
-                        await ctx.send(
-                            "The giveaway specified has already ended!\n`To re-roll that giveaway, use the command ,giveaway reroll`")
-                        return
-
-
-
-        elif action.lower() == "reroll":  # Reroll existent giveaway
-            if message_ID == None:
-                await ctx.send("You must provide the message ID of a giveaway to reroll!")
-            else:
-                cursor = await self.bot.db.execute(
-                    "SELECT number_winners, status FROM Giveaways WHERE message_id = (?)", (message_ID,))
-                row = await cursor.fetchone()
-                await cursor.close()
-
-                if row == None:
-                    await ctx.send(
-                        "The specified giveaway doesn't seem to exist!\n`Either this giveaway never existed, or the data for the giveaway was deleted after 10 days of disuse.`")
-                else:
-                    status, number_winners = ",".join([str(value) for value in row]).split(",")
-                    if status == "active":
-                        await ctx.send(
-                            "You cannot reroll an on-going giveaway! \n`To end this giveaway, use ',giveaway end'`.")
-                    if reroll_number == None:  # Reroll whole giveaway
-                        await self.roll_giveaway(message_ID)
-                    elif reroll_number.isnumeric() == False:
-                        await ctx.send("The number of winners to reroll for must be numeric!")
-                    else:
-                        reroll_number = math.floor(int(reroll_number))
-                        if reroll_number <= int(
-                                number_winners):  # Reroll giveaway with only a certain number of new winners
-                            await self.roll_giveaway(message_ID, reroll_number)
-                        else:
-                            await ctx.send(
-                                "You cannot reroll a giveaway for more winners than was originally intended!")
-
-
-        elif action.lower() == "list":  # List all current giveaways
-            cursor = await self.bot.db.execute(
-                "SELECT prize, channel_id, message_id, number_winners, time_of_finish, status FROM Giveaways")
-            rows = cursor.fetchall()
+    @commands.command(aliases=["giveawayfinish", "gend", "gfinish"])
+    @commands.has_role("Giveaway Creator")
+    async def giveawayend(self, ctx, message_ID):
+        """
+        Prematurely ends the giveaway with the given message ID!
+        """
+        if message_ID == None:
+            await ctx.send("You must provide the message ID of a giveaway to end!")
+        else:
+            cursor = await self.bot.db.execute("SELECT status FROM Giveaways WHERE message_id = (?)", (message_ID,))
+            row = await cursor.fetchone()
             await cursor.close()
 
-            if rows == None:
-                embed = discord.Embed(title="There have been no giveaways in the last 10 days!",
-                                      description="To make a new giveaway, use the command `,giveaway create`",
-                                      color=0xFF0000)
-                await ctx.send(embed=embed)
+            if row == None:
+                await ctx.send(
+                    "The specified giveaway doesn't seem to exist!\n`Either this giveaway never existed, or the data for the giveaway was deleted after 10 days of disuse.`")
             else:
-                embed = discord.Embed(title="Giveaways:",
-                                      description="Listed below are all giveaways from the last 10 days.",
-                                      color=0x8368ff)
-                for row in rows:
-                    prize, channel_id, message_id, number_winners, datetime_end_str, status = ",".join(
-                        [str(value) for value in row]).split(",")
+                status = "".join(row)
+                if status == "active":
+                    await self.roll_giveaway(message_ID)
+                else:
+                    await ctx.send(
+                        "The giveaway specified has already ended!\n`To re-roll that giveaway, use the command ,giveaway reroll`")
 
-                    embed.add_field(name=f"{prize}",
-                                    value=f"Channel: <#{channel_id}> \nMessage ID: {message_id} \nNumber Of Winners: {number_winners} \nEnds At: {datetime_end_str} \nStatus: {status}")
-                await ctx.send(embed=embed)
 
+
+    @commands.command(aliases=["greroll", "reroll"])
+    @commands.has_role("Giveaway Creator")
+    async def giveawayreroll(self, ctx, message_ID, reroll_number=None):
+        """
+        Rerolls the giveaway with the given message ID and no. winners to reroll!
+        """
+        if message_ID == None:
+            await ctx.send("You must provide the message ID of a giveaway to reroll!")
         else:
-            embed = discord.Embed(title="Invalid Command!", description="Use `,help giveaway` for more info on",
-                                  color=0xFF0000)
+            cursor = await self.bot.db.execute(
+                "SELECT number_winners, status FROM Giveaways WHERE message_id = (?)", (message_ID,))
+            row = await cursor.fetchone()
+            await cursor.close()
+
+            if row == None:
+                await ctx.send(
+                    "The specified giveaway doesn't seem to exist!\n`Either this giveaway never existed, or the data for the giveaway was deleted after 10 days of disuse.`")
+            else:
+                status, number_winners = ",".join([str(value) for value in row]).split(",")
+                if status == "active":
+                    await ctx.send(
+                        "You cannot reroll an on-going giveaway! \n`To end this giveaway, use ',giveaway end'`.")
+                if reroll_number == None:  # Reroll whole giveaway
+                    await self.roll_giveaway(message_ID)
+                elif reroll_number.isnumeric() == False:
+                    await ctx.send("The number of winners to reroll for must be numeric!")
+                else:
+                    reroll_number = math.floor(int(reroll_number))
+                    if reroll_number <= int(
+                            number_winners):  # Reroll giveaway with only a certain number of new winners
+                        await self.roll_giveaway(message_ID, reroll_number)
+                    else:
+                        await ctx.send(
+                            "You cannot reroll a giveaway for more winners than was originally intended!")
+
+
+
+    @commands.command(aliases=["glist"])
+    @commands.has_role("Giveaway Creator")
+    async def giveawaylist(self, ctx):
+        """
+        Lists all giveaways from the last 10 days!
+        """
+        cursor = await self.bot.db.execute(
+            "SELECT prize, channel_id, message_id, number_winners, time_of_finish, status FROM Giveaways")
+        rows = cursor.fetchall()
+        await cursor.close()
+
+        if rows == None:
+            embed = discord.Embed(title="There have been no giveaways in the last 10 days!",
+                                    description="To make a new giveaway, use the command `,giveaway create`",
+                                    color=0xFF0000)
             await ctx.send(embed=embed)
+        else:
+            embed = discord.Embed(title="Giveaways:",
+                                    description="Listed below are all giveaways from the last 10 days.",
+                                    color=0x8368ff)
+            for row in rows:
+                prize, channel_id, message_id, number_winners, datetime_end_str, status = ",".join(
+                    [str(value) for value in row]).split(",")
+
+                embed.add_field(name=f"{prize}",
+                                value=f"Channel: <#{channel_id}> \nMessage ID: {message_id} \nNumber Of Winners: {number_winners} \nEnds At: {datetime_end_str} \nStatus: {status}")
+            await ctx.send(embed=embed)
+
+
+
+
 
     async def roll_giveaway(self, message_ID, reroll_number=None):
         cursor = await self.bot.db.execute(
@@ -529,6 +548,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
         await message_channel.send(
             f":tada: Congratulations {announcement} you won the giveaway for {prize}!\nMake a ticket to claim!")
 
+
     @tasks.loop(minutes=1)
     async def check_giveaways(self):
         cursor = await self.bot.db.execute("SELECT message_id, status, time_of_finish FROM Giveaways")
@@ -544,6 +564,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
             elif status == "inactive" and datetime.utcnow() > datetime_end + timedelta(days=10):  # If giveaway ended more than 10 days ago, delete it
                 await self.bot.db.execute("DELETE FROM Giveaways WHERE message_id = (?)", (message_id,))
                 await self.bot.db.commit()
+
 
     @check_giveaways.before_loop
     async def before_giveaway_check(self):
