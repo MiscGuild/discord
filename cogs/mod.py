@@ -60,7 +60,6 @@ class Moderation(commands.Cog, name="Moderation"):
         name = await utils.name_grabber(ctx.author)
         transcript = await chat_exporter.export(ctx.channel, limit=amount)
         if transcript is None:
-            print("transcript failed")
             pass
         else:
             transcript_file = discord.File(io.BytesIO(transcript.encode()),

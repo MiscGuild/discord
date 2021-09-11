@@ -220,13 +220,10 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 if "prefix" in req["player"]:
                     player_prefix = (req["player"]["prefix"])
                     if player_prefix == "§d[PIG§b+++§d]":
-                        print('Rank acquired- PIG')
                         rank = f"[PIG+++]"
                     elif player_prefix == "§c[SLOTH]":
-                        print('Rank acquired- Sloth')
                         rank = "[SLOTH]"
                     elif player_prefix == "§c[OWNER]":
-                        print('Rank acquired- Owner')
                         rank = "[OWNER]"
                 else:
                     if "newPackageRank" in req["player"]:
@@ -235,7 +232,6 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             if rank == 'YOUTUBER':
                                 rank = '[YOUTUBE]'
                             if rank == 'ADMIN':
-                                print('Rank acquired- Admin')
                                 rank = '[ADMIN]'
                         else:
                             rank = (req["player"]["newPackageRank"])
@@ -243,25 +239,18 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                 if "monthlyPackageRank" in req["player"]:
                                     mvp_plus_plus = (req["player"]["monthlyPackageRank"])
                                     if mvp_plus_plus == "NONE":
-                                        print('Rank acquired- MVP+')
                                         rank = '[MVP+]'
                                     else:
-                                        print('Rank acquired- MVP+')
                                         rank = "[MVP++]"
                                 else:
-                                    print('Rank acquired- MVP+')
                                     rank = "[MVP+]"
                             elif rank == 'MVP':
-                                print('Rank acquired- MVP')
                                 rank = '[MVP]'
                             elif rank == 'VIP_PLUS':
-                                print('Rank acquired- VIP+')
                                 rank = '[VIP+]'
                             elif rank == 'VIP':
-                                print('Rank acquired- VIP')
                                 rank = '[VIP]'
                     else:
-                        print('Rank acquired- Non')
                         rank = " "
 
                 'ACHIEVEMENT POINTS'
@@ -990,7 +979,6 @@ class Hypixel(commands.Cog, name="Hypixel"):
             if gname != 'Miscellaneous':
                 await ctx.send('The user is not in Miscellaneous')
             if len(data) < 2:
-                print("The user is not in any guild!")
                 await ctx.send('The user is not in any guild')
             else:
                 for member in data["guild"]["members"]:
@@ -1084,13 +1072,10 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     if "prefix" in data["player"]:
                         player_prefix = (data["player"]["prefix"])
                         if player_prefix == "§d[PIG§b+++§d]":  # Pig+++
-                            print('Rank acquired- PIG')
                             playerrank = f"&d[PIG&b+++&d]"
                         elif player_prefix == "§c[SLOTH]":  # Sloth
-                            print('Rank acquired- Sloth')
                             playerrank = "&c[SLOTH]"
                         elif player_prefix == "§c[OWNER]":  # Owner
-                            print('Rank acquired- Owner')
                             playerrank = "&c[OWNER]"
 
                     if "newPackageRank" in data["player"]:
@@ -1099,13 +1084,10 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             if rank == 'YOUTUBER':  # Youtuber
                                 playerrank = '&c[&fYOUTUBE&c]'
                             if rank == 'ADMIN':  # Admin
-                                print('Rank acquired- Admin')
                                 playerrank = '&c[ADMIN]'
                             if rank == 'MODERATOR':  # Moderator
-                                print('Rank acquired- Moderator')
                                 playerrank = '&2[MOD]'
                             if rank == 'HELPER':  # Helper
-                                print('Rank acquired- Helper')
                                 playerrank = '&9[HELPER]'
 
                         else:
@@ -1118,7 +1100,6 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                     if (data["player"]["monthlyPackageRank"]) == "NONE":  # Had MVP++ but now is an MVP+
                                         if 'rankPlusColor' in data['player']:
                                             pluscolor = color.get(data['player']['rankPlusColor'])
-                                            print('Rank acquired- MVP+ (MVP++ sub category)')
                                             playerrank = f'&b[MVP{pluscolor}+&b]'
                                         else:
                                             playerrank = f'&b[MVP&c+&b]'
@@ -1128,25 +1109,20 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                             if data['player']['monthlyRankColor'] == 'GOLD':  # Gold MVP++
                                                 if 'rankPlusColor' in data['player']:  # Gold MVP++ w/custom + colors
                                                     pluscolor = color.get(data['player']['rankPlusColor'])
-                                                    print('Rank acquired- MVP++ (Gold + rankPlusColor)')
                                                     playerrank = f'&6[MVP{pluscolor}++&6]'
                                                 else:  # Gold MVP++ w/o custom + colors
                                                     playerrank = f'&6[MVP&c++&6]'
-                                                    print('Rank acquired- MVP++ (Gold + No rankPlusColor)')
 
                                             elif data['player'][
                                                 'monthlyRankColor'] == 'AQUA':  # Aqua MVP++ w/custom + colors
                                                 if 'rankPlusColor' in data['player']:
                                                     pluscolor = color.get(data['player']['rankPlusColor'])
-                                                    print('Rank acquired- MVP++ (Aqua + rankPlusColor)')
                                                     playerrank = f'&b[MVP{pluscolor}++&b]'
                                                 else:  # Aqua MVP++ w/o custom + colors
                                                     playerrank = f'&b[MVP&c++&b]'
-                                                    print('Rank acquired- MVP++ (Aqua + No rankPlusColor)')
                                         else:
                                             if 'rankPlusColor' in data['player']:
                                                 pluscolor = color.get(data['player']['rankPlusColor'])
-                                                print('Rank acquired- MVP+ (MVP++ sub category)')
                                                 playerrank = f'&b[MVP{pluscolor}+&b]'
                                             else:
                                                 playerrank = f'&b[MVP&c+&b]'
@@ -1154,21 +1130,16 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                 else:  # MVP+ (No MVP++ subcategory found)
                                     if 'rankPlusColor' in data['player']:
                                         pluscolor = color.get(data['player']['rankPlusColor'])
-                                        print('Rank acquired- MVP+ (MVP+ category)')
                                         playerrank = f'&b[MVP{pluscolor}+&b]'
                                     else:
                                         playerrank = f'&b[MVP&c+&b]'
                             elif rank == 'MVP':
-                                print('Rank acquired- MVP')
                                 playerrank = '&b[MVP]'
                             elif rank == 'VIP_PLUS':
-                                print('Rank acquired- VIP+')
                                 playerrank = '&a[VIP&6+&a]'
                             elif rank == 'VIP':
-                                print('Rank acquired- VIP')
                                 playerrank = '&a[VIP]'
                     else:
-                        print('Rank acquired- Non')
                         playerrank = '&7'
 
                     if iteration_number != 10:
@@ -1255,13 +1226,10 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     if "prefix" in data["player"]:
                         player_prefix = (data["player"]["prefix"])
                         if player_prefix == "§d[PIG§b+++§d]":  # Pig+++
-                            print('Rank acquired- PIG')
                             playerrank = f"&d[PIG&b+++&d]"
                         elif player_prefix == "§c[SLOTH]":  # Sloth
-                            print('Rank acquired- Sloth')
                             playerrank = "&c[SLOTH]"
                         elif player_prefix == "§c[OWNER]":  # Owner
-                            print('Rank acquired- Owner')
                             playerrank = "&c[OWNER]"
 
                     if "newPackageRank" in data["player"]:
@@ -1270,7 +1238,6 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             if rank == 'YOUTUBER':  # Youtuber
                                 playerrank = '&c[&fYOUTUBE&c]'
                             if rank == 'ADMIN':  # Admin
-                                print('Rank acquired- Admin')
                                 playerrank = '&c[ADMIN]'
 
 
@@ -1285,7 +1252,6 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                     if (data["player"]["monthlyPackageRank"]) == "NONE":  # Had MVP++ but now is an MVP+
                                         if 'rankPlusColor' in data['player']:
                                             pluscolor = color.get(data['player']['rankPlusColor'])
-                                            print('Rank acquired- MVP+ (MVP++ sub category)')
                                             playerrank = f'&b[MVP{pluscolor}+&b]'
                                         else:
                                             playerrank = f'&b[MVP&c+&b]'
@@ -1296,43 +1262,34 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                             'monthlyRankColor'] == 'GOLD':  # Gold MVP++
                                             if 'rankPlusColor' in data['player']:  # Gold MVP++ w/custom + colors
                                                 pluscolor = color.get(data['player']['rankPlusColor'])
-                                                print('Rank acquired- MVP++ (Gold + rankPlusColor)')
                                                 playerrank = f'&6[MVP{pluscolor}++&6]'
                                             else:  # Gold MVP++ w/o custom + colors
                                                 playerrank = f'&6[MVP&c++&6]'
-                                                print('Rank acquired- MVP++ (Gold + No rankPlusColor)')
 
 
                                         elif data['player'][
                                             'monthlyRankColor'] == 'AQUA':  # Aqua MVP++ w/custom + colors
                                             if 'rankPlusColor' in data['player']:
                                                 pluscolor = color.get(data['player']['rankPlusColor'])
-                                                print('Rank acquired- MVP++ (Aqua + rankPlusColor)')
                                                 playerrank = f'&b[MVP{pluscolor}++&b]'
                                             else:  # Aqua MVP++ w/o custom + colors
                                                 playerrank = f'&b[MVP&c++&b]'
-                                                print('Rank acquired- MVP++ (Aqua + No rankPlusColor)')
 
 
 
                                 else:  # MVP+ (No MVP++ subcategory found)
                                     if 'rankPlusColor' in data['player']:
                                         pluscolor = color.get(data['player']['rankPlusColor'])
-                                        print('Rank acquired- MVP+ (MVP+ category)')
                                         playerrank = f'&b[MVP{pluscolor}+&b]'
                                     else:
                                         playerrank = f'&b[MVP&c+&b]'
                             elif rank == 'MVP':
-                                print('Rank acquired- MVP')
                                 playerrank = '&b[MVP]'
                             elif rank == 'VIP_PLUS':
-                                print('Rank acquired- VIP+')
                                 playerrank = '&a[VIP&6+&a]'
                             elif rank == 'VIP':
-                                print('Rank acquired- VIP')
                                 playerrank = '&a[VIP]'
                     else:
-                        print('Rank acquired- Non')
                         playerrank = '&7'
 
                     if z != 10:
