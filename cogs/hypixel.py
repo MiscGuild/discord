@@ -54,16 +54,16 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     else:  # 'tag' argument is NOT None, but user doesn't have roles
                         await ctx.send(
                             "Your tag will not be updated since you do not have the active/staff/former staff/server booster role!")
-
-                    await ctx.author.remove_roles(self.bot.guest, self.bot.awaiting_app, reason="Sync")
-                    await ctx.author.add_roles(self.bot.member_role, reason="Sync")
-                    embed = discord.Embed(title="Your nick, role and tag were successfully changed!",
-                                          description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
-                                          color=0x8368ff)
-                    embed.set_footer(
-                        text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
-                    embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
-                    await ctx.reply(embed=embed)
+                    if guild_name == "Miscellaneous":
+                        await ctx.author.remove_roles(self.bot.guest, self.bot.awaiting_app, reason="Sync")
+                        await ctx.author.add_roles(self.bot.member_role, reason="Sync")
+                        embed = discord.Embed(title="Your nick, role and tag were successfully changed!",
+                                              description="If this wasn't the change you anticipated, kindly create a ticket or get in contact with staff!",
+                                              color=0x8368ff)
+                        embed.set_footer(
+                            text="Member of Miscellaneous\n• Nick Changed\n• Guest & Awaiting Approval were removed\n• Member was given")
+                        embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
+                        await ctx.reply(embed=embed)
 
                 elif guild_name in self.bot.misc_allies:
                     for guild in self.bot.misc_allies:
@@ -84,7 +84,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
                             await ctx.send(embed=embed)
 
-                elif guild_name != "Miscellaneous" and guild_name not in self.bot.misc_allies:
+                if guild_name != "Miscellaneous" and guild_name not in self.bot.misc_allies:
                     if str(ctx.channel.category.name) == "RTickets":
                         await ctx.send("You aren't in Miscellaneous in-game. Kindly await staff assistance!")
                     else:
@@ -916,7 +916,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             if "commands" not in ctx.channel.name and ctx.channel.category.name not in (
                                     '🎫 Ticket Section', 'DNKL', 'MILESTONES', 'REPORTS', 'EVENT', 'OTHER', 'RTickets'):
                                 name = name.replace("_", "\_")
+                                await ctx.channel.purge(limit=1)
                                 await ctx.send(f"__**{name}**__\n**Guild Experience -** `{totalexp}`")
+
                             else:
                                 embed = discord.Embed(title=f"{name}",
                                                       url=f'https://plancke.io/hypixel/player/stats/{name}',
