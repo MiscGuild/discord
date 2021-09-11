@@ -441,7 +441,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
             # ROLE REQUIREMENTS
             if len(required_roles) and role_requirement_type != "none":
                 if role_requirement_type == "optional":  # Needs ONE of the required roles
-                    if not any(role.id in required_roles for role in winner.roles):
+                    if not any(str(role.id) in required_roles for role in winner.roles):
                         entrants.remove(winner)
                         continue
 
