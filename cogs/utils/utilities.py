@@ -60,20 +60,6 @@ async def name_grabber(author):
     return name
 
 
-async def name_grabber_rolecheck(author):
-    name = author.nick
-    if name is None:
-        name = author.name
-    else:
-        if "_" in name:
-            name.replace("_","\_")
-        if "\\" in name:
-            name.replace("\\","\\\\")
-        if "|" in name:
-            name.replace("|","\\|")
-        name = name.split()[0]
-    return name
-
 
 async def get_level(name):
     data = await get_data(name)

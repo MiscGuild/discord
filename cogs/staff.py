@@ -582,7 +582,7 @@ class staff(commands.Cog, name="Staff"):
 
 
                     if member.id not in self.bot.adminids and member.bot is False:
-                        name = await utils.name_grabber_rolecheck(member)
+                        name = await utils.name_grabber(member)
                         has_tag_perms = any(role in ctx.author.roles for role in self.bot.tag_allowed_roles)
 
                         await msg.edit(content=f"**Checking** {name}")
@@ -592,7 +592,8 @@ class staff(commands.Cog, name="Staff"):
                                 if mojang.status != 200:  # If the IGN is invalid
                                     await member.remove_roles(self.bot.member_role, self.bot.guest, reason="Rolecheck")
                                     await member.add_roles(self.bot.new_member_role, reason="Rolecheck")
-                                    new_member_description = str(new_member_description) + f"{name} ||{member}|| Player doesn't exist. **++New Member | --Member | -- Guest**\n"
+                                    name = name.replace("_","\\_")
+                                    new_member_description = str(new_member_description) + f"{name} **++New Member | --Member | -- Guest**\n"
                                     continue
                                 else:
                                     mojang_json = await mojang.json()
@@ -627,7 +628,8 @@ class staff(commands.Cog, name="Staff"):
                                             await member.add_roles(self.bot.inactive_role, self.bot.member_role, reason="Rolecheck")
                                             await member.remove_roles(self.bot.active_role, self.bot.ally, self.bot.guest,
                                                                       reason="Rolecheck")
-                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | ++Inactive | --Active** \n",
+                                            name = name.replace("_", "\\_")
+                                            misc_member_description = str(misc_member_description) + f"{name} **++Member | ++Inactive | --Active** \n",
 
                                         elif totalexp >= self.bot.active:  # If the member is active
                                             if has_tag_perms is False:
@@ -635,7 +637,8 @@ class staff(commands.Cog, name="Staff"):
                                             await member.remove_roles(self.bot.inactive_role, self.bot.new_member_role, self.bot.guest,
                                                                       self.bot.ally, reason="Rolecheck")
                                             await member.add_roles(self.bot.active_role, self.bot.member_role, reason="Rolecheck")
-                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | ++Active | --Inactive** \n"
+                                            name = name.replace("_", "\\_")
+                                            misc_member_description = str(misc_member_description) + f"{name} **++Member | ++Active | --Inactive** \n"
 
                                         elif totalexp > self.bot.inactive:
                                             username = await utils.name_grabber(member)
@@ -644,7 +647,8 @@ class staff(commands.Cog, name="Staff"):
                                             await member.add_roles(self.bot.member_role, reason="Rolecheck")
                                             await member.remove_roles(self.bot.inactive_role, self.bot.active_role, self.bot.guest,
                                                                       self.bot.ally, self.bot.guest, reason="Rolecheck")
-                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | --Inactive | --Active** \n"
+                                            name = name.replace("_", "\\_")
+                                            misc_member_description = str(misc_member_description) + f"{name} **++Member | --Inactive | --Active** \n"
                                     else:  # For residents
                                         if totalexp < self.bot.resident_req:
                                             username = await utils.name_grabber(member)
@@ -653,7 +657,8 @@ class staff(commands.Cog, name="Staff"):
                                             await member.add_roles(self.bot.inactive_role, self.bot.member_role, reason="Rolecheck")
                                             await member.remove_roles(self.bot.active_role, self.bot.ally, self.bot.guest,
                                                                       reason="Rolecheck")
-                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | ++Inactive | --Active** \n"
+                                            name = name.replace("_", "\\_")
+                                            misc_member_description = str(misc_member_description) + f"{name} **++Member | ++Inactive | --Active** \n"
 
                                         elif totalexp >= self.bot.active:  # If the member is active
                                             if has_tag_perms is False:
@@ -661,7 +666,8 @@ class staff(commands.Cog, name="Staff"):
                                             await member.remove_roles(self.bot.inactive_role, self.bot.new_member_role, self.bot.guest,
                                                                       self.bot.ally, reason="Rolecheck")
                                             await member.add_roles(self.bot.active_role, self.bot.member_role, reason="Rolecheck")
-                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | ++Active | --Inactive** \n"
+                                            name = name.replace("_", "\\_")
+                                            misc_member_description = str(misc_member_description) + f"{name} **++Member | ++Active | --Inactive** \n"
 
                                         elif totalexp > self.bot.resident_req:
                                             username = await utils.name_grabber(member)
@@ -670,7 +676,8 @@ class staff(commands.Cog, name="Staff"):
                                             await member.add_roles(self.bot.member_role, reason="Rolecheck")
                                             await member.remove_roles(self.bot.inactive_role, self.bot.active_role, self.bot.guest,
                                                                       self.bot.ally, reason="Rolecheck")
-                                            misc_member_description = str(misc_member_description) + f"{name} ||{member}|| **++Member | --Inactive| --Active** \n"
+                                            name = name.replace("_", "\\_")
+                                            misc_member_description = str(misc_member_description) + f"{name} **++Member | --Inactive| --Active** \n"
                         # Ally
                         elif ign in ally_members:
                             guild_name = await utils.get_guild(name)
@@ -683,15 +690,16 @@ class staff(commands.Cog, name="Staff"):
                                     await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
                                                               self.bot.active_role, self.bot.inactive_role,
                                                               reason="Rolecheck")
-                                    ally_member_description = str(ally_member_description) + f"{name} ||{member}|| Member of {guild} **++Ally | ++Guest | --Member | --Active** \n"
+                                    name = name.replace("_", "\\_")
+                                    ally_member_description = str(ally_member_description) + f"{name} Member of {guild} **++Ally | ++Guest | --Member | --Active** \n"
                         else:
                             await member.edit(nick=ign)
                             await member.add_roles(self.bot.guest, reason="Rolecheck")
                             await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
                                                       self.bot.active_role, self.bot.inactive_role, self.bot.ally,
                                                       reason="Rolecheck")
-
-                            guest_description = str(guest_description) + f"{name} ||{member}|| **++Guest | --Member | --Active** \n"
+                            name = name.replace("_", "\\_")
+                            guest_description = str(guest_description) + f"{name} **++Guest | --Member | --Active** \n"
                 try:
                     if misc_member_description != "":
                         embed = discord.Embed(title="Miscellaneous Members", description=misc_member_description,

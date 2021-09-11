@@ -186,19 +186,23 @@ class Roles(commands.Cog, command_attrs=dict(hidden=True)):
                     849830936434704404,
                     849831004310077441,
                     855598846843551744]
+
+        labels = {849830869036040212: "He/Him",
+                  849830936434704404: "She/Her",
+                  849831004310077441: "They/Them",
+                  855598846843551744: "Other"}
         member = self.bot.misc_guild.get_member(int(res.user.id))
-        for role in res.component.options:
-            if int(role.value) in role_ids:
-                cached_role = self.bot.misc_guild.get_role(int(role.value))
-                if cached_role in member.roles:
-                    await member.remove_roles(cached_role, reason=f"Pronoun role: {role.label} Removed")
-                    await res.respond(content=f"Removed {role.label}")
-                elif cached_role not in member.roles:
-                    for x in role_ids:
-                        await member.remove_roles(self.bot.misc_guild.get_role(x),
-                                                  reason="Pronouns Duplicate Prevention")
-                    await member.add_roles(cached_role, reason=f"Pronoun role: {role.label} Given")
-                    await res.respond(content=f"Added {role.label}")
+        if int(res.values[0]) in role_ids:
+            cached_role = self.bot.misc_guild.get_role(int(res.values[0]))
+            if cached_role in member.roles:
+                await member.remove_roles(cached_role, reason=f"Pronoun role: {labels.get(int(res.values[0]))} Removed")
+                await res.respond(content=f"Removed {labels.get(int(res.values[0]))}")
+            elif cached_role not in member.roles:
+                for x in role_ids:
+                    await member.remove_roles(self.bot.misc_guild.get_role(x),
+                                              reason="Pronouns Duplicate Prevention")
+                await member.add_roles(cached_role, reason=f"Pronoun role: {labels.get(int(res.values[0]))} Given")
+                await res.respond(content=f"Added {labels.get(int(res.values[0]))}")
 
 
 def setup(bot):
