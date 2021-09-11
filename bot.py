@@ -54,7 +54,7 @@ bot.help_command = HelpCommand(command_attrs={'hidden': True})
 
 initial_extensions = ['cogs.fun', 'cogs.hypixel', 'cogs.mod', 'cogs.staff', 'cogs.tickets', 'cogs.owner',
                       'cogs.buttons',
-                      'cogs.miscellaneous']
+                      'cogs.giveaways']
 
 if __name__ == '__main__':
     for extension in initial_extensions:
@@ -95,7 +95,7 @@ async def on_command_error(ctx, error):
         await ctx.send(embed=embed)
     elif isinstance(error, commands.MissingPermissions):
         embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
-                              description="You do not have the required roles to access this restricted command!",
+                              description="You do not have the required permissions to access this restricted command!",
                               color=0xDE3163)
         await ctx.send(embed=embed)
     elif isinstance(error, commands.MissingRequiredArgument):
