@@ -42,8 +42,6 @@ class staff(commands.Cog, name="Staff"):
         embed = discord.Embed(title='How to get Resident?',
                               description='To be eligible for Resident, you must be one of the following',
                               color=0x8368ff)
-        embed.add_field(name="Veteran", value="Be in the guild for more than 1 year",
-                        inline=False)
         embed.add_field(name="Youtuber",
                         value="If you're a youtuber with more than 5,000 subscribers, you aren't subject to any guild requirements.",
                         inline=False)
