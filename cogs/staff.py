@@ -557,26 +557,27 @@ class staff(commands.Cog, name="Staff"):
         for guild in self.bot.guilds:
             if str(guild) == "Miscellaneous [MISC]":  # Check if the Discord is Miscellaneous
                 for member in guild.members:  # For loop for all members in the Discord
-
-                    if len(misc_member_description) > 2096:
-                        embed = discord.Embed(title="Miscellaneous Members", description=misc_member_description,
-                                              color=0x8368ff)
-                        await ctx.send(embed=embed)
-                        misc_member_description = ""
-                    if len(ally_member_description) > 2096:
-                        embed = discord.Embed(title="Ally Members", description=ally_member_description, color=0x8368ff)
-                        await ctx.send(embed=embed)
-                        ally_member_description = ""
-                    if len(new_member_description) > 2096:
-                        embed = discord.Embed(title="New Member (Role)", description=new_member_description,
-                                              color=0x8368ff)
-                        await ctx.send(embed=embed)
-                        new_member_description = ""
-                    if len(guest_description) > 2096:
-                        embed = discord.Embed(title="Guest (Role)", description=guest_description, color=0x8368ff)
-                        await ctx.send(embed=embed)
-                        guest_description = ""
-
+                    try: 
+                        if len(misc_member_description) > 2096:
+                            embed = discord.Embed(title="Miscellaneous Members", description=misc_member_description,
+                                                  color=0x8368ff)
+                            await ctx.send(embed=embed)
+                            misc_member_description = ""
+                        if len(ally_member_description) > 2096:
+                            embed = discord.Embed(title="Ally Members", description=ally_member_description, color=0x8368ff)
+                            await ctx.send(embed=embed)
+                            ally_member_description = ""
+                        if len(new_member_description) > 2096:
+                            embed = discord.Embed(title="New Member (Role)", description=new_member_description,
+                                                  color=0x8368ff)
+                            await ctx.send(embed=embed)
+                            new_member_description = ""
+                        if len(guest_description) > 2096:
+                            embed = discord.Embed(title="Guest (Role)", description=guest_description, color=0x8368ff)
+                            await ctx.send(embed=embed)
+                            guest_description = ""
+                    except Excpetion as e:
+                        await ctx.send(f"Embed sending error\n```{e}```")
 
 
                     if member.id not in self.bot.adminids and member.bot is False:
