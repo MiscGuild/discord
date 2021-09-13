@@ -13,7 +13,7 @@ class Fun(commands.Cog, name="Fun"):
     def __init__(self, bot):
         self.bot = bot
 
-    # Pizza
+
     @commands.command()
     async def pizza(self, ctx):
         """Gives you a pizza
@@ -26,17 +26,7 @@ class Fun(commands.Cog, name="Fun"):
         embed.set_image(url=req['image'])
         await ctx.send(embed=embed)
 
-    # Ping
-    @commands.command()
-    async def ping(self, ctx):
-        """Gives the bot's ping
-        """
-        embed = discord.Embed(title='Pong',
-                              description=f"{round(self.bot.latency * 1000)}ms",
-                              color=0x8368ff)
-        await ctx.send(embed=embed)
 
-    # 8ball
     @commands.command(name='8ball', aliases=['eightball'])
     async def _8ball(self, ctx, *, question):
         """Play with the magic 8ball
