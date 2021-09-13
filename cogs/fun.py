@@ -139,6 +139,14 @@ class Fun(commands.Cog, name="Fun"):
 
             await ctx.send(f"📚 Definition for **{result['word']}**```fix\n{definition}```")
 
+    @commands.command()
+    async def reverse(self, ctx, *, text: str):
+        """ !ffuts sesreveR
+        Everything you type after reverse will be reversed
+        """
+        t_rev = text[::-1].replace("@", "@\u200B").replace("&", "&\u200B")
+        await ctx.send(f"🔁 {t_rev}")
+
     
 
     @commands.command()
