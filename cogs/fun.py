@@ -192,7 +192,25 @@ class Fun(commands.Cog, name="Fun"):
             beer_offer = beer_offer + f"\n\n**Reason:** {reason}" if reason else beer_offer
             await msg.edit(content=beer_offer)
 
+    @commands.command(aliases=["howhot", "hot","hotness"])
+    async def hotcalc(self, ctx, *, user: discord.Member = None):
+        """ Returns a random percent for how hot is a discord user """
+        user = user or ctx.author
 
+        random.seed(user.id)
+        r = random.randint(1, 100)
+        hot = r / 1.17
+
+        if hot > 75:
+            emoji = "💞"
+        elif hot > 50:
+            emoji = "💖"
+        elif hot > 25:
+            emoji = "❤"
+        else:
+            emoji = "💔"
+
+        await ctx.send(f"**{user.name}** is **{hot:.2f}%** hot {emoji}")
 
     @commands.command()
     async def joke(self, ctx):
