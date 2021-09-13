@@ -323,7 +323,7 @@ class giveaways(commands.Cog, name="Giveaways"):
                     await ctx.send("The number of winners to reroll for must be numeric!")
                 else:
                     reroll_number = math.floor(int(reroll_number))
-                    if reroll_number <= number_winners:  # Reroll giveaway with only a certain number of new winners
+                    if reroll_number <= int(number_winners):  # Reroll giveaway with only a certain number of new winners
                         await self.roll_giveaway(message_ID, reroll_number)
                     else:
                         await ctx.send("You cannot reroll a giveaway for more winners than was originally intended!")
