@@ -112,9 +112,34 @@ class Fun(commands.Cog, name="Fun"):
         embed.set_image(url=req['image'])
         await ctx.send(embed=embed)
 
+    @commands.command(aliases=["urbandict", "urbandictionary"])
+    async def urban(self, ctx, *, word):
+        """ Find the 'best' definition to your words """
+        async with ctx.channel.typing():
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(f"https://api.urbandictionary.com/v0/define?term={word}") as resp:
+                        req = await resp.json()
+            except Exception:
+                return await ctx.send("Urban API returned invalid data... might be down atm.")
+
+            if not req:
+                return await ctx.send("I think the API broke...")
+
+            if not len(req["list"]):
+                return await ctx.send("Couldn't find your search in the dictionary...")
+
+            result = sorted(req["list"], reverse=True, key=lambda g: int(g["thumbs_up"]))[0]
+
+            definition = result["definition"]
+            if len(definition) >= 1000:
+                definition = definition[:1000]
+                definition = definition.rsplit(" ", 1)[0]
+                definition += "..."
+
+            await ctx.send(f"📚 Definition for **{result['word']}**```fix\n{definition}```")
+
     
-
-
 
     @commands.command()
     async def joke(self, ctx):
