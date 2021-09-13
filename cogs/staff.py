@@ -578,6 +578,10 @@ class staff(commands.Cog, name="Staff"):
                             guest_description = ""
                     except Exception as e:
                         await ctx.send(f"Embed sending error\n```{e}```")
+                        guest_description = ""
+                        new_member_description = ""
+                        ally_member_description = ""
+                        misc_member_description = ""
 
 
                     if member.id not in self.bot.adminids and member.bot is False:

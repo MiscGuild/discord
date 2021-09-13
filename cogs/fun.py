@@ -2,6 +2,8 @@ import random
 
 import aiohttp
 import discord
+import requests
+import secrets
 from discord.ext import commands
 
 from cogs.utils import utilities as utils
@@ -109,6 +111,10 @@ class Fun(commands.Cog, name="Fun"):
         embed.set_footer(text=f"Fun Fact:\n{req['fact']}")
         embed.set_image(url=req['image'])
         await ctx.send(embed=embed)
+
+    
+
+
 
     @commands.command()
     async def joke(self, ctx):
