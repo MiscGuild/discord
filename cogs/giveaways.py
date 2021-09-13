@@ -313,7 +313,7 @@ class giveaways(commands.Cog, name="Giveaways"):
                 await ctx.send(
                     "The specified giveaway doesn't seem to exist!\n`Either this giveaway never existed, or the data for the giveaway was deleted after 10 days of disuse.`")
             else:
-                status, number_winners = row
+                number_winners, status = row
                 if status == "active":
                     await ctx.send(
                         "You cannot reroll an on-going giveaway! \n`To end this giveaway, use ',giveaway end'`.")
