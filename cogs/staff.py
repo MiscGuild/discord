@@ -576,7 +576,7 @@ class staff(commands.Cog, name="Staff"):
                             embed = discord.Embed(title="Guest (Role)", description=guest_description, color=0x8368ff)
                             await ctx.send(embed=embed)
                             guest_description = ""
-                    except Excpetion as e:
+                    except Exception as e:
                         await ctx.send(f"Embed sending error\n```{e}```")
 
 
