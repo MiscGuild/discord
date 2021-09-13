@@ -147,7 +147,17 @@ class Fun(commands.Cog, name="Fun"):
         t_rev = text[::-1].replace("@", "@\u200B").replace("&", "&\u200B")
         await ctx.send(f"🔁 {t_rev}")
 
-    
+    @commands.command()
+    async def password(self, ctx, nbytes: int = 18):
+        """ Generates a random password string for you
+        This returns a random URL-safe text string, containing nbytes random bytes.
+        The text is Base64 encoded, so on average each byte results in approximately 1.3 characters.
+        """
+        if nbytes not in range(3, 1401):
+            return await ctx.send("I only accept any numbers between 3-1400")
+        if hasattr(ctx, "guild") and ctx.guild is not None:
+            await ctx.send(f"Sending you a private message with your random generated password **{ctx.author.name}**")
+        await ctx.author.send(f"🎁 **Here is your password:**\n{secrets.token_urlsafe(nbytes)}")
 
     @commands.command()
     async def joke(self, ctx):
