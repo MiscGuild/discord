@@ -10,12 +10,10 @@ from discord.ext import commands, tasks
 from cogs.utils import utilities as utils
 
 
-class miscellaneous(commands.Cog, name="Miscellaneous"):
+class giveaways(commands.Cog, name="Giveaways"):
     def __init__(self, bot):
         self.bot = bot
         self.check_giveaways.start()
-
-    
 
     @commands.command(aliases=["gcreate"])
     @commands.has_role("Giveaway Creator")
@@ -30,7 +28,6 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                                                     check=lambda
                                                         x: x.channel == ctx.channel and x.author == ctx.author)
             destination = destination.content.lower()
-
             if destination == "cancel":
                 await ctx.send("Giveaway cancelled!")
                 return
@@ -43,10 +40,9 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                 destination = re.sub(r"\s+", "-", destination)
                 destination_channel = discord.utils.get(ctx.guild.channels, name=destination)
 
-            if destination_channel != None:  # Channel exists
-                break
-            else:  # Channel is non-existent - Redo step.
+            if destination_channel == None:  # Channel exists
                 await ctx.send(f"The channel {destination} is invalid!")
+                break
 
             # Channel entered correctly
             await ctx.send(
@@ -270,7 +266,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
 
                     await ctx.send(f"Ok! The giveaway has been set up in <#{destination_channel.id}>.")
                     break
-
+            break
     
 
     @commands.command(aliases=["giveawayfinish", "gend", "gfinish"])
@@ -317,7 +313,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                 await ctx.send(
                     "The specified giveaway doesn't seem to exist!\n`Either this giveaway never existed, or the data for the giveaway was deleted after 10 days of disuse.`")
             else:
-                status, number_winners = ",".join([str(value) for value in row]).split(",")
+                status, number_winners = row
                 if status == "active":
                     await ctx.send(
                         "You cannot reroll an on-going giveaway! \n`To end this giveaway, use ',giveaway end'`.")
@@ -327,29 +323,26 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                     await ctx.send("The number of winners to reroll for must be numeric!")
                 else:
                     reroll_number = math.floor(int(reroll_number))
-                    if reroll_number <= int(
-                            number_winners):  # Reroll giveaway with only a certain number of new winners
+                    if reroll_number <= number_winners:  # Reroll giveaway with only a certain number of new winners
                         await self.roll_giveaway(message_ID, reroll_number)
                     else:
-                        await ctx.send(
-                            "You cannot reroll a giveaway for more winners than was originally intended!")
+                        await ctx.send("You cannot reroll a giveaway for more winners than was originally intended!")
 
 
 
     @commands.command(aliases=["glist"])
-    @commands.has_role("Giveaway Creator")
     async def giveawaylist(self, ctx):
         """
         Lists all giveaways from the last 10 days!
         """
         cursor = await self.bot.db.execute(
             "SELECT prize, channel_id, message_id, number_winners, time_of_finish, status FROM Giveaways")
-        rows = cursor.fetchall()
+        rows = await cursor.fetchall()
         await cursor.close()
 
-        if rows == None:
+        if rows == []:
             embed = discord.Embed(title="There have been no giveaways in the last 10 days!",
-                                    description="To make a new giveaway, use the command `,giveaway create`",
+                                    description="To make a new giveaway, use the command `,giveawaycreate`",
                                     color=0xFF0000)
             await ctx.send(embed=embed)
         else:
@@ -357,8 +350,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                                     description="Listed below are all giveaways from the last 10 days.",
                                     color=0x8368ff)
             for row in rows:
-                prize, channel_id, message_id, number_winners, datetime_end_str, status = ",".join(
-                    [str(value) for value in row]).split(",")
+                prize, channel_id, message_id, number_winners, datetime_end_str, status = row
 
                 embed.add_field(name=f"{prize}",
                                 value=f"Channel: <#{channel_id}> \nMessage ID: {message_id} \nNumber Of Winners: {number_winners} \nEnds At: {datetime_end_str} \nStatus: {status}")
@@ -374,12 +366,11 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
             (message_ID,))
         row = await cursor.fetchone()
         await cursor.close()
-        message_id, channel_id, prize, number_winners, role_requirement_type, required_roles, required_gexp = ",".join(
-            [str(value) for value in row]).split(",")
+        message_id, channel_id, prize, number_winners, role_requirement_type, required_roles, required_gexp = row
         required_roles = required_roles.split(" ")
 
-        message = await self.bot.get_channel(int(channel_id)).fetch_message(int(message_id))
-        message_channel = self.bot.get_channel(int(channel_id))
+        message = await self.bot.get_channel(channel_id).fetch_message(message_id)
+        message_channel = self.bot.get_channel(channel_id)
 
         reactions = message.reactions
         entrants = []
@@ -472,7 +463,6 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
                         continue
 
             # GEXP REQUIREMENTS
-            required_gexp = int(required_gexp)
             if required_gexp != 0:  # There is a gexp requirement
                 async with aiohttp.ClientSession() as session:  # Get winner profile info
                     async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
@@ -555,7 +545,7 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
         await cursor.close()
 
         for row in rows:
-            message_id, status, datetime_end_str = ",".join([str(value) for value in row]).split(",")
+            message_id, status, datetime_end_str = row
             datetime_end = datetime.strptime(datetime_end_str, "%Y-%m-%d %H:%M:%S")
 
             if status == "active" and datetime_end < datetime.utcnow():  # Giveaway needs to be ended
@@ -571,4 +561,4 @@ class miscellaneous(commands.Cog, name="Miscellaneous"):
 
 
 def setup(bot):
-    bot.add_cog(miscellaneous(bot))
+    bot.add_cog(giveaways(bot))
