@@ -191,18 +191,19 @@ class Fun(commands.Cog, name="Fun"):
         r = random.randint(1, 100)
         hot = r / 1.17
 
-        if user.id == "484411714637529088":
+        
+        if user.id == 484411714637529088:
             hot = 420
-            await ctx.send(f"**{user.name}** is **{hot:.2f}%** hot 💞 ||I love ElijahRus he is so smart and handsome||")
+
+        if hot > 75:
+            emoji = "💞"
+        elif hot > 50:
+            emoji = "💖"
+        elif hot > 25:
+            emoji = "❤"
         else:
-            if hot > 75:
-                emoji = "💞"
-            elif hot > 50:
-                emoji = "💖"
-            elif hot > 25:
-                emoji = "❤"
-            else:
-                emoji = "💔"
+            emoji = "💔"
+
         await ctx.send(f"**{user.name}** is **{hot:.2f}%** hot {emoji}")
 
 
