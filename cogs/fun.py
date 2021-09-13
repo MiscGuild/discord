@@ -190,19 +190,21 @@ class Fun(commands.Cog, name="Fun"):
         random.seed(user.id)            
         r = random.randint(1, 100)
         hot = r / 1.17
+
         if user.id == "484411714637529088":
-            hot = 100
-
-        if hot > 75:
-            emoji = "💞"
-        elif hot > 50:
-            emoji = "💖"
-        elif hot > 25:
-            emoji = "❤"
+            hot = 420
+            await ctx.send(f"**{user.name}** is **{hot:.2f}%** hot 💞 ||I love ElijahRus he is so smart and handsome||")
         else:
-            emoji = "💔"
-
+            if hot > 75:
+                emoji = "💞"
+            elif hot > 50:
+                emoji = "💖"
+            elif hot > 25:
+                emoji = "❤"
+            else:
+                emoji = "💔"
         await ctx.send(f"**{user.name}** is **{hot:.2f}%** hot {emoji}")
+
 
     @commands.command()
     async def joke(self, ctx):
