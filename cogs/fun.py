@@ -195,7 +195,8 @@ class Fun(commands.Cog, name="Fun"):
         
         if user.id == 484411714637529088:
             hot = 420
-
+            
+ 
         if hot > 75:
             emoji = "💞"
         elif hot > 50:
@@ -263,6 +264,7 @@ class Fun(commands.Cog, name="Fun"):
     async def simpcard(self, ctx, member: Union[discord.Member, discord.User] = None):
         """Gives the mentioned member a simpcard"""
         member = member or ctx.author
+
         await ctx.send(f"https://some-random-api.ml/canvas/simpcard?avatar={member.avatar_url_as(format="png")}")
 
 
