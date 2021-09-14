@@ -259,13 +259,6 @@ class Fun(commands.Cog, name="Fun"):
         member = member or ctx.author
         await ctx.send(f"https://some-random-api.ml/canvas/simpcard?avatar={member.avatar_url}")
 
-    @commands.command()
-    async def avatar(self, ctx, member: discord.User):
-        """Sends the member's discord avatar
-        """
-        embed = discord.Embed(title=f"{member.name}'s avatar:", color=0x8368ff)
-        embed.set_image(url=member.avatar_url)
-        await ctx.send(embed=embed)
 
     @commands.command()
     async def userinfo(self, ctx, member: discord.Member):
