@@ -97,6 +97,11 @@ async def on_command_error(ctx, error):
                               description="You do not have the required permissions to access this restricted command!",
                               color=0xDE3163)
         await ctx.send(embed=embed)
+    elif isinstance(error, commands.MemberNotFound):
+        embed = discord.Embed(title="Member not found",
+                                description="This member doesn't seem to exist.\nCheck you have their ID or tag's capitalization and spelling correct!",
+                                color=0xDE3163)
+        await ctx.send(embed=embed)
     elif isinstance(error, commands.MissingRequiredArgument):
         usage = f"{ctx.prefix}{ctx.command.name}"
         for key, value in ctx.command.clean_params.items():

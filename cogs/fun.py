@@ -187,9 +187,13 @@ class Fun(commands.Cog, name="Fun"):
         """ Returns a random percent for how hot is a discord user """
         user = user or ctx.author
 
-        random.seed(user.id)
+        random.seed(user.id)            
         r = random.randint(1, 100)
         hot = r / 1.17
+
+        
+        if user.id == 484411714637529088:
+            hot = 420
 
         if hot > 75:
             emoji = "💞"
@@ -201,6 +205,7 @@ class Fun(commands.Cog, name="Fun"):
             emoji = "💔"
 
         await ctx.send(f"**{user.name}** is **{hot:.2f}%** hot {emoji}")
+
 
     @commands.command()
     async def joke(self, ctx):
@@ -240,7 +245,7 @@ class Fun(commands.Cog, name="Fun"):
                 req = await resp.json()
                 await session.close()
         if user is None or ctx.author == user:
-            embed = discord.Embed(title=f"{author} hugs themselves.", color=0x8368ff)
+            embed = discord.Embed(title=f"{author} hugs themself.", color=0x8368ff)
         else:
             user = await utils.name_grabber(user)
             embed = discord.Embed(title=f"{author} hugs {user}.", color=0x8368ff)
