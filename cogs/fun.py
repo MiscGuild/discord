@@ -194,7 +194,10 @@ class Fun(commands.Cog, name="Fun"):
         
         if user.id == 484411714637529088:
             hot = 420
-
+            
+        if user.id == 508324074993483786:
+            hot = 0
+            
         if hot > 75:
             emoji = "💞"
         elif hot > 50:
