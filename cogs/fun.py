@@ -7,6 +7,7 @@ import secrets
 from discord.ext import commands
 
 from cogs.utils import utilities as utils
+from typing import Union
 
 
 class Fun(commands.Cog, name="Fun"):
@@ -150,7 +151,7 @@ class Fun(commands.Cog, name="Fun"):
         await ctx.author.send(f"🎁 **Here is your password:**\n{secrets.token_urlsafe(nbytes)}")
 
     @commands.command()
-    async def beer(self, ctx, user: discord.Member = None, *, reason: commands.clean_content = ""):
+    async def beer(self, ctx, user: Union[discord.Member, discord.User] = None, *, reason: commands.clean_content = ""):
         """ Give someone a beer! 🍻 """
         if not user or user.id == ctx.author.id:
             return await ctx.send(f"**{ctx.author.name}**: paaaarty!🎉🍺")
@@ -183,7 +184,7 @@ class Fun(commands.Cog, name="Fun"):
             await msg.edit(content=beer_offer)
 
     @commands.command(aliases=["howhot", "hot", "hotness"])
-    async def hotcalc(self, ctx, *, user: discord.Member = None):
+    async def hotcalc(self, ctx, *, user: Union[discord.Member, discord.User] = None):
         """ Returns a random percent for how hot is a discord user """
         user = user or ctx.author
 
@@ -219,7 +220,7 @@ class Fun(commands.Cog, name="Fun"):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def pat(self, ctx, user: discord.Member = None):
+    async def pat(self, ctx, user: Union[discord.Member, discord.User] = None):
         """Pat the specified user!
         """
         author = await utils.name_grabber(ctx.author)
@@ -236,7 +237,7 @@ class Fun(commands.Cog, name="Fun"):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def hug(self, ctx, user: discord.Member = None):
+    async def hug(self, ctx, user: Union[discord.Member, discord.User] = None):
         """hug the specified user!
         """
         author = await utils.name_grabber(ctx.author)
@@ -253,20 +254,20 @@ class Fun(commands.Cog, name="Fun"):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def horny(self, ctx, member: discord.User = None):
+    async def horny(self, ctx, member: Union[discord.Member, discord.User] = None):
         """Gives the mentioned member a horny card"""
         member = member or ctx.author
-        await ctx.send(f"https://some-random-api.ml/canvas/horny?avatar={member.avatar_url}")
+        await ctx.send(f"https://some-random-api.ml/canvas/horny?avatar={member.avatar_url_as(format="png")}")
 
     @commands.command(aliases=['simp'])
-    async def simpcard(self, ctx, member: discord.User = None):
+    async def simpcard(self, ctx, member: Union[discord.Member, discord.User] = None):
         """Gives the mentioned member a simpcard"""
         member = member or ctx.author
-        await ctx.send(f"https://some-random-api.ml/canvas/simpcard?avatar={member.avatar_url}")
+        await ctx.send(f"https://some-random-api.ml/canvas/simpcard?avatar={member.avatar_url_as(format="png")}")
 
 
     @commands.command()
-    async def userinfo(self, ctx, member: discord.Member):
+    async def userinfo(self, ctx, member: Union[discord.Member, discord.User]):
         """Sends an embed with the discord member's info
         """
         embed = discord.Embed(title=f"{member.name}", description=member.nick, color=member.color)
