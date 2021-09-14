@@ -97,6 +97,11 @@ async def on_command_error(ctx, error):
                               description="You do not have the required permissions to access this restricted command!",
                               color=0xDE3163)
         await ctx.send(embed=embed)
+    elif isinstance(error, commands.MemberNotFound):
+        embed = discord.Embed(title="Member not found",
+                                description="This member doesn't seem to exist.\nCheck you have their ID or tag's capitalization and spelling correct!",
+                                color=0xDE3163)
+        await ctx.send(embed=embed)
     elif isinstance(error, commands.MissingRequiredArgument):
         usage = f"{ctx.prefix}{ctx.command.name}"
         for key, value in ctx.command.clean_params.items():
@@ -155,11 +160,11 @@ bot.loop.run_until_complete(connect_db())
 @tasks.loop(count=1)
 async def after_cache_ready():
     # replace the below IDs in testing servers - make sure to revert before committing.
-    bot.error_channel = bot.get_channel(523743721443950612)
-    bot.dnkl_channel = bot.get_channel(629564802812870657)
-    bot.ticket_channel = bot.get_channel(650248396480970782)
-    bot.logs = bot.get_channel(714821811832881222)
-    bot.misc_guild = bot.get_guild(522586672148381726)
+    bot.error_channel = bot.get_channel(859916798111907875)
+    bot.dnkl_channel = bot.get_channel(859916798111907875)
+    bot.ticket_channel = bot.get_channel(859916798111907875)
+    bot.logs = bot.get_channel(859916798111907875)
+    bot.misc_guild = bot.get_guild(859916798111907871)
     bot.guild_master = discord.utils.get(bot.misc_guild.roles, name="Guild Master")
     bot.admin = discord.utils.get(bot.misc_guild.roles, name="Admin")
     bot.staff = discord.utils.get(bot.misc_guild.roles, name="Staff")

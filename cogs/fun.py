@@ -245,7 +245,7 @@ class Fun(commands.Cog, name="Fun"):
                 req = await resp.json()
                 await session.close()
         if user is None or ctx.author == user:
-            embed = discord.Embed(title=f"{author} hugs themselves.", color=0x8368ff)
+            embed = discord.Embed(title=f"{author} hugs themself.", color=0x8368ff)
         else:
             user = await utils.name_grabber(user)
             embed = discord.Embed(title=f"{author} hugs {user}.", color=0x8368ff)
