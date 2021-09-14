@@ -257,7 +257,7 @@ class Fun(commands.Cog, name="Fun"):
     async def horny(self, ctx, member: discord.User = None):
         """Gives the mentioned member a horny card"""
         member = member or ctx.author
-        await ctx.send(f"https://some-random-api.ml/canvas/horny?avatar={member.avatar_url}")
+        await ctx.send(f"https://some-random-api.ml/canvas/horny?avatar={member.avatar_url}".replace('?size=1024', ''))
 
     @commands.command(aliases=['simp'])
     async def simpcard(self, ctx, member: discord.User = None):
