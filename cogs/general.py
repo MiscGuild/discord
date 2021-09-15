@@ -11,6 +11,7 @@ class General(commands.Cog, name="General"):
     def __init__(self, bot):
         self.bot = bot
 
+    # Copied command from https://github.com/Rapptz/RoboDanny
     @commands.command()
     async def source(self, ctx, *, command: str = None):
         """Displays my full source code or for a specific command.
