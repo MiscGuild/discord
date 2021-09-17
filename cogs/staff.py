@@ -80,7 +80,7 @@ class staff(commands.Cog, name="Staff"):
         await ctx.send(embed=embed)
 
     @commands.command()
-    @commands.has_role(538015368782807040)
+    @commands.has_role("Staff")
     async def inactive(self, ctx):
         """Prints a list of users who need to be promoted, demoted, warned and kicked!
         """
@@ -274,7 +274,7 @@ class staff(commands.Cog, name="Staff"):
 
 
     @commands.command(aliases=['fs'])
-    @commands.has_role(538015368782807040)
+    @commands.has_role("Staff")
     async def forcesync(self, ctx, member: discord.Member, name):
         """Used to forcefully sync a player's IGN
         """
@@ -360,7 +360,7 @@ class staff(commands.Cog, name="Staff"):
             await ctx.send(embed=embed)
 
     @commands.command()
-    @commands.has_role(522588118251995147)
+    @commands.has_role("Admin")
     async def staffreview(self, ctx):
         channel = self.bot.get_channel(523226672980557824)
         admin = discord.utils.get(ctx.guild.roles, name="Admin")
@@ -400,7 +400,7 @@ class staff(commands.Cog, name="Staff"):
             await ctx.send(embed=embed)
 
     @commands.command()
-    @commands.has_role(522588118251995147)
+    @commands.has_role("Admin")
     async def partner(self, ctx):
         await ctx.send("**What is the name of the guild/organization you wish to partner?**")
         name = await self.bot.wait_for('message', check=lambda x: x.author == ctx.message.author)
@@ -418,7 +418,7 @@ class staff(commands.Cog, name="Staff"):
         await partner_channel.send(embed=embed)
 
     @commands.command()
-    @commands.has_role(538015368782807040)
+    @commands.has_role("Staff")
     async def challenge(self, ctx, x):
         channel = self.bot.get_channel(753103243659444286)
         if x == "e":
@@ -506,7 +506,7 @@ class staff(commands.Cog, name="Staff"):
             await channel.send(embed=embed)
 
     @commands.command()
-    @commands.has_role(538015368782807040)
+    @commands.has_role("Staff")
     async def rolecheck(self, ctx, send_ping=None):
         """Checks the roles of all the users and changes them on the basis of their guild
         """

@@ -1614,7 +1614,7 @@ class Tickets(commands.Cog, name="Tickets"):
                 '''await self.bot.logs.send(file=discord.File(transcript_file))'''
 
     @commands.command()
-    @commands.has_any_role(538015368782807040, 522588122807271424)
+    @commands.has_role("Staff")
     async def add(self, ctx, member: discord.Member):
         """Adds the specified user to the ticket.
         """
@@ -1628,7 +1628,7 @@ class Tickets(commands.Cog, name="Tickets"):
             await ctx.send(embed=embed)
 
     @commands.command()
-    @commands.has_any_role(538015368782807040, 522588122807271424)
+    @commands.has_role("Staff")
     async def remove(self, ctx, member: discord.Member):
         """Removes the specified user from the ticket.
         """
@@ -1642,7 +1642,7 @@ class Tickets(commands.Cog, name="Tickets"):
             await ctx.send(embed=embed)
 
     @commands.command()
-    @commands.has_any_role(538015368782807040, 522588122807271424)
+    @commands.has_role("Staff")
     async def rename(self, ctx, *, channel_name):
         """Renames the channel
         """
@@ -1652,7 +1652,7 @@ class Tickets(commands.Cog, name="Tickets"):
             await ctx.channel.edit(name=f"{channel_name}")
 
     @commands.command()
-    @commands.has_any_role(538015368782807040, 522588122807271424)
+    @commands.has_role("Staff")
     async def transcript(self, ctx):
         """Creates a transcript for the channel the command is entered in
         """
@@ -1674,7 +1674,7 @@ class Tickets(commands.Cog, name="Tickets"):
             await ctx.send(file=transcript_file)
 
     @commands.command()
-    @commands.has_role(522588118251995147)
+    @commands.has_role("Admin")
     async def accept(self, ctx, member: discord.Member):
         """Used to accept staff applications. This command must be typed in the application channel. It doesn't work elsewhere.
         """
@@ -1687,7 +1687,7 @@ class Tickets(commands.Cog, name="Tickets"):
             await ctx.send(embed=embed)
 
     @commands.command()
-    @commands.has_any_role(522588118251995147, 522590574734213120)
+    @commands.has_any_role("Admin", "Moderator")
     async def deny(self, ctx, channel: discord.TextChannel):
         """Used to deny staff applications. This command can be used in any channel provided, the syntax is met.
         """
