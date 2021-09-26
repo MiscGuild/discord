@@ -188,7 +188,7 @@ async def get_dispnameID(name):
         async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
             request = await resp.json(content_type=None)
             await session.close()
-    if 'error' not in request and request is not None:
+    if request != None and 'error' not in request:
         ign = request["name"]
         id = request["id"]
         return ign, id
@@ -382,20 +382,18 @@ def discord_verification(name, member: discord.Member):
         return False
 
 async def check_tag(tag):
+    tag = tag.lower()
     with open('badwords.txt', 'r') as f:
         badwords = f.read()
-    if tag.isalpha() is True:
-        if tag.lower() in badwords.split('\n'):
-            return "profane"
-    else: 
-         if tag in badwords.split('\n'):
-            return "profane"
-    if tag.isascii() is False:
-        return "invalid"
-    if len(tag) > 6:
-        return "length"
+
+    if tag in badwords.split('\n'):
+        return False, "The tag may not include profanity."
+    elif tag.isascii() is False:
+        return False, "Your tag may not include special characters unless it's the tag of an ally guild."
+    elif len(tag) > 6:
+        return False, "Your tag may not be longer than 6 characters."
     else:
-        return True
+        return True, None
 
 async def get_tag_message():
     embed = discord.Embed(title="What would you like your tag to be? ",

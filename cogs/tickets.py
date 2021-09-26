@@ -761,18 +761,14 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                     check=lambda
                                                                         x: x.channel == channel and x.author == author)
                                     tag = tag.content
-                                    tag_check = await utils.check_tag(tag)
+                                    tag_check_success, tag_check_reason = await utils.check_tag(tag)
 
-                                    if tag_check == "invalid":
-                                        await channel.send("The tag may not include special characters unless it's the tag of an ally guild.")
-                                    elif tag_check == "length":
-                                        await channel.send("The tag may not be longer than 6 characters.")
-                                    elif tag_check == "profane":
-                                        await channel.send("The tag may not include profanity.")
-                                    else:
+                                    if tag_check_success:
                                         new_nick = ign + f' [{tag}]'
                                         await author.edit(nick=new_nick)
                                         break
+                                    else:
+                                        await channel.send(tag_check_reason)
 
                             await author.add_roles(self.bot.member_role, reason="Ticket Sync")
                             embed = discord.Embed(title="Your nick and role was successfully changed!",
