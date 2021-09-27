@@ -30,10 +30,12 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 embed = discord.Embed(title="Please enter a valid minecraft username!",
                                       color=0xDE3163)
                 await ctx.channel.send(embed=embed)
+                return
             elif ign in self.bot.staff_names and self.bot.staff not in ctx.author.roles:
                 embed = discord.Embed(title="Staff impersonation is a punishable offense!",
                                       color=0xDE3163)
                 await ctx.channel.send(embed=embed)
+                return
             else:
                 guild_name = await utils.get_guild(name)
                 has_tag_perms = any(role in ctx.author.roles for role in self.bot.tag_allowed_roles)
@@ -67,6 +69,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 if guild_name != "Miscellaneous" and guild_name not in self.bot.misc_allies:
                     if str(ctx.channel.category.name) == "RTickets":
                         await ctx.send("You aren't in Miscellaneous in-game. Kindly await staff assistance!")
+                        return
                     else:
                         roles_to_remove.extend([self.bot.member_role, self.bot.awaiting_app])
                         roles_to_add.append(self.bot.guest)
@@ -86,10 +89,12 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 embed = discord.Embed(title="Please enter a valid minecraft username!",
                                       color=0xDE3163)
                 await ctx.channel.send(embed=embed)
+                return
             elif ign in self.bot.staff_names and self.bot.staff not in ctx.author.roles:
                 embed = discord.Embed(title="Staff impersonation is a punishable offense!",
                                       color=0xDE3163)
                 await ctx.channel.send(embed=embed)
+                return
             else:
                 await ctx.author.edit(nick=ign)
                 guild_name = await utils.get_guild(name)
@@ -125,6 +130,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 elif guild_name != "Miscellaneous" and guild_name not in self.bot.misc_allies:
                     if str(ctx.channel.category.name) == "RTickets":
                         await ctx.send("You aren't in Miscellaneous in-game. Kindly await staff assistance!")
+                        return
                     else:
                         roles_to_remove.extend([self.bot.member_role, self.bot.awaiting_app])
                         roles_to_add.append(self.bot.guest)
@@ -133,6 +139,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
         await author.add_roles(*roles_to_add, reason = "Sync")
         await author.remove_roles(*roles_to_remove, reason = "Sync")
+
         footer = f"• Member of {guild_name}"
         for role in roles_to_remove:
             footer += f"\n• Removed {role.name}"
