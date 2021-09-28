@@ -803,7 +803,11 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     await ctx.send(embed=embed)
                 else:
                     gname = req['guild']['name']
-                    gtag = req['guild']['tag']
+                    try:
+                        gtag = req['guild']['tag']
+                    except Exception:
+                        gtag = gname
+                        
                     for member in req['guild']["members"]:
                         if uuid == member["uuid"]:
                             joined = member['joined']
