@@ -584,7 +584,7 @@ class staff(commands.Cog, name="Staff"):
                         misc_member_description = ""
 
 
-                    if member.id not in self.bot.adminids and member.bot is False:
+                    if member.id not in self.bot.admin_ids and member.bot is False:
                         name = await utils.name_grabber(member)
                         has_tag_perms = any(role in ctx.author.roles for role in self.bot.tag_allowed_roles)
 
@@ -605,7 +605,7 @@ class staff(commands.Cog, name="Staff"):
 
                                 await session.close()
                             # Miscellaneous
-                        if ign in misc_members and ign not in self.bot.adminnames:
+                        if ign in misc_members and ign not in self.bot.admin_names:
                             async with aiohttp.ClientSession() as session:
                                 async with session.get(
                                         f"https://api.hypixel.net/guild?key={utils.get_api()}&player={uuid}") as resp:

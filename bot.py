@@ -181,8 +181,8 @@ async def after_cache_ready():
 
     bot.ticket_categories = ('RTickets', '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL')
     bot.misc_allies = ("XL", "Lucid", "Cronos", "OUT", "Betrayed", "Blight")
-    bot.adminids = [member.id for member in bot.admin.members]
-    bot.adminnames = [await hypixel.name_grabber(member) for member in bot.admin.members]
+    bot.admin_ids = [member.id for member in bot.admin.members]
+    bot.admin_names = [await hypixel.name_grabber(member) for member in bot.admin.members]
     bot.staff_names = [await hypixel.name_grabber(member) for member in bot.staff.members]
 
     chat_exporter.init_exporter(bot)
