@@ -568,7 +568,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                         async with aiohttp.ClientSession() as session:
                                             async with session.get(
                                                     f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-                                                request = await resp.json()
+                                                request = await resp.json(content_type=None)
                                                 ign = request['name']
                                                 uuid = request['id']
                                                 rank = await utils.get_rank(name)
@@ -1011,7 +1011,7 @@ class Tickets(commands.Cog, name="Tickets"):
 
                         async with aiohttp.ClientSession() as session:
                             async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-                                request = await resp.json()
+                                request = await resp.json(content_type=None)
                                 await session.close()
                         uuid = request['id']
                         await channel.edit(name=f"Staff-Application-{name}",
