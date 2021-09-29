@@ -29,7 +29,7 @@ class Moderation(commands.Cog, name="Moderation"):
         await ctx.send(embed=embed)
         embed = discord.Embed(title=f'{name} muted {member.name}',
                               description=f"**Reason:** {reason}", color=0x8368ff)
-        await self.bot.logs.send(embed=embed)
+        await self.bot.log_channel.send(embed=embed)
 
     # Unmute
     @commands.command()
@@ -49,7 +49,7 @@ class Moderation(commands.Cog, name="Moderation"):
         await ctx.send(embed=embed)
         embed = discord.Embed(title=f'{name} unmuted {member.name}',
                               description=f"**Reason:** {reason}", color=0x8368ff)
-        await self.bot.logs.send(embed=embed)
+        await self.bot.log_channel.send(embed=embed)
 
     # Clear
     @commands.command(aliases=["purge", "prune"])
@@ -70,8 +70,8 @@ class Moderation(commands.Cog, name="Moderation"):
             await ctx.channel.purge(limit=amount)
             embed = discord.Embed(title=f'{name} purged {amount} messages in {ctx.channel.name}',
                                   description=f"**Reason:** {reason}", color=0x8368ff)
-            await self.bot.logs.send(embed=embed)
-            '''await self.bot.logs.send(file=transcript_file)'''
+            await self.bot.log_channel.send(embed=embed)
+            '''await self.bot.log_channel.send(file=transcript_file)'''
 
     # Kick
     @commands.command()
@@ -87,7 +87,7 @@ class Moderation(commands.Cog, name="Moderation"):
         await ctx.send(f"{member} was kicked!")
         embed = discord.Embed(title=f'{name} kicked {member.name}',
                               description=f"**Reason:** {reason}", color=0x8368ff)
-        await self.bot.logs.send(embed=embed)
+        await self.bot.log_channel.send(embed=embed)
 
     # Ban
     @commands.command()
@@ -103,7 +103,7 @@ class Moderation(commands.Cog, name="Moderation"):
         await ctx.send(f"{member} was banned!")
         embed = discord.Embed(title=f'{name} banned {member.name}',
                               description=f"**Reason:** {reason}", color=0x8368ff)
-        await self.bot.logs.send(embed=embed)
+        await self.bot.log_channel.send(embed=embed)
 
     # unban
     @commands.command()
@@ -119,7 +119,7 @@ class Moderation(commands.Cog, name="Moderation"):
         await ctx.send(f'{member.mention} has been unbanned')
         embed = discord.Embed(title=f'{name} unbanned {member.name}',
                               description=f"**Reason:** {reason}", color=0x8368ff)
-        await self.bot.logs.send(embed=embed)
+        await self.bot.log_channel.send(embed=embed)
 
     @commands.command()
     @commands.has_permissions(ban_members=True)
@@ -137,7 +137,7 @@ class Moderation(commands.Cog, name="Moderation"):
         await ctx.send(f'{member.name} has been softbanned.')
         embed = discord.Embed(title=f'{name} softbanned {member.name}',
                               description=f"**Reason:** {reason}", color=0x8368ff)
-        await self.bot.logs.send(embed=embed)
+        await self.bot.log_channel.send(embed=embed)
 
 
 def setup(bot):

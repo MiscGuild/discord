@@ -456,7 +456,7 @@ class giveaways(commands.Cog, name="Giveaways"):
 
                 elif role_requirement_type == "required":  # Needs ALL of the required roles
                     for req in required_roles:
-                        if discord.utils.get(self.bot.misc_guild.roles, id=req) not in winner.roles:
+                        if discord.utils.get(self.bot.guild.roles, id=req) not in winner.roles:
                             for_broken = True
                     if for_broken:
                         entrants.remove(winner)
@@ -508,10 +508,10 @@ class giveaways(commands.Cog, name="Giveaways"):
 
         announcement = ""
         for winner in winners:
-            category = discord.utils.get(self.bot.misc_guild.categories, name="🎫 Ticket Section")
-            winner_ticket = await self.bot.misc_guild.create_text_channel(f"giveaway-winner-{winner.nick}",
+            category = discord.utils.get(self.bot.guild.categories, name="🎫 Ticket Section")
+            winner_ticket = await self.bot.guild.create_text_channel(f"giveaway-winner-{winner.nick}",
                                                                             category=category)
-            await winner_ticket.set_permissions(self.bot.misc_guild.get_role(self.bot.misc_guild.id),
+            await winner_ticket.set_permissions(self.bot.guild.get_role(self.bot.guild.id),
                                                 send_messages=False,
                                                 read_messages=False)
             await winner_ticket.set_permissions(self.bot.staff, send_messages=True, read_messages=True,

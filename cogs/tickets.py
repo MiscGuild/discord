@@ -28,7 +28,7 @@ class Tickets(commands.Cog, name="Tickets"):
                 await channel.send(embed=embed, components=[[yes, no]])
 
                 click = await self.bot.wait_for("button_click")
-                author = self.bot.misc_guild.get_member(int(click.user.id))
+                author = self.bot.guild.get_member(int(click.user.id))
                 name = await utils.name_grabber(author)
                 if click.component.id == "yes":
                     await channel.edit(name=f"join-request-{name}")
@@ -245,7 +245,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                 check=lambda x: (
                                                                                         x.author == author and x.channel == channel) or (
                                                                                         self.bot.staff in (
-                                                                                    self.bot.misc_guild.get_member(
+                                                                                    self.bot.guild.get_member(
                                                                                         x.author.id).roles) and x.channel == channel))
 
                                 if click.component.id == "yes":
@@ -271,8 +271,8 @@ class Tickets(commands.Cog, name="Tickets"):
                                         embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
                                                               description="They deleted their own ticket.",
                                                               color=0x8368ff)
-                                        await self.bot.logs.send(embed=embed)
-                                        '''await self.bot.logs.send(file=discord.File(transcript_file))'''
+                                        await self.bot.log_channel.send(embed=embed)
+                                        '''await self.bot.log_channel.send(file=discord.File(transcript_file))'''
                                         break
                                 elif click.component.id == "no":
                                     success_embed = discord.Embed(title="Success", color=0x00A86B)
@@ -360,14 +360,14 @@ class Tickets(commands.Cog, name="Tickets"):
                 )
                 interaction = await self.bot.wait_for("select_option", check=lambda
                     x: x.channel == channel)
-                author = self.bot.misc_guild.get_member(int(interaction.user.id))
+                author = self.bot.guild.get_member(int(interaction.user.id))
                 response_embed = discord.Embed(title="Ticket Reason Selected!", color=0x00A86B)
                 response_embed.set_footer(text=interaction.values[0])
                 await channel.send(embed=response_embed)
                 await interaction.respond(content="Great! Now answer the bot's prompts!")  # interaction.values is a list
                 reply = interaction.values[0]
 
-                author = self.bot.misc_guild.get_member(int(interaction.user.id))
+                author = self.bot.guild.get_member(int(interaction.user.id))
                 name = await utils.name_grabber(author)
 
                 if reply == "Do not kick list application":
@@ -519,8 +519,8 @@ class Tickets(commands.Cog, name="Tickets"):
 
                                     click = await self.bot.wait_for("button_click",
                                                                     check=lambda x: x.channel == channel and (
-                                                                            self.bot.staff in self.bot.misc_guild.get_member(
-                                                                        x.author.id).roles or self.bot.helper in self.bot.misc_guild.get_member(
+                                                                            self.bot.staff in self.bot.guild.get_member(
+                                                                        x.author.id).roles or self.bot.helper in self.bot.guild.get_member(
                                                                         x.author.id).roles))
 
                                     if click.component.id == "approve":
@@ -682,7 +682,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                     check=lambda x: (
                                                                             x.author == author and x.channel == channel) or (
                                                                             self.bot.staff in (
-                                                                        self.bot.misc_guild.get_member(
+                                                                        self.bot.guild.get_member(
                                                                             x.author.id).roles) and x.channel == channel))
 
                     if click.component.id == "yes":
@@ -707,8 +707,8 @@ class Tickets(commands.Cog, name="Tickets"):
                             name = await utils.name_grabber(author)
                             embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
                                                   description="They deleted their own ticket.", color=0x8368ff)
-                            await self.bot.logs.send(embed=embed)
-                            '''await self.bot.logs.send(file=discord.File(transcript_file))'''
+                            await self.bot.log_channel.send(embed=embed)
+                            '''await self.bot.log_channel.send(file=discord.File(transcript_file))'''
                             break
                     elif click.component.id == "no":
                         success_embed = discord.Embed(title="Success", color=0x00A86B)
@@ -854,8 +854,8 @@ class Tickets(commands.Cog, name="Tickets"):
                             name = await utils.name_grabber(author)
                             embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
                                                   description="They deleted their own ticket.", color=0x8368ff)
-                            await self.bot.logs.send(embed=embed)
-                            '''await self.bot.logs.send(file=discord.File(transcript_file))'''
+                            await self.bot.log_channel.send(embed=embed)
+                            '''await self.bot.log_channel.send(file=discord.File(transcript_file))'''
                             break
                     elif click.component.id == "no":
                         success_embed = discord.Embed(title="Success", color=0x00A86B)
@@ -964,8 +964,8 @@ class Tickets(commands.Cog, name="Tickets"):
                                 name = await utils.name_grabber(author)
                                 embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
                                                       description="They deleted their own ticket.", color=0x8368ff)
-                                await self.bot.logs.send(embed=embed)
-                                '''await self.bot.logs.send(file=discord.File(transcript_file))'''
+                                await self.bot.log_channel.send(embed=embed)
+                                '''await self.bot.log_channel.send(file=discord.File(transcript_file))'''
                                 break
                         elif click.component.id == "no":
                             success_embed = discord.Embed(title="Success", color=0x00A86B)
@@ -1414,8 +1414,8 @@ class Tickets(commands.Cog, name="Tickets"):
                                         embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
                                                               description="They deleted their own ticket.",
                                                               color=0x8368ff)
-                                        await self.bot.logs.send(embed=embed)
-                                        '''await self.bot.logs.send(file=transcript_file)'''
+                                        await self.bot.log_channel.send(embed=embed)
+                                        '''await self.bot.log_channel.send(file=transcript_file)'''
                                         break
                                 elif click.component.id == "no":
                                     success_embed = discord.Embed(title="Success", color=0x00A86B)
@@ -1606,8 +1606,8 @@ class Tickets(commands.Cog, name="Tickets"):
                 name = await utils.name_grabber(ctx.author)
                 embed = discord.Embed(title=f'{ctx.channel.name} was deleted by {name}',
                                       description="", color=0x8368ff)
-                await self.bot.logs.send(embed=embed)
-                '''await self.bot.logs.send(file=discord.File(transcript_file))'''
+                await self.bot.log_channel.send(embed=embed)
+                '''await self.bot.log_channel.send(file=discord.File(transcript_file))'''
 
     @commands.command()
     @commands.has_role("Staff")
@@ -1765,8 +1765,8 @@ class Tickets(commands.Cog, name="Tickets"):
     async def new(self, ctx):
         name = await utils.name_grabber(ctx.author)
 
-        category = discord.utils.get(self.bot.misc_guild.categories, name="🎫 Ticket Section")
-        ticket_channel = await self.bot.misc_guild.create_text_channel(f"ticket-{name}",
+        category = discord.utils.get(self.bot.guild.categories, name="🎫 Ticket Section")
+        ticket_channel = await self.bot.guild.create_text_channel(f"ticket-{name}",
                                                                        category=category,
                                                                        topic="<:t:869239368060112906><:i:869239367942697010><:c:869239368383074414>"
                                                                              "<:k:869239367854612480><:e:869239368517287936><:t:869239368060112906>")
@@ -1777,7 +1777,7 @@ class Tickets(commands.Cog, name="Tickets"):
 
         await ctx.send(embed=creating_ticket)
 
-        await ticket_channel.set_permissions(self.bot.misc_guild.get_role(self.bot.misc_guild.id), send_messages=False,
+        await ticket_channel.set_permissions(self.bot.guild.get_role(self.bot.guild.id), send_messages=False,
                                              read_messages=False)
         await ticket_channel.set_permissions(self.bot.staff, send_messages=True, read_messages=True,
                                              add_reactions=True, embed_links=True,

@@ -132,8 +132,8 @@ class Roles(commands.Cog, command_attrs=dict(hidden=True)):
                     "780717935140012052",
                     "855657894518325258"]
         if res.component.id in role_ids:
-            member = self.bot.misc_guild.get_member(int(res.user.id))
-            role = self.bot.misc_guild.get_role(int(res.component.id))
+            member = self.bot.guild.get_member(int(res.user.id))
+            role = self.bot.guild.get_role(int(res.component.id))
             if role in member.roles:
                 await member.remove_roles(role, reason="Pressed Button, removed role")
                 await res.respond(content=f"Removed {res.component.label} role from you.")
@@ -141,12 +141,12 @@ class Roles(commands.Cog, command_attrs=dict(hidden=True)):
                 await member.add_roles(role, reason="Pressed Button, added role")
                 await res.respond(content=f"Added {res.component.label} role to you.")
         elif res.component.id == "ticketer":
-            member = self.bot.misc_guild.get_member(int(res.user.id))
+            member = self.bot.guild.get_member(int(res.user.id))
 
             name = await utils.name_grabber(member)
 
-            category = discord.utils.get(self.bot.misc_guild.categories, name="🎫 Ticket Section")
-            ticket_channel = await self.bot.misc_guild.create_text_channel(f"ticket-{name}",
+            category = discord.utils.get(self.bot.guild.categories, name="🎫 Ticket Section")
+            ticket_channel = await self.bot.guild.create_text_channel(f"ticket-{name}",
                                                                            category=category,
                                                                            topic="<:t:869239368060112906><:i:869239367942697010><:c:869239368383074414>"
                                                                                  "<:k:869239367854612480><:e:869239368517287936><:t:869239368060112906>")
@@ -157,7 +157,7 @@ class Roles(commands.Cog, command_attrs=dict(hidden=True)):
 
             await res.respond(embed=creating_ticket)
 
-            await ticket_channel.set_permissions(self.bot.misc_guild.get_role(self.bot.misc_guild.id),
+            await ticket_channel.set_permissions(self.bot.guild.get_role(self.bot.guild.id),
                                                  send_messages=False,
                                                  read_messages=False)
             await ticket_channel.set_permissions(self.bot.staff, send_messages=True, read_messages=True,
@@ -191,22 +191,22 @@ class Roles(commands.Cog, command_attrs=dict(hidden=True)):
                       849830936434704404: "She/Her",
                       849831004310077441: "They/Them",
                       855598846843551744: "Other"}
-            member = self.bot.misc_guild.get_member(int(res.user.id))
+            member = self.bot.guild.get_member(int(res.user.id))
             if res.values != []:
                 if int(res.values[0]) in role_ids:
-                    cached_role = self.bot.misc_guild.get_role(int(res.values[0]))
+                    cached_role = self.bot.guild.get_role(int(res.values[0]))
                     if cached_role in member.roles:
                         await member.remove_roles(cached_role, reason=f"Pronoun role: {labels.get(int(res.values[0]))} Removed")
                         await res.respond(content=f"Removed {labels.get(int(res.values[0]))}")
                     elif cached_role not in member.roles:
                         for x in role_ids:
-                            await member.remove_roles(self.bot.misc_guild.get_role(x),
+                            await member.remove_roles(self.bot.guild.get_role(x),
                                                       reason="Pronouns Duplicate Prevention")
                         await member.add_roles(cached_role, reason=f"Pronoun role: {labels.get(int(res.values[0]))} Given")
                         await res.respond(content=f"Added {labels.get(int(res.values[0]))}")
             else:
                 for x in role_ids:
-                    await member.remove_roles(self.bot.misc_guild.get_role(x),
+                    await member.remove_roles(self.bot.guild.get_role(x),
                                               reason="Pronouns Duplicate Prevention")
                 await res.respond(content=f"Removed all pronoun roles!")
 def setup(bot):
