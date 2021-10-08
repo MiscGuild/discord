@@ -16,6 +16,5 @@ typing-extensions==3.10.0.0
 urllib3==1.26.6
 yarl==1.6.3
 zope.interface==5.4.0
-discord-components==2.0.1
+discord-components==2.1.1
 chat-exporter==1.6.2
-

@@ -1223,60 +1223,98 @@ class Tickets(commands.Cog, name="Tickets"):
                     else:
                         req = await utils.get_data(name)
                         uuid = req['player']['uuid']
-
                         x = 0
                         y = 0
                         z = 0
-
                         # Bedwars
-                        bw_wins = int(req['player']['stats']['Bedwars']['wins_bedwars'])
-                        bw_final_kills = int(req['player']['stats']['Bedwars']['final_kills_bedwars'])
-                        bw_final_deaths = int(req['player']['stats']['Bedwars']['final_deaths_bedwars'])
-                        bw_fkdr = bw_final_kills / bw_final_deaths
-                        bw_fkdr = round(bw_fkdr, 2)
+                        bw_list_of_fields=['wins_bedwars','final_kills_bedwars','final_deaths_bedwars']
 
-                        if bw_wins > 500:
+                        bw_wins=0
+                        final_kills_bedwars=1
+                        final_deaths_bedwars=2
+                        bw_fkdr=3
+
+                        bedwars_stats=[]
+
+                        for field in bw_list_of_fields:
+                            try:
+                                stat = int(req['player']['stats']['Bedwars'][field])
+                            except:
+                                stat = 0
+                            bedwars_stats.append(stat)
+                        if bedwars_stats[final_deaths_bedwars] == 0:
+                            bedwars_stats[final_deaths_bedwars] = 1
+                        bedwars_stats.append(round((bedwars_stats[final_kills_bedwars]/bedwars_stats[final_deaths_bedwars]), 2))
+
+
+                        if bedwars_stats[bw_wins] > 500:
                             x = x + 1
-                        if bw_fkdr > 1.6:
+                        if bedwars_stats[bw_fkdr] > 1.6:
                             x = x + 1
 
                         # Skywars
-                        sw_wins_overall = int(req['player']['stats']['SkyWars']['wins'])
-                        sw_wins_solo = int(req['player']['stats']['SkyWars']['wins_solo'])
-                        sw_wins_doubles = int(req['player']['stats']['SkyWars']['wins_team'])
-                        sw_kills = int(req['player']['stats']['SkyWars']['kills'])
-                        sw_deaths = int(req['player']['stats']['SkyWars']['deaths'])
-                        sw_kdr = sw_kills / sw_deaths
-                        sw_kdr = round(sw_kdr, 2)
-                        if sw_wins_overall > 1000:
+                        sw_list_of_fields = ['wins', 'wins_solo', 'wins_team', 'kills', 'deaths']
+                        skywars_stats = []
+
+                        sw_wins_overall = 0
+                        sw_wins_solo = 1
+                        sw_wins_doubles = 2
+                        sw_kills = 3
+                        sw_deaths = 4
+                        sw_kdr = 5
+
+                        for field in sw_list_of_fields:
+                            try:
+                                stat = int(req['player']['stats']['SkyWars'][field])
+                            except:
+                                stat = 0
+                            skywars_stats.append(stat)
+                        if skywars_stats[sw_deaths] == 0:
+                            skywars_stats[sw_deaths]=1
+                        skywars_stats.append(round((skywars_stats[sw_kills]/skywars_stats[sw_deaths]), 2))
+
+
+                        if skywars_stats[sw_wins_overall] > 1000:
                             y = y + 1
-                        if sw_kdr > 1.2:
+                        if skywars_stats[sw_kdr] > 1.2:
                             y = y + 1
 
                         # Duel
-                        duels_wins = int(req['player']['stats']['Duels']['wins'])
-                        duels_losses = int(req['player']['stats']['Duels']['losses'])
-                        duels_kills = int(req['player']['stats']['Duels']['kills'])
-                        duels_wlr = duels_wins / duels_losses
-                        duels_wlr = round(duels_wlr, 2)
+                        duel_list_of_fields = ['wins', 'losses', 'kills']
+                        duels_stats = []
+                        duels_wins = 0
+                        duels_losses = 1
+                        duels_kills = 2
+                        duels_wlr = 3
 
-                        if duels_wins > 2000:
+                        for field in duel_list_of_fields:
+                            try:
+                                stat = int(req['player']['stats']['Duels'][field])
+                            except:
+                                stat = 0
+                            duels_stats.append(stat)
+                        if duels_stats[duels_losses] == 0:
+                            duels_stats[duels_losses] = 1
+                        duels_stats.append(round((duels_stats[duels_wins]/duels_stats[duels_losses]), 2))
+
+
+                        if duels_stats[duels_wins] > 2000:
                             z = z + 1
-                        if duels_wlr > 1.5:
+                        if duels_stats[duels_wlr] > 1.5:
                             z = z + 1
 
                         if x >= 2 and y >= 2 and z >= 2:
                             embed1 = discord.Embed(title="You're eligible for the Polyvalent GvG Team!",
                                                    description="Kindly await staff assistance for further information!",
                                                    color=0x8368ff)
-                            embed1.add_field(name="Bedwars Wins", value=f'`{bw_wins}`')
-                            embed1.add_field(name="Bedwars FKDR", value=f'`{bw_fkdr}`')
-                            embed1.add_field(name="Skywars Wins (Overall)", value=f'`{sw_wins_overall}`')
-                            embed1.add_field(name="Skywars Wins (Solo)", value=f'`{sw_wins_solo}`')
-                            embed1.add_field(name="Skywars Wins (doubles)", value=f'`{sw_wins_doubles}`')
-                            embed1.add_field(name="Skywars KDR", value=f'`{sw_kdr}`')
-                            embed1.add_field(name="Duels Wins", value=f'`{duels_wins}`')
-                            embed1.add_field(name="Duels WLR", value=f'`{duels_wlr}`')
+                            embed1.add_field(name="Bedwars Wins", value=f'`{bedwars_stats[bw_wins]}`')
+                            embed1.add_field(name="Bedwars FKDR", value=f'`{bedwars_stats[bw_fkdr]}`')
+                            embed1.add_field(name="Skywars Wins (Overall)", value=f'`{skywars_stats[sw_wins_overall]}`')
+                            embed1.add_field(name="Skywars Wins (Solo)", value=f'`{skywars_stats[sw_wins_solo]}`')
+                            embed1.add_field(name="Skywars Wins (doubles)", value=f'`{skywars_stats[sw_wins_doubles]}`')
+                            embed1.add_field(name="Skywars KDR", value=f'`{skywars_stats[sw_kdr]}`')
+                            embed1.add_field(name="Duels Wins", value=f'`{duels_stats[duels_wins]}`')
+                            embed1.add_field(name="Duels WLR", value=f'`{duels_stats[duels_wlr]}`')
                             await channel.send(embed=embed1)
                             break
 
@@ -1285,14 +1323,14 @@ class Tickets(commands.Cog, name="Tickets"):
                                 title="You're eligible for any two of the teams!\n You will be assigned to any two teams on the basis of your stats!",
                                 description="Kindly await staff assistance for further information!",
                                 color=0x8368ff)
-                            embed1.add_field(name="Bedwars Wins", value=f'`{bw_wins}`')
-                            embed1.add_field(name="Bedwars FKDR", value=f'`{bw_fkdr}`')
-                            embed1.add_field(name="Skywars Wins (Overall)", value=f'`{sw_wins_overall}`')
-                            embed1.add_field(name="Skywars Wins (Solo)", value=f'`{sw_wins_solo}`')
-                            embed1.add_field(name="Skywars Wins (doubles)", value=f'`{sw_wins_doubles}`')
-                            embed1.add_field(name="Skywars KDR", value=f'`{sw_kdr}`')
-                            embed1.add_field(name="Duels Wins", value=f'`{duels_wins}`')
-                            embed1.add_field(name="Duels WLR", value=f'`{duels_wlr}`')
+                            embed1.add_field(name="Bedwars Wins", value=f'`{bedwars_stats[bw_wins]}`')
+                            embed1.add_field(name="Bedwars FKDR", value=f'`{bedwars_stats[bw_fkdr]}`')
+                            embed1.add_field(name="Skywars Wins (Overall)", value=f'`{skywars_stats[sw_wins_overall]}`')
+                            embed1.add_field(name="Skywars Wins (Solo)", value=f'`{skywars_stats[sw_wins_solo]}`')
+                            embed1.add_field(name="Skywars Wins (doubles)", value=f'`{skywars_stats[sw_wins_doubles]}`')
+                            embed1.add_field(name="Skywars KDR", value=f'`{skywars_stats[sw_kdr]}`')
+                            embed1.add_field(name="Duels Wins", value=f'`{duels_stats[duels_wins]}`')
+                            embed1.add_field(name="Duels WLR", value=f'`{duels_stats[duels_wlr]}`')
                             await channel.send(embed=embed1)
                             break
 
@@ -1300,13 +1338,13 @@ class Tickets(commands.Cog, name="Tickets"):
                             embed1 = discord.Embed(title="You're eligible for the Bedwars and Skywars GvG Teams!",
                                                    description="Kindly await staff assistance for further information!",
                                                    color=0x8368ff)
-                            embed1.add_field(name="Bedwars Wins", value=f'`{bw_wins}`')
-                            embed1.add_field(name="Bedwars FKDR", value=f'`{bw_fkdr}`')
-                            embed1.add_field(name="Skywars Wins (Overall)", value=f'`{sw_wins_overall}`')
-                            embed1.add_field(name="Skywars Wins (Solo)", value=f'`{sw_wins_solo}`')
-                            embed1.add_field(name="Skywars Wins (doubles)", value=f'`{sw_wins_doubles}`')
-                            embed1.add_field(name="Skywars KDR", value=f'`{sw_kdr}`')
-                            embed1.set_footer(text=f"Duels wins - {duels_wins}\nDuels WLR - {duels_wlr}")
+                            embed1.add_field(name="Bedwars Wins", value=f'`{bedwars_stats[bw_wins]}`')
+                            embed1.add_field(name="Bedwars FKDR", value=f'`{bedwars_stats[bw_fkdr]}`')
+                            embed1.add_field(name="Skywars Wins (Overall)", value=f'`{skywars_stats[sw_wins_overall]}`')
+                            embed1.add_field(name="Skywars Wins (Solo)", value=f'`{skywars_stats[sw_wins_solo]}`')
+                            embed1.add_field(name="Skywars Wins (doubles)", value=f'`{skywars_stats[sw_wins_doubles]}`')
+                            embed1.add_field(name="Skywars KDR", value=f'`{skywars_stats[sw_kdr]}`')
+                            embed1.set_footer(text=f"Duels wins - {duels_stats[duels_wins]}`\nDuels WLR - {duels_stats[duels_wlr]}")
                             await channel.send(embed=embed1)
                             break
 
@@ -1314,12 +1352,12 @@ class Tickets(commands.Cog, name="Tickets"):
                             embed1 = discord.Embed(title="You're eligible for the Bedwars and Duels GvG Teams!",
                                                    description="Kindly await staff assistance for further information!",
                                                    color=0x8368ff)
-                            embed1.add_field(name="Bedwars Wins", value=f'`{bw_wins}`')
-                            embed1.add_field(name="Bedwars FKDR", value=f'`{bw_fkdr}`')
-                            embed1.add_field(name="Duels Wins", value=f'`{duels_wins}`')
-                            embed1.add_field(name="Duels WLR;", value=f'`{duels_wlr}`')
+                            embed1.add_field(name="Bedwars Wins", value=f'`{bedwars_stats[bw_wins]}`')
+                            embed1.add_field(name="Bedwars FKDR", value=f'`{bedwars_stats[bw_fkdr]}`')
+                            embed1.add_field(name="Duels Wins", value=f'`{duels_stats[duels_wins]}`')
+                            embed1.add_field(name="Duels WLR", value=f'`{duels_stats[duels_wlr]}`')
                             embed1.set_footer(
-                                text=f"Skywars Wins (Overall) - {sw_wins_overall}\nSkywars Wins (Solo) - {sw_wins_solo}\nSkywars Wins (Doubles) - {sw_wins_doubles}\nSkywars KDR - {sw_kdr}")
+                                text=f"Skywars Wins (Overall) - {skywars_stats[sw_wins_overall]}\nSkywars Wins (Solo) - {skywars_stats[sw_wins_solo]}\nSkywars Wins (Doubles) - {skywars_stats[sw_wins_doubles]}\nSkywars KDR - {skywars_stats[sw_kdr]}")
                             await channel.send(embed=embed1)
                             break
 
@@ -1327,45 +1365,45 @@ class Tickets(commands.Cog, name="Tickets"):
                             embed1 = discord.Embed(title="You're eligible for the Skywars and Duels GvG Teams!",
                                                    description="Kindly await staff assistance for further information!",
                                                    color=0x8368ff)
-                            embed1.add_field(name="Skywars Wins (Overall)", value=f'`{sw_wins_overall}`')
-                            embed1.add_field(name="Skywars Wins (Solo)", value=f'`{sw_wins_solo}`')
-                            embed1.add_field(name="Skywars Wins (doubles)", value=f'`{sw_wins_doubles}`')
-                            embed1.add_field(name="Skywars KDR", value=f'`{sw_kdr}`')
-                            embed1.add_field(name="Duels Wins", value=f'`{duels_wins}`')
-                            embed1.add_field(name="Duels WLR", value=f'`{duels_wlr}`')
-                            embed1.set_footer(text=f"Bedwars Wins - {bw_wins}\nBedwars FKDR - {bw_fkdr}")
+                            embed1.add_field(name="Skywars Wins (Overall)", value=f'`{skywars_stats[sw_wins_overall]}`')
+                            embed1.add_field(name="Skywars Wins (Solo)", value=f'`{skywars_stats[sw_wins_solo]}`')
+                            embed1.add_field(name="Skywars Wins (doubles)", value=f'`{skywars_stats[sw_wins_doubles]}`')
+                            embed1.add_field(name="Skywars KDR", value=f'`{skywars_stats[sw_kdr]}`')
+                            embed1.add_field(name="Duels Wins", value=f'`{duels_stats[duels_wins]}`')
+                            embed1.add_field(name="Duels WLR", value=f'`{duels_stats[duels_wlr]}`')
+                            embed1.set_footer(text=f"Bedwars Wins - {bedwars_stats[bw_wins]}\nBedwars FKDR - {bedwars_stats[bw_fkdr]}")
                             await channel.send(embed=embed1)
                             break
                         elif x >= 1:
                             embed1 = discord.Embed(title="You're eligible for the Bedwars GvG Team!",
                                                    description="Kindly await staff assistance for further information!",
                                                    color=0x8368ff)
-                            embed1.add_field(name="Bedwars Wins", value=f'`{bw_wins}`')
-                            embed1.add_field(name="Bedwars FKDR", value=f'`{bw_fkdr}`')
+                            embed1.add_field(name="Bedwars Wins", value=f'`{bedwars_stats[bw_wins]}`')
+                            embed1.add_field(name="Bedwars FKDR", value=f'`{bedwars_stats[bw_fkdr]}`')
                             embed1.set_footer(
-                                text=f"Skywars Wins (Overall) - {sw_wins_overall}\nSkywars Wins (Solo) - {sw_wins_solo}\nSkywars Wins (Doubles) - {sw_wins_doubles}\nSkywars KDR - {sw_kdr}\nDuels wins - {duels_wins}\nDuels Kills - {duels_kills}\nDuels WLR - {duels_wlr}")
+                                text=f"Skywars Wins (Overall) - {skywars_stats[sw_wins_overall]}\nSkywars Wins (Solo) - {skywars_stats[sw_wins_solo]}\nSkywars Wins (Doubles) - {skywars_stats[sw_wins_doubles]}\nSkywars KDR - {skywars_stats[sw_kdr]}\nDuels wins - {duels_stats[duels_wins]}\nDuels WLR - {duels_stats[duels_wlr]}")
                             await channel.send(embed=embed1)
                             break
                         elif y >= 1:
                             embed1 = discord.Embed(title="You're eligible for the Skywars GvG Team!",
                                                    description="Kindly await staff assistance for further information!",
                                                    color=0x8368ff)
-                            embed1.add_field(name="Skywars Wins (Overall)", value=f'`{sw_wins_overall}`')
-                            embed1.add_field(name="Skywars Wins (Solo)", value=f'`{sw_wins_solo}`')
-                            embed1.add_field(name="Skywars Wins (doubles)", value=f'`{sw_wins_doubles}`')
-                            embed1.add_field(name="Skywars KDR", value=f'`{sw_kdr}`')
+                            embed1.add_field(name="Skywars Wins (Overall)", value=f'`{skywars_stats[sw_wins_overall]}`')
+                            embed1.add_field(name="Skywars Wins (Solo)", value=f'`{skywars_stats[sw_wins_solo]}`')
+                            embed1.add_field(name="Skywars Wins (doubles)", value=f'`{skywars_stats[sw_wins_doubles]}`')
+                            embed1.add_field(name="Skywars KDR", value=f'`{skywars_stats[sw_kdr]}`')
                             embed1.set_footer(
-                                text=f"Bedwars Wins - {bw_wins}\nBedwars FKDR - {bw_fkdr}\nDuels wins - {duels_wins}\nDuels WLR - {duels_wlr}")
+                                text=f"Bedwars Wins - {bw_wins}\nBedwars FKDR - {bw_fkdr}\nDuels wins - {duels_stats[duels_wins]}`\nDuels WLR - {duels_stats[duels_wlr]}")
                             await channel.send(embed=embed1)
                             break
                         elif z >= 1:
                             embed1 = discord.Embed(title="You're eligible for the Duels GvG Team!",
                                                    description="Kindly await staff assistance for further information!",
                                                    color=0x8368ff)
-                            embed1.add_field(name="Duels Wins", value=f'`{duels_wins}`')
-                            embed1.add_field(name="Duels WLR", value=f'`{duels_wlr}`')
+                            embed1.add_field(name="Duels Wins", value=f'`{duels_stats[duels_wins]}`')
+                            embed1.add_field(name="Duels WLR", value=f'`{duels_stats[duels_wlr]}`')
                             embed1.set_footer(
-                                text=f"Bedwars Wins - {bw_wins}\nBedwars FKDR - {bw_fkdr}\nSkywars Wins (Overall) - {sw_wins_overall}\nSkywars Wins (Solo) - {sw_wins_solo}\nSkywars Wins (Doubles) - {sw_wins_doubles}\nSkywars KDR - {sw_kdr}")
+                                text=f"Bedwars Wins - {bedwars_stats[bw_wins]}\nBedwars FKDR - {bedwars_stats[bw_fkdr]}\nSkywars Wins (Overall) - {skywars_stats[sw_wins_overall]}\nSkywars Wins (Solo) - {skywars_stats[sw_wins_solo]}\nSkywars Wins (Doubles) - {skywars_stats[sw_wins_doubles]}\nSkywars KDR - {skywars_stats[sw_kdr]}")
                             await channel.send(embed=embed1)
                             break
                         else:
@@ -1373,7 +1411,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                 title="You're ineligible to apply GvG Team because you don't meet the requirements!",
                                 description="Kindly await staff assistance for further information!", color=0xcd5c5c)
                             embed1.set_footer(
-                                text=f"Bedwars Wins - {bw_wins}\nBedwars FKDR - {bw_fkdr}\nSkywars Wins (Overall) - {sw_wins_overall}\nSkywars Wins (Solo) - {sw_wins_solo}\nSkywars Wins (Doubles) - {sw_wins_doubles}\nSkywars KDR - {sw_kdr}\nDuels wins - {duels_wins}\nDuels WLR - {duels_wlr}")
+                                text=f"Bedwars Wins - {bedwars_stats[bw_wins]}\nBedwars FKDR - {bedwars_stats[bw_fkdr]}\nSkywars Wins (Overall) - {skywars_stats[sw_wins_overall]}\nSkywars Wins (Solo) - {skywars_stats[sw_wins_solo]}\nSkywars Wins (Doubles) - {skywars_stats[sw_wins_doubles]}\nSkywars KDR - {skywars_stats[sw_kdr]}\nDuels wins - {duels_stats[duels_wins]}`\nDuels WLR - {duels_stats[duels_wlr]}")
                             await channel.send(embed=embed1)
                             stop_embed = discord.Embed(
                                 title="Since you don't meet the requirements, can this ticket be closed?",

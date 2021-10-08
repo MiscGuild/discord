@@ -884,12 +884,6 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                                       color=colour)
                                 embed.set_author(name=f"{gname} [{gtag}]", url=f'https://plancke.io/hypixel/guild/player/{name}')
                                 embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
-                                '''embed.add_field(name="Rank:", value=rank, inline=True)
-                                embed.add_field(name="Joined:", value=dt, inline=True)
-                                embed.add_field(name="Quests Completed:", value=cq, inline=True)
-                                embed.add_field(name="Overall Exp:", value=f"`{totalexp}`", inline=False)
-                                embed.add_field(name="GEXP History", value=gexphistory, inline=False)
-'''
                                 embed.add_field(name="General Information:",
                                                 value=f"`✚` **Rank**: `{rank}`\n"
                                                       f"`✚` **Joined**: `{dt}`\n"
@@ -1129,13 +1123,14 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     image_data = BytesIO(await resp.read())
                     await session.close()
 
-            await ctx.send(file=discord.File(image_data, 'gtop.jpg'))'''
+            await ctx.send(file=discord.File(image_data, 'gtop.jpg'))
 
             image = requests.get(url)
 
             with open('temppicture.jpg', 'wb') as f:
                 f.write(image.content)
-            await ctx.send(file=discord.File('temppicture.jpg'))
+            await ctx.send(file=discord.File('temppicture.jpg'))'''
+            await ctx.send(url)
 
     @commands.command()
     async def dailylb(self, ctx, x=1):
@@ -1280,12 +1275,13 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     image_data = BytesIO(await resp.read())
                     await session.close()
 
-            await ctx.send(file=discord.File(image_data, 'dailylb.jpg'))'''
+            await ctx.send(file=discord.File(image_data, 'dailylb.jpg'))
             image = requests.get(url)
 
             with open('temppicture.jpg', 'wb') as f:
                 f.write(image.content)
-            await ctx.send(file=discord.File('temppicture.jpg'))
+            await ctx.send(file=discord.File('temppicture.jpg'))'''
+            await ctx.send(url)
 
 
 def setup(bot):

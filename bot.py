@@ -73,7 +73,7 @@ async def on_ready():
 async def on_command_error(ctx, error):
     # Prevents commands with local handlers or cogs with overwrritten on_command_errors being handled here
     if isinstance(error, commands.CommandNotFound):
-        embed = discord.Embed(title='Invalid Command!',
+        embed = discord.Embed(title=f'Invalid Command!',
                               descrption='Use `,help` to view a list of all commands!', color=0xDE3163)
         await ctx.send(embed=embed)
         return
@@ -84,21 +84,21 @@ async def on_command_error(ctx, error):
     error = getattr(error, 'original', error)
 
     if isinstance(error, commands.NotOwner):
-        embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
+        embed = discord.Embed(title=f'Your soul lacks the strength to utilize this command!',
                               description="You are not the owner of this bot!", color=0xDE3163)
         await ctx.send(embed=embed)
     elif isinstance(error, commands.MissingRole):
-        embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
+        embed = discord.Embed(title=f'Your soul lacks the strength to utilize this command!',
                               description="You do not have the required roles to access this restricted command!",
                               color=0xDE3163)
         await ctx.send(embed=embed)
     elif isinstance(error, commands.MissingPermissions):
-        embed = discord.Embed(title='Your soul lacks the strength to utilize this command!',
+        embed = discord.Embed(title=f'Your soul lacks the strength to utilize this command!',
                               description="You do not have the required permissions to access this restricted command!",
                               color=0xDE3163)
         await ctx.send(embed=embed)
     elif isinstance(error, commands.MemberNotFound):
-        embed = discord.Embed(title="Member not found",
+        embed = discord.Embed(title=f"Member not found",
                                 description="This member doesn't seem to exist.\nCheck you have their ID or tag's capitalization and spelling correct!",
                                 color=0xDE3163)
         await ctx.send(embed=embed)
@@ -109,7 +109,7 @@ async def on_command_error(ctx, error):
                 usage += " [" + key + "]"
             else:
                 usage += " <" + key + ">"
-        embed = discord.Embed(title="Missing arguments",
+        embed = discord.Embed(title=f" arguments",
                               description=f"Command usage:\n`{usage}`\nFor more help, see `{ctx.prefix}help {ctx.command}`",
                               color=0xDE3163)
         await ctx.send(embed=embed)
@@ -119,6 +119,8 @@ async def on_command_error(ctx, error):
         tb = ''.join(traceback.format_exception(type(error), error, error.__traceback__))
         if len(tb) <= 2000:
             await bot.error_channel.send(f"Ignoring exception in command {ctx.command}:\n```py\n{tb}\n```")
+            embed = discord.Embed(title=f"Error",description=str(error).split(":")[2],color=0xDE3163)
+            await ctx.send(embed=embed)
         else:
             await bot.error_channel.send(f"```An error occurred in command '{ctx.command}' that could not be sent in this channel, check the console for the traceback. \n\n'{error}'```")
             print("The below exception could not be sent to the error channel.")
@@ -180,7 +182,7 @@ async def after_cache_ready():
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster, bot.rich_kid)
 
     bot.ticket_categories = ('RTickets', '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL')
-    bot.misc_allies = ("XL", "Lucid", "Cronos", "OUT", "Betrayed", "Blight")
+    bot.misc_allies = ("XL", "Lucid", "Cronos", "OUT", "Betrayed", "Blight","TheNinjaWarriors")
     bot.admin_ids = [member.id for member in bot.admin.members]
     bot.admin_names = [await hypixel.name_grabber(member) for member in bot.admin.members]
     bot.staff_names = [await hypixel.name_grabber(member) for member in bot.staff.members]
