@@ -129,16 +129,13 @@ async def on_error(event, *args, **kwargs):
 
 @bot.event
 async def on_member_join(member):
-    channel = bot.get_channel(714882620001091585)
-    role = discord.utils.get(member.guild.roles, name="New Member")
-    await member.add_roles(role)
+    await member.add_roles(bot.new_member_role)
 
-    embed = discord.Embed(title=f"Welcome to the Miscellaneous Discord, {member.name}", color=0x8368ff)
-    embed.add_field(name="Register using the following command:", value="**,register** `Your Minecraft Name`",
+    embed = discord.Embed(title=f"Welcome to the Miscellaneous Discord, {member.name}", description="Before you can view the server, please register with your Minecraft username.", color=0x8368ff)
+    embed.add_field(name="To register use the following command:", value=",register `Your Minecraft Name`\n\nExample:\n,register John",
                     inline=False)
-    embed.set_footer(text="Example:\n,register John")
 
-    await channel.send(embed=embed)
+    await bot.registration_channel.send(embed=embed)
 
 
 async def connect_db():
@@ -153,6 +150,7 @@ async def after_cache_ready():
     bot.dnkl_channel = bot.get_channel(config['bot']['dnkl_channel_id'])
     bot.ticket_channel = bot.get_channel(config['bot']['ticket_channel_id'])
     bot.log_channel = bot.get_channel(config['bot']['log_channel_id'])
+    bot.registration_channel = bot.get_channel(config['bot']['registration_channel_id'])
     bot.guild = bot.get_guild(config['bot']['guild_id'])
 
     bot.guild_master = discord.utils.get(bot.guild.roles, name="Guild Master")

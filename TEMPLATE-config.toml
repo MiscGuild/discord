@@ -7,6 +7,7 @@ error_channel_id = XXXXXXXXXXXXXXXXXX
 dnkl_channel_id = XXXXXXXXXXXXXXXXXX
 ticket_channel_id = XXXXXXXXXXXXXXXXXX
 log_channel_id = XXXXXXXXXXXXXXXXXX
+registration_channel_id = XXXXXXXXXXXXXXXXXX
 guild_id = XXXXXXXXXXXXXXXXXX
 
 [hypixel]
