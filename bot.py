@@ -11,13 +11,11 @@ from discord.ext import commands, tasks
 from cogs.utils import utilities as hypixel
 
 logging.basicConfig(level=logging.INFO)
-
 config = toml.load('config.toml')
 
 intents = discord.Intents.default()
 intents.reactions = True
 intents.members = True
-
 bot = commands.Bot(command_prefix=commands.when_mentioned_or(config['bot']['prefix']), intents=intents,
                    status=discord.Status.idle, activity=discord.Game(config['bot']['status']), case_insensitive=True)
 
@@ -52,8 +50,7 @@ class HelpCommand(commands.MinimalHelpCommand):
 
 bot.help_command = HelpCommand(command_attrs={'hidden': True})
 
-initial_extensions = ['cogs.fun', 'cogs.hypixel', 'cogs.mod', 'cogs.staff', 'cogs.tickets', 'cogs.owner',
-                      'cogs.buttons', 'cogs.giveaways', 'cogs.general']
+initial_extensions = []
 
 if __name__ == '__main__':
     for extension in initial_extensions:
