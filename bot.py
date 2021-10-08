@@ -59,14 +59,10 @@ if __name__ == '__main__':
     for extension in initial_extensions:
         try:
             bot.load_extension(extension)
-            print(f'{extension} Loaded!')
         except Exception as e:
-            print(f'Failed to load extention {extension}', file=sys.stderr)
+            print(f'WARNING: Failed to load extention {extension}', file=sys.stderr)
 
 
-@bot.event
-async def on_ready():
-    print('The Miscellaneous Bot is ONLINE!\n\n')
 
 
 @bot.event
@@ -150,8 +146,6 @@ async def on_member_join(member):
 
 async def connect_db():
     bot.db = await aiosqlite.connect('database.db')
-    print("db connected")
-
 
 bot.loop.run_until_complete(connect_db())
 
@@ -189,7 +183,7 @@ async def after_cache_ready():
 
     chat_exporter.init_exporter(bot)
 
-    print("Cache filled and task complete.")
+    print("Cache filled")
 
 
 @after_cache_ready.before_loop

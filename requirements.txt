@@ -5,7 +5,7 @@ attrs==21.2.0
 certifi==2021.5.30
 chardet==4.0.0
 DateTime==4.3
-discord.py==1.7.3
+pycord==0.0.1
 idna==3.2
 multidict==5.1.0
 pytz==2021.1
@@ -16,5 +16,4 @@ typing-extensions==3.10.0.0
 urllib3==1.26.6
 yarl==1.6.3
 zope.interface==5.4.0
-discord-components==2.1.1
 chat-exporter==1.6.2
