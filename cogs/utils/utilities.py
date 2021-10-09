@@ -407,3 +407,25 @@ async def get_tag_message():
         url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png")
     embed.set_footer(text="If you don't want a tag, type: None")
     return embed
+    '''@commands.command()
+    @commands.has_role("Staff")
+    async def information_aa(self, ctx, send_ping=None):
+        body = \'\'\'Miscellaneous is an all games Hypixel guild. Our primary goal is to be a guild that is friendly to everyone. All of our guild requirements are well thought out. Miscellaneous strives to be a good community while maintaining its position on the guild leaderboards.We are a 2014 guild which makes us one of the OG hypixel guilds. We, the miscellaneous staff team will do anything to protect the legacy of this spectacle of a guild.\'\'\'
+        embed = discord.Embed(description=body,color=0x8368ff)
+        embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/rey4uPv9eHzVTkM9_GVWvWiK1jyrtBy_sUQjBaE5qbE/https/images-ext-2.discordapp.net/external/oTPK3H5eQJWBw_syuTTVUJ3yP7YkvvXTb0JbMX0cdJQ/https/images-ext-1.discordapp.net/external/ziYSZZe7dPyKDYLxA1s2jqpKi-kdCvPFpPaz3zft-wo/%25253Fwidth%25253D671%252526height%25253D671/https/media.discordapp.net/attachments/523227151240134664/803843877999607818/misc.png")
+        embed.set_author(name="Miscellaneous",url="https://plancke.io/hypixel/guild/name/Miscellaneous")
+        partners = \'\'\'XL - https://discord.gg/XvqCvYn
+                    Lucid - https://discord.gg/DDTMad2pYR
+                    OUT - https://discord.gg/OUT
+                    Betrayed - https://discord.gg/Betrayed
+                    Cronos - https://discord.gg/DgfUSPEQ
+                    Blight - https://discord.gg/dgTWpgy
+                    Cubelify - https://cubelify.com/ / https://discord.gg/cubelify\'\'\'
+        embed.add_field(name="Partners",value=partners,inline=False)
+        links = \'\'\'Guild Website: https://miscguild.xyz/
+                Guild Thread: http://bit.ly/MiscThread
+                Permanent Discord Invite Link: https://discord.gg/bHFWukp\'\'\'
+        embed.add_field(name="Useful Links",value=links,inline=False)
+        embed.set_footer(text="This guild was founded by @Fantastic_Doge")
+        await ctx.send("https://images-ext-2.discordapp.net/external/FTPm31ZbVY3GRGwU7XsrBeCEPo3U5dtkuOM55jj__qA/https/media.discordapp.net/attachments/522862347388190801/874785998498852874/information.jpg")
+        await ctx.send(embed=embed)'''
