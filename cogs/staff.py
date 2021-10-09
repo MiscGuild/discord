@@ -47,6 +47,8 @@ class staff(commands.Cog, name="Staff"):
                         inline=False)
         embed.add_field(name="Rich Kid", value="Spend Money on the guild by doing giveaways, sponsoring events!",
                         inline=False)
+        embed.add_field(name="Server Booster", value="Boost the guild discord!",
+                        inline=False)
         embed.add_field(name="GvG Team", value="Be an exceptional GvG player.",
                         inline=False)
         embed.set_footer(
