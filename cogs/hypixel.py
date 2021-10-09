@@ -163,7 +163,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             if req["player"] is None:
                 embed = discord.Embed(title="Your discord nick doesn't match your minecraft name",
                                       description=',sync `Your minecraft name`', color=0xff0000)
-                await ctx.channel.purge(limit=1)
+                await ctx.channel.purge(limit=1, check=lambda x: x.author == ctx.author)
                 await ctx.send(embed=embed)
             else:
                 ign = req["player"]["displayname"]
@@ -875,7 +875,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             if "commands" not in ctx.channel.name and ctx.channel.category.name not in (
                                     '🎫 Ticket Section', 'DNKL', 'MILESTONES', 'REPORTS', 'EVENT', 'OTHER', 'RTickets'):
                                 name = name.replace("_", "\_")
-                                await ctx.channel.purge(limit=1)
+                                await ctx.channel.purge(limit=1 ,check=lambda x:x.author == ctx.author)
                                 await ctx.send(f"__**{name}**__\n**Guild Experience -** `{totalexp}`")
 
                             else:
@@ -1136,7 +1136,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
     async def dailylb(self, ctx, x=1):
         """Prints the daily guild leaderboard. The value defaults to the day prior.
         """
-        await ctx.channel.purge(limit=1)
+        await ctx.channel.purge(limit=1, check=lambda x: x.author == ctx.author)
         msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
         api = utils.get_api()
         async with aiohttp.ClientSession() as session:

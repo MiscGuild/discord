@@ -524,7 +524,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                         x.author.id).roles))
 
                                     if click.component.id == "approve":
-
+                                        dnkl_staff_embed.set_footer(text="")
                                         message = await self.bot.dnkl_channel.send(embed=dnkl_embed)
 
                                         cursor = await self.bot.db.execute("SELECT message_id FROM DNKL WHERE username = (?)", (ign,))
