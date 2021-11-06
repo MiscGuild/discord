@@ -1472,7 +1472,21 @@ class Tickets(commands.Cog, name="Tickets"):
 
 
                 if reply == "Christmas Event":
-                    await channel.send("Ayo christmas event!")
+                    embed = discord.Embed(title="What is your Minecraft Username?",
+                        color=0x4b89e4)
+                    await channel.send(embed=embed)
+                    username = await self.bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                    name, uuid = await utils.get_dispnameID(username.content)
+                    await channel.edit(name=f"Event-{name}", category=discord.utils.get(channel.guild.categories, name="EVENT"))
+
+                    if name != None:
+                        embed = discord.Embed(title="General Information", description="Following is some general information surrounding the event.", color=0x8368ff)
+                        # TODO: actually write some information...
+                        embed.add_field(name="yes", value="yes yes")
+                        await channel.send(embed=embed)
+                        break
+                    else:
+                        await channel.send("Unkown IGN! Restarting ticket process...")
 
 
                 elif reply == "Other":
