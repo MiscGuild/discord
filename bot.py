@@ -53,7 +53,7 @@ class HelpCommand(commands.MinimalHelpCommand):
 bot.help_command = HelpCommand(command_attrs={'hidden': True})
 
 initial_extensions = ['cogs.fun', 'cogs.hypixel', 'cogs.mod', 'cogs.staff', 'cogs.tickets', 'cogs.owner',
-                      'cogs.buttons', 'cogs.giveaways', 'cogs.general']
+                      'cogs.buttons', 'cogs.giveaways', 'cogs.general', 'cogs.events']
 
 if __name__ == '__main__':
     for extension in initial_extensions:
@@ -151,6 +151,11 @@ async def on_member_join(member):
 async def connect_db():
     bot.db = await aiosqlite.connect('database.db')
     print("db connected")
+    await bot.db.execute('''CREATE TABLE IF NOT EXISTS event(
+        uuid TEXT PRIMARY KEY NOT NULL,
+        points NUMERIC NOT NULL,
+        completed INTEGER NOT NULL)''')
+    await bot.db.commit()
 
 
 bot.loop.run_until_complete(connect_db())

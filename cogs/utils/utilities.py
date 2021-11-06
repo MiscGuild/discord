@@ -157,7 +157,7 @@ async def get_guild(name):
             uuid = request['id']
             api = get_api()
             async with session.get(f"https://api.hypixel.net/guild?key={api}&player={uuid}") as resp:
-                req = await resp.json()
+                req = await resp.json(content_type=None)
                 await session.close()
     if 'cause' in req:
         print(req['cause'], api)

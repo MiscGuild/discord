@@ -1484,6 +1484,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         # TODO: actually write some information...
                         embed.add_field(name="yes", value="yes yes")
                         await channel.send(embed=embed)
+                        await author.add_roles(self.bot.christmas_event)
                         break
                     else:
                         await channel.send("Unkown IGN! Restarting ticket process...")
