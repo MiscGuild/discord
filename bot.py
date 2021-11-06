@@ -179,6 +179,7 @@ async def after_cache_ready():
     bot.server_booster = discord.utils.get(bot.guild.roles, name="Server Booster")
     bot.rich_kid = discord.utils.get(bot.guild.roles, name="Rich Kid")
     bot.giveaways_events = discord.utils.get(bot.guild.roles, name="Giveaways/Events")
+    bot.christmas_event = discord.utils.get(bot.guild.roles, name="Christmas Event")
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster, bot.rich_kid)
 
     bot.ticket_categories = ('RTickets', '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL')

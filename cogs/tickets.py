@@ -353,6 +353,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                 SelectOption(label="Query/Problem", value="Query/Problem", emoji="🤔"),
                                 SelectOption(label="Apply for staff", value="Staff Application", emoji="🤵"),
                                 SelectOption(label="Apply for the GvG Team", value="Gvg Application", emoji="⚔️"),
+                                SelectOption(label="Christmas Event", value="Christmas Event", emoji="🎅"),
                                 SelectOption(label="Other", value="Other", emoji="❓")
                             ], max_values=1, min_values=0)
                         ]
@@ -1468,6 +1469,12 @@ class Tickets(commands.Cog, name="Tickets"):
                                                           color=0x00a86b)
                                     await asyncio.sleep(2)
                             break
+
+
+                if reply == "Christmas Event":
+                    await channel.send("Ayo christmas event!")
+
+
                 elif reply == "Other":
                     embed = discord.Embed(title=f"{name} created this ticket for an unspecified reason!",
                                         description="Kindly specify your reason behind creating this ticket and wait for staff to help you!")
