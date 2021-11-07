@@ -791,7 +791,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 api = utils.get_api()
                 async with aiohttp.ClientSession() as session:
                     async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
-                        req = await resp.json(content_type=None)
+                        req = await resp.json()
                         await session.close()
 
                 if "guild" not in req or req['guild'] is None:
