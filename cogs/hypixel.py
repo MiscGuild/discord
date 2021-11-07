@@ -171,7 +171,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 api = utils.get_api()
                 async with aiohttp.ClientSession() as session:
                     async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
-                        req2 = await resp.json()
+                        req2 = await resp.json(content_type=None)
 
                 'NETWORK LEVEL'
                 exp = int(req["player"]["networkExp"])
@@ -490,7 +490,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 api = utils.get_api()
                 async with aiohttp.ClientSession() as session:
                     async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as req:
-                        req = await req.json()
+                        req = await req.json(content_type=None)
                         await session.close()
                 if req['guild'] is None:
                     await ctx.send("The user is not in any guild!")
@@ -554,7 +554,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         api = utils.get_api()
         async with aiohttp.ClientSession() as session:
             async with session.get(f'https://api.hypixel.net/guild?key={api}&name={gname}') as req:
-                req = await req.json()
+                req = await req.json(content_type=None)
                 await session.close()
         if req['guild'] is None:
             await ctx.send("Invalid Guild Name!")
@@ -567,7 +567,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     async with aiohttp.ClientSession() as session:
                         async with session.get(
                                 f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as names:
-                            names = await names.json()
+                            names = await names.json(content_type=None)
 
                     name = names['name'] + f" [{req['guild']['members'][i]['rank']}]"
                     expHistory = sum(req['guild']['members'][i]['expHistory'].values())
@@ -608,7 +608,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         link = f'https://api.slothpixel.me/api/guilds/{gname}'
         async with aiohttp.ClientSession() as session:
             async with session.get(link) as resp:
-                g = await resp.json()
+                g = await resp.json(content_type=None)
         array = {}
         exp = 0
         await msg.edit(content=f"**Please wait!**\n `Approximate wait time: 5 seconds`")
@@ -620,7 +620,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     async with aiohttp.ClientSession() as session:
                         async with session.get(
                                 f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
-                            a = await resp.json()
+                            a = await resp.json(content_type=None)
                     name = a['name'] + f"[{g['members'][i]['rank']}]"
                     exp += expHistory
                     array[name] = exp
@@ -656,7 +656,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         link = f'https://api.slothpixel.me/api/guilds/{gname}'
         async with aiohttp.ClientSession() as session:
             async with session.get(link) as resp:
-                g = await resp.json()
+                g = await resp.json(content_type=None)
         array = {}
         exp = 0
         await msg.edit(content=f"**Please wait!**\n `Approximate wait time: 10 seconds!`")
@@ -668,7 +668,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     async with aiohttp.ClientSession() as session:
                         async with session.get(
                                 f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
-                            a = await resp.json()
+                            a = await resp.json(content_type=None)
                     name = a['name']
                     rank = g['members'][i]['rank']
                     name = name + f'[{rank}]'
@@ -710,7 +710,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         link = f'https://api.slothpixel.me/api/guilds/{gname}'
         async with aiohttp.ClientSession() as session:
             async with session.get(link) as resp:
-                g = await resp.json()
+                g = await resp.json(content_type=None)
                 await session.close()
         array = {}
         exp = 0
@@ -736,7 +736,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     async with aiohttp.ClientSession() as session:
                         async with session.get(
                                 f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
-                            a = await resp.json()
+                            a = await resp.json(content_type=None)
                             await session.close()
                     name = a['name']
                     expHistory = sum(g['members'][i]['exp_history'].values())
@@ -791,7 +791,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                 api = utils.get_api()
                 async with aiohttp.ClientSession() as session:
                     async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
-                        req = await resp.json()
+                        req = await resp.json(content_type=None)
                         await session.close()
 
                 if "guild" not in req or req['guild'] is None:
@@ -934,7 +934,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             api = utils.get_api()
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
-                    data = await resp.json()
+                    data = await resp.json(content_type=None)
                     if data['guild'] == None:
                         await ctx.send('You are not in a guild!')
                         return
@@ -985,7 +985,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         api = utils.get_api()
         async with aiohttp.ClientSession() as session:
             async with session.get(f'https://api.hypixel.net/guild?key={api}&name=Miscellaneous') as resp:
-                req = await resp.json()
+                req = await resp.json(content_type=None)
                 await session.close()
         array = {}
         exp = 0
@@ -1022,13 +1022,13 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     async with aiohttp.ClientSession() as session:
                         async with session.get(
                                 f'https://sessionserver.mojang.com/session/minecraft/profile/{user[0]}') as resp:
-                            mojang = await resp.json()
+                            mojang = await resp.json(content_type=None)
                             await session.close()
                     name = mojang['name']
 
                     async with aiohttp.ClientSession() as session:
                         async with session.get(f"https://api.hypixel.net/player?key={api}&name={name}") as resp:
-                            data = await resp.json()
+                            data = await resp.json(content_type=None)
                             await session.close()
 
                     if data["player"] is None:
@@ -1141,7 +1141,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         api = utils.get_api()
         async with aiohttp.ClientSession() as session:
             async with session.get(f'https://api.hypixel.net/guild?key={api}&name=Miscellaneous') as resp:
-                req = await resp.json()
+                req = await resp.json(content_type=None)
                 await session.close()
         array = {}
         async with ctx.channel.typing():
@@ -1177,13 +1177,13 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     async with aiohttp.ClientSession() as session:
                         async with session.get(
                                 f'https://sessionserver.mojang.com/session/minecraft/profile/{user[0]}') as resp:
-                            mojang = await resp.json()
+                            mojang = await resp.json(content_type=None)
                             name = mojang['name']
                             await session.close()
 
                     async with aiohttp.ClientSession() as session:
                         async with session.get(f"https://api.hypixel.net/player?key={api}&name={name}") as resp:
-                            data = await resp.json()
+                            data = await resp.json(content_type=None)
                             await session.close()
 
                     if data["player"] is None:

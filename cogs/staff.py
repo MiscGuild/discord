@@ -90,7 +90,7 @@ class staff(commands.Cog, name="Staff"):
         api = utils.get_api()
         async with aiohttp.ClientSession() as session:
             async with session.get(f'https://api.hypixel.net/guild?key={api}&name=Miscellaneous') as resp:
-                g = await resp.json()
+                g = await resp.json(content_type=None)
                 await session.close()
 
         cursor = await self.bot.db.execute("SELECT username FROM DNKL")
@@ -118,7 +118,7 @@ class staff(commands.Cog, name="Staff"):
                     async with aiohttp.ClientSession() as session:
                         async with session.get(
                                 f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
-                            a = await resp.json()
+                            a = await resp.json(content_type=None)
                             await session.close()
                     name = a['name']
                     time = str(datetime.fromtimestamp(int(str(joined)[:-3])))
@@ -135,7 +135,7 @@ class staff(commands.Cog, name="Staff"):
                     async with aiohttp.ClientSession() as session:
                         async with session.get(
                                 f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
-                            a = await resp.json()
+                            a = await resp.json(content_type=None)
                             await session.close()
                     name = a['name']
                     time = str(datetime.fromtimestamp(int(str(joined)[:-3])))
@@ -153,7 +153,7 @@ class staff(commands.Cog, name="Staff"):
                         async with aiohttp.ClientSession() as session:
                             async with session.get(
                                     f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
-                                a = await resp.json()
+                                a = await resp.json(content_type=None)
                         time = str(datetime.fromtimestamp(int(str(joined)[:-3])))
                         name = a['name']
                         dt = (time[0:10])
@@ -170,7 +170,7 @@ class staff(commands.Cog, name="Staff"):
                             async with aiohttp.ClientSession() as session:
                                 async with session.get(
                                         f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}') as resp:
-                                    a = await resp.json()
+                                    a = await resp.json(content_type=None)
                             time = str(datetime.fromtimestamp(int(str(joined)[:-3])))
                             name = a['name']
                             dt = (time[0:10])
@@ -601,7 +601,7 @@ class staff(commands.Cog, name="Staff"):
                                     new_member_description = str(new_member_description) + f"{name} **++New Member | --Member | -- Guest**\n"
                                     continue
                                 else:
-                                    mojang_json = await mojang.json()
+                                    mojang_json = await mojang.json(content_type=None)
                                     ign = mojang_json["name"]
                                     uuid = mojang_json['id']
 
@@ -611,7 +611,7 @@ class staff(commands.Cog, name="Staff"):
                             async with aiohttp.ClientSession() as session:
                                 async with session.get(
                                         f"https://api.hypixel.net/guild?key={utils.get_api()}&player={uuid}") as resp:
-                                    req = await resp.json()
+                                    req = await resp.json(content_type=None)
                                     await session.close()
 
                             if self.bot.member_role not in member.roles:

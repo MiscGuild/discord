@@ -124,7 +124,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         async with aiohttp.ClientSession() as session:
                             async with session.get(
                                     f'https://api.hypixel.net/guild?key={api}&name={guildname.replace(" ", "%20")}') as resp:
-                                req = await resp.json()
+                                req = await resp.json(content_type=None)
                                 await session.close()
                         level = await utils.get_guild_level(req['guild']['exp'])
                         if level > 100:
@@ -176,7 +176,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         async with aiohttp.ClientSession() as session:
                             async with session.get(
                                     f'https://api.hypixel.net/guild?key={api}&name={guildname.replace(" ", "%20")}') as resp:
-                                req = await resp.json()
+                                req = await resp.json(content_type=None)
                                 await session.close()
                         level = await utils.get_guild_level(req['guild']['exp'])
                         if level > 50:
@@ -387,7 +387,7 @@ class Tickets(commands.Cog, name="Tickets"):
                     api = utils.get_api()
                     async with aiohttp.ClientSession() as session:
                         async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
-                            data = await resp.json()
+                            data = await resp.json(content_type=None)
                             await session.close()
                     if data['guild'] != None:
                         gname = data['guild']['name']

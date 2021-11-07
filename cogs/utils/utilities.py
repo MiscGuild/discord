@@ -22,21 +22,21 @@ async def get_data(name):
     api = get_api()
     async with aiohttp.ClientSession() as session:
         async with session.get(f"https://api.hypixel.net/player?key={api}&name={name}") as resp:
-            req = await resp.json()
+            req = await resp.json(content_type=None)
     return req
 
 
 async def get_data1(name):
     async with aiohttp.ClientSession() as session:
         async with session.get(f"https://api.slothpixel.me/api/players/{name}") as resp:
-            req = await resp.json()
+            req = await resp.json(content_type=None)
     return req
 
 
 async def get_guild_data(name):
     async with aiohttp.ClientSession() as session:
         async with session.get(f"https://api.slothpixel.me/api/guilds/{name}") as resp:
-            req = await resp.json()
+            req = await resp.json(content_type=None)
     return req
 
 
@@ -44,7 +44,7 @@ async def get_leaderboards():
     api = get_api()
     async with aiohttp.ClientSession() as session:
         async with session.get(f"https://api.hypixel.net/leaderboards?key={api}") as resp:
-            req = await resp.json()
+            req = await resp.json(content_type=None)
     if req["success"]:
         return req
     elif not req["success"]:
@@ -96,7 +96,7 @@ async def get_rank(name):
         api = get_api()
         async with aiohttp.ClientSession() as session:
             async with session.get(f"https://api.hypixel.net/player?key={api}&name={name}") as resp:
-                data = await resp.json()
+                data = await resp.json(content_type=None)
                 await session.close()
     else:
         data = await get_data(name)
@@ -153,11 +153,11 @@ async def get_guild(name):
                 await session.close()
                 return None
 
-            request = await request.json()
+            request = await request.json(content_type=None)
             uuid = request['id']
             api = get_api()
             async with session.get(f"https://api.hypixel.net/guild?key={api}&player={uuid}") as resp:
-                req = await resp.json()
+                req = await resp.json(content_type=None)
                 await session.close()
     if 'cause' in req:
         print(req['cause'], api)
@@ -172,7 +172,7 @@ async def get_gtag(name):
     api = get_api()
     async with aiohttp.ClientSession() as session:
         async with session.get(f'https://api.hypixel.net/guild?key={api}&name={name}') as resp:
-            req = await resp.json()
+            req = await resp.json(content_type=None)
             await session.close()
     if len(req['guild']) < 2:
         return (" ")
@@ -289,7 +289,7 @@ async def get_guild_members(gname):
     api = get_api()
     async with aiohttp.ClientSession() as session:
         async with session.get(f'https://api.hypixel.net/guild?key={api}&name={gname}') as resp:
-            req = await resp.json()
+            req = await resp.json(content_type=None)
             await session.close()
     uuids = []
     for i in range(len(req['guild']['members'])):
@@ -302,7 +302,7 @@ async def get_misc_members(gname):
     api = get_api()
     async with aiohttp.ClientSession() as session:
         async with session.get(f'https://api.hypixel.net/guild?key={api}&name={gname}') as resp:
-            req = await resp.json()
+            req = await resp.json(content_type=None)
             await session.close()
     gmemberdata = []
     for i in range(len(req['guild']['members'])):
@@ -315,7 +315,7 @@ async def get_misc_members(gname):
 def fetch(session, individual_uuid):
     base_url = "https://sessionserver.mojang.com/session/minecraft/profile/"
     with session.get(base_url + individual_uuid) as response:
-        data = response.json()
+        data = response.json(content_type=None)
 
         if response.status_code != 200:
             return None
@@ -332,7 +332,7 @@ def discord_member_check(session, member):
         name = member.name
 
     with session.get(base_url + name) as mojang:
-        data = mojang.json()
+        data = mojang.json(content_type=None)
 
         if mojang.status != 200:  # If the IGN is invalid
             invalid_members.append(member)
