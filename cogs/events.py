@@ -9,23 +9,25 @@ class Events(commands.Cog, name="Events"):
 
     @commands.command()
     @commands.has_role("Staff")
-    async def completechallenge(self, ctx, member: discord.Member, challenge_index: int, scaled_challenge_points: int=1):
+    async def completechallenge(self, ctx, member: discord.Member, challenge_type: str, points: int=1):
         name, uuid = await utils.get_dispnameID(await utils.name_grabber(member))
+        challenge_type = challenge_type.lower()
+
         # Calculate points based on challenge
-        if challenge_index == 1:
-            points_earned = scaled_challenge_points
-        elif challenge_index == 2:
+        if challenge_type in ["scaled", "s"]:
+            points_earned = points
+        elif challenge_type in ["hard", "h"]:
             points_earned = 2
-        elif challenge_index == 3:
+        elif challenge_type in ["easy", "e"]:
             points_earned = 1
-        elif challenge_index == 4:
+        elif challenge_type in ["member", "m"]:
             if await utils.get_guild(name) != "Miscellaneous" and await utils.get_guild(name) not in self.bot.misc_allies:
                 await ctx.send("This player is not eligible for this challenge! Only members of miscellaneous and allied guilds can participate!")
                 return
             else:
                 points_earned = 1
         else:
-            await ctx.send("Invalid challenge number! Please enter a number between 1 and 4!")
+            await ctx.send("Invalid challenge! Available challenges are: **S**caled, **H**ard, **E**asy, **M**ember.")
             return
 
         # Get data from db
