@@ -1,7 +1,10 @@
 import discord
 from discord.ext import commands
-from discord.ext.commands.core import command
 from cogs.utils import utilities as utils
+import aiohttp
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+import requests
 
 class Events(commands.Cog, name="Events"):
     def __init__(self, bot):
@@ -103,6 +106,21 @@ class Events(commands.Cog, name="Events"):
 
 
 
+    @commands.command(aliases=["challengelb"])
+    @commands.has_role("Staff")
+    async def challengeleaderboard(self, ctx):
+        description = "Listed below are the top 10 players for today's scaled challenge.\n\n"
+        with requests.Session() as session:
+            count = 1
+            for data_set in await self.get_scaled_lb():
+                uuid, score = data_set
+                name = utils.fetch(session, uuid)
+                description = description + "**" + str(count) + " -**" + uuid + ": " + str(score) if name == None else description + "**" + str(count) + " -** " + name + ": " + str(score)
+                count += 1
+            session.close()
+        await ctx.send(embed=discord.Embed(title="Scaled Challenge Leaderboard", description=description, color=0x8368ff))
+
+
 
     async def insert_new(self, uuid, points, challenges, scaled_challenge_score):
         await self.bot.db.execute("INSERT INTO event VALUES (?, ?, ?, ?)", (uuid, points, challenges, scaled_challenge_score,))
@@ -128,6 +146,12 @@ class Events(commands.Cog, name="Events"):
         row = await cursor.fetchone()
         await cursor.close()
         return row
+
+    async def get_scaled_lb(self):
+        cursor = await self.bot.db.execute("SELECT uuid, scaled_challenge_score FROM event ORDER BY scaled_challenge_score DESC")
+        rows = await cursor.fetchmany(10)
+        await cursor.close()
+        return rows
 
 
 def setup(bot):
