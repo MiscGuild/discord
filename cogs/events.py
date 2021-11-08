@@ -18,13 +18,15 @@ class Events(commands.Cog, name="Events"):
             points_earned = 2
         elif challenge_index == 3:
             points_earned = 1
+        elif challenge_index == 4:
+            if await utils.get_guild(name) != "Miscellaneous" and await utils.get_guild(name) not in self.bot.misc_allies:
+                await ctx.send("This player is not eligible for this challenge! Only members of miscellaneous and allied guilds can participate!")
+                return
+            else:
+                points_earned = 1
         else:
-            await ctx.send("Invalid challenge number! Please enter a number between 1 and 3!")
+            await ctx.send("Invalid challenge number! Please enter a number between 1 and 4!")
             return
-
-        # Check if member is in guild/allied or not
-        if await utils.get_guild(name) != "Miscellaneous" and await utils.get_guild(name) not in self.bot.misc_allies:
-            points_earned *= 0.75
 
         # Get data from db
         row = await self.get_player(uuid)
