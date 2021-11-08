@@ -154,7 +154,8 @@ async def connect_db():
     await bot.db.execute('''CREATE TABLE IF NOT EXISTS event(
         uuid TEXT PRIMARY KEY NOT NULL,
         points NUMERIC NOT NULL,
-        completed INTEGER NOT NULL)''')
+        completed INTEGER NOT NULL,
+        scaled_challenge_score NUMERIC NOT NULL)''')
     await bot.db.commit()
 
 
