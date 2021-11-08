@@ -20,14 +20,14 @@ class Events(commands.Cog, name="Events"):
                 return
             
             # Get player data
-            row = await self.get_player(uuid)
+            row = await self.get_player_short(uuid)
             if row != None:
-                uuid, total_points, completed_challenges, scaled_challenge = row
+                uuid, total_points, completed_challenges = row
                 await self.update_value(uuid, total_points, completed_challenges, scaled_challenge_score)
             else:
                 await self.insert_new(uuid, 0, 1, scaled_challenge_score)
 
-            await ctx.send(f"{name}'s highest scaled challenge score today is {scaled_challenge_score}")
+            await ctx.send(f"{name}'s scaled challenge score today is {scaled_challenge_score}")
             return
 
         elif challenge_type in ["hard", "h"]:
@@ -67,15 +67,15 @@ class Events(commands.Cog, name="Events"):
     @commands.has_role("Staff")
     async def addpoints(self, ctx, member: discord.Member, points: int):
         name, uuid = await utils.get_dispnameID(await utils.name_grabber(member))
-        row = await self.get_player(uuid)
+        row = await self.get_player_short(uuid)
 
         if row == None:
             await self.insert_new(uuid, points, None, 0)
             completed_challenges = 0
         else:
-            uuid, total_points, completed_challenges, scaled_challenge_score = row
-            await self.update_value(uuid, total_points + points, completed_challenges)
+            uuid, total_points, completed_challenges = row
             points += total_points
+            await self.update_value(uuid, points, completed_challenges)
 
         # Send player's overall stats
         embed = discord.Embed(title=f"Event statistics - {name}", description=f"**Total points:** {points}\n**Challenges completed:** {completed_challenges}", color=0x8368ff)
@@ -87,10 +87,10 @@ class Events(commands.Cog, name="Events"):
     @commands.has_role("Staff")
     async def removepoints(self, ctx, member: discord.Member, points: int):
         name, uuid = await utils.get_dispnameID(await utils.name_grabber(member))
-        row = await self.get_player(uuid)
+        row = await self.get_player_short(uuid)
 
         if row != None:
-            uuid, total_points, completed_challenges, scaled_challenge_score = row
+            uuid, total_points, completed_challenges = row
             points = total_points - points
             await self.update_value(uuid, points)
         else:
@@ -119,6 +119,12 @@ class Events(commands.Cog, name="Events"):
 
     async def get_player(self, uuid):
         cursor = await self.bot.db.execute("SELECT * FROM event WHERE uuid = (?)", (uuid,))
+        row = await cursor.fetchone()
+        await cursor.close()
+        return row
+
+    async def get_player_short(self, uuid):
+        cursor = await self.bot.db.execute("SELECT uuid, points, completed FROM event WHERE uuid = (?)", (uuid,))
         row = await cursor.fetchone()
         await cursor.close()
         return row
