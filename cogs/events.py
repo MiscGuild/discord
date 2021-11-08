@@ -75,7 +75,7 @@ class Events(commands.Cog, name="Events"):
         else:
             uuid, total_points, completed_challenges, scaled_challenge_score = row
             await self.update_value(uuid, total_points + points, completed_challenges)
-            points = total_points
+            points += total_points
 
         # Send player's overall stats
         embed = discord.Embed(title=f"Event statistics - {name}", description=f"**Total points:** {points}\n**Challenges completed:** {completed_challenges}", color=0x8368ff)
