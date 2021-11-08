@@ -70,7 +70,7 @@ class Events(commands.Cog, name="Events"):
         row = await self.get_player(uuid)
 
         if row == None:
-            await self.insert_new(uuid, points, 0, 0)
+            await self.insert_new(uuid, points, None, 0)
             completed_challenges = 0
         else:
             uuid, total_points, completed_challenges, scaled_challenge_score = row
@@ -94,7 +94,7 @@ class Events(commands.Cog, name="Events"):
             points = total_points - points
             await self.update_value(uuid, points)
         else:
-            await self.insert_new(uuid, points, 0, 0)
+            await self.insert_new(uuid, points, None, 0)
             completed_challenges = 0
 
         # Send player's overall stats
