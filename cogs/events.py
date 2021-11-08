@@ -109,10 +109,10 @@ class Events(commands.Cog, name="Events"):
         await self.bot.db.commit()
 
     async def update_value(self, uuid, points, completed=None, scaled_challenge_score=None):
-        if completed == None:
-            await self.bot.db.execute("UPDATE event SET points = (?) WHERE uuid = (?)", (points, uuid,))
-        elif scaled_challenge_score != None:
+        if scaled_challenge_score != None:
             await self.bot.db.execute("UPDATE event SET points = (?), scaled_challenge_score = (?) WHERE uuid = (?)", (points, scaled_challenge_score, uuid,))
+        elif completed == None:
+            await self.bot.db.execute("UPDATE event SET points = (?) WHERE uuid = (?)", (points, uuid,))
         else:
             await self.bot.db.execute("UPDATE event SET points = (?), completed = (?) WHERE uuid = (?)", (points, completed, uuid,))
         await self.bot.db.commit()
