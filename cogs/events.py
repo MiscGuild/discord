@@ -162,6 +162,22 @@ class Events(commands.Cog, name="Events"):
             session.close()
         await ctx.send(embed=discord.Embed(title="Scaled Challenge Leaderboard", description=description, color=0x8368ff))
 
+    
+    
+    @commands.command(aliases=["resetlb", "clearlb"])
+    @commands.has_role("Staff")
+    async def resetleaderboard(self, ctx):
+        await ctx.send("Are you sure you want to reset the daily scaled challenge leaderboard? This action cannot be undone. (yes/no)")
+        confirmation = await self.bot.wait_for('message',
+                    check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+        confirmation = confirmation.content 
+        if confirmation.lower() in ["yes", "y", "ye", "yeah"]:
+            await self.bot.db.execute("UPDATE event SET scaled_challenge_score = 0")
+            await self.bot.db.commit()
+            await ctx.send("The daily scaled challenge leaderboard has been cleared!")
+        else:
+            await ctx.send("Cancelling data deletion!")
+
 
 
     async def insert_new(self, uuid, points, challenges, scaled_challenge_score):
