@@ -1,9 +1,7 @@
 import discord
 from discord.ext import commands
 from cogs.utils import utilities as utils
-import aiohttp
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
+
 import requests
 
 class Events(commands.Cog, name="Events"):
@@ -104,6 +102,12 @@ class Events(commands.Cog, name="Events"):
         embed = discord.Embed(title=f"Event statistics - {name}", description=f"**Total points:** {points}\n**Challenges completed:** {completed_challenges}", color=0x8368ff)
         await ctx.send(embed=embed)
 
+
+
+    @commands.command(aliases=["qchallenge"])
+    @commands.has_role("Staff")
+    async def queuechallenge(self, ctx):
+        await ctx.send("Yes")
 
 
     @commands.command(aliases=["challengelb"])
