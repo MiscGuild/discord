@@ -1,12 +1,14 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from cogs.utils import utilities as utils
 
+from datetime import datetime, timedelta
 import requests
 
 class Events(commands.Cog, name="Events"):
     def __init__(self, bot):
         self.bot = bot
+        self.check_queue.start()
 
     @commands.command()
     @commands.has_role("Staff")
@@ -107,7 +109,43 @@ class Events(commands.Cog, name="Events"):
     @commands.command(aliases=["qchallenge"])
     @commands.has_role("Staff")
     async def queuechallenge(self, ctx):
-        await ctx.send("Yes")
+        await ctx.send("Please enter tomorrow's scaled challenge.")
+        scaled_challenge = await self.bot.wait_for('message',
+                    check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+        scaled_challenge = scaled_challenge.content
+        if scaled_challenge.lower() == "none":
+            await ctx.send("Entry cancelled!")
+            return
+
+        await ctx.send("Please enter tomorrow's hard challenge for two points.")
+        hard_challenge = await self.bot.wait_for('message',
+                    check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+        hard_challenge = hard_challenge.content
+        if hard_challenge.lower() == "none":
+            await ctx.send("Entry cancelled!")
+            return
+        
+        await ctx.send("Please enter tomorrow's easy challenge for one point.")
+        easy_challenge = await self.bot.wait_for('message',
+                    check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+        easy_challenge = easy_challenge.content
+        if easy_challenge.lower() == "none":
+            await ctx.send("Entry cancelled!")
+            return
+
+        await ctx.send("Please enter tomorrow's member/ally challenge for one point.")
+        guild_challenge = await self.bot.wait_for('message',
+                    check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+        guild_challenge = guild_challenge.content
+        if guild_challenge.lower() == "none":
+            await ctx.send("Entry cancelled!")
+            return
+
+        await ctx.send(f"{scaled_challenge} {hard_challenge} {easy_challenge} {guild_challenge}")
+        tomorrow_day = datetime.today() + timedelta(days=1)
+        tomorrow_day = tomorrow_day.strftime("%Y-%m-%d")
+        await self.bot.db.execute("INSERT INTO event_challenge VALUES (?, ?, ?, ?, ?)", (tomorrow_day, scaled_challenge, hard_challenge, easy_challenge, guild_challenge,))
+        await self.bot.db.commit()
 
 
     @commands.command(aliases=["challengelb"])
@@ -156,6 +194,32 @@ class Events(commands.Cog, name="Events"):
         rows = await cursor.fetchmany(10)
         await cursor.close()
         return rows
+
+
+    @tasks.loop(minutes=1)
+    async def check_queue(self):
+        current_date = datetime.today().strftime("%Y-%m-%d")
+        cursor = await self.bot.db.execute("SELECT * FROM event_challenge WHERE date = (?)", (current_date,))
+        row = await cursor.fetchone()
+        await cursor.close()
+
+        if (row != None):
+            date, scaled_challenge, hard_challenge, easy_challenge, member_challenge = row
+            embed=discord.Embed(title=f"Challenges for {current_date}", color=0x8368ff)
+            embed.add_field(name="Scaled challenge", value=scaled_challenge, inline=False)
+            embed.add_field(name="Hard challenge", value=hard_challenge, inline=False)
+            embed.add_field(name="Easy challenge", value=easy_challenge, inline=False)
+            embed.add_field(name="Member/ally challenge", value=member_challenge, inline=False)
+            await self.bot.events_channel.send(embed=embed)
+            await self.bot.events_channel.send(f"{self.bot.christmas_event.mention}")
+
+            await self.bot.db.execute("DELETE FROM event_challenge WHERE date = (?)", (date,))
+            await self.bot.db.commit()
+
+
+    @check_queue.before_loop
+    async def before_queue_check(self):
+        await self.bot.wait_until_ready()
 
 
 def setup(bot):

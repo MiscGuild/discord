@@ -156,6 +156,12 @@ async def connect_db():
         points NUMERIC NOT NULL,
         completed INTEGER NOT NULL,
         scaled_challenge_score NUMERIC NOT NULL)''')
+    await bot.db.execute('''CREATE TABLE IF NOT EXISTS event_challenge(
+        date TEXT PRIMARY KEY NOT NULL,
+        scaled_challenge TEXT NOT NULL,
+        hard_challenge TEXT NOT NULL,
+        easy_challenge TEXT NOT NULL,
+        member_challenge TEXT NOT NULL)''')
     await bot.db.commit()
 
 
@@ -168,6 +174,7 @@ async def after_cache_ready():
     bot.dnkl_channel = bot.get_channel(config['bot']['dnkl_channel_id'])
     bot.ticket_channel = bot.get_channel(config['bot']['ticket_channel_id'])
     bot.log_channel = bot.get_channel(config['bot']['log_channel_id'])
+    bot.events_channel = bot.get_channel(config['bot']['event_channel_id'])
     bot.guild = bot.get_guild(config['bot']['guild_id'])
 
     bot.guild_master = discord.utils.get(bot.guild.roles, name="Guild Master")
