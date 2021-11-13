@@ -61,7 +61,7 @@ class Events(commands.Cog, name="Events"):
             await self.insert_new(uuid, total_points, completed_challenges, 0)
         
         # Send player's overall stats
-        embed = discord.Embed(title=f"Event statistics - {name}", description=f"**Scaled points earned:** {points_earned}\n**Total points:** {total_points}\n**Challenges completed:** {completed_challenges}", color=0x8368ff)
+        embed = discord.Embed(title=f"Event statistics - {name}", description=f"**Points earned:** {points_earned}\n**Total points:** {total_points}\n**Challenges completed:** {completed_challenges}", color=0x8368ff)
         await ctx.send(embed=embed)
 
 
@@ -151,13 +151,13 @@ class Events(commands.Cog, name="Events"):
     @commands.command(aliases=["challengelb"])
     @commands.has_role("Staff")
     async def challengeleaderboard(self, ctx):
-        description = "Listed below are the top 10 players for today's scaled challenge.\n\n"
+        description = "Listed below are the top 10 players for today's scaled challenge.\n"
         with requests.Session() as session:
             count = 1
             for data_set in await self.get_scaled_lb():
                 uuid, score = data_set
                 name = utils.fetch(session, uuid)
-                description = description + "**" + str(count) + " -**" + uuid + ": " + str(score) if name == None else description + "**" + str(count) + " -** " + name + ": " + str(score)
+                description = description + "\n**" + str(count) + " -**" + uuid + ": " + str(score) if name == None else description + "\n**" + str(count) + " -** " + name + ": " + str(score)
                 count += 1
             session.close()
         await ctx.send(embed=discord.Embed(title="Scaled Challenge Leaderboard", description=description, color=0x8368ff))
