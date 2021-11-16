@@ -37,14 +37,14 @@ class Events(commands.Cog, name="Events"):
             points_earned = 2
         elif challenge_type in ["easy", "e"]:
             points_earned = 1
-        elif challenge_type in ["member", "m"]:
-            if await utils.get_guild(name) != "Miscellaneous" and await utils.get_guild(name) not in self.bot.misc_allies:
-                await ctx.send("This player is not eligible for this challenge! Only members of miscellaneous and allied guilds can participate!")
-                return
+        elif challenge_type in ["weekend", "w"]:
+            if await self.is_weekend():
+                points_earned = 3
             else:
-                points_earned = 1
+                await ctx.send("It must be a weekend for you to complete this challenge!")
+                return
         else:
-            await ctx.send("Invalid challenge! Available challenges are: **S**caled, **H**ard, **E**asy, **M**ember.")
+            await ctx.send("Invalid challenge! Available challenges are: **S**caled, **H**ard, **E**asy, **W**eekend.")
             return
 
         # Update player's statistics for general challenge
@@ -149,22 +149,24 @@ class Events(commands.Cog, name="Events"):
             await ctx.send("Entry cancelled!")
             return
 
-        await ctx.send(f"Please enter the member/ally challenge for {target_date} worth one point.")
-        guild_challenge = await self.bot.wait_for('message',
-                    check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
-        guild_challenge = guild_challenge.content
-        if guild_challenge.lower() == "none":
-            await ctx.send("Entry cancelled!")
-            return
+        weekend_challenge = None
+        if await self.is_weekend():
+            await ctx.send(f"Please enter the weekend challenge for {target_date} worth three points.")
+            weekend_challenge = await self.bot.wait_for('message',
+                        check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+            weekend_challenge = weekend_challenge.content
+            if weekend_challenge.lower() == "none":
+                await ctx.send("Entry cancelled!")
+                return
 
 
         tomorrow_day = (datetime.utcnow() + timedelta(days=1) - timedelta(hours=5)).strftime("%Y-%m-%d")
         cursor = await self.bot.db.execute("SELECT date FROM event_challenge WHERE date = (?)", (tomorrow_day,))
 
         if await cursor.fetchone() == None:
-            await self.bot.db.execute("INSERT INTO event_challenge VALUES (?, ?, ?, ?, ?)", (tomorrow_day, scaled_challenge, hard_challenge, easy_challenge, guild_challenge,))
+            await self.bot.db.execute("INSERT INTO event_challenge VALUES (?, ?, ?, ?, ?)", (tomorrow_day, scaled_challenge, hard_challenge, easy_challenge, weekend_challenge,))
         else:
-            await self.bot.db.execute("UPDATE event_challenge SET scaled_challenge = (?), hard_challenge = (?), easy_challenge = (?), member_challenge = (?) WHERE date = (?)", (scaled_challenge, hard_challenge, easy_challenge, guild_challenge, tomorrow_day,))
+            await self.bot.db.execute("UPDATE event_challenge SET scaled_challenge = (?), hard_challenge = (?), easy_challenge = (?), weekend_challenge = (?) WHERE date = (?)", (scaled_challenge, hard_challenge, easy_challenge, weekend_challenge, tomorrow_day,))
         await self.bot.db.commit()
 
         await ctx.send(f"Alright! The challenges for {target_date} have been set!")
@@ -242,15 +244,19 @@ class Events(commands.Cog, name="Events"):
         await cursor.close()
 
         if row != None:
-            _, scaled_challenge, hard_challenge, easy_challenge, member_challenge = row
+            _, scaled_challenge, hard_challenge, easy_challenge, weekend_challenge = row
             embed=discord.Embed(title=f"Challenges for {date}", color=0x8368ff)
             embed.add_field(name="Scaled challenge", value=scaled_challenge, inline=False)
             embed.add_field(name="Hard challenge", value=hard_challenge, inline=False)
             embed.add_field(name="Easy challenge", value=easy_challenge, inline=False)
-            embed.add_field(name="Member/ally challenge", value=member_challenge, inline=False)
+            if weekend_challenge != None:
+                embed.add_field(name="Weekend challenge", value=weekend_challenge, inline=False)
             return embed
             
         return None
+
+    async def is_weekend(self):
+        return (datetime.utcnow() - timedelta(hours=5)).weekday() > 4
 
     @tasks.loop(minutes=1)
     async def check_queue(self):

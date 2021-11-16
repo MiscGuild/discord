@@ -161,7 +161,7 @@ async def connect_db():
         scaled_challenge TEXT NOT NULL,
         hard_challenge TEXT NOT NULL,
         easy_challenge TEXT NOT NULL,
-        member_challenge TEXT NOT NULL)''')
+        weekend_challenge TEXT)''')
     await bot.db.commit()
 
 
