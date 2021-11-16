@@ -151,7 +151,7 @@ class Events(commands.Cog, name="Events"):
             return
 
         weekend_challenge = None
-        if await self.is_weekend():
+        if await self.is_weekend(datetime.strptime(target_date, "%Y-%m-%d")):
             await ctx.send(f"Please enter the weekend challenge for {target_date} worth three points.")
             weekend_challenge = await self.bot.wait_for('message',
                         check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
@@ -161,13 +161,12 @@ class Events(commands.Cog, name="Events"):
                 return
 
 
-        tomorrow_day = (datetime.utcnow() + timedelta(days=1) - timedelta(hours=5)).strftime("%Y-%m-%d")
-        cursor = await self.bot.db.execute("SELECT date FROM event_challenge WHERE date = (?)", (tomorrow_day,))
+        cursor = await self.bot.db.execute("SELECT date FROM event_challenge WHERE date = (?)", (target_date,))
 
         if await cursor.fetchone() == None:
-            await self.bot.db.execute("INSERT INTO event_challenge VALUES (?, ?, ?, ?, ?)", (tomorrow_day, scaled_challenge, hard_challenge, easy_challenge, weekend_challenge,))
+            await self.bot.db.execute("INSERT INTO event_challenge VALUES (?, ?, ?, ?, ?)", (target_date, scaled_challenge, hard_challenge, easy_challenge, weekend_challenge,))
         else:
-            await self.bot.db.execute("UPDATE event_challenge SET scaled_challenge = (?), hard_challenge = (?), easy_challenge = (?), weekend_challenge = (?) WHERE date = (?)", (scaled_challenge, hard_challenge, easy_challenge, weekend_challenge, tomorrow_day,))
+            await self.bot.db.execute("UPDATE event_challenge SET scaled_challenge = (?), hard_challenge = (?), easy_challenge = (?), weekend_challenge = (?) WHERE date = (?)", (scaled_challenge, hard_challenge, easy_challenge, weekend_challenge, target_date,))
         await self.bot.db.commit()
 
         await ctx.send(f"Alright! The challenges for {target_date} have been set!")
@@ -256,7 +255,9 @@ class Events(commands.Cog, name="Events"):
             
         return None
 
-    async def is_weekend(self):
+    async def is_weekend(self, date=None):
+        if date != None:
+            return date.weekday() > 4
         return (datetime.utcnow() - timedelta(hours=5)).weekday() > 4
 
     @tasks.loop(minutes=1)
