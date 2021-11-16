@@ -143,7 +143,13 @@ class Events(commands.Cog, name="Events"):
 
         await ctx.send(f"{scaled_challenge} {hard_challenge} {easy_challenge} {guild_challenge}")
         tomorrow_day = (datetime.utcnow() + timedelta(days=1) - timedelta(hours=5)).strftime("%Y-%m-%d")
-        await self.bot.db.execute("INSERT INTO event_challenge VALUES (?, ?, ?, ?, ?)", (tomorrow_day, scaled_challenge, hard_challenge, easy_challenge, guild_challenge,))
+
+        cursor = await self.bot.db.execute("SELECT date FROM event_challenge WHERE date = (?)", (tomorrow_day,))
+
+        if await cursor.fetchone() == None:
+            await self.bot.db.execute("INSERT INTO event_challenge VALUES (?, ?, ?, ?, ?)", (tomorrow_day, scaled_challenge, hard_challenge, easy_challenge, guild_challenge,))
+        else:
+            await self.bot.db.execute("UPDATE event_challenge SET scaled_challenge = (?), hard_challenge = (?), easy_challenge = (?), member_challenge = (?) WHERE date = (?)", (scaled_challenge, hard_challenge, easy_challenge, guild_challenge, tomorrow_day,))
         await self.bot.db.commit()
 
 
@@ -218,7 +224,7 @@ class Events(commands.Cog, name="Events"):
         row = await cursor.fetchone()
         await cursor.close()
 
-        if (row != None):
+        if row != None:
             date, scaled_challenge, hard_challenge, easy_challenge, member_challenge = row
             embed=discord.Embed(title=f"Challenges for {current_date}", color=0x8368ff)
             embed.add_field(name="Scaled challenge", value=scaled_challenge, inline=False)
