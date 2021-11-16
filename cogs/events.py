@@ -142,8 +142,7 @@ class Events(commands.Cog, name="Events"):
             return
 
         await ctx.send(f"{scaled_challenge} {hard_challenge} {easy_challenge} {guild_challenge}")
-        tomorrow_day = datetime.today() + timedelta(days=1)
-        tomorrow_day = tomorrow_day.strftime("%Y-%m-%d")
+        tomorrow_day = (datetime.utcnow() + timedelta(days=1) - timedelta(hours=5)).strftime("%Y-%m-%d")
         await self.bot.db.execute("INSERT INTO event_challenge VALUES (?, ?, ?, ?, ?)", (tomorrow_day, scaled_challenge, hard_challenge, easy_challenge, guild_challenge,))
         await self.bot.db.commit()
 
@@ -214,7 +213,7 @@ class Events(commands.Cog, name="Events"):
 
     @tasks.loop(minutes=1)
     async def check_queue(self):
-        current_date = datetime.today().strftime("%Y-%m-%d")
+        current_date = (datetime.utcnow() - timedelta(hours=5)).strftime("%Y-%m-%d")
         cursor = await self.bot.db.execute("SELECT * FROM event_challenge WHERE date = (?)", (current_date,))
         row = await cursor.fetchone()
         await cursor.close()
