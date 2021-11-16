@@ -109,20 +109,21 @@ class Events(commands.Cog, name="Events"):
     @commands.command(aliases=["qchallenge"])
     @commands.has_role("Staff")
     async def queuechallenge(self, ctx):
-        await ctx.send("Please enter the date for which these challenges will be set (EST). `(YYYY-MM-DD)`")
-        target_date = await self.bot.wait_for('message',
-            check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
-        target_date = target_date.content
+        while True:
+            await ctx.send("Please enter the date for which these challenges will be set (EST). `(YYYY-MM-DD)`")
+            target_date = await self.bot.wait_for('message',
+                check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+            target_date = target_date.content
 
-        if target_date.lower() == "none":
-            await ctx.send("Entry cancelled!")
-            return
-        
-        try: 
-            target_date = (datetime.strptime(target_date, "%Y-%m-%d")).strftime("%Y-%m-%d")
-        except Exception:
-            await ctx.send("Invalid date! Please enter a date in the form YYYY-MM-DD")
-            return
+            if target_date.lower() == "none":
+                await ctx.send("Entry cancelled!")
+                return
+            
+            try: 
+                target_date = (datetime.strptime(target_date, "%Y-%m-%d")).strftime("%Y-%m-%d")
+                break
+            except Exception:
+                await ctx.send("Invalid date! Please enter a date in the form YYYY-MM-DD")
 
 
         await ctx.send(f"Please enter the scaled challenge for {target_date}.")
