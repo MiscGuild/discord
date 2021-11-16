@@ -109,7 +109,23 @@ class Events(commands.Cog, name="Events"):
     @commands.command(aliases=["qchallenge"])
     @commands.has_role("Staff")
     async def queuechallenge(self, ctx):
-        await ctx.send("Please enter tomorrow's scaled challenge.")
+        await ctx.send("Please enter the date for which these challenges will be set (EST). `(YYYY-MM-DD)`")
+        target_date = await self.bot.wait_for('message',
+            check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+        target_date = target_date.content
+
+        if target_date.lower() == "none":
+            await ctx.send("Entry cancelled!")
+            return
+        
+        try: 
+            target_date = (datetime.strptime(target_date, "%Y-%m-%d")).strftime("%Y-%m-%d")
+        except Exception:
+            await ctx.send("Invalid date! Please enter a date in the form YYYY-MM-DD")
+            return
+
+
+        await ctx.send(f"Please enter the scaled challenge for {target_date}.")
         scaled_challenge = await self.bot.wait_for('message',
                     check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
         scaled_challenge = scaled_challenge.content
@@ -117,7 +133,7 @@ class Events(commands.Cog, name="Events"):
             await ctx.send("Entry cancelled!")
             return
 
-        await ctx.send("Please enter tomorrow's hard challenge for two points.")
+        await ctx.send(f"Please enter the hard challenge for {target_date} worth two points.")
         hard_challenge = await self.bot.wait_for('message',
                     check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
         hard_challenge = hard_challenge.content
@@ -125,7 +141,7 @@ class Events(commands.Cog, name="Events"):
             await ctx.send("Entry cancelled!")
             return
         
-        await ctx.send("Please enter tomorrow's easy challenge for one point.")
+        await ctx.send(f"Please enter the easy challenge for {target_date} worth one point.")
         easy_challenge = await self.bot.wait_for('message',
                     check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
         easy_challenge = easy_challenge.content
@@ -133,7 +149,7 @@ class Events(commands.Cog, name="Events"):
             await ctx.send("Entry cancelled!")
             return
 
-        await ctx.send("Please enter tomorrow's member/ally challenge for one point.")
+        await ctx.send(f"Please enter the member/ally challenge for {target_date} worth one point.")
         guild_challenge = await self.bot.wait_for('message',
                     check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
         guild_challenge = guild_challenge.content
@@ -141,9 +157,8 @@ class Events(commands.Cog, name="Events"):
             await ctx.send("Entry cancelled!")
             return
 
-        await ctx.send(f"{scaled_challenge} {hard_challenge} {easy_challenge} {guild_challenge}")
-        tomorrow_day = (datetime.utcnow() + timedelta(days=1) - timedelta(hours=5)).strftime("%Y-%m-%d")
 
+        tomorrow_day = (datetime.utcnow() + timedelta(days=1) - timedelta(hours=5)).strftime("%Y-%m-%d")
         cursor = await self.bot.db.execute("SELECT date FROM event_challenge WHERE date = (?)", (tomorrow_day,))
 
         if await cursor.fetchone() == None:
@@ -151,6 +166,11 @@ class Events(commands.Cog, name="Events"):
         else:
             await self.bot.db.execute("UPDATE event_challenge SET scaled_challenge = (?), hard_challenge = (?), easy_challenge = (?), member_challenge = (?) WHERE date = (?)", (scaled_challenge, hard_challenge, easy_challenge, guild_challenge, tomorrow_day,))
         await self.bot.db.commit()
+
+        await ctx.send(f"Alright! The challenges for {target_date} have been set!")
+        embed = await self.challenge_embed(target_date)
+        if embed != None:
+            await ctx.send(embed=embed)
 
 
     @commands.command(aliases=["challengelb"])
@@ -216,25 +236,32 @@ class Events(commands.Cog, name="Events"):
         await cursor.close()
         return rows
 
-
-    @tasks.loop(minutes=1)
-    async def check_queue(self):
-        current_date = (datetime.utcnow() - timedelta(hours=5)).strftime("%Y-%m-%d")
-        cursor = await self.bot.db.execute("SELECT * FROM event_challenge WHERE date = (?)", (current_date,))
+    async def challenge_embed(self, date):
+        cursor = await self.bot.db.execute("SELECT * FROM event_challenge WHERE date = (?)", (date,))
         row = await cursor.fetchone()
         await cursor.close()
 
         if row != None:
-            date, scaled_challenge, hard_challenge, easy_challenge, member_challenge = row
-            embed=discord.Embed(title=f"Challenges for {current_date}", color=0x8368ff)
+            _, scaled_challenge, hard_challenge, easy_challenge, member_challenge = row
+            embed=discord.Embed(title=f"Challenges for {date}", color=0x8368ff)
             embed.add_field(name="Scaled challenge", value=scaled_challenge, inline=False)
             embed.add_field(name="Hard challenge", value=hard_challenge, inline=False)
             embed.add_field(name="Easy challenge", value=easy_challenge, inline=False)
             embed.add_field(name="Member/ally challenge", value=member_challenge, inline=False)
+            return embed
+            
+        return None
+
+    @tasks.loop(minutes=1)
+    async def check_queue(self):
+        current_date = (datetime.utcnow() - timedelta(hours=5)).strftime("%Y-%m-%d")
+        embed = await self.challenge_embed(current_date)
+
+        if embed != None:
             await self.bot.events_channel.send(embed=embed)
             await self.bot.events_channel.send(f"{self.bot.christmas_event.mention}")
 
-            await self.bot.db.execute("DELETE FROM event_challenge WHERE date = (?)", (date,))
+            await self.bot.db.execute("DELETE FROM event_challenge WHERE date = (?)", (current_date,))
             await self.bot.db.commit()
 
 
