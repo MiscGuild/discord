@@ -50,14 +50,16 @@ class HelpCommand(commands.MinimalHelpCommand):
 
 bot.help_command = HelpCommand(command_attrs={'hidden': True})
 
-initial_extensions = []
+initial_extensions = ["func.cogs.giveaways", "func.cogs.owner"]
 
 if __name__ == '__main__':
     for extension in initial_extensions:
         try:
             bot.load_extension(extension)
+            print(f"Loaded {extension}")
         except Exception as e:
             print(f'WARNING: Failed to load extention {extension}', file=sys.stderr)
+            print(e)
 
 
 

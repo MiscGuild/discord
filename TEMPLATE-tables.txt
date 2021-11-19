@@ -1,16 +1,16 @@
 To create the following tables, insert them into bot.py after the database is connected.
 
-Giveaways:
+DNKL:
 
-await bot.db.execute('''CREATE TABLE IF NOT EXISTS DNKL (
+await bot.db.execute('''CREATE TABLE IF NOT EXISTS dnkl (
 	message_id integer NOT NULL,
 	username text NOT NULL)''')
 await bot.db.commit()
 
 
-DNKL:
+Giveaways:
 
-await bot.db.execute('''CREATE TABLE IF NOT EXISTS Giveaways (
+await bot.db.execute('''CREATE TABLE IF NOT EXISTS giveaways (
     message_id integer PRIMARY KEY NOT NULL,
     channel_id integer NOT NULL,
     prize text NOT NULL,

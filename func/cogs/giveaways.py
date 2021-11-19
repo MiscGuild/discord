@@ -1,7 +1,7 @@
 from discord.ext import commands, tasks
 from datetime import datetime, timedelta
 
-from ..classes.Integer import Integer
+from func.classes.Integer import Integer
 
 class Giveaways(commands.Cog, name="Giveaways"):
     def __init__(self, bot):
@@ -13,20 +13,27 @@ class Giveaways(commands.Cog, name="Giveaways"):
     # async def giveawaycreate(self, ctx):
 
 
-    # @commands.command(aliases=["giveawayfinish", "gend", "gfinish"])
-    # @commands.has_role("Giveaway Creator")
-    # async def giveawayend(self, ctx, message_ID):
-    #     await ctx.send(await Integer(integer=message_ID).giveawayend())
+    @commands.command(aliases=["gend", "giveawayfinish", "gfinish"])
+    @commands.has_role("Giveaway Creator")
+    async def giveawayend(self, ctx, message_ID: int):
+        """
+        Ends the giveaway with the given message ID!
+        """
+        await ctx.send(await Integer(integer=message_ID).giveawayend())
 
 
-    # @commands.command(aliases=["greroll", "reroll"])
-    # @commands.has_role("Giveaway Creator")
-    # async def giveawayreroll(self, ctx, message_ID, reroll_number=None):
-    #     await ctx.send(await Integer(integer=message_ID).giveawayreroll(reroll_number))
+    @commands.command(aliases=["greroll", "reroll"])
+    @commands.has_role("Giveaway Creator")
+    async def giveawayreroll(self, ctx, message_ID: int, reroll_number: int=None):
+        """
+        Rerolls the giveaway with the given message ID!
+        """
+        await ctx.send(await Integer(integer=message_ID).giveawayreroll(reroll_number))
 
 
     # @commands.command(aliases=["glist"])
     # async def giveawaylist(self, ctx):
+
 
     @tasks.loop(minutes=1)
     async def check_giveaways(self):
