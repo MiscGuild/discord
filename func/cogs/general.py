@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
 
-from ..classes.User import User
-from ..classes.String import String
+from func.classes.User import User
+from func.classes.String import String
 
 class General(commands.Cog, name="General"):
     def __init__(self, bot):
@@ -11,7 +11,7 @@ class General(commands.Cog, name="General"):
 
     # Command from https://github.com/Rapptz/RoboDanny
     @commands.command()
-    async def source(self, ctx, *, command: str = None):
+    async def source(self, ctx, *, command: str=None):
         await ctx.send(await String(string=command).source())
 
 
