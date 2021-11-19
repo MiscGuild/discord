@@ -8,7 +8,7 @@ import discord
 import toml
 from discord.ext import commands, tasks
 
-from cogs.utils import utilities as hypixel
+from func.utils import utilities as hypixel
 
 logging.basicConfig(level=logging.INFO)
 config = toml.load('config.toml')

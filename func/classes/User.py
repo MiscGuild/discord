@@ -7,4 +7,5 @@ class User:
         self.user = user
     
     # async def unban():
-    
+
+    # async def avatar():

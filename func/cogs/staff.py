@@ -23,12 +23,6 @@ class Staff(commands.Cog, name="Staff"):
     # @commands.has_role("Admin")
     # async def partner(self, ctx):
 
-    
-    # # Legacy command - Challenge
-    # @commands.command()
-    # @commands.has_role("Staff")
-    # async def challenge(self, ctx, x):
-
 
     # @commands.command()
     # @commands.has_role("Staff")

@@ -6,7 +6,7 @@ class Moderation(commands.Cog, name="Moderation"):
 
     # @commands.command()
     # @commands.has_permissions(kick_members=True)
-    # async def mute(self, ctx, member: discord.Member, *, reason=None):\
+    # async def mute(self, ctx, member: discord.Member, *, reason=None):
 
 
     # @commands.command()

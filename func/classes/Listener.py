@@ -2,7 +2,7 @@
 
 class Listener:
     def __init__(self, res):
-        self.res = res
+        self.obj = res
 
     # async def on_button_click():
 

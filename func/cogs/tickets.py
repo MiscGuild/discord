@@ -9,7 +9,7 @@ class Tickets(commands.Cog, name="Tickets"):
 
 
     # @commands.command(aliases=['reg', 'verify'])
-    # async def register(self, ctx, name):
+    # async def register(self, ctx, name: str):
 
 
     # @commands.command(aliases=['del'])
@@ -28,7 +28,7 @@ class Tickets(commands.Cog, name="Tickets"):
 
     # @commands.command()
     # @commands.has_role("Staff")
-    # async def rename(self, ctx, *, channel_name):
+    # async def rename(self, ctx, *, channel_name: str):
 
 
     # @commands.command()
