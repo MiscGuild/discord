@@ -1,21 +1,9 @@
-# utilities.py
 import datetime
 import math
-import random
 from datetime import datetime
 
 import aiohttp
 import discord
-import toml
-
-configFile = toml.load('config.toml')
-
-
-def get_api():
-    API_KEY = configFile['hypixel']['api_keys']
-
-    api = random.choice(API_KEY)
-    return api
 
 
 async def get_data(name):
@@ -182,18 +170,6 @@ async def get_gtag(name):
         gtag = req["guild"]["tag"]
         return (f"[{gtag}]")
 
-
-async def get_dispnameID(name):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-            request = await resp.json(content_type=None)
-            await session.close()
-    if request != None and 'error' not in request:
-        ign = request["name"]
-        id = request["id"]
-        return ign, id
-    else:
-        return None, None
 
 
 async def get_flogin(name):
