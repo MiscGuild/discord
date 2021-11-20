@@ -4,7 +4,7 @@ from __main__ import bot
 import discord
 from typing import Union
 
-from func.utils.consts import neg_color
+from func.utils.consts import neg_color, neutral_color
 
 class Union:
     def __init__(self, user: Union[discord.Member, discord.User]):
@@ -18,9 +18,23 @@ class Union:
         await self.user.add_roles(discord.utils.get(guild_roles, name="Muted"))
         return discord.Embed(title="Muted!", description=f"{self.user} was muted by {author}!", color=neg_color)
 
-    # async def unmute():
 
-    # async def kick(reason: str=None):
+    async def unmute(self, guild_roles):
+        await self.user.remove_roles(discord.utils.get(guild_roles, name="Muted"))
+        embed = discord.Embed(title="Unmuted!",
+                            description=f"{self.user} has been unmuted!",
+                            color=neutral_color)
+        return embed
+
+
+    async def kick(self, author, reason: str=None):
+        if reason == None:
+            reason = f"Responsible moderator: {author}"
+
+        await self.user.kick(reason=reason)
+        return discord.Embed(title="Kicked!",
+                            description=f"{self.user} was kicked by {author}",
+                            color=neg_color)
 
     # async def ban(reason: str=None):
 
