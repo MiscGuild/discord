@@ -39,16 +39,6 @@ async def get_leaderboards():
         return None
 
 
-async def name_grabber(author):
-    name = author.nick
-    if name is None:
-        name = author.name
-    else:
-        name = name.split()[0]
-    return name
-
-
-
 async def get_level(name):
     data = await get_data(name)
     if data["player"] is None:
