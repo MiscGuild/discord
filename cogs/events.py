@@ -37,14 +37,25 @@ class Events(commands.Cog, name="Events"):
             points_earned = 2
         elif challenge_type in ["easy", "e"]:
             points_earned = 1
-        elif challenge_type in ["weekend", "w"]:
-            if await self.is_weekend():
-                points_earned = 3
-            else:
-                await ctx.send("It must be a weekend for you to complete this challenge!")
-                return
+        elif challenge_type in ["weekend", "w", "guild", "g"]:
+            if challenge_type in ["weekend", "w"]:
+                if await self.is_weekend():
+                    points_earned = 3
+                else:
+                    await ctx.send("It must be a weekend for you to complete this challenge!")
+                    return
+            elif challenge_type in ["guild", "g"]:
+                if await self.is_weekend():
+                    await ctx.send("Guild challenges are only available on weekdays!")
+                    return
+                else:
+                    if await utils.get_guild(name) == "Miscellaneous" or await utils.get_guild(name) in self.bot.misc_allies:
+                        points_earned = 1
+                    else:
+                        await ctx.send("You must be a member of Miscellaneous or an allied guild to complete this challenge!")
+                        return
         else:
-            await ctx.send("Invalid challenge! Available challenges are: **S**caled, **H**ard, **E**asy, **W**eekend.")
+            await ctx.send("Invalid challenge! Available challenges are: **S**caled, **H**ard, **E**asy, **W**eekend/**G**uild.")
             return
 
         # Update player's statistics for general challenge

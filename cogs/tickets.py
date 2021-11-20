@@ -1479,7 +1479,6 @@ class Tickets(commands.Cog, name="Tickets"):
                     name, uuid = await utils.get_dispnameID(username.content)
 
                     embed = discord.Embed(title="General Information", description="Following is some general information surrounding the event.", color=0x8368ff)
-                    # TODO: actually write some information... Add rules, timings, how to submit a the completion of a quest etc.
                     embed.add_field(name="Miscellaneous Christmas Countdown", value="""Every day from the 1st to the 24th of December, a series of challenges
                                                                                         will be released for participants to complete.\n
                                                                                         Additionally, there will be one extra member/ally only challenge, and an open challenge for everyone on weekends.""", inline=False)
