@@ -3,8 +3,11 @@
 from __main__ import bot
 import discord
 from typing import Union
+from discord.errors import Forbidden, NotFound
 
-from func.utils.consts import neg_color, neutral_color
+from discord.ext.commands.errors import MissingPermissions
+
+from func.utils.consts import neg_color, neutral_color, err_404_embed, bot_missing_perms_embed
 
 class Union:
     def __init__(self, user: Union[discord.Member, discord.User]):
@@ -28,6 +31,7 @@ class Union:
 
 
     async def kick(self, author, reason: str=None):
+        # Default reason is responsible moderator
         if reason == None:
             reason = f"Responsible moderator: {author}"
 
@@ -36,11 +40,51 @@ class Union:
                             description=f"{self.user} was kicked by {author}",
                             color=neg_color)
 
-    # async def ban(reason: str=None):
 
-    # async def softban(reason: str=None):
+    async def ban(self, guild, author, reason: str=None):
+        # Default reason is responsible moderator
+        if reason == None:
+            reason = f"Responsible moderator: {author}"
 
-    # async def unban():
+        # Catch MissingPermissions error
+        try:
+            await guild.ban(self.user, reason=reason)
+            return discord.Embed(title="Banned!",
+                                description=f"{self.user} was banned by {author}",
+                                color=neg_color)
+        except Forbidden:
+            return bot_missing_perms_embed
+
+
+    async def softban(self, guild, author, reason: str=None):
+        # Default reason is responsible moderator
+        if reason == None:
+            reason = f"Responsible moderator: {author}"
+
+        # Catch MissingPermissions error
+        try:
+            await guild.ban(self.user, reason=reason)
+            await guild.unban(self.user, reason=reason)
+            return discord.Embed(title="Softbanned!",
+                                description=f"{self.user} was softbanned by {author}",
+                                color=neg_color)
+        except Forbidden:
+            return bot_missing_perms_embed
+
+
+    async def unban(self, guild, author, reason: str=None):
+        # Default reason is responsible moderator
+        if reason == None:
+            reason = f"Responsible moderator: {author}"
+
+        # Catch Unkown Ban error
+        try:
+            await guild.unban(self.user, reason=reason)
+            return discord.Embed(title="Unbanned!",
+                                description=f"{self.user} was unbanned by {author}",
+                                color=neg_color)
+        except NotFound:
+            return err_404_embed
 
     # async def forcesync(new_name: str):
 

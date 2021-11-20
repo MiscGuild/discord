@@ -7,4 +7,6 @@ neutral_color = 0x8368ff
 unknown_ign_embed = discord.Embed(title="Please enter a valid Minecraft username!", color=neg_color)
 unknown_ign_msg = "Unkown IGN!"
 
+err_404_embed = discord.Embed(title="404 - Not Found", description="The bot encountered an error 404 while performing this action!", color=neg_color)
 staff_impersonation_embed = discord.Embed(title="Staff impersonation is a punishable offense!", color=neg_color)
+bot_missing_perms_embed = discord.Embed(title="Missing permissions!", description="Due to the role hierarchy, the bot does not have the permission to do that!", color=neg_color)

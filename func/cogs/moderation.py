@@ -34,19 +34,30 @@ class Moderation(commands.Cog, name="Moderation"):
         await ctx.send(embed=await Union(user=member).kick(ctx.author, reason))
 
 
-    # @commands.command()
-    # @commands.has_permissions(ban_members=True)
-    # async def ban(self, ctx, member: discord.Member, *, reason=None):
+    @commands.command()
+    @commands.has_permissions(ban_members=True)
+    async def ban(self, ctx, member: discord.Member, *, reason=None):
+        """
+        Bans the mentioned user!
+        """
+        await ctx.send(embed=await Union(user=member).ban(ctx.guild, ctx.author, reason))
+
+    @commands.command()
+    @commands.has_permissions(ban_members=True)
+    async def softban(self, ctx, member: discord.Member, *, reason=None):
+        """
+        Softbans the mentioned user!
+        """
+        await ctx.send(embed=await Union(user=member).softban(ctx.guild, ctx.author, reason))
 
 
-    # @commands.command()
-    # @commands.has_permissions(ban_members=True)
-    # async def unban(self, ctx, member: discord.User, *, reason=None):
-
-
-    # @commands.command()
-    # @commands.has_permissions(ban_members=True)
-    # async def softban(self, ctx, member: discord.Member, *, reason=None):
+    @commands.command()
+    @commands.has_permissions(ban_members=True)
+    async def unban(self, ctx, user: discord.User, *, reason=None):
+        """
+        Bans the mentioned user!
+        """
+        await ctx.send(embed=await Union(user=user).unban(ctx.guild, ctx.author, reason))
 
 
     # @commands.command(aliases=["purge", "prune"])
