@@ -1477,36 +1477,29 @@ class Tickets(commands.Cog, name="Tickets"):
                     await channel.send(embed=embed)
                     username = await self.bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                     name, uuid = await utils.get_dispnameID(username.content)
-                    if len(name):
-                        guild_name = await utils.get_guild(name)
-                        if guild_name == "Miscellaneous" or guild_name in self.bot.misc_allies:
-                            if guild_name == Miscellaneous:
-                                await channel.edit(name=f"{name}-[MEMBER]", category=discord.utils.get(channel.guild.categories, name="EVENT"))
-                                footer = "You have registered to the tournament as a member of Miscellaneous!"
-                            elif guild_name in self.bot.misc_allies:
-                                await channel.edit(name=f"{name}-[ALLY]", category=discord.utils.get(channel.guild.categories, name="EVENT"))
-                                footer = f"You have registered to the tournament as a member of {guild_name}!"
 
+                    embed = discord.Embed(title="General Information", description="Following is some general information surrounding the event.", color=0x8368ff)
+                    # TODO: actually write some information... Add rules, timings, how to submit a the completion of a quest etc.
+                    embed.add_field(name="Miscellaneous Christmas Countdown", value="""Every day from the 1st to the 24th of December, a series of challenges
+                                                                                        will be released for participants to complete.\n
+                                                                                        Additionally, there will be one extra member/ally only challenge, and an open challenge for everyone on weekends.""", inline=False)
+                    embed.add_field(name="Scaled challenges", value="""As part of the daily challenges, scaled challenges will reward differing points depending on how well you performed compared to other participants. Point distribution is as follows:\n
+                                                                        1st-3rd - 3 points
+                                                                        4th-10th - 2 points
+                                                                        Remaining players - 1 point""", inline=False)
 
+                    embed.add_field(name="Submitting", value="""Evidence for all challenges is required in the form of an unedited image or video.
+                                                                Only the current day's challenges are valid submissions.\n
+                                                                Please submit your challenges in this ticket.""", inline=False)
+                    await channel.send(embed=embed)
 
-                                embed = discord.Embed(title="General Information", description="Following is some general information surrounding the event.", color=0x8368ff)
-                                # TODO: actually write some information... Add rules, timings, how to submit a the completion of a quest etc.
-                                embed.add_field(name="yes", value="yes yes")
-                                await channel.send(embed=embed)
-                                await author.add_roles(self.bot.christmas_event)
-                                embed = discord.Embed(title=":ballot_box_with_check: Registration Successful!",color=0xFFFDD0)
-                                embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
-                                embed.add_field(name=ign, value="To unregister, please ping a staff member!",inline=False)
-                                embed.set_footer(text=footer)
-                                await ctx.send(embed=embed)
-                                break
-                        else:
-                            embed = discord.Embed(title=f'Event requirements not met!',
-                            descrption='In order to take part in the event, you must either be a member of Miscellaneous or a memeber of an ally guild!', color=0xDE3163)
-                            await ctx.send(embed=embed)
-                            
-                    else:
-                        await channel.send("Unkown IGN! Restarting ticket process...")
+                    await author.add_roles(self.bot.christmas_event)
+
+                    embed = discord.Embed(title=":ballot_box_with_check: Registration Successful!", color=0xFFFDD0)
+                    embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
+                    embed.add_field(name=name, value="To unregister, please ping a staff member!", inline=False)
+                    await channel.send(embed=embed)
+                    break
                 
 
 
