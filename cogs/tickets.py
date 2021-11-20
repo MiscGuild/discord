@@ -1480,7 +1480,7 @@ class Tickets(commands.Cog, name="Tickets"):
 
                     if name != None:
                         await channel.edit(name=f"Event-{name}",
-                            category=discord.utils.get(channel.guild.categories, name="EVENT"))
+                            category=discord.utils.get(channel.guild.categories, name="CHRISTMAS COUNTDOWN"))
                         
                         embed = discord.Embed(title="General Information", description="Following is some general information surrounding the event.", color=0x8368ff)
                         embed.add_field(name="Miscellaneous Christmas Countdown", value="""Every day from the 1st to the 24th of December, a series of challenges
