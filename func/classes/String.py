@@ -87,7 +87,7 @@ class String:
         if weeklygexp == None:
             return discord.Embed(title="Guildless!", description="This player is not in a guild!", color=neg_color)
 
-        _, uuid = await m_profile(self.string)
+        self.string, uuid = await m_profile(self.string)
         # Player is eligible
         if weeklygexp > bot.dnkl:
             embed = discord.Embed(title=self.string, color=pos_color)
@@ -99,7 +99,6 @@ class String:
         # Player is not eligible
         else:
             embed = discord.Embed(title=self.string, color=neg_color)
-            print(format(bot.dnkl, ',d'))
             embed.add_field(name="You are not eligible to apply for the do-not-kick-list.",
                             value="You have {:,}/{:,} weekly guild experience to be eligible.".format(weeklygexp, bot.dnkl),
                             inline=True)
