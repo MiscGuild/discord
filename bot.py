@@ -53,7 +53,7 @@ class HelpCommand(commands.MinimalHelpCommand):
 bot.help_command = HelpCommand(command_attrs={'hidden': True})
 
 initial_extensions = ['cogs.fun', 'cogs.hypixel', 'cogs.mod', 'cogs.staff', 'cogs.tickets', 'cogs.owner',
-                      'cogs.buttons', 'cogs.giveaways', 'cogs.general']
+                      'cogs.buttons', 'cogs.giveaways', 'cogs.general', 'cogs.events']
 
 if __name__ == '__main__':
     for extension in initial_extensions:
@@ -151,6 +151,18 @@ async def on_member_join(member):
 async def connect_db():
     bot.db = await aiosqlite.connect('database.db')
     print("db connected")
+    await bot.db.execute('''CREATE TABLE IF NOT EXISTS event(
+        uuid TEXT PRIMARY KEY NOT NULL,
+        points NUMERIC NOT NULL,
+        completed INTEGER NOT NULL,
+        scaled_challenge_score NUMERIC NOT NULL)''')
+    await bot.db.execute('''CREATE TABLE IF NOT EXISTS event_challenge(
+        date TEXT PRIMARY KEY NOT NULL,
+        scaled_challenge TEXT NOT NULL,
+        hard_challenge TEXT NOT NULL,
+        easy_challenge TEXT NOT NULL,
+        weekend_challenge TEXT)''')
+    await bot.db.commit()
 
 
 bot.loop.run_until_complete(connect_db())
@@ -162,6 +174,7 @@ async def after_cache_ready():
     bot.dnkl_channel = bot.get_channel(config['bot']['dnkl_channel_id'])
     bot.ticket_channel = bot.get_channel(config['bot']['ticket_channel_id'])
     bot.log_channel = bot.get_channel(config['bot']['log_channel_id'])
+    bot.events_channel = bot.get_channel(config['bot']['event_channel_id'])
     bot.guild = bot.get_guild(config['bot']['guild_id'])
 
     bot.guild_master = discord.utils.get(bot.guild.roles, name="Guild Master")
@@ -179,6 +192,7 @@ async def after_cache_ready():
     bot.server_booster = discord.utils.get(bot.guild.roles, name="Server Booster")
     bot.rich_kid = discord.utils.get(bot.guild.roles, name="Rich Kid")
     bot.giveaways_events = discord.utils.get(bot.guild.roles, name="Giveaways/Events")
+    bot.christmas_event = discord.utils.get(bot.guild.roles, name="Christmas Event")
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster, bot.rich_kid)
 
     bot.ticket_categories = ('RTickets', '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL')

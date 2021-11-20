@@ -343,6 +343,7 @@ class Tickets(commands.Cog, name="Tickets"):
                     components=[
                         [
                             Select(placeholder="Select your reason!", options=[
+                                SelectOption(label="Christmas Event", value="Christmas Event", emoji="🎅"),
                                 SelectOption(label="Update your Role/Username/Tag", value="Discord Nick Change",
                                              emoji="👨"),
                                 SelectOption(label="Register a Milestone", value="Milestone Registration", emoji="🏆"),
@@ -1468,6 +1469,39 @@ class Tickets(commands.Cog, name="Tickets"):
                                                           color=0x00a86b)
                                     await asyncio.sleep(2)
                             break
+
+
+                if reply == "Christmas Event":
+                    embed = discord.Embed(title="What is your Minecraft Username?",
+                        color=0x4b89e4)
+                    await channel.send(embed=embed)
+                    username = await self.bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                    name, uuid = await utils.get_dispnameID(username.content)
+
+                    embed = discord.Embed(title="General Information", description="Following is some general information surrounding the event.", color=0x8368ff)
+                    embed.add_field(name="Miscellaneous Christmas Countdown", value="""Every day from the 1st to the 24th of December, a series of challenges
+                                                                                        will be released for participants to complete.\n
+                                                                                        Additionally, there will be one extra member/ally only challenge, and an open challenge for everyone on weekends.""", inline=False)
+                    embed.add_field(name="Scaled challenges", value="""As part of the daily challenges, scaled challenges will reward differing points depending on how well you performed compared to other participants. Point distribution is as follows:\n
+                                                                        1st-3rd - 3 points
+                                                                        4th-10th - 2 points
+                                                                        Remaining players - 1 point""", inline=False)
+
+                    embed.add_field(name="Submitting", value="""Evidence for all challenges is required in the form of an unedited image or video.
+                                                                Only the current day's challenges are valid submissions.\n
+                                                                Please submit your challenges in this ticket.""", inline=False)
+                    await channel.send(embed=embed)
+
+                    await author.add_roles(self.bot.christmas_event)
+
+                    embed = discord.Embed(title=":ballot_box_with_check: Registration Successful!", color=0xFFFDD0)
+                    embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
+                    embed.add_field(name=name, value="To unregister, please ping a staff member!", inline=False)
+                    await channel.send(embed=embed)
+                    break
+                
+
+
                 elif reply == "Other":
                     embed = discord.Embed(title=f"{name} created this ticket for an unspecified reason!",
                                         description="Kindly specify your reason behind creating this ticket and wait for staff to help you!")
