@@ -3,6 +3,8 @@ from discord.ext import commands
 
 from func.classes.String import String
 
+from func.utils.discord.name_grabber import name_grabber
+
 class Hypixel(commands.Cog, name="Hypixel"):
     def __init__(self, bot):
         self.bot = bot
@@ -41,14 +43,20 @@ class Hypixel(commands.Cog, name="Hypixel"):
     #         await ctx.send(embed=result)
 
 
-    # @commands.command(aliases=['dnklchk'])
-    # async def dnklcheck(self, ctx, name: str=None):
-    #     result = await String(string=name).dnklcheck()
-    #     # Send result according to returned value
-    #     if isinstance(result, discord.Embed):
-    #         await ctx.send(embed=result)
-    #     elif isinstance(result, str):
-    #         await ctx.send(result)
+    @commands.command(aliases=['dnklchk'])
+    async def dnklcheck(self, ctx, name: str=None):
+        """
+        Checks whether you are eligible for the do-not-kick-list!
+        """
+        if name == None:
+            name = await name_grabber(ctx.author)
+
+        result = await String(string=name).dnklcheck()
+        # Send result according to returned value
+        if isinstance(result, discord.Embed):
+            await ctx.send(embed=result)
+        elif isinstance(result, str):
+            await ctx.send(result)
 
 
 def setup(bot):

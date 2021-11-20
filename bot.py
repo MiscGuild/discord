@@ -62,8 +62,6 @@ if __name__ == '__main__':
             print(e)
 
 
-
-
 @bot.event
 async def on_command_error(ctx, error):
     # Prevents commands with local handlers or cogs with overwrritten on_command_errors being handled here
