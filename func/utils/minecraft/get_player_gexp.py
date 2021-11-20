@@ -1,5 +1,5 @@
-from func.utils.general.requests.m_profile import m_profile
-from func.utils.general.requests.player_guild import player_guild
+from func.utils.requests.m_profile import m_profile
+from func.utils.requests.player_guild import player_guild
 
 async def get_player_gexp(name: str):
     name, uuid = await m_profile(name)

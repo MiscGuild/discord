@@ -8,7 +8,7 @@ import discord
 import toml
 from discord.ext import commands, tasks
 
-from func.utils import utilities as hypixel
+from func.utils.discord.name_grabber import name_grabber
 
 logging.basicConfig(level=logging.INFO)
 config = toml.load('config.toml')
@@ -50,7 +50,7 @@ class HelpCommand(commands.MinimalHelpCommand):
 
 bot.help_command = HelpCommand(command_attrs={'hidden': True})
 
-initial_extensions = ["func.cogs.general", "func.cogs.giveaways", "func.cogs.owner"]
+initial_extensions = ["func.cogs.general", "func.cogs.giveaways", "func.cogs.hypixel", "func.cogs.owner"]
 
 if __name__ == '__main__':
     for extension in initial_extensions:
@@ -175,8 +175,8 @@ async def after_cache_ready():
     bot.ticket_categories = ('RTickets', '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL')
     bot.misc_allies = ("XL", "Lucid", "Cronos", "OUT", "Betrayed", "Blight","TheNinjaWarriors")
     bot.admin_ids = [member.id for member in bot.admin.members]
-    bot.admin_names = [await hypixel.name_grabber(member) for member in bot.admin.members]
-    bot.staff_names = [await hypixel.name_grabber(member) for member in bot.staff.members]
+    bot.admin_names = [await name_grabber(member) for member in bot.admin.members]
+    bot.staff_names = [await name_grabber(member) for member in bot.staff.members]
 
     chat_exporter.init_exporter(bot)
 

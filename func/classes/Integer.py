@@ -1,6 +1,6 @@
 # The following file contains: giveawayend, giveawayreroll, dailylb
 
-from func.utils import giveaways as giveaway_utils
+from func.utils.discord import giveaways as giveaway_utils
 
 class Integer:
     def __init__(self, integer: int):

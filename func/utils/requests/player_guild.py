@@ -1,6 +1,6 @@
 import aiohttp
 
-from func.utils.general.requests.get_hyapi_key import get_hyapi_key
+from func.utils.requests.get_hyapi_key import get_hyapi_key
 
 async def player_guild(uuid):
     api_key = await get_hyapi_key()
