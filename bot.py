@@ -23,11 +23,11 @@ bot.config = config
 bot.token = config['bot']['token']
 bot.api_tokens = config['hypixel']['api_keys']
 bot.owner_id = config['bot']['ownerID']
-bot.resident_req = int(50000)
-bot.active = int(285000)
-bot.inactive = int(115000)
-bot.dnkl = (bot.inactive * 2)
-bot.new_member = int(20000)
+bot.resident_req = 50000
+bot.active = 285000
+bot.inactive = 115000
+bot.dnkl = bot.inactive * 2
+bot.new_member = 20000
 
 
 class HelpCommand(commands.MinimalHelpCommand):
