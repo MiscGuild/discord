@@ -1478,27 +1478,34 @@ class Tickets(commands.Cog, name="Tickets"):
                     username = await self.bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
                     name, uuid = await utils.get_dispnameID(username.content)
 
-                    embed = discord.Embed(title="General Information", description="Following is some general information surrounding the event.", color=0x8368ff)
-                    embed.add_field(name="Miscellaneous Christmas Countdown", value="""Every day from the 1st to the 24th of December, a series of challenges
-                                                                                        will be released for participants to complete.\n
-                                                                                        Additionally, there will be one extra member/ally only challenge, and an open challenge for everyone on weekends.""", inline=False)
-                    embed.add_field(name="Scaled challenges", value="""As part of the daily challenges, scaled challenges will reward differing points depending on how well you performed compared to other participants. Point distribution is as follows:\n
-                                                                        1st-3rd - 3 points
-                                                                        4th-10th - 2 points
-                                                                        Remaining players - 1 point""", inline=False)
+                    if name != None:
+                        await channel.edit(name=f"Event-{name}",
+                            category=discord.utils.get(channel.guild.categories, name="EVENT"))
+                        
+                        embed = discord.Embed(title="General Information", description="Following is some general information surrounding the event.", color=0x8368ff)
+                        embed.add_field(name="Miscellaneous Christmas Countdown", value="""Every day from the 1st to the 24th of December, a series of challenges
+                                                                                            will be released for participants to complete.\n
+                                                                                            Additionally, there will be one extra member/ally only challenge, and an open challenge for everyone on weekends.""", inline=False)
+                        embed.add_field(name="Scaled challenges", value="""As part of the daily challenges, scaled challenges will reward differing points depending on how well you performed compared to other participants. Point distribution is as follows:\n
+                                                                            1st-3rd - 3 points
+                                                                            4th-10th - 2 points
+                                                                            Remaining players - 1 point""", inline=False)
 
-                    embed.add_field(name="Submitting", value="""Evidence for all challenges is required in the form of an unedited image or video.
-                                                                Only the current day's challenges are valid submissions.\n
-                                                                Please submit your challenges in this ticket.""", inline=False)
-                    await channel.send(embed=embed)
+                        embed.add_field(name="Submitting", value="""Evidence for all challenges is required in the form of an unedited image or video.
+                                                                    Only the current day's challenges are valid submissions.\n
+                                                                    Please submit your challenges in this ticket.""", inline=False)
+                        await channel.send(embed=embed)
 
-                    await author.add_roles(self.bot.christmas_event)
+                        await author.add_roles(self.bot.christmas_event)
 
-                    embed = discord.Embed(title=":ballot_box_with_check: Registration Successful!", color=0xFFFDD0)
-                    embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
-                    embed.add_field(name=name, value="To unregister, please ping a staff member!", inline=False)
-                    await channel.send(embed=embed)
-                    break
+                        embed = discord.Embed(title=":ballot_box_with_check: Registration Successful!", color=0xFFFDD0)
+                        embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
+                        embed.add_field(name=name, value="To unregister, please ping a staff member!", inline=False)
+                        await channel.send(embed=embed)
+                        break
+
+                    else:
+                        await channel.send("Unkown IGN! Restarting ticket process...")
                 
 
 
