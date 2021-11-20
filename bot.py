@@ -50,7 +50,7 @@ class HelpCommand(commands.MinimalHelpCommand):
 
 bot.help_command = HelpCommand(command_attrs={'hidden': True})
 
-initial_extensions = ["func.cogs.general", "func.cogs.giveaways", "func.cogs.hypixel", "func.cogs.owner"]
+initial_extensions = ["func.cogs.general", "func.cogs.giveaways", "func.cogs.hypixel", "func.cogs.moderation", "func.cogs.owner"]
 
 if __name__ == '__main__':
     for extension in initial_extensions:

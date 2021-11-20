@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 
-from func.classes.User import User
 from func.classes.String import String
 
 class General(commands.Cog, name="General"):
