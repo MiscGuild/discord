@@ -1495,7 +1495,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                             1st-3rd - 3 points
                                                                             4th-10th - 2 points
                                                                             Remaining players - 1 point""", inline=False)
-                        embed.add_fied(name="Rules", value='''All Hypixel rules apply. This includes:
+                        embed.add_field(name="Rules", value='''All Hypixel rules apply. This includes:
                                     - No cheating
                                     - No account sharing
                                     - No boosting, etc''',inline=False)
