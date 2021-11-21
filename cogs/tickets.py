@@ -1481,7 +1481,12 @@ class Tickets(commands.Cog, name="Tickets"):
                     if name != None:
                         await channel.edit(name=f"Event-{name}",
                             category=discord.utils.get(channel.guild.categories, name="CHRISTMAS COUNTDOWN"))
-                        
+                        text = '''**Submitting Challenges:** Every day, along with the challenges, a unique password will be given for that days challenges. When submitting your challenges, you will be required to have the password written in your chat box. (Example below). Submissions can take the form of an unedited screenshot or short video, whatever works best. You can only submit challenges from the day you're submitting, so previously given challenges will not be awarded with points.
+                                    All Hypixel rules apply. This includes:
+                                    - No cheating
+                                    - No account sharing
+                                    - No boosting, etc
+                                    https://media.discordapp.net/attachments/522861704921481229/911759503073116230/unknown.png?width=1111&height=625'''
                         embed = discord.Embed(title="General Information", description="Following is some general information surrounding the event.", color=0x8368ff)
                         embed.add_field(name="Miscellaneous Christmas Countdown", value="""Every day from the 1st to the 24th of December, a series of challenges
                                                                                             will be released for participants to complete.\n
@@ -1490,10 +1495,16 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                             1st-3rd - 3 points
                                                                             4th-10th - 2 points
                                                                             Remaining players - 1 point""", inline=False)
-
-                        embed.add_field(name="Submitting", value="""Evidence for all challenges is required in the form of an unedited image or video.
-                                                                    Only the current day's challenges are valid submissions.\n
-                                                                    Please submit your challenges in this ticket.""", inline=False)
+                        embed.add_fied(name="Rules", value='''All Hypixel rules apply. This includes:
+                                    - No cheating
+                                    - No account sharing
+                                    - No boosting, etc''',inline=False)
+                        embed.add_field(name="Submitting", value="""Every day, along with the challenges, a unique password will be given for that days challenges.
+                        When submitting your challenges, you will be required to have the password written in your chat box (Example below).
+                        Submissions can take the form of an unedited screenshot or short video, whatever works best.
+                        You can only submit challenges from the day you're submitting, 
+                        so previously given challenges will not be awarded with points.""", inline=False)
+                        embed.set_image(url="https://media.discordapp.net/attachments/911761019947352074/911792454099947580/unknown.png?width=1111&height=625")
                         await channel.send(embed=embed)
 
                         await author.add_roles(self.bot.christmas_event)
@@ -1502,6 +1513,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
                         embed.add_field(name=name, value="To unregister, please ping a staff member!", inline=False)
                         await channel.send(embed=embed)
+                        await channel.send(text)
                         break
 
                     else:
