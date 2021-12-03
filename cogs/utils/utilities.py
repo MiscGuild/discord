@@ -315,7 +315,7 @@ async def get_misc_members(gname):
 def fetch(session, individual_uuid):
     base_url = "https://sessionserver.mojang.com/session/minecraft/profile/"
     with session.get(base_url + individual_uuid) as response:
-        data = response.json(content_type=None)
+        data = response.json()
 
         if response.status_code != 200:
             return None
