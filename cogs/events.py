@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands, tasks
+from discord.ext.commands.core import command
 from cogs.utils import utilities as utils
 
 from datetime import datetime, timedelta
@@ -23,12 +24,16 @@ class Events(commands.Cog, name="Events"):
                 return
             
             # Get player data
-            row = await self.get_player_short(uuid)
+            row = await self.get_player(uuid)
             if row != None:
-                uuid, total_points, completed_challenges = row
+                uuid, total_points, completed_challenges, orig_scaled_challenge_score = row
+                # Add 1 base point for first submission of the day
+                if orig_scaled_challenge_score == None or orig_scaled_challenge_score == 0:
+                    total_points += 1
+
                 await self.update_value(uuid, total_points, completed_challenges, scaled_challenge_score)
             else:
-                await self.insert_new(uuid, 0, 1, scaled_challenge_score)
+                await self.insert_new(uuid, 1, 1, scaled_challenge_score)
 
             await ctx.send(f"{name}'s scaled challenge score today is {scaled_challenge_score}")
             return
@@ -186,9 +191,9 @@ class Events(commands.Cog, name="Events"):
             await ctx.send(embed=embed)
 
 
-    @commands.command(aliases=["challengelb"])
-    @commands.has_role("Staff")
-    async def challengeleaderboard(self, ctx):
+    @commands.command(aliases=["scaledlb"])
+    @commands.has_role("Christmas Event")
+    async def scaledleaderboard(self, ctx):
         description = "Listed below are the top 10 players for today's scaled challenge.\n"
         with requests.Session() as session:
             count = 1
@@ -201,6 +206,24 @@ class Events(commands.Cog, name="Events"):
         await ctx.send(embed=discord.Embed(title="Scaled Challenge Leaderboard", description=description, color=0x8368ff))
 
     
+    @commands.command(aliases=["eventlb"])
+    @commands.has_role("Christmas Event")
+    async def eventleaderboard(self, ctx):
+        cursor = await self.bot.db.execute("SELECT uuid, points FROM event ORDER BY points DESC")
+        rows = await cursor.fetchmany(20)
+        await cursor.close()
+
+        description = "Listed below are the top 20 players for the Miscellaneous Christmas Countdown.\n"
+        with requests.Session() as session:
+            count = 1
+            for data_set in rows:
+                uuid, score = data_set
+                name = utils.fetch(session, uuid)
+                description = description + "\n**" + str(count) + " -**" + uuid + ": " + str(score) if name == None else description + "\n**" + str(count) + " -** " + name + ": " + str(score)
+                count += 1
+            session.close()
+        await ctx.send(embed=discord.Embed(title="Christmas Countdown Leaderboard", description=description, color=0x8368ff))
+
     
     @commands.command(aliases=["resetlb", "clearlb"])
     @commands.has_role("Staff")
