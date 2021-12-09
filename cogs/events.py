@@ -33,7 +33,7 @@ class Events(commands.Cog, name="Events"):
 
                 await self.update_value(uuid, total_points, completed_challenges, scaled_challenge_score)
             else:
-                await self.insert_new(uuid, 1, 1, scaled_challenge_score)
+                await self.insert_new(uuid, 0, 1, scaled_challenge_score)
 
             await ctx.send(f"{name}'s scaled challenge score today is {scaled_challenge_score}")
             return
