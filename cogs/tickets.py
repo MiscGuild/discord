@@ -697,11 +697,10 @@ class Tickets(commands.Cog, name="Tickets"):
                                                            filename=f"deleted-{channel.name}.html")
 
                         if channel.category.name in self.bot.ticket_categories:
-                            name = channel.name
                             embed = discord.Embed(title='This ticket will be deleted in 10 seconds!',
                                                   description='',
                                                   color=0xDE3163)
-                            msg = await channel.send(embed=embed)
+                            await channel.send(embed=embed)
                             await asyncio.sleep(10)
                             await discord.TextChannel.delete(channel)
 
@@ -709,7 +708,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
                                                   description="They deleted their own ticket.", color=0x8368ff)
                             await self.bot.log_channel.send(embed=embed)
-                            '''await self.bot.log_channel.send(file=discord.File(transcript_file))'''
+                            await self.bot.log_channel.send(file=discord.File(transcript_file))
                             break
                     elif click.component.id == "no":
                         success_embed = discord.Embed(title="Success", color=0x00A86B)
@@ -844,11 +843,10 @@ class Tickets(commands.Cog, name="Tickets"):
                                                            filename=f"deleted-{channel.name}.html")
 
                         if channel.category.name in self.bot.ticket_categories:
-                            name = channel.name
                             embed = discord.Embed(title='This ticket will be deleted in 10 seconds!',
                                                   description='',
                                                   color=0xDE3163)
-                            msg = await channel.send(embed=embed)
+                            await channel.send(embed=embed)
                             await asyncio.sleep(10)
                             await discord.TextChannel.delete(channel)
 
@@ -856,7 +854,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
                                                   description="They deleted their own ticket.", color=0x8368ff)
                             await self.bot.log_channel.send(embed=embed)
-                            '''await self.bot.log_channel.send(file=discord.File(transcript_file))'''
+                            await self.bot.log_channel.send(file=discord.File(transcript_file))
                             break
                     elif click.component.id == "no":
                         success_embed = discord.Embed(title="Success", color=0x00A86B)
@@ -954,11 +952,10 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                filename=f"deleted-{channel.name}.html")
 
                             if channel.category.name in self.bot.ticket_categories:
-                                name = channel.name
                                 embed = discord.Embed(title='This ticket will be deleted in 10 seconds!',
                                                       description='',
                                                       color=0xDE3163)
-                                msg = await channel.send(embed=embed)
+                                await channel.send(embed=embed)
                                 await asyncio.sleep(10)
                                 await discord.TextChannel.delete(channel)
 
@@ -966,7 +963,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                 embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
                                                       description="They deleted their own ticket.", color=0x8368ff)
                                 await self.bot.log_channel.send(embed=embed)
-                                '''await self.bot.log_channel.send(file=discord.File(transcript_file))'''
+                                await self.bot.log_channel.send(file=discord.File(transcript_file))
                                 break
                         elif click.component.id == "no":
                             success_embed = discord.Embed(title="Success", color=0x00A86B)
@@ -1441,11 +1438,10 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                        filename=f"deleted-{channel.name}.html")
 
                                     if channel.category.name in self.bot.ticket_categories:
-                                        name = channel.name
                                         embed = discord.Embed(title='This ticket will be deleted in 10 seconds!',
                                                               description='',
                                                               color=0xDE3163)
-                                        msg = await channel.send(embed=embed)
+                                        await channel.send(embed=embed)
                                         await asyncio.sleep(10)
                                         await discord.TextChannel.delete(channel)
 
@@ -1454,7 +1450,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                               description="They deleted their own ticket.",
                                                               color=0x8368ff)
                                         await self.bot.log_channel.send(embed=embed)
-                                        '''await self.bot.log_channel.send(file=transcript_file)'''
+                                        await self.bot.log_channel.send(file=transcript_file)
                                         break
                                 elif click.component.id == "no":
                                     success_embed = discord.Embed(title="Success", color=0x00A86B)
@@ -1680,10 +1676,10 @@ class Tickets(commands.Cog, name="Tickets"):
 
         if self.bot.staff in ctx.author.roles:
             if ctx.channel.category.name in self.bot.ticket_categories:
-                name = ctx.channel.name
+
                 embed = discord.Embed(title='This ticket will be deleted in 10 seconds!', description='',
                                       color=0xDE3163)
-                msg = await ctx.send(embed=embed)
+                await ctx.send(embed=embed)
                 await asyncio.sleep(10)
                 await discord.TextChannel.delete(ctx.channel)
 
@@ -1691,7 +1687,7 @@ class Tickets(commands.Cog, name="Tickets"):
                 embed = discord.Embed(title=f'{ctx.channel.name} was deleted by {name}',
                                       description="", color=0x8368ff)
                 await self.bot.log_channel.send(embed=embed)
-                '''await self.bot.log_channel.send(file=discord.File(transcript_file))'''
+                await self.bot.log_channel.send(file=discord.File(transcript_file))
 
     @commands.command()
     @commands.has_role("Staff")
@@ -1748,9 +1744,6 @@ class Tickets(commands.Cog, name="Tickets"):
             transcript_file = discord.File(io.BytesIO(transcript.encode()),
                                            filename=f"transcript-{ctx.channel.name}.html")
 
-            embed = discord.Embed(title="Transcript isn't working rn!",
-                                  color=0x00A86B)
-            await ctx.send(embed=embed)
             await ctx.send(file=transcript_file)
 
     @commands.command()
@@ -1844,6 +1837,18 @@ class Tickets(commands.Cog, name="Tickets"):
                     break
                 elif more in ('No', 'Nah', 'Nope'):
                     await channel.send(embed=embed)
+                    transcript = await chat_exporter.export(channel)
+
+                    if transcript is None:
+                        embed = discord.Embed(text="Transcript creation failed!",
+                                              color=0xDE3163)
+                        await ctx.send(embed=embed)
+                        return
+
+                    transcript_file = discord.File(io.BytesIO(transcript.encode()),
+                                                   filename=f"transcript-{channel.name}.html")
+
+                    await channel.send(file=transcript_file)
 
     @commands.command()
     async def new(self, ctx):
