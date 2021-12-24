@@ -556,7 +556,7 @@ class staff(commands.Cog, name="Staff"):
         for guild in self.bot.guilds:
             if str(guild) == "Miscellaneous [MISC]":  # Check if the Discord is Miscellaneous
                 for member in guild.members:  # For loop for all members in the Discord
-                    if member.id not in self.bot.adminids and member.bot is False:
+                    if member.id not in self.bot.admin_ids and member.bot is False:
                         name = await utils.name_grabber(member)
 
                         message = await ctx.send(f"Checking {name}")
