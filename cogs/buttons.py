@@ -18,7 +18,7 @@ class Roles(commands.Cog, command_attrs=dict(hidden=True)):
         reaction_roles = discord.Embed(title="To get your desired role, click its respective button!",
                                        description="<:sb:732824932177805405> __**SkyBlock**__\n*Gives you the access to the SkyBlock category!*\n\n"
                                                    "<:minigames:732825420235407400> __**Discord Minigames**__\n*Allows you to play some Discord minigames!*\n\n"
-                                                   "👨‍👩‍👧‍👦 __**SMP Server Access**__\n*This role allows you to visit our SMP!*\n\n"
+                                                   "❓  __**QOTD Ping**__\n*The staff team will mention this role when there's a new question of the day!*\n\n"
                                                    "🎉 __**Giveaways/Events**__\n*React so you don't miss any giveaway or event*\n\n"
                                                    "📖 __**Storytimes**__\n*Get pinged whenever a storytime happens* ",
                                        color=0x8368ff)
@@ -35,8 +35,8 @@ class Roles(commands.Cog, command_attrs=dict(hidden=True)):
                            id="732279654261588048"),
                     Button(style=ButtonStyle.grey, label="Discord Minigames",
                            emoji=self.bot.get_emoji(732825420235407400), id="732824611175006239"),
-                    Button(style=ButtonStyle.grey, label="SMP Server Access", emoji="👨‍👩‍👧‍👦",
-                           id="763704865297268776"),
+                    Button(style=ButtonStyle.grey, label="QOTD Ping", emoji="❓",
+                           id="923978802818871356"),
                     Button(style=ButtonStyle.grey, label="Giveaways/Events", emoji="🎉", id="780717935140012052"),
                     Button(style=ButtonStyle.grey, label="Storytimes", emoji="📖", id="855657894518325258"),
                 ]
@@ -59,19 +59,19 @@ class Roles(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.command()
     @commands.is_owner()
     async def ticket_embed(self, ctx):
-        embed = discord.Embed(title="Tickets", description="Tickets can be created for any of the following reasons:-"
-                                                           "\n> Do Not Kick List"
-                                                           "\n> Discord Nick/Role Change"
-                                                           "\n> Problems/Queries/Complaint"
-                                                           "\n> Player Report"
-                                                           "\n> Milestone"
-                                                           "\n> Staff Application"
-                                                           "\n> Event"
-                                                           "\n> Other"
-                                                           "\nOnce you have created a ticket by clicking the button, you will be linked to a ticket in the \":ticket: Ticket Section\" category.\n"
-                                                           "When you open the ticket, you will be greeted by a message from the Miscellaneous Bot. "
-                                                           "The bot will ask you to choose the reason behind the creation of your ticket from a given list. Choose the appropriate reason and then proceed!\n"
-                                                           "Once you have created your ticket, staff will respond within 24 hours.",
+        embed = discord.Embed(title="Tickets", description='''Tickets can be created for any of the following reasons:-
+                                                           \n> Do Not Kick List
+                                                           \n> Discord Nick/Role Change
+                                                           \n> Problems/Queries/Complaint
+                                                           \n> Player Report
+                                                           \n> Milestone
+                                                           \n> Staff Application
+                                                           \n> Event
+                                                           \n> Other
+                                                           \nOnce you have created a ticket by clicking the button, you will be linked to a ticket in the ":ticket: Ticket Section" category.\n
+                                                           When you open the ticket, you will be greeted by a message from the Miscellaneous Bot. 
+                                                           The bot will ask you to choose the reason behind the creation of your ticket from a given list. Choose the appropriate reason and then proceed!\n
+                                                           Once you have created your ticket, staff will respond within 24 hours.''',
                               color=0x8368ff)
         embed.add_field(name="Do Not Kick List",
                         value="Once you create  the ticket you  will see <@736266884147576903>'s prompts. "

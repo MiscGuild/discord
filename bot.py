@@ -61,17 +61,17 @@ if __name__ == '__main__':
             bot.load_extension(extension)
             print(f'{extension} Loaded!')
         except Exception as e:
-            print(f'Failed to load extention {extension}', file=sys.stderr)
+            print(f'Failed to load extension {extension}', file=sys.stderr)
 
 
 @bot.event
 async def on_ready():
-    print('The Miscellaneous Bot is ONLINE!\n\n')
+    print('Bot Status - Online\n\n')
 
 
 @bot.event
 async def on_command_error(ctx, error):
-    # Prevents commands with local handlers or cogs with overwrritten on_command_errors being handled here
+    # Prevents commands with local handlers or cogs with overwritten on_command_errors being handled here
     if isinstance(error, commands.CommandNotFound):
         embed = discord.Embed(title=f'Invalid Command!',
                               descrption='Use `,help` to view a list of all commands!', color=0xDE3163)
@@ -99,13 +99,13 @@ async def on_command_error(ctx, error):
         await ctx.send(embed=embed)
     elif isinstance(error, commands.MemberNotFound):
         embed = discord.Embed(title=f"Member not found",
-                                description="This member doesn't seem to exist.\nCheck you have their ID or tag's capitalization and spelling correct!",
-                                color=0xDE3163)
+                              description="This member doesn't seem to exist.\nCheck you have their ID or tag's capitalization and spelling correct!",
+                              color=0xDE3163)
         await ctx.send(embed=embed)
     elif isinstance(error, commands.MissingRequiredArgument):
         usage = f"{ctx.prefix}{ctx.command.name}"
         for key, value in ctx.command.clean_params.items():
-            if value.default == None:
+            if not value.default:
                 usage += " [" + key + "]"
             else:
                 usage += " <" + key + ">"
@@ -119,10 +119,11 @@ async def on_command_error(ctx, error):
         tb = ''.join(traceback.format_exception(type(error), error, error.__traceback__))
         if len(tb) <= 2000:
             await bot.error_channel.send(f"Ignoring exception in command {ctx.command}:\n```py\n{tb}\n```")
-            embed = discord.Embed(title=f"Error",description=str(error).split(":")[2],color=0xDE3163)
+            embed = discord.Embed(title=f"Error", description=str(error).splitlines()[-1], color=0xDE3163)
             await ctx.send(embed=embed)
         else:
-            await bot.error_channel.send(f"```An error occurred in command '{ctx.command}' that could not be sent in this channel, check the console for the traceback. \n\n'{error}'```")
+            await bot.error_channel.send(
+                f"```An error occurred in command '{ctx.command}' that could not be sent in this channel, check the console for the traceback. \n\n'{error}'```")
             print("The below exception could not be sent to the error channel.")
             print(tb)
 
@@ -196,7 +197,7 @@ async def after_cache_ready():
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster, bot.rich_kid)
 
     bot.ticket_categories = ('RTickets', '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL')
-    bot.misc_allies = ("XL", "Lucid", "Cronos", "OUT", "Betrayed", "Blight","TheNinjaWarriors")
+    bot.misc_allies = ("XL", "Lucid", "Cronos", "OUT", "Betrayed", "Blight", "TheNinjaWarriors")
     bot.admin_ids = [member.id for member in bot.admin.members]
     bot.admin_names = [await hypixel.name_grabber(member) for member in bot.admin.members]
     bot.staff_names = [await hypixel.name_grabber(member) for member in bot.staff.members]

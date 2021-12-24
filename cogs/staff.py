@@ -514,13 +514,10 @@ class staff(commands.Cog, name="Staff"):
         """
         msg = await ctx.send("**Processing all the prerequisites**")
 
-
-        misc_members = ally_members = ally_uuids = []
-        misc_member_description = ally_member_description = new_member_description = guest_description = ""
-
         misc_uuids = await utils.get_guild_members("Miscellaneous")
-        for ally in self.bot.misc_allies:
-            ally_uuids = ally_uuids + await utils.get_guild_members(ally)
+        misc_members, ally_members, ally_uuids = [], [], []
+        for x in self.bot.misc_allies:
+            ally_uuids = ally_uuids + await utils.get_guild_members(x)
 
         # Miscellaneous Member Names
         await msg.edit(content="**Processing** - 1/2")
@@ -559,65 +556,39 @@ class staff(commands.Cog, name="Staff"):
         for guild in self.bot.guilds:
             if str(guild) == "Miscellaneous [MISC]":  # Check if the Discord is Miscellaneous
                 for member in guild.members:  # For loop for all members in the Discord
-                    try: 
-                        if len(misc_member_description) > 2096:
-                            embed = discord.Embed(title="Miscellaneous Members", description=misc_member_description,
-                                                  color=0x8368ff)
-                            await ctx.send(embed=embed)
-                            misc_member_description = ""
-                        if len(ally_member_description) > 2096:
-                            embed = discord.Embed(title="Ally Members", description=ally_member_description, color=0x8368ff)
-                            await ctx.send(embed=embed)
-                            ally_member_description = ""
-                        if len(new_member_description) > 2096:
-                            embed = discord.Embed(title="New Member (Role)", description=new_member_description,
-                                                  color=0x8368ff)
-                            await ctx.send(embed=embed)
-                            new_member_description = ""
-                        if len(guest_description) > 2096:
-                            embed = discord.Embed(title="Guest (Role)", description=guest_description, color=0x8368ff)
-                            await ctx.send(embed=embed)
-                            guest_description = ""
-                    except Exception as e:
-                        await ctx.send(f"Embed sending error\n```{e}```")
-                        guest_description = ""
-                        new_member_description = ""
-                        ally_member_description = ""
-                        misc_member_description = ""
-
-
-                    if member.id not in self.bot.admin_ids and member.bot is False:
+                    if member.id not in self.bot.adminids and member.bot is False:
                         name = await utils.name_grabber(member)
-                        has_tag_perms = any(role in ctx.author.roles for role in self.bot.tag_allowed_roles)
 
-                        await msg.edit(content=f"**Checking** {name}")
+                        message = await ctx.send(f"Checking {name}")
+
                         async with aiohttp.ClientSession() as session:
                             async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as mojang:
 
                                 if mojang.status != 200:  # If the IGN is invalid
                                     await member.remove_roles(self.bot.member_role, self.bot.guest, reason="Rolecheck")
                                     await member.add_roles(self.bot.new_member_role, reason="Rolecheck")
-                                    name = name.replace("_","\\_")
-                                    new_member_description = str(new_member_description) + f"{name} **++New Member | --Member | -- Guest**\n"
+                                    await message.edit(content=
+                                                       f"{name} ||{member}|| Player doesn't exist. **++New Member | --Member | -- Guest**")
                                     continue
-                                else:
-                                    mojang_json = await mojang.json(content_type=None)
+                                elif self.bot.guild_master not in member.roles:
+                                    mojang_json = await mojang.json()
                                     ign = mojang_json["name"]
                                     uuid = mojang_json['id']
-
                                 await session.close()
                             # Miscellaneous
-                        if ign in misc_members and ign not in self.bot.admin_names:
+                        if ign in misc_members and ign not in (
+                                "Rowdies", "PolarPowah", "LBROz", "Fantastic_Doge", "ElijahRus", "BotTyler", "silviccs"):
                             async with aiohttp.ClientSession() as session:
                                 async with session.get(
                                         f"https://api.hypixel.net/guild?key={utils.get_api()}&player={uuid}") as resp:
-                                    req = await resp.json(content_type=None)
+                                    req = await resp.json()
                                     await session.close()
 
                             if self.bot.member_role not in member.roles:
                                 await member.add_roles(self.bot.member_role, reason="Rolecheck")
                                 await member.remove_roles(self.bot.new_member_role, self.bot.guest, reason="Rolecheck")
 
+                            has_tag_perms = any(role in ctx.author.roles for role in self.bot.tag_allowed_roles)
 
                             for user in req['guild']["members"]:
                                 if uuid == user["uuid"]:
@@ -630,99 +601,78 @@ class staff(commands.Cog, name="Staff"):
                                             username = await utils.name_grabber(member)
                                             if has_tag_perms is False:
                                                 await member.edit(nick=username)
-                                            await member.add_roles(self.bot.inactive_role, self.bot.member_role, reason="Rolecheck")
-                                            await member.remove_roles(self.bot.active_role, self.bot.ally, self.bot.guest,
+                                            await member.add_roles(self.bot.inactive_role, reason="Rolecheck")
+                                            await member.remove_roles(self.bot.active_role, self.bot.ally,
                                                                       reason="Rolecheck")
-                                            name = name.replace("_", "\\_")
-                                            misc_member_description = str(misc_member_description) + f"{name} **++Member | ++Inactive | --Active** \n",
+                                            await message.edit(
+                                                content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
 
                                         elif totalexp >= self.bot.active:  # If the member is active
-                                            if has_tag_perms is False:
-                                                await member.edit(nick=username)
-                                            await member.remove_roles(self.bot.inactive_role, self.bot.new_member_role, self.bot.guest,
+                                            await member.remove_roles(self.bot.inactive_role, self.bot.new_member_role,
                                                                       self.bot.ally, reason="Rolecheck")
-                                            await member.add_roles(self.bot.active_role, self.bot.member_role, reason="Rolecheck")
-                                            name = name.replace("_", "\\_")
-                                            misc_member_description = str(misc_member_description) + f"{name} **++Member | ++Active | --Inactive** \n"
+                                            await member.add_roles(self.bot.active_role, reason="Rolecheck")
+                                            await message.edit(
+                                                content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
 
                                         elif totalexp > self.bot.inactive:
                                             username = await utils.name_grabber(member)
                                             if has_tag_perms is False:
                                                 await member.edit(nick=username)
-                                            await member.add_roles(self.bot.member_role, reason="Rolecheck")
-                                            await member.remove_roles(self.bot.inactive_role, self.bot.active_role, self.bot.guest,
-                                                                      self.bot.ally, self.bot.guest, reason="Rolecheck")
-                                            name = name.replace("_", "\\_")
-                                            misc_member_description = str(misc_member_description) + f"{name} **++Member | --Inactive | --Active** \n"
+                                            await member.remove_roles(self.bot.inactive_role, self.bot.active_role,
+                                                                      self.bot.ally, reason="Rolecheck")
+                                            await message.edit(
+                                                content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
                                     else:  # For residents
                                         if totalexp < self.bot.resident_req:
                                             username = await utils.name_grabber(member)
                                             if has_tag_perms is False:
                                                 await member.edit(nick=username)
-                                            await member.add_roles(self.bot.inactive_role, self.bot.member_role, reason="Rolecheck")
-                                            await member.remove_roles(self.bot.active_role, self.bot.ally, self.bot.guest,
+                                            await member.add_roles(self.bot.inactive_role, reason="Rolecheck")
+                                            await member.remove_roles(self.bot.active_role, self.bot.ally,
                                                                       reason="Rolecheck")
-                                            name = name.replace("_", "\\_")
-                                            misc_member_description = str(misc_member_description) + f"{name} **++Member | ++Inactive | --Active** \n"
+                                            await message.edit(
+                                                content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
 
                                         elif totalexp >= self.bot.active:  # If the member is active
-                                            if has_tag_perms is False:
-                                                await member.edit(nick=username)
-                                            await member.remove_roles(self.bot.inactive_role, self.bot.new_member_role, self.bot.guest,
+                                            await member.remove_roles(self.bot.inactive_role, self.bot.new_member_role,
                                                                       self.bot.ally, reason="Rolecheck")
-                                            await member.add_roles(self.bot.active_role, self.bot.member_role, reason="Rolecheck")
-                                            name = name.replace("_", "\\_")
-                                            misc_member_description = str(misc_member_description) + f"{name} **++Member | ++Active | --Inactive** \n"
+                                            await member.add_roles(self.bot.active_role, reason="Rolecheck")
+                                            await message.edit(
+                                                content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
 
                                         elif totalexp > self.bot.resident_req:
                                             username = await utils.name_grabber(member)
                                             if has_tag_perms is False:
                                                 await member.edit(nick=username)
-                                            await member.add_roles(self.bot.member_role, reason="Rolecheck")
-                                            await member.remove_roles(self.bot.inactive_role, self.bot.active_role, self.bot.guest,
+                                            await member.remove_roles(self.bot.inactive_role, self.bot.active_role,
                                                                       self.bot.ally, reason="Rolecheck")
-                                            name = name.replace("_", "\\_")
-                                            misc_member_description = str(misc_member_description) + f"{name} **++Member | --Inactive| --Active** \n"
+                                            await message.edit(
+                                                content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
+
                         # Ally
                         elif ign in ally_members:
                             guild_name = await utils.get_guild(name)
                             for guild in self.bot.misc_allies:
                                 if guild == guild_name:
                                     gtag = await utils.get_gtag(guild_name)
-                                    username = ign + " " + str(gtag)
-                                    await member.edit(nick=username)
+                                    if member.nick is None or str(gtag) not in member.nick:
+                                        ign = ign + " " + str(gtag)
+                                        await member.edit(nick=ign)
                                     await member.add_roles(self.bot.guest, self.bot.ally, reason="Rolecheck")
                                     await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
                                                               self.bot.active_role, self.bot.inactive_role,
                                                               reason="Rolecheck")
-                                    name = name.replace("_", "\\_")
-                                    ally_member_description = str(ally_member_description) + f"{name} Member of {guild} **++Ally | ++Guest | --Member | --Active** \n"
+                                    await message.edit(
+                                        content=f"{name} ||{member}|| Member of {guild} **++Ally \| ++Guest | --Member | --Active**")
                         else:
-                            await member.edit(nick=ign)
                             await member.add_roles(self.bot.guest, reason="Rolecheck")
                             await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
                                                       self.bot.active_role, self.bot.inactive_role, self.bot.ally,
                                                       reason="Rolecheck")
-                            name = name.replace("_", "\\_")
-                            guest_description = str(guest_description) + f"{name} **++Guest | --Member | --Active** \n"
-                try:
-                    if misc_member_description != "":
-                        embed = discord.Embed(title="Miscellaneous Members", description=misc_member_description,
-                                              color=0x8368ff)
-                        await ctx.send(embed=embed)
-                    if ally_member_description != "":
-                        embed = discord.Embed(title="Ally Members", description=ally_member_description, color=0x8368ff)
-                        await ctx.send(embed=embed)
-                    if new_member_description != "":
-                        embed = discord.Embed(title="New Member (Role)", description=new_member_description, color=0x8368ff)
-                        await ctx.send(embed=embed)
-                    if guest_description != "":
-                        embed = discord.Embed(title="Guest (Role)", description=guest_description, color=0x8368ff)
-                        await ctx.send(embed=embed)
-                except:
-                    await ctx.send("embed sending erorr")
+                            await message.edit(
+                                content=f"{name} ||{member}|| **++Guest | --Member | --Active**")
                 await ctx.send('**Rolecheck completed**')
-        if send_ping is None:
+        if not send_ping:
             inactivity_channel = self.bot.get_channel(848067712156434462)
 
             embed = discord.Embed(title="You do not meet the guild requirements!",
