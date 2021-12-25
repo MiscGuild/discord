@@ -1667,12 +1667,6 @@ class Tickets(commands.Cog, name="Tickets"):
     async def delete(self, ctx):
         """Deletes the ticket channel the command is used in.
         """
-        transcript = await chat_exporter.export(ctx.channel)
-        if transcript is None:
-            pass
-        else:
-            transcript_file = discord.File(io.BytesIO(transcript.encode()),
-                                           filename=f"deleted-{ctx.channel.name}.html")
 
         if self.bot.staff in ctx.author.roles:
             if ctx.channel.category.name in self.bot.ticket_categories:
@@ -1681,13 +1675,24 @@ class Tickets(commands.Cog, name="Tickets"):
                                       color=0xDE3163)
                 await ctx.send(embed=embed)
                 await asyncio.sleep(10)
+                transcript = await chat_exporter.export(ctx.channel)
+
+                if transcript is None:
+                    embed = discord.Embed(text="Transcript creation failed!",
+                                          color=0xDE3163)
+                    await ctx.send(embed=embed)
+                    return
+                transcript_file = discord.File(io.BytesIO(transcript.encode()),
+                                               filename=f"transcript-{ctx.channel.name}.html")
+
                 await discord.TextChannel.delete(ctx.channel)
 
                 name = await utils.name_grabber(ctx.author)
                 embed = discord.Embed(title=f'{ctx.channel.name} was deleted by {name}',
                                       description="", color=0x8368ff)
+                embed.set_footer(text="Following is the transcript")
                 await self.bot.log_channel.send(embed=embed)
-                await self.bot.log_channel.send(file=discord.File(transcript_file))
+                await self.bot.log_channel.send(file=transcript_file)
 
     @commands.command()
     @commands.has_role("Staff")
