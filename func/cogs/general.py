@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 from func.classes.String import String
+from func.classes.Union import Union
 
 class General(commands.Cog, name="General"):
     def __init__(self, bot):
@@ -14,14 +15,9 @@ class General(commands.Cog, name="General"):
         await ctx.send(await String(string=command).source())
 
 
-    # @commands.command()
-    # async def ping(self, ctx):
-
-
-    # @commands.command()
-    # async def avatar(self, ctx, user: discord.User):
-    #     await ctx.send(embed=await User(user=user).avatar()) 
-
+    @commands.command()
+    async def avatar(self, ctx, user: discord.User):
+        await ctx.send(embed=await Union(user=user).avatar()) 
 
 
 def setup(bot):
