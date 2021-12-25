@@ -16,18 +16,14 @@ class Giveaways(commands.Cog, name="Giveaways"):
     @commands.command(aliases=["gend", "giveawayfinish", "gfinish"])
     @commands.has_role("Giveaway Creator")
     async def giveawayend(self, ctx, message_ID: int):
-        """
-        Ends the giveaway with the given message ID!
-        """
+        """Ends the giveaway with the given message ID!"""
         await ctx.send(await Integer(integer=message_ID).giveawayend())
 
 
     @commands.command(aliases=["greroll", "reroll"])
     @commands.has_role("Giveaway Creator")
     async def giveawayreroll(self, ctx, message_ID: int, reroll_number: int=None):
-        """
-        Rerolls the giveaway with the given message ID!
-        """
+        """Rerolls the giveaway with the given message ID!"""
         await ctx.send(await Integer(integer=message_ID).giveawayreroll(reroll_number))
 
 

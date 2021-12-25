@@ -45,9 +45,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
     @commands.command(aliases=['dnklchk'])
     async def dnklcheck(self, ctx, name: str=None):
-        """
-        Checks whether you are eligible for the do-not-kick-list!
-        """
+        """Check whether you are eligible for the do-not-kick-list!"""
         if name == None:
             name = await name_grabber(ctx.author)
 
