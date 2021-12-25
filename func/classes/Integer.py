@@ -36,3 +36,7 @@ class Integer:
             return "This giveaway hasn't ended yet!\n`To end it, use ,giveawayend`"
 
     # async def dailylb(msg):
+
+    async def clear(self, ctx, reason):
+        await ctx.message.delete()
+        await ctx.channel.purge(limit=self.integer)
