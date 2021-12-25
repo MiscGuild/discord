@@ -1,6 +1,8 @@
 # The following file contains: giveawayend, giveawayreroll, dailylb
 
 from func.utils.discord import giveaways as giveaway_utils
+from func.utils.discord.log_event import log_event
+from func.utils.discord.name_grabber import name_grabber
 
 class Integer:
     def __init__(self, integer: int):
@@ -40,3 +42,4 @@ class Integer:
     async def clear(self, ctx, reason):
         await ctx.message.delete()
         await ctx.channel.purge(limit=self.integer)
+        await log_event(f"{await name_grabber(ctx.author)} purged {self.integer} messages in {ctx.channel.name}", f"**Reason:** {reason}")
