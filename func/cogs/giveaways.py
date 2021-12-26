@@ -41,9 +41,12 @@ class Giveaways(commands.Cog, name="Giveaways"):
             message_id, status, datetime_end_str = row
             datetime_end = datetime.strptime(datetime_end_str, "%Y-%m-%d %H:%M:%S")
 
-            if status == "active" and datetime_end < datetime.utcnow():  # Giveaway needs to be ended
+            # Giveaway needs to be ended
+            if status == "active" and datetime_end < datetime.utcnow():
                 await self.roll_giveaway(message_id)
-            elif status == "inactive" and datetime.utcnow() > datetime_end + timedelta(days=10):  # If giveaway ended more than 10 days ago, delete it
+
+            # Giveaway ended more than 10 days ago, delete it
+            elif status == "inactive" and datetime.utcnow() > datetime_end + timedelta(days=10):
                 await self.bot.db.execute("DELETE FROM Giveaways WHERE message_id = (?)", (message_id,))
                 await self.bot.db.commit()
 

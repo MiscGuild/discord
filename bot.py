@@ -11,22 +11,22 @@ from discord.ext import commands, tasks
 from func.utils.discord.name_grabber import name_grabber
 
 logging.basicConfig(level=logging.INFO)
-config = toml.load('config.toml')
+config = toml.load("config.toml")
 
 intents = discord.Intents.default()
 intents.reactions = True
 intents.members = True
-bot = commands.Bot(command_prefix=commands.when_mentioned_or(config['bot']['prefix']), intents=intents,
-                   status=discord.Status.idle, activity=discord.Game(config['bot']['status']), case_insensitive=True)
+bot = commands.Bot(command_prefix=commands.when_mentioned_or(config["bot"]["prefix"]), intents=intents,
+                   status=discord.Status.idle, activity=discord.Game(config["bot"]["status"]), case_insensitive=True)
 
 bot.config = config
-bot.token = config['bot']['token']
-bot.api_tokens = config['hypixel']['api_keys']
-bot.owner_id = config['bot']['ownerID']
+bot.token = config["bot"]["token"]
+bot.api_tokens = config["hypixel"]["api_keys"]
+bot.owner_id = config["bot"]["ownerID"]
 bot.resident_req = 50000
-bot.active = 285000
-bot.inactive = 115000
-bot.dnkl = bot.inactive * 2
+bot.active_req = 285000
+bot.member_req = 115000
+bot.dnkl = bot.member_req * 2
 bot.new_member = 20000
 
 
@@ -48,17 +48,17 @@ class HelpCommand(commands.MinimalHelpCommand):
         await channel.send(embed=embed)
 
 
-bot.help_command = HelpCommand(command_attrs={'hidden': True})
+bot.help_command = HelpCommand(command_attrs={"hidden": True})
 
-initial_extensions = ["func.cogs.general", "func.cogs.giveaways", "func.cogs.hypixel", "func.cogs.moderation", "func.cogs.owner"]
+initial_extensions = ["func.cogs.general", "func.cogs.giveaways", "func.cogs.guild", "func.cogs.hypixel", "func.cogs.moderation", "func.cogs.owner"]
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     for extension in initial_extensions:
         try:
             bot.load_extension(extension)
             print(f"Loaded {extension}")
         except Exception as e:
-            print(f'WARNING: Failed to load extention {extension}', file=sys.stderr)
+            print(f"WARNING: Failed to load extention {extension}", file=sys.stderr)
             print(e)
 
 
@@ -66,27 +66,27 @@ if __name__ == '__main__':
 async def on_command_error(ctx, error):
     # Prevents commands with local handlers or cogs with overwrritten on_command_errors being handled here
     if isinstance(error, commands.CommandNotFound):
-        embed = discord.Embed(title=f'Invalid Command!',
-                              descrption='Use `,help` to view a list of all commands!', color=0xDE3163)
+        embed = discord.Embed(title=f"Invalid Command!",
+                              descrption="Use `,help` to view a list of all commands!", color=0xDE3163)
         await ctx.send(embed=embed)
         return
     elif ctx.command.has_error_handler() or ctx.cog.has_error_handler():
         return
 
     # Checks for the original exception raised and send to CommandInvokeError
-    error = getattr(error, 'original', error)
+    error = getattr(error, "original", error)
 
     if isinstance(error, commands.NotOwner):
-        embed = discord.Embed(title=f'Your soul lacks the strength to utilize this command!',
+        embed = discord.Embed(title=f"Your soul lacks the strength to utilize this command!",
                               description="You are not the owner of this bot!", color=0xDE3163)
         await ctx.send(embed=embed)
     elif isinstance(error, commands.MissingRole):
-        embed = discord.Embed(title=f'Your soul lacks the strength to utilize this command!',
+        embed = discord.Embed(title=f"Your soul lacks the strength to utilize this command!",
                               description="You do not have the required roles to access this restricted command!",
                               color=0xDE3163)
         await ctx.send(embed=embed)
     elif isinstance(error, commands.MissingPermissions):
-        embed = discord.Embed(title=f'Your soul lacks the strength to utilize this command!',
+        embed = discord.Embed(title=f"Your soul lacks the strength to utilize this command!",
                               description="You do not have the required permissions to access this restricted command!",
                               color=0xDE3163)
         await ctx.send(embed=embed)
@@ -109,7 +109,7 @@ async def on_command_error(ctx, error):
 
     else:
         # All other errors get sent to the error channel
-        tb = ''.join(traceback.format_exception(type(error), error, error.__traceback__))
+        tb = "".join(traceback.format_exception(type(error), error, error.__traceback__))
         if len(tb) <= 2000:
             await bot.error_channel.send(f"Ignoring exception in command {ctx.command}:\n```py\n{tb}\n```")
             embed = discord.Embed(title=f"Error",description=str(error).split(":")[2],color=0xDE3163)
@@ -139,19 +139,19 @@ async def on_member_join(member):
 
 
 async def connect_db():
-    bot.db = await aiosqlite.connect('database.db')
+    bot.db = await aiosqlite.connect("database.db")
 
 bot.loop.run_until_complete(connect_db())
 
 
 @tasks.loop(count=1)
 async def after_cache_ready():
-    bot.error_channel = bot.get_channel(config['bot']['error_channel_id'])
-    bot.dnkl_channel = bot.get_channel(config['bot']['dnkl_channel_id'])
-    bot.ticket_channel = bot.get_channel(config['bot']['ticket_channel_id'])
-    bot.log_channel = bot.get_channel(config['bot']['log_channel_id'])
-    bot.registration_channel = bot.get_channel(config['bot']['registration_channel_id'])
-    bot.guild = bot.get_guild(config['bot']['guild_id'])
+    bot.error_channel = bot.get_channel(config["bot"]["error_channel_id"])
+    bot.dnkl_channel = bot.get_channel(config["bot"]["dnkl_channel_id"])
+    bot.ticket_channel = bot.get_channel(config["bot"]["ticket_channel_id"])
+    bot.log_channel = bot.get_channel(config["bot"]["log_channel_id"])
+    bot.registration_channel = bot.get_channel(config["bot"]["registration_channel_id"])
+    bot.guild = bot.get_guild(config["bot"]["guild_id"])
 
     bot.guild_master = discord.utils.get(bot.guild.roles, name="Guild Master")
     bot.admin = discord.utils.get(bot.guild.roles, name="Admin")
@@ -170,7 +170,7 @@ async def after_cache_ready():
     bot.giveaways_events = discord.utils.get(bot.guild.roles, name="Giveaways/Events")
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster, bot.rich_kid)
 
-    bot.ticket_categories = ('RTickets', '🎫 Ticket Section', 'OTHER', 'REPORTS', 'MILESTONES', 'DNKL')
+    bot.ticket_categories = ("RTickets", "🎫 Ticket Section", "OTHER", "REPORTS", "MILESTONES", "DNKL")
     bot.misc_allies = ("XL", "Lucid", "Cronos", "OUT", "Betrayed", "Blight","TheNinjaWarriors")
     bot.admin_ids = [member.id for member in bot.admin.members]
     bot.admin_names = [await name_grabber(member) for member in bot.admin.members]

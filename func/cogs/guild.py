@@ -1,8 +1,9 @@
 import discord
 from discord.ext import commands
 
-from ..classes.Integer import Integer
-from ..classes.String import String
+from func.classes.Integer import Integer
+from func.classes.String import String
+from func.utils.discord.name_grabber import name_grabber
 
 class Guild(commands.Cog, name="Guild"):
     def __init__(self, bot):
@@ -42,14 +43,18 @@ class Guild(commands.Cog, name="Guild"):
     #     await ctx.send(embed=await String(string=reqrank).grank(msg))
 
 
-    # @commands.command(aliases=['gm', 'g'])
-    # async def gmember(self, ctx, name=None):
-    #     result = await String(string=name).gmember()
-    #     # Send result according to returned value
-    #     if isinstance(result, discord.Embed):
-    #         await ctx.send(embed=result)
-    #     if isinstance(result, str):
-    #         await ctx.send(result)
+    @commands.command(aliases=['gm', 'g'])
+    async def gmember(self, ctx, name=None):
+        """View the given user's gexp over the past week!"""
+        if name == None:
+            name = await name_grabber(ctx.author)
+            
+        result = await String(string=name).gmember(ctx)
+        # Send result according to returned value
+        if isinstance(result, discord.Embed):
+            await ctx.send(embed=result)
+        if isinstance(result, str):
+            await ctx.send(result)
 
 
     # @commands.command(aliases=["gt"])

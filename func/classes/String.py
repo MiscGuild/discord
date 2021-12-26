@@ -4,11 +4,16 @@ from __main__ import bot
 import discord
 import inspect
 import os
+import datetime
+from quickchart import QuickChart, QuickChartFunction
 
 from func.utils.requests.m_profile import m_profile
+from func.utils.requests.player_guild import player_guild
 from func.utils.minecraft.get_player_gexp import get_player_gexp
+from func.utils.minecraft.get_graph_color_by_rank import get_graph_color_by_rank
+from func.utils.discord.name_grabber import name_grabber
 
-from func.utils.consts import pos_color, neg_color
+from func.utils.consts import pos_color, neg_color, guildless_embed
 
 class String:
     def __init__(self, string: str):
@@ -62,7 +67,85 @@ class String:
     # async def grank(msg):
 
 
-    # async def gmember():
+    async def gmember(self, ctx):
+        name, uuid = await m_profile(self.string)
+        guild = await player_guild(uuid)
+
+        # Player is guildless
+        if guild == None:
+            return guildless_embed
+        
+        # Get guild data
+        gname = guild["guild"]["name"]
+        gtag = gname if guild["guild"]["tag"] == None else guild["guild"]["tag"]
+
+        # Find player in req
+        for member in guild["guild"]["members"]:
+            if member["uuid"] == uuid:
+                # Get player data
+                gexp_history = member["expHistory"]
+                weekly_gexp = sum(gexp_history.values())
+
+                # Send shortened version for non-command channels
+                if "commands" not in ctx.channel.name:
+                    await ctx.message.delete()
+                    return f"__**{name}**__\n**Guild Experience -** `{format(weekly_gexp, 'd')}`"
+
+                week_dict = {
+                    0: "Today:",
+                    1: "Yesterday:",
+                    2: "Two days ago:",
+                    3: "Three days ago:",
+                    4: "Four days ago:",
+                    5: "Five days ago:",
+                    6: "Six days ago:"
+                }
+
+                # Fetch remaining data
+                join_date = str(datetime.fromtimestamp(int(str(member["joined"])[:-3])))[0:10]
+                rank = member["rank"]
+                quest_participation = member["questParticipation"] if "questParticipation" in member else 0
+                dates = [int(k) for k, _ in gexp_history.items()]
+                gexp_vals = [int(v) for _, v in gexp_history.items()]
+                gexp_history_text = ""
+                for i in range(0, 7):
+                    date = week_dict.get(i, "None")
+                    gexp_history_text = gexp_history_text + f"**▸** {date} **{format(gexp_vals[i], ',d')}**\n"
+
+                # Get graph color
+                color, graph_color, graph_border = get_graph_color_by_rank(rank, weekly_gexp)
+
+                # Create embed
+                embed = discord.Embed(title=name, url=f"https://plancke.io/hypixel/player/stats/{name}", color=color)
+                embed.set_author(name=f"{gname} [{gtag}]", url=f"https://plancke.io/hypixel/guild/player/{name}")
+                embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
+                embed.add_field(name="General Information:",
+                                value=f"`✚` **Rank**: `{rank}`\n"
+                                    f"`✚` **Joined**: `{join_date}`\n"
+                                    f"`✚` **Quests Completed**: `{quest_participation}`\n", inline=False)
+                embed.add_field(name="Guild Experience", value=f"**Overall Guild Experience**: `{weekly_gexp}`\n\n"f"{gexp_history_text}")
+
+                # Create chart
+                chart = QuickChart()
+                chart.width = 1000
+                chart.height = 500
+                chart.background_color = "transparent"
+                chart.config = {
+                    "type": "line",
+                    "data": {
+                        "labels": dates.reverse(),
+                        "datasets": [{
+                            "label": "Experience",
+                            "data": gexp_vals.reverse(),
+                            "lineTension": 0.4,
+                            "backgroundColor": graph_color,
+                            "borderColor": graph_border,
+                            "pointRadius": 0,
+                        }]
+                    }
+                }
+                return embed.set_image(url=chart.get_url())
+
 
 
     # async def sync(tag=None):
