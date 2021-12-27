@@ -259,11 +259,10 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                        filename=f"deleted-{channel.name}.html")
 
                                     if channel.category.name in self.bot.ticket_categories:
-                                        name = channel.name
                                         embed = discord.Embed(title='This registration ticket will be deleted in 10 seconds!',
                                                               description='',
                                                               color=0xDE3163)
-                                        msg = await channel.send(embed=embed)
+                                        await channel.send(embed=embed)
                                         await asyncio.sleep(10)
                                         await discord.TextChannel.delete(channel)
 
@@ -272,7 +271,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                               description="They deleted their own ticket.",
                                                               color=0x8368ff)
                                         await self.bot.log_channel.send(embed=embed)
-                                        '''await self.bot.log_channel.send(file=discord.File(transcript_file))'''
+                                        await self.bot.log_channel.send(file=transcript_file)
                                         break
                                 elif click.component.id == "no":
                                     success_embed = discord.Embed(title="Success", color=0x00A86B)
@@ -708,7 +707,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
                                                   description="They deleted their own ticket.", color=0x8368ff)
                             await self.bot.log_channel.send(embed=embed)
-                            await self.bot.log_channel.send(file=discord.File(transcript_file))
+                            await self.bot.log_channel.send(file=transcript_file)
                             break
                     elif click.component.id == "no":
                         success_embed = discord.Embed(title="Success", color=0x00A86B)
@@ -854,7 +853,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
                                                   description="They deleted their own ticket.", color=0x8368ff)
                             await self.bot.log_channel.send(embed=embed)
-                            await self.bot.log_channel.send(file=discord.File(transcript_file))
+                            await self.bot.log_channel.send(file=transcript_file)
                             break
                     elif click.component.id == "no":
                         success_embed = discord.Embed(title="Success", color=0x00A86B)
@@ -963,7 +962,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                 embed = discord.Embed(title=f'{channel.name} was deleted by {name}',
                                                       description="They deleted their own ticket.", color=0x8368ff)
                                 await self.bot.log_channel.send(embed=embed)
-                                await self.bot.log_channel.send(file=discord.File(transcript_file))
+                                await self.bot.log_channel.send(file=transcript_file)
                                 break
                         elif click.component.id == "no":
                             success_embed = discord.Embed(title="Success", color=0x00A86B)
