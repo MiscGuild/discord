@@ -12,6 +12,14 @@ guildless_embed = discord.Embed(title="Guildless!", description="This player is 
 unknown_ign_embed = discord.Embed(title="Please enter a valid Minecraft username!", color=neg_color)
 unknown_ign_msg = "Unknown IGN!"
 
+# General embeds
+registration_embed = discord.Embed(title="Welcome to the Miscellaneous Discord!",
+                    description="Before you can view the server, please register with your Minecraft username.",
+                    color=neutral_color)\
+                        .add_field(name="To register use the following command:",
+                                value=",register `Your Minecraft Name`\n\nExample:\n,register John",
+                                inline=False)
+
 # Errors
 not_owner_embed = discord.Embed(title=f"Your soul lacks the strength to utilize this command!",
                                 description="You are not the owner of this bot!",

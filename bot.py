@@ -4,9 +4,7 @@ import discord
 import logging
 import sys
 import toml
-import traceback
 from discord.ext import commands, tasks
-from func.utils.consts import not_owner_embed, missing_role_embed, missing_permissions_embed, member_not_found_embed
 
 logging.basicConfig(level=logging.INFO)
 config = toml.load("config.toml")
@@ -49,7 +47,7 @@ class HelpCommand(commands.MinimalHelpCommand):
 bot.help_command = HelpCommand(command_attrs={"hidden": True})
 
 initial_extensions = ["func.cogs.general", "func.cogs.giveaways", "func.cogs.guild", "func.cogs.hypixel",
-                      "func.cogs.moderation", "func.cogs.owner"]
+                      "func.cogs.listeners", "func.cogs.moderation", "func.cogs.owner"]
 
 if __name__ == "__main__":
     for extension in initial_extensions:
@@ -59,73 +57,6 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"WARNING: Failed to load extention {extension}", file=sys.stderr)
             print(e)
-
-
-@bot.event
-async def on_command_error(ctx, error):
-    # Prevents commands with local handlers or cogs with overwrritten on_command_errors being handled here
-    if isinstance(error, commands.CommandNotFound):
-        embed = discord.Embed(title=f"Invalid Command!",
-                              descrption="Use `,help` to view a list of all commands!", color=0xDE3163)
-        await ctx.send(embed=embed)
-        return
-    elif ctx.command.has_error_handler() or ctx.cog.has_error_handler():
-        return
-
-    # Checks for the original exception raised and send to CommandInvokeError
-    error = getattr(error, "original", error)
-
-    if isinstance(error, commands.NotOwner):
-        await ctx.send(embed=not_owner_embed)
-    elif isinstance(error, commands.MissingRole):
-        await ctx.send(embed=missing_role_embed)
-    elif isinstance(error, commands.MissingPermissions):
-        await ctx.send(embed=missing_permissions_embed)
-    elif isinstance(error, commands.MemberNotFound):
-        await ctx.send(embed=member_not_found_embed)
-    elif isinstance(error, commands.MissingRequiredArgument):
-        usage = f"{ctx.prefix}{ctx.command.name}"
-        for key, value in ctx.command.clean_params.items():
-            if not value.default:
-                usage += " [" + key + "]"
-            else:
-                usage += " <" + key + ">"
-        embed = discord.Embed(title=f" arguments",
-                              description=f"Command usage:\n`{usage}`\nFor more help, see `{ctx.prefix}help {ctx.command}`",
-                              color=0xDE3163)
-        await ctx.send(embed=embed)
-
-    else:
-        # All other errors get sent to the error channel
-        tb = "".join(traceback.format_exception(type(error), error, error.__traceback__))
-        if len(tb) <= 2000:
-            await bot.error_channel.send(f"Ignoring exception in command {ctx.command}:\n```py\n{tb}\n```")
-        else:
-            await bot.error_channel.send(
-                f"```An error occurred in command '{ctx.command}' that could not be sent in this channel, check the console for the traceback. \n\n'{error}'```")
-            print("The below exception could not be sent to the error channel:")
-            print(tb)
-
-
-@bot.event
-async def on_error(event, *args, **kwargs):
-    # Grabs the error being handled, formats it and sends it to the error channel
-    tb = traceback.format_exc()
-    await bot.error_channel.send(f"Ignoring exception in event {event}:\n```py\n{tb}\n```")
-
-
-@bot.event
-async def on_member_join(member):
-    await member.add_roles(bot.new_member_role)
-
-    embed = discord.Embed(title=f"Welcome to the Miscellaneous Discord, {member.name}",
-                          description="Before you can view the server, please register with your Minecraft username.",
-                          color=0x8368ff)
-    embed.add_field(name="To register use the following command:",
-                    value=",register `Your Minecraft Name`\n\nExample:\n,register John",
-                    inline=False)
-
-    await bot.registration_channel.send(embed=embed)
 
 
 async def connect_db():

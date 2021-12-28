@@ -5,9 +5,6 @@ class Tickets(commands.Cog, name="Tickets"):
     def __init__(self, bot):
         self.bot = bot
 
-    # @commands.Cog.listener()
-    # async def on_guild_channel_create(self, channel):
-
     # @commands.command(aliases=['reg', 'verify'])
     # async def register(self, ctx, name: str):
 
