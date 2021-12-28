@@ -4,7 +4,7 @@ from __main__ import bot
 import discord
 import inspect
 import os
-import datetime
+from datetime import datetime
 from quickchart import QuickChart, QuickChartFunction
 
 from func.utils.requests.m_profile import m_profile
@@ -89,7 +89,7 @@ class String:
                 # Send shortened version for non-command channels
                 if "commands" not in ctx.channel.name:
                     await ctx.message.delete()
-                    return f"__**{name}**__\n**Guild Experience -** `{format(weekly_gexp, 'd')}`"
+                    return f"__**{name}**__\n**Guild Experience -** `{format(weekly_gexp, ',d')}`"
 
                 week_dict = {
                     0: "Today:",
@@ -105,7 +105,7 @@ class String:
                 join_date = str(datetime.fromtimestamp(int(str(member["joined"])[:-3])))[0:10]
                 rank = member["rank"]
                 quest_participation = member["questParticipation"] if "questParticipation" in member else 0
-                dates = [int(k) for k, _ in gexp_history.items()]
+                dates = [k for k, _ in gexp_history.items()]
                 gexp_vals = [int(v) for _, v in gexp_history.items()]
                 gexp_history_text = ""
                 for i in range(0, 7):
@@ -113,7 +113,7 @@ class String:
                     gexp_history_text = gexp_history_text + f"**▸** {date} **{format(gexp_vals[i], ',d')}**\n"
 
                 # Get graph color
-                color, graph_color, graph_border = get_graph_color_by_rank(rank, weekly_gexp)
+                color, graph_color, graph_border = await get_graph_color_by_rank(rank, weekly_gexp)
 
                 # Create embed
                 embed = discord.Embed(title=name, url=f"https://plancke.io/hypixel/player/stats/{name}", color=color)
@@ -122,10 +122,12 @@ class String:
                 embed.add_field(name="General Information:",
                                 value=f"`✚` **Rank**: `{rank}`\n"
                                     f"`✚` **Joined**: `{join_date}`\n"
-                                    f"`✚` **Quests Completed**: `{quest_participation}`\n", inline=False)
-                embed.add_field(name="Guild Experience", value=f"**Overall Guild Experience**: `{weekly_gexp}`\n\n"f"{gexp_history_text}")
+                                    f"`✚` **Quests Completed**: `{quest_participation}`\n"
+                                    f"`✚` **Overall Guild Experience**: `{format(weekly_gexp, ',d')}`\n\n{gexp_history_text}", inline=False)
 
                 # Create chart
+                dates.reverse()
+                gexp_vals.reverse()
                 chart = QuickChart()
                 chart.width = 1000
                 chart.height = 500
@@ -133,10 +135,10 @@ class String:
                 chart.config = {
                     "type": "line",
                     "data": {
-                        "labels": dates.reverse(),
+                        "labels": dates,
                         "datasets": [{
                             "label": "Experience",
-                            "data": gexp_vals.reverse(),
+                            "data": gexp_vals,
                             "lineTension": 0.4,
                             "backgroundColor": graph_color,
                             "borderColor": graph_border,
