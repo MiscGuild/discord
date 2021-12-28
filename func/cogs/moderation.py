@@ -49,11 +49,11 @@ class Moderation(commands.Cog, name="Moderation"):
         await ctx.send(embed=await Union(user=user).unban(ctx.guild, ctx.author, reason))
 
 
-    @commands.command(aliases=["purge", "prune"])
+    @commands.command()
     @commands.has_permissions(manage_messages=True)
-    async def clear(self, ctx, amount: int, *, reason: str=None):
+    async def purge(self, ctx, amount: int, *, reason: str=None):
         """Clears the given number of messages!"""
-        await Integer(integer=amount).clear(ctx, reason)
+        await Integer(integer=amount).purge(ctx, reason)
 
 def setup(bot):
     bot.add_cog(Moderation(bot))

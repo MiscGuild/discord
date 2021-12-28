@@ -1,4 +1,4 @@
-# The following file contains: giveawayend, giveawayreroll, dailylb, clear
+# The following file contains: giveawayend, giveawayreroll, dailylb, purge
 
 from func.utils.discord_utils import name_grabber, log_event, get_giveaway_status, roll_giveaway
 
@@ -37,7 +37,7 @@ class Integer:
 
     # async def dailylb(msg):
 
-    async def clear(self, ctx, reason):
+    async def purge(self, ctx, reason):
         await ctx.message.delete()
         await ctx.channel.purge(limit=self.integer)
         await log_event(f"{await name_grabber(ctx.author)} purged {self.integer} messages in {ctx.channel.name}", f"**Reason:** {reason}")
