@@ -6,7 +6,6 @@ import sys
 import toml
 import traceback
 from discord.ext import commands, tasks
-from func.utils.discord.name_grabber import name_grabber
 
 logging.basicConfig(level=logging.INFO)
 config = toml.load("config.toml")
@@ -176,6 +175,8 @@ async def after_cache_ready():
 
     bot.ticket_categories = ("RTickets", "🎫 Ticket Section", "OTHER", "REPORTS", "MILESTONES", "DNKL")
     bot.misc_allies = ("XL", "Lucid", "Cronos", "OUT", "Betrayed", "Blight", "TheNinjaWarriors")
+
+    from func.utils.discord_utils import name_grabber
     bot.admin_ids = [member.id for member in bot.admin.members]
     bot.admin_names = [await name_grabber(member) for member in bot.admin.members]
     bot.staff_names = [await name_grabber(member) for member in bot.staff.members]
