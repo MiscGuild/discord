@@ -5,13 +5,12 @@ import discord
 import inspect
 import os
 from datetime import datetime
-from quickchart import QuickChart, QuickChartFunction
+from quickchart import QuickChart
 
 from func.utils.requests.m_profile import m_profile
 from func.utils.requests.player_guild import player_guild
 from func.utils.minecraft.get_player_gexp import get_player_gexp
 from func.utils.minecraft.get_graph_color_by_rank import get_graph_color_by_rank
-from func.utils.discord.name_grabber import name_grabber
 
 from func.utils.consts import pos_color, neg_color, guildless_embed
 
@@ -170,22 +169,22 @@ class String:
 
         # Player is not in a guild
         if weeklygexp == None:
-            return discord.Embed(title="Guildless!", description="This player is not in a guild!", color=neg_color)
+            guildless_embed
 
         self.string, uuid = await m_profile(self.string)
         # Player is eligible
         if weeklygexp > bot.dnkl:
             embed = discord.Embed(title=self.string, color=pos_color)
-            embed.add_field(name="You are eligible to apply for the do-not-kick-list.",
-                            value="You have {;,}/{:,} weekly guild experience.".format(weeklygexp, bot.dnkl),
+            embed.add_field(name="This player is eligible to apply for the do-not-kick-list.",
+                            value=f"They have {weeklygexp}/{bot.dnkl} weekly guild experience.",
                             inline=True)
 
 
         # Player is not eligible
         else:
             embed = discord.Embed(title=self.string, color=neg_color)
-            embed.add_field(name="You are not eligible to apply for the do-not-kick-list.",
-                            value="You have {:,}/{:,} weekly guild experience to be eligible.".format(weeklygexp, bot.dnkl),
+            embed.add_field(name="This player is not eligible to apply for the do-not-kick-list.",
+                            value=f"They have {weeklygexp}/{bot.dnkl} weekly guild experience to be eligible.",
                             inline=True)
 
         embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
