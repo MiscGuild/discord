@@ -1,5 +1,26 @@
+# The following file contains: get_player_gexp, get_graph_color_by_rank
+
 from __main__ import bot
 
+from func.utils.request_utils import get_mojang_profile, get_player_guild
+
+
+# Returns player's gexp history and total
+async def get_player_gexp(name: str):
+    name, uuid = await get_mojang_profile(name)
+    guild_data = await get_player_guild(uuid)
+
+    # Player is in a guild
+    if guild_data != None:
+        for member in guild_data["guild"]["members"]:
+            if member["uuid"] == uuid:
+                return member["expHistory"], sum(member["expHistory"].values())
+    
+    # Player is not in a guild
+    return None, None
+
+
+# Returns a color based on player's gexp and their guild rank
 async def get_graph_color_by_rank(rank: str, weekly_gexp: int):
     if rank == "Resident":
         # Member meets res reqs

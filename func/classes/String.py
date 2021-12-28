@@ -8,14 +8,9 @@ from datetime import datetime
 from discord.errors import Forbidden
 from quickchart import QuickChart
 
-from func.utils.discord.check_tag import check_tag
-from func.utils.discord.has_tag_perms import has_tag_perms
-from func.utils.requests.get_gtag import get_gtag
-from func.utils.requests.m_profile import m_profile
-from func.utils.requests.player_guild import player_guild
-from func.utils.minecraft.get_player_gexp import get_player_gexp
-from func.utils.minecraft.get_graph_color_by_rank import get_graph_color_by_rank
-
+from func.utils.discord_utils import has_tag_perms, check_tag
+from func.utils.request_utils import get_mojang_profile, get_player_guild, get_gtag
+from func.utils.minecraft_utils import get_player_gexp, get_graph_color_by_rank
 from func.utils.consts import pos_color, neg_color, neutral_color, guildless_embed, unknown_ign_embed, staff_impersonation_embed, bot_missing_perms_embed
 
 class String:
@@ -71,8 +66,8 @@ class String:
 
 
     async def gmember(self, ctx):
-        name, uuid = await m_profile(self.string)
-        guild = await player_guild(uuid)
+        name, uuid = await get_mojang_profile(self.string)
+        guild = await get_player_guild(uuid)
 
         # Player is guildless
         if guild == None:
@@ -153,7 +148,7 @@ class String:
 
 
     async def sync(self, ctx, tag=None):
-        ign, uuid = await m_profile(self.string)
+        ign, uuid = await get_mojang_profile(self.string)
 
         # Invalid username
         if ign == None:
@@ -167,7 +162,7 @@ class String:
         roles_to_remove = []
         new_nick = ign
 
-        guild_name = await player_guild(uuid)
+        guild_name = await get_player_guild(uuid)
         guild_name = guild_name["guild"]["name"]
         can_tag = await has_tag_perms(ctx.author)
 
@@ -228,8 +223,6 @@ class String:
         return embed
             
             
-
-
     # async def info():
 
 
@@ -249,7 +242,7 @@ class String:
         if weeklygexp == None:
             guildless_embed
 
-        self.string, uuid = await m_profile(self.string)
+        self.string, uuid = await get_mojang_profile(self.string)
         # Player is eligible
         if weeklygexp > bot.dnkl:
             embed = discord.Embed(title=self.string, color=pos_color)

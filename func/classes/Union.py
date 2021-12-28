@@ -5,8 +5,6 @@ import discord
 from typing import Union
 from discord.errors import Forbidden, NotFound
 
-from discord.ext.commands.errors import MissingPermissions
-
 from func.utils.consts import neg_color, neutral_color, err_404_embed, bot_missing_perms_embed
 
 class Union:

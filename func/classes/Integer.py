@@ -1,8 +1,6 @@
-# The following file contains: giveawayend, giveawayreroll, dailylb
+# The following file contains: giveawayend, giveawayreroll, dailylb, clear
 
-from func.utils.discord import giveaways as giveaway_utils
-from func.utils.discord.log_event import log_event
-from func.utils.discord.name_grabber import name_grabber
+from func.utils.discord_utils import name_grabber, log_event, get_giveaway_status, roll_giveaway
 
 class Integer:
     def __init__(self, integer: int):
@@ -10,7 +8,7 @@ class Integer:
 
     async def giveawayend(self):
         # Get giveaway status
-        status = await giveaway_utils.get_status(self.integer)
+        status = await get_giveaway_status(self.integer)
 
         # Giveaway does not exist
         if status == None:
@@ -18,14 +16,14 @@ class Integer:
 
         # Giveaway exists
         if status == "active":
-            await giveaway_utils.roll_giveaway(self.integer)
+            await roll_giveaway(self.integer)
         else:
             return "This giveaway has already ended!\n`To re-roll it use ,giveawayreroll`"
 
     
     async def giveawayreroll(self, reroll_number: int=None):
         # Get giveaway status
-        status = await giveaway_utils.get_status(self.integer)
+        status = await get_giveaway_status(self.integer)
 
         # Giveaway does not exist
         if status == None:
@@ -33,7 +31,7 @@ class Integer:
         
         # Giveaway exists
         if status == "inactive":
-            await giveaway_utils.roll_giveaway(self.integer, reroll_number)
+            await roll_giveaway(self.integer, reroll_number)
         else:
             return "This giveaway hasn't ended yet!\n`To end it, use ,giveawayend`"
 

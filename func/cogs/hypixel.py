@@ -3,7 +3,7 @@ from discord.ext import commands
 
 from func.classes.String import String
 
-from func.utils.discord.name_grabber import name_grabber
+from func.utils.discord_utils import name_grabber
 
 class Hypixel(commands.Cog, name="Hypixel"):
     def __init__(self, bot):

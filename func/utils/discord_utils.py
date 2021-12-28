@@ -1,0 +1,53 @@
+# The following file includes: name_grabber, log_event, has_tag_perms, check_tag, get_giveaway_status, roll_giveaway
+
+from __main__ import bot
+import discord
+
+from func.utils.consts import neutral_color
+
+
+# Return user's displaying name
+async def name_grabber(author: discord.User):
+    if author.nick == None:
+        return author.name
+    return author.nick.split()[0]
+
+
+# Log a given event in logging channel
+async def log_event(title: str, description: str):
+    embed = discord.Embed(title=title, description=description, color=neutral_color)
+    await bot.log_channel.send(embed=embed)
+
+
+# Return if user can change their tag
+async def has_tag_perms(user: discord.User):
+    return any(role in user.roles for role in bot.tag_allowed_roles)
+
+
+# Check tag for
+async def check_tag(tag: str):
+    tag = tag.lower()
+    with open("badwords.txt", "r") as f:
+        badwords = f.read()
+
+    if tag in badwords.split("\n"):
+        return False, "Your tag may not include profanity."
+    elif tag.isascii() == False:
+        return False, "Your tag may not include special characters unless it's the tag of an ally guild."
+    elif len(tag) > 6:
+        return False, "Your tag may not be longer than 6 characters."
+    # Tag is okay to use
+    return True, None
+
+
+# Get the activity status of a giveaway
+async def get_giveaway_status(id: int):
+    cursor = await bot.db.execute("SELECT status FROM giveaways WHERE message_id = (?)", (id,))
+    row = await cursor.fetchone()
+    await cursor.close()
+    return row
+
+
+# Roll a giveaway
+async def roll_giveaway(reroll_target: int=None):
+    return True
