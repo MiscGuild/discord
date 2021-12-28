@@ -1,9 +1,9 @@
 from discord.ext import commands
 
+
 class Owner(commands.Cog, command_attrs=dict(hidden=True)):
     def __init__(self, bot):
         self.bot = bot
-
 
     @commands.command()
     @commands.is_owner()
@@ -14,7 +14,6 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         except Exception as e:
             await ctx.send(e)
 
-
     @commands.command()
     @commands.is_owner()
     async def unload(self, ctx, extension: str):
@@ -23,7 +22,6 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
             await ctx.send(f"{extension} has been unloaded")
         except Exception as e:
             await ctx.send(e)
-
 
     @commands.command()
     @commands.is_owner()

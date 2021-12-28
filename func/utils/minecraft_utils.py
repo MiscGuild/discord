@@ -11,11 +11,11 @@ async def get_player_gexp(name: str):
     guild_data = await get_player_guild(uuid)
 
     # Player is in a guild
-    if guild_data != None:
+    if guild_data:
         for member in guild_data["guild"]["members"]:
             if member["uuid"] == uuid:
                 return member["expHistory"], sum(member["expHistory"].values())
-    
+
     # Player is not in a guild
     return None, None
 
@@ -29,7 +29,7 @@ async def get_graph_color_by_rank(rank: str, weekly_gexp: int):
 
         # Member does not meet res reqs
         return 0xffb464, 'rgba(255, 180, 100,0.3)', 'rgba(255, 180, 100,0.3)'
-    
+
     else:
         # Member meets active reqs
         if weekly_gexp > bot.active_req:
@@ -38,6 +38,6 @@ async def get_graph_color_by_rank(rank: str, weekly_gexp: int):
         # Member meets normal reqs
         if weekly_gexp > bot.member_req:
             return 0x64ffff, 'rgba(100, 255, 255,0.3)', 'rgba(100, 255, 255,0.3)'
-        
+
         # Member is inactive
         return 0xff6464, 'rgba(255, 100, 100,0.3)', 'rgba(255, 100, 100,0.3)'

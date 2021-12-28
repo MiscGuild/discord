@@ -1,13 +1,11 @@
-import logging
-import sys
-import traceback
-
 import aiosqlite
 import chat_exporter
 import discord
+import logging
+import sys
 import toml
+import traceback
 from discord.ext import commands, tasks
-
 from func.utils.discord.name_grabber import name_grabber
 
 logging.basicConfig(level=logging.INFO)
@@ -50,7 +48,8 @@ class HelpCommand(commands.MinimalHelpCommand):
 
 bot.help_command = HelpCommand(command_attrs={"hidden": True})
 
-initial_extensions = ["func.cogs.general", "func.cogs.giveaways", "func.cogs.guild", "func.cogs.hypixel", "func.cogs.moderation", "func.cogs.owner"]
+initial_extensions = ["func.cogs.general", "func.cogs.giveaways", "func.cogs.guild", "func.cogs.hypixel",
+                      "func.cogs.moderation", "func.cogs.owner"]
 
 if __name__ == "__main__":
     for extension in initial_extensions:
@@ -92,13 +91,13 @@ async def on_command_error(ctx, error):
         await ctx.send(embed=embed)
     elif isinstance(error, commands.MemberNotFound):
         embed = discord.Embed(title=f"Member not found",
-                                description="This member doesn't seem to exist.\nCheck you have their ID or tag's capitalization and spelling correct!",
-                                color=0xDE3163)
+                              description="This member doesn't seem to exist.\nCheck you have their ID or tag's capitalization and spelling correct!",
+                              color=0xDE3163)
         await ctx.send(embed=embed)
     elif isinstance(error, commands.MissingRequiredArgument):
         usage = f"{ctx.prefix}{ctx.command.name}"
         for key, value in ctx.command.clean_params.items():
-            if value.default == None:
+            if not value.default:
                 usage += " [" + key + "]"
             else:
                 usage += " <" + key + ">"
@@ -112,10 +111,11 @@ async def on_command_error(ctx, error):
         tb = "".join(traceback.format_exception(type(error), error, error.__traceback__))
         if len(tb) <= 2000:
             await bot.error_channel.send(f"Ignoring exception in command {ctx.command}:\n```py\n{tb}\n```")
-            embed = discord.Embed(title=f"Error",description=str(error).split(":")[2],color=0xDE3163)
+            embed = discord.Embed(title=f"Error", description=str(error).split(":")[2], color=0xDE3163)
             await ctx.send(embed=embed)
         else:
-            await bot.error_channel.send(f"```An error occurred in command '{ctx.command}' that could not be sent in this channel, check the console for the traceback. \n\n'{error}'```")
+            await bot.error_channel.send(
+                f"```An error occurred in command '{ctx.command}' that could not be sent in this channel, check the console for the traceback. \n\n'{error}'```")
             print("The below exception could not be sent to the error channel.")
             print(tb)
 
@@ -131,8 +131,11 @@ async def on_error(event, *args, **kwargs):
 async def on_member_join(member):
     await member.add_roles(bot.new_member_role)
 
-    embed = discord.Embed(title=f"Welcome to the Miscellaneous Discord, {member.name}", description="Before you can view the server, please register with your Minecraft username.", color=0x8368ff)
-    embed.add_field(name="To register use the following command:", value=",register `Your Minecraft Name`\n\nExample:\n,register John",
+    embed = discord.Embed(title=f"Welcome to the Miscellaneous Discord, {member.name}",
+                          description="Before you can view the server, please register with your Minecraft username.",
+                          color=0x8368ff)
+    embed.add_field(name="To register use the following command:",
+                    value=",register `Your Minecraft Name`\n\nExample:\n,register John",
                     inline=False)
 
     await bot.registration_channel.send(embed=embed)
@@ -140,6 +143,7 @@ async def on_member_join(member):
 
 async def connect_db():
     bot.db = await aiosqlite.connect("database.db")
+
 
 bot.loop.run_until_complete(connect_db())
 
@@ -171,7 +175,7 @@ async def after_cache_ready():
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster, bot.rich_kid)
 
     bot.ticket_categories = ("RTickets", "🎫 Ticket Section", "OTHER", "REPORTS", "MILESTONES", "DNKL")
-    bot.misc_allies = ("XL", "Lucid", "Cronos", "OUT", "Betrayed", "Blight","TheNinjaWarriors")
+    bot.misc_allies = ("XL", "Lucid", "Cronos", "OUT", "Betrayed", "Blight", "TheNinjaWarriors")
     bot.admin_ids = [member.id for member in bot.admin.members]
     bot.admin_names = [await name_grabber(member) for member in bot.admin.members]
     bot.staff_names = [await name_grabber(member) for member in bot.staff.members]

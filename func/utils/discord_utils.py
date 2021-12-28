@@ -1,14 +1,14 @@
 # The following file includes: name_grabber, log_event, has_tag_perms, check_tag, get_giveaway_status, roll_giveaway
 
-from __main__ import bot
 import discord
+from __main__ import bot
 
 from func.utils.consts import neutral_color
 
 
 # Return user's displaying name
 async def name_grabber(author: discord.User):
-    if author.nick == None:
+    if not author.nick:
         return author.name
     return author.nick.split()[0]
 
@@ -32,7 +32,7 @@ async def check_tag(tag: str):
 
     if tag in badwords.split("\n"):
         return False, "Your tag may not include profanity."
-    elif tag.isascii() == False:
+    elif not tag.isascii():
         return False, "Your tag may not include special characters unless it's the tag of an ally guild."
     elif len(tag) > 6:
         return False, "Your tag may not be longer than 6 characters."
@@ -49,5 +49,5 @@ async def get_giveaway_status(id: int):
 
 
 # Roll a giveaway
-async def roll_giveaway(reroll_target: int=None):
+async def roll_giveaway(reroll_target: int = None):
     return True

@@ -3,8 +3,8 @@ from discord.ext import commands
 
 from func.classes.Integer import Integer
 from func.classes.String import String
-
 from func.utils.discord_utils import name_grabber
+
 
 class Guild(commands.Cog, name="Guild"):
     def __init__(self, bot):
@@ -19,7 +19,6 @@ class Guild(commands.Cog, name="Guild"):
     #     elif isinstance(result, str):
     #         await ctx.send(result)
 
-
     # @commands.command(aliases=['ge'])
     # async def gexp(self, ctx, *, name: str):
     #     result = await String(string=name).gexp()
@@ -29,27 +28,23 @@ class Guild(commands.Cog, name="Guild"):
     #     elif isinstance(result, str):
     #         await ctx.send(result)
 
-
     # @commands.command()
     # async def gactive(self, ctx):
 
-
     # @commands.command()
     # async def ginactive(self, ctx):
-
 
     # @commands.command(aliases=['gr'])
     # async def grank(self, ctx, reqrank: str):
     #     msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
     #     await ctx.send(embed=await String(string=reqrank).grank(msg))
 
-
     @commands.command(aliases=['gm', 'g'])
     async def gmember(self, ctx, name=None):
         """View the given user's gexp over the past week!"""
-        if name == None:
+        if not name:
             name = await name_grabber(ctx.author)
-            
+
         result = await String(string=name).gmember(ctx)
         # Send result according to returned value
         if isinstance(result, discord.Embed):
@@ -57,23 +52,19 @@ class Guild(commands.Cog, name="Guild"):
         if isinstance(result, str):
             await ctx.send(result)
 
-
     # @commands.command(aliases=["gt"])
     # async def gtop(self, ctx):
-
 
     # @commands.command()
     # async def dailylb(self, ctx, day=1):
     #     msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
     #     await ctx.send(await Integer(integer=day).dailylb(msg))
 
-
     # @commands.command(aliases=['req', 'requirement'])
     # async def requirements(self, ctx):
 
     # @commands.command(aliases=['res'])
     # async def resident(self, ctx):
-
 
     # @commands.command(aliases=['ticket'])
     # async def tickets(self, ctx):

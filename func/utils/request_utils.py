@@ -18,7 +18,7 @@ async def get_mojang_profile(name: str):
             await session.close()
 
     # If player and request is valid
-    if resp != None and "error" not in resp:
+    if resp and "error" not in resp:
         return resp["name"], resp["id"]
     
     # Player does not exist
@@ -35,7 +35,7 @@ async def get_player_guild(uuid):
             await session.close()
 
     # Player is not in a guild
-    if "guild" not in resp or resp["guild"] == None:
+    if not resp["guild"] or "guild" not in resp:
         return None
 
     # Player is in a guild
@@ -53,7 +53,7 @@ async def get_gtag(name):
 
     if len(resp["guild"]) < 2:
         return (" ")
-    if resp["guild"]["tag"] is None:
+    if not resp["guild"]["tag"]:
         return (" ")
     else:
         gtag = resp["guild"]["tag"]

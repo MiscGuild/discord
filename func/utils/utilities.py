@@ -1,9 +1,8 @@
+import aiohttp
 import datetime
+import discord
 import math
 from datetime import datetime
-
-import aiohttp
-import discord
 
 
 async def get_data(name):
@@ -41,7 +40,7 @@ async def get_leaderboards():
 
 async def get_level(name):
     data = await get_data(name)
-    if data["player"] is None:
+    if not data["player"]:
         return None
     exp = int(data["player"]["networkExp"])  # This just gets the player experience from our data
     exp = (math.sqrt((2 * exp) + 30625) / 50) - 2.5
@@ -52,7 +51,7 @@ async def get_karma(name):
     data = await get_data(name)
     if 'cause' in data:
         print(data['cause'])
-    if data["player"] is None:
+    if not data["player"]:
         return None
     karma = int(data["player"]["karma"])
     return (f"{karma:,d}")
@@ -80,7 +79,7 @@ async def get_rank(name):
         data = await get_data(name)
     if 'cause' in data:
         print(data['cause'])
-    if data["player"] is None:
+    if not data["player"]:
         return None
     if "prefix" in data["player"]:
         player_prefix = (data["player"]["prefix"])
@@ -124,7 +123,7 @@ async def get_rank(name):
 
 async def get_flogin(name):
     data = await get_data(name)
-    if data["player"] is None:
+    if not data["player"]:
         return None
     first_login = data["player"]["firstLogin"]
     time = datetime.fromtimestamp(int(str(first_login)[:-3]))
@@ -133,14 +132,14 @@ async def get_flogin(name):
 
 async def get_llogin(name):
     data = await get_data(name)
-    if data["player"] is None:
+    if data["player"]:
         return None
     if "lastLogin" in data["player"]:
         Last_login = data["player"]["lastLogin"]
         time = datetime.fromtimestamp(int(str(Last_login)[:-3]))
         return time
     else:
-        return ('Unknown')
+        return 'Unknown'
 
 
 async def get_guild_level(exp):
@@ -185,27 +184,27 @@ async def get_challenges_completed(name):
             if request.status != 200:
                 return None
     data = await get_data(name)
-    if data["player"] is None:
+    if not data["player"]:
         return None
     if "general_challenger" in data["player"]["achievements"]:
         cp = int(data["player"]["achievements"]['general_challenger'])
         return (f"{cp:,d}")
     else:
-        return ("0")
+        return "0"
 
 
 async def get_completed_quests(name):
     request = await get_data1(name)
     if "quests_completed" in request:
         cq = int(request["quests_completed"])
-        return (f"{cq:,d}")
+        return f"{cq:,d}"
     else:
-        return ("-")
+        return "-"
 
 
 async def get_online_status(name):
     request = await get_data1(name)
-    if request["online"] is True:
+    if request["online"]:
         return True
     else:
         return False
@@ -254,7 +253,7 @@ def discord_member_check(session, member):
     base_url = "https://api.mojang.com/users/profiles/minecraft/"
 
     name = member.nick  # Obtaining their nick
-    if name is None:  # If they don't have a nick, it uses their name.
+    if not name:  # If they don't have a nick, it uses their name.
         name = member.name
 
     with session.get(base_url + name) as mojang:
@@ -275,12 +274,12 @@ def discord_verification(name, member: discord.Member):
 
 async def get_tag_message():
     embed = discord.Embed(title="What would you like your tag to be? ",
-                                url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png",
-                                description="**Rules:**"
-                                            "\n• Tags can have a maximum length of 6 characters."
-                                            " \n• Tags cannot include special characters."
-                                            " \n• Tags cannot include profane language. ",
-                                color=0x8368ff)
+                          url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png",
+                          description="**Rules:**"
+                                      "\n• Tags can have a maximum length of 6 characters."
+                                      " \n• Tags cannot include special characters."
+                                      " \n• Tags cannot include profane language. ",
+                          color=0x8368ff)
     embed.set_thumbnail(
         url="https://media.discordapp.net/attachments/420572640172834816/867506975884181554/unknown.png")
     embed.set_footer(text="If you don't want a tag, type: None")
