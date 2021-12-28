@@ -122,46 +122,6 @@ async def get_rank(name):
         return ('')
 
 
-async def get_guild(name):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
-            request = resp
-
-            if resp.status != 200:
-                await session.close()
-                return None
-
-            request = await request.json()
-            uuid = request['id']
-            api = get_api()
-            async with session.get(f"https://api.hypixel.net/guild?key={api}&player={uuid}") as resp:
-                req = await resp.json()
-                await session.close()
-    if 'cause' in req:
-        print(req['cause'], api)
-    elif req['guild'] is not None:
-        gname = req["guild"]['name']
-        return (f"{gname}")
-    else:
-        return None
-
-
-async def get_gtag(name):
-    api = get_api()
-    async with aiohttp.ClientSession() as session:
-        async with session.get(f'https://api.hypixel.net/guild?key={api}&name={name}') as resp:
-            req = await resp.json()
-            await session.close()
-    if len(req['guild']) < 2:
-        return (" ")
-    if req["guild"]["tag"] is None:
-        return (" ")
-    else:
-        gtag = req["guild"]["tag"]
-        return (f"[{gtag}]")
-
-
-
 async def get_flogin(name):
     data = await get_data(name)
     if data["player"] is None:
@@ -305,41 +265,6 @@ def discord_member_check(session, member):
         return invalid_members
 
 
-async def get_color(color, gexp, requirement):
-    if color == "res_met":
-        if gexp > requirement * 2:
-            return 0x64ffdc, 'rgba(100, 255, 220,0.3)', 'rgba(100, 255, 220,0.3)'
-        elif gexp > requirement:
-            return 0x64ffb4, 'rgba(100, 255, 180,0.3)', 'rgba(100, 255, 180,0.3)'
-
-    elif color == "res_not_met":
-        if gexp * 2 < requirement:
-            return 0xff6464, 'rgba(255, 100, 100,0.3)', 'rgba(255, 100, 100,0.3)'
-        elif gexp * 2 > requirement:
-            return 0xff8764, 'rgba(255, 135, 100,0.3)', 'rgba(255, 135, 100,0.3)'
-        else:
-            return 0xffb464, 'rgba(255, 180, 100,0.3)', 'rgba(255, 180, 100,0.3)'
-
-    elif color == "active":
-        if gexp * 2 < requirement:
-            return 0xa064ff, 'rgba(160, 100, 255,0.3)', 'rgba(160, 100, 255,0.3)'
-        elif gexp * 2 > requirement:
-            return 0x6464ff, 'rgba(100, 100, 255,0.3)', 'rgba(100, 100, 255,0.3)'
-        else:
-            return 0x64b4ff, 'rgba(100, 180, 255,0.3)', 'rgba(100, 180, 255,0.3)'
-
-    elif color == "member":
-        if gexp * 2 < requirement:
-            return 0x64c8ff, 'rgba(100, 200, 255,0.3)', 'rgba(100, 200, 255,0.3)'
-        elif gexp * 2 > requirement:
-            return 0x64e1ff, 'rgba(100, 225, 255,0.3)', 'rgba(100, 225, 255,0.3)'
-        else:
-            return 0x64ffff, 'rgba(100, 255, 255,0.3)', 'rgba(100, 255, 255,0.3)'
-
-    elif color == "inactive":
-        return 0xff6464, 'rgba(255, 100, 100,0.3)', 'rgba(255, 100, 100,0.3)'
-
-
 def discord_verification(name, member: discord.Member):
     req = get_data1(name)
     if member.name == req['player']['socialMedia']['links']['DISCORD']:
@@ -347,19 +272,6 @@ def discord_verification(name, member: discord.Member):
     else:
         return False
 
-async def check_tag(tag):
-    tag = tag.lower()
-    with open('badwords.txt', 'r') as f:
-        badwords = f.read()
-
-    if tag in badwords.split('\n'):
-        return False, "The tag may not include profanity."
-    elif tag.isascii() is False:
-        return False, "Your tag may not include special characters unless it's the tag of an ally guild."
-    elif len(tag) > 6:
-        return False, "Your tag may not be longer than 6 characters."
-    else:
-        return True, None
 
 async def get_tag_message():
     embed = discord.Embed(title="What would you like your tag to be? ",

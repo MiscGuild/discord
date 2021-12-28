@@ -9,9 +9,14 @@ class Hypixel(commands.Cog, name="Hypixel"):
     def __init__(self, bot):
         self.bot = bot
 
-    # @commands.command()
-    # async def sync(self, ctx, name: str, tag: str=None):
-    #     await ctx.send(embed=await String(string=name).sync(tag))
+    @commands.command()
+    async def sync(self, ctx, name: str, tag: str=None):
+        """Update your discord nick, tag and roles!"""
+        result = await String(string=name).sync(ctx, tag)
+        if isinstance(result, discord.Embed):
+            await ctx.send(embed=result)
+        elif isinstance(result, str):
+            await ctx.send(result)
 
     
     # @commands.command(aliases=["i"])
