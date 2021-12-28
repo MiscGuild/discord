@@ -6,6 +6,7 @@ import sys
 import toml
 import traceback
 from discord.ext import commands, tasks
+from func.utils.consts import not_owner_embed, missing_role_embed, missing_permissions_embed, member_not_found_embed
 
 logging.basicConfig(level=logging.INFO)
 config = toml.load("config.toml")
@@ -75,24 +76,13 @@ async def on_command_error(ctx, error):
     error = getattr(error, "original", error)
 
     if isinstance(error, commands.NotOwner):
-        embed = discord.Embed(title=f"Your soul lacks the strength to utilize this command!",
-                              description="You are not the owner of this bot!", color=0xDE3163)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=not_owner_embed)
     elif isinstance(error, commands.MissingRole):
-        embed = discord.Embed(title=f"Your soul lacks the strength to utilize this command!",
-                              description="You do not have the required roles to access this restricted command!",
-                              color=0xDE3163)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=missing_role_embed)
     elif isinstance(error, commands.MissingPermissions):
-        embed = discord.Embed(title=f"Your soul lacks the strength to utilize this command!",
-                              description="You do not have the required permissions to access this restricted command!",
-                              color=0xDE3163)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=missing_permissions_embed)
     elif isinstance(error, commands.MemberNotFound):
-        embed = discord.Embed(title=f"Member not found",
-                              description="This member doesn't seem to exist.\nCheck you have their ID or tag's capitalization and spelling correct!",
-                              color=0xDE3163)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=member_not_found_embed)
     elif isinstance(error, commands.MissingRequiredArgument):
         usage = f"{ctx.prefix}{ctx.command.name}"
         for key, value in ctx.command.clean_params.items():
@@ -110,12 +100,10 @@ async def on_command_error(ctx, error):
         tb = "".join(traceback.format_exception(type(error), error, error.__traceback__))
         if len(tb) <= 2000:
             await bot.error_channel.send(f"Ignoring exception in command {ctx.command}:\n```py\n{tb}\n```")
-            embed = discord.Embed(title=f"Error", description=str(error).split(":")[2], color=0xDE3163)
-            await ctx.send(embed=embed)
         else:
             await bot.error_channel.send(
                 f"```An error occurred in command '{ctx.command}' that could not be sent in this channel, check the console for the traceback. \n\n'{error}'```")
-            print("The below exception could not be sent to the error channel.")
+            print("The below exception could not be sent to the error channel:")
             print(tb)
 
 
