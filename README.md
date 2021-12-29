@@ -20,17 +20,21 @@ The bot used by the Miscellaneous Hypixel guild's discord.
 ## Installation
 
 * Install [Python](https://www.python.org/) version 3.x.x or later. 
-* Fill out the [`config.toml`](https://github.com/MiscGuild/MiscBot/blob/main/config.toml) file with your credentials
-* Install all the packages
-* Run the following commands in a terminal or command prompt in the bots directory.
-
-```bash
-python3 bot.py
-```
+* Fill out the template toml config file with your credentials and rename it to `config.toml`
+* Run the following commands in a terminal or command prompt in the bot's directory:
+  * Install all packages
+  ```
+  pip install -r requirements.txt
+  ```
+  * Start the bot
+  ```
+  python3 bot.py
+  ```
 
 ## Contributing
-Pull requests are welcome. If you would like to chat with other developers please join our [Discord](https://discord.gg/dEsfnJkQcq) and go to `#programming-talk`
+Pull requests are welcome. If you would like to chat with other developers please join our [Discord](https://discord.gg/dEsfnJkQcq) and go to `#programming-talk`.
 
-Please test your code before committing it.
+All code **must** be tested before being committed.
+
 ## License
-[MIT](https://github.com/MiscGuild/BridgeBot/blob/master/LICENSE)
+This is an open-source repository licensed under the [MIT License](https://github.com/MiscGuild/MiscBot/blob/main/LICENSE).
