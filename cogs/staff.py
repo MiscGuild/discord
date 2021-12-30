@@ -422,12 +422,25 @@ class staff(commands.Cog, name="Staff"):
     async def rolecheck(self, ctx, send_ping=None):
         """Checks the roles of all the users and changes them on the basis of their guild
         """
+        import time
         msg = await ctx.send("**Processing all the prerequisites**")
 
-        misc_uuids = await utils.get_guild_members("Miscellaneous")
+        misc_uuids = await utils.get_guild_members("Miscellaneous")     #Fetches the uuids of all miscellaneous members
         misc_members, ally_members, ally_uuids = [], [], []
+        start_time = time.time()
+        discord_member_count = 0
         for x in self.bot.misc_allies:
-            ally_uuids = ally_uuids + await utils.get_guild_members(x)
+            ally_uuids = ally_uuids + await utils.get_guild_members(x)      #Fetches the uuids of all ally guild members
+
+
+        cursor = await self.bot.db.execute("SELECT username FROM DNKL")
+        rows = await cursor.fetchall()
+        await cursor.close()
+
+        dnkl_names = []
+        for tuple in rows:
+            username = tuple[0]
+            dnkl_names.append(username)
 
         # Miscellaneous Member Names
         await msg.edit(content="**Processing** - 1/2")
@@ -466,19 +479,22 @@ class staff(commands.Cog, name="Staff"):
         for guild in self.bot.guilds:
             if str(guild) == "Miscellaneous [MISC]":  # Check if the Discord is Miscellaneous
                 for member in guild.members:  # For loop for all members in the Discord
+                    discord_member_count+=1
                     if member.id not in self.bot.admin_ids and member.bot is False:
                         name = await utils.name_grabber(member)
-
-                        message = await ctx.send(f"Checking {name}")
+                        has_tag_perms = any(role in ctx.author.roles for role in self.bot.tag_allowed_roles)
+                        await msg.edit(content=f"Checking {name} - \\{member}"
+                                               f"\n*If you see that the checking is stuck on a member, check <#523743721443950612>, if you see an error forcesync the user the bot got stuck on and then rerun rolecheck!*")
 
                         async with aiohttp.ClientSession() as session:
                             async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as mojang:
 
                                 if mojang.status != 200:  # If the IGN is invalid
-                                    await member.remove_roles(self.bot.member_role, self.bot.guest, reason="Rolecheck")
-                                    await member.add_roles(self.bot.new_member_role, reason="Rolecheck")
-                                    await message.edit(content=
-                                                       f"{name} ||{member}|| Player doesn't exist. **++New Member | --Member | -- Guest**")
+                                    await member.remove_roles(self.bot.member_role,
+                                                              self.bot.guest,
+                                                              reason="Rolecheck")
+                                    await member.add_roles(self.bot.new_member_role,
+                                                           reason="Rolecheck"),
                                     continue
                                 elif self.bot.guild_master not in member.roles:
                                     mojang_json = await mojang.json()
@@ -486,19 +502,21 @@ class staff(commands.Cog, name="Staff"):
                                     uuid = mojang_json['id']
                                 await session.close()
                             # Miscellaneous
-                        if ign in misc_members and ign not in (
-                                "Rowdies", "PolarPowah", "LBROz", "Fantastic_Doge", "ElijahRus", "BotTyler", "silviccs"):
+                        if ign in misc_members and ign not in ("Rowdies", "PolarPowah", "LBROz", "Fantastic_Doge", "ElijahRus", "BotTyler", "silviccs"):
                             async with aiohttp.ClientSession() as session:
                                 async with session.get(
                                         f"https://api.hypixel.net/guild?key={utils.get_api()}&player={uuid}") as resp:
                                     req = await resp.json()
                                     await session.close()
 
-                            if self.bot.member_role not in member.roles:
-                                await member.add_roles(self.bot.member_role, reason="Rolecheck")
-                                await member.remove_roles(self.bot.new_member_role, self.bot.guest, reason="Rolecheck")
+                            if self.bot.member_role not in member.roles or self.bot.new_member in member.roles or self.bot.ally in member.roles:
+                                await member.add_roles(self.bot.member_role,
+                                                       reason="Rolecheck - Member of Miscellaneous - Member Role Absent/New Member or Ally Role(s) Present - Given Member")
+                                await member.remove_roles(self.bot.new_member_role,
+                                                          self.bot.guest,
+                                                          self.bot.ally,
+                                                          reason="Rolecheck - Member of Miscellaneous - Member role Absent/New Member or Ally Role(s) Present - Removed New Member, Guest &/or Ally")
 
-                            has_tag_perms = any(role in ctx.author.roles for role in self.bot.tag_allowed_roles)
 
                             for user in req['guild']["members"]:
                                 if uuid == user["uuid"]:
@@ -506,82 +524,79 @@ class staff(commands.Cog, name="Staff"):
                                     totalexp = sum(totalexp.values())
                                     usergrank = user['rank']
 
-                                    if usergrank != 'Resident':
-                                        if totalexp < self.bot.inactive:
-                                            username = await utils.name_grabber(member)
+                                    if totalexp >= self.bot.active:  # If the member meets active requirements
+                                        if has_tag_perms is False:
+                                            await member.edit(nick=name)
+                                        await member.remove_roles(self.bot.inactive_role,
+                                                                  reason="Rolecheck - Active Requirements met - Removed Inactive")
+                                        await member.add_roles(self.bot.active_role,
+                                                               reason="Rolecheck - Active Requirements met - Given Active role")
+
+
+                                    elif usergrank != 'Resident':     # For non-residents
+                                        if totalexp < self.bot.inactive:    # Base requirement check for non-residents
                                             if has_tag_perms is False:
-                                                await member.edit(nick=username)
+                                                await member.edit(nick=name)
+                                            if name not in dnkl_names:  # If the member doesn't meet base guild requirements
+                                                await member.add_roles(self.bot.inactive_role,
+                                                                       reason="Rolecheck - Guild Requirements not met - Given Active role")
+                                            await member.remove_roles(self.bot.active_role,
+                                                                      reason="Rolecheck - Guild Requirements not met - Removed Active role")
+
+                                        else:  # If the member meets regular requirements
+                                            if has_tag_perms is False:
+                                                await member.edit(nick=name)
+                                            await member.remove_roles(self.bot.inactive_role,
+                                                                      self.bot.active_role,
+                                                                      reason="Rolecheck - Regular Requirements met - Removed Inactive &/or Active")
+
+
+                                    else:       # For residents
+                                        if totalexp < self.bot.resident_req:    # Base requirement check for residents
+                                            if has_tag_perms is False:
+                                                await member.edit(nick=name)
                                             await member.add_roles(self.bot.inactive_role, reason="Rolecheck")
                                             await member.remove_roles(self.bot.active_role, self.bot.ally,
                                                                       reason="Rolecheck")
-                                            await message.edit(
-                                                content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
 
-                                        elif totalexp >= self.bot.active:  # If the member is active
-                                            await member.remove_roles(self.bot.inactive_role, self.bot.new_member_role,
-                                                                      self.bot.ally, reason="Rolecheck")
-                                            await member.add_roles(self.bot.active_role, reason="Rolecheck")
-                                            await message.edit(
-                                                content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
-
-                                        elif totalexp > self.bot.inactive:
-                                            username = await utils.name_grabber(member)
+                                        else:  # If the resident meets base resident requirements
                                             if has_tag_perms is False:
-                                                await member.edit(nick=username)
-                                            await member.remove_roles(self.bot.inactive_role, self.bot.active_role,
-                                                                      self.bot.ally, reason="Rolecheck")
-                                            await message.edit(
-                                                content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
-                                    else:  # For residents
-                                        if totalexp < self.bot.resident_req:
-                                            username = await utils.name_grabber(member)
-                                            if has_tag_perms is False:
-                                                await member.edit(nick=username)
-                                            await member.add_roles(self.bot.inactive_role, reason="Rolecheck")
-                                            await member.remove_roles(self.bot.active_role, self.bot.ally,
-                                                                      reason="Rolecheck")
-                                            await message.edit(
-                                                content=f"{name} ||{member}|| **++Member \| ++Inactive \| --Active**")
-
-                                        elif totalexp >= self.bot.active:  # If the member is active
-                                            await member.remove_roles(self.bot.inactive_role, self.bot.new_member_role,
-                                                                      self.bot.ally, reason="Rolecheck")
-                                            await member.add_roles(self.bot.active_role, reason="Rolecheck")
-                                            await message.edit(
-                                                content=f"{name} ||{member}|| **++Member \| ++Active \| --Inactive**")
-
-                                        elif totalexp > self.bot.resident_req:
-                                            username = await utils.name_grabber(member)
-                                            if has_tag_perms is False:
-                                                await member.edit(nick=username)
-                                            await member.remove_roles(self.bot.inactive_role, self.bot.active_role,
-                                                                      self.bot.ally, reason="Rolecheck")
-                                            await message.edit(
-                                                content=f"{name} ||{member}|| **++Member \| --Inactive\| --Active**")
+                                                await member.edit(nick=name)
+                                            await member.remove_roles(self.bot.inactive_role,
+                                                                      self.bot.active_role,
+                                                                      reason="Rolecheck - Resident Requirements met - Removed Inactive &/or Active")
 
                         # Ally
                         elif ign in ally_members:
                             guild_name = await utils.get_guild(name)
-                            for guild in self.bot.misc_allies:
-                                if guild == guild_name:
+                            for ally_guild in self.bot.misc_allies:
+                                if ally_guild == guild_name:
                                     gtag = await utils.get_gtag(guild_name)
-                                    if member.nick is None or str(gtag) not in member.nick:
+                                    if (member.nick is None or str(gtag) not in member.nick) and has_tag_perms is False:
                                         ign = ign + " " + str(gtag)
                                         await member.edit(nick=ign)
-                                    await member.add_roles(self.bot.guest, self.bot.ally, reason="Rolecheck")
-                                    await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
-                                                              self.bot.active_role, self.bot.inactive_role,
-                                                              reason="Rolecheck")
-                                    await message.edit(
-                                        content=f"{name} ||{member}|| Member of {guild} **++Ally \| ++Guest | --Member | --Active**")
+                                    await member.add_roles(self.bot.guest,
+                                                           self.bot.ally,
+                                                           reason="Rolecheck - Member of an Ally Guild - Given Guest &/or Ally")
+                                    await member.remove_roles(self.bot.member_role,
+                                                              self.bot.new_member_role,
+                                                              self.bot.active_role,
+                                                              self.bot.inactive_role,
+                                                              reason="Rolecheck - Member of an Ally Guild - Removed Member, New Member, Active &/or Inactive")
+
                         else:
-                            await member.add_roles(self.bot.guest, reason="Rolecheck")
-                            await member.remove_roles(self.bot.member_role, self.bot.new_member_role,
-                                                      self.bot.active_role, self.bot.inactive_role, self.bot.ally,
-                                                      reason="Rolecheck")
-                            await message.edit(
-                                content=f"{name} ||{member}|| **++Guest | --Member | --Active**")
-                await ctx.send('**Rolecheck completed**')
+                            if member.nick != name and has_tag_perms is False:
+                                await member.edit(nick=ign)
+                            await member.add_roles(self.bot.guest, reason="Rolecheck - Guest - Given Guest")
+                            await member.remove_roles(self.bot.member_role,
+                                                      self.bot.new_member_role,
+                                                      self.bot.active_role,
+                                                      self.bot.inactive_role,
+                                                      self.bot.ally,
+                                                      reason="Rolecheck - Guest - Removed Member, New Member, Active, Inactive &/or Ally")
+                end_time = time.time()
+                await msg.edit(content=f"**Completed rolecheck for {discord_member_count} discord members!**\n"
+                                       f"Time Taken for execution- {round(end_time-start_time)}")
         if not send_ping:
             inactivity_channel = self.bot.get_channel(848067712156434462)
 
