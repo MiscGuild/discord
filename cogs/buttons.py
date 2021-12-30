@@ -209,6 +209,7 @@ class Roles(commands.Cog, command_attrs=dict(hidden=True)):
                     await member.remove_roles(self.bot.guild.get_role(x),
                                               reason="Pronouns Duplicate Prevention")
                 await res.respond(content=f"Removed all pronoun roles!")
+
 def setup(bot):
     DiscordComponents(bot)
     bot.add_cog(Roles(bot))

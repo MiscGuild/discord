@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands, tasks
-from discord.ext.commands.core import command
 from cogs.utils import utilities as utils
 
 from datetime import datetime, timedelta

@@ -33,9 +33,10 @@ class Tickets(commands.Cog, name="Tickets"):
                 if click.component.id == "yes":
                     await channel.edit(name=f"join-request-{name}")
                     await channel.purge(limit=10)
-                    embed = discord.Embed(title=f"{name} wishes to join Miscellaneous", description="Please wait until staff get in contact with you.\n\n"
-                                                                                                    "You are recommended to leave your present guild (if any) so that staff can invite you to Miscellaneous ASAP\n\n"
-                                                                                                    "If you get in the guild and want the member role in the discord, use \n,sync `Your Minecraft Name`",
+                    embed = discord.Embed(title=f"{name} wishes to join Miscellaneous",
+                                          description="Please wait until staff get in contact with you.\n\n"
+                                                      "You are recommended to leave your present guild (if any) so that staff can invite you to Miscellaneous ASAP\n\n"
+                                                      "If you get in the guild and want the member role in the discord, use \n,sync `Your Minecraft Name`",
                                           color=0x8368ff)
                     embed.add_field(name="Miscellaneous Guild Requirements",
                                     value=f"**Active**\n•  {format(self.bot.active, ',d')} Weekly Guild Experience\n\n"
@@ -53,15 +54,13 @@ class Tickets(commands.Cog, name="Tickets"):
                     embed = discord.Embed(title="Why did you join the Miscellaneous Discord?",
                                           description="Please select your reason from the dropdown list below!",
                                           color=0x8368ff)
-                    success_ticket = discord.Embed(title="Success!",
-                                                   color=0x00A86B)
 
-                    await click.respond(embed=success_ticket)
+                    await click.respond(type=6)
                     await channel.send(
                         embed=embed,
                         components=[
                             [
-                                Select(placeholder="Select max 1!", options=[
+                                Select(placeholder="Please select one!", options=[
                                     SelectOption(label="Alliance/Partner Request", value="Alliance",
                                                  emoji="🤝"),
                                     SelectOption(label="GvG Request", value="GvG",
@@ -74,9 +73,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         ]
                     )
                     interaction = await self.bot.wait_for("select_option")
-                    response_embed = discord.Embed(title="Ticket Reason Selected!", color=0x00A86B)
-                    response_embed.set_footer(text=interaction.values[0])
-                    await interaction.respond(embed=response_embed)  # interaction.values is a list
+                    await click.respond(type=6)  # interaction.values is a list
                     reply = interaction.values[0]
 
                     if reply == "Alliance":
@@ -137,6 +134,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             position = position.content
                             embed = discord.Embed(title=f"Partner Request from {guildname} (Organization)",
                                                   description="The application process has concluded. Please wait for staff assistance.",
+                                                  url=guild_planke,
                                                   color=0x8368ff)
                             embed.set_footer(text=f"Position of Applicant: **{position}**")
                             embed.add_field(name="Level:", value=level, inline=True)
@@ -189,6 +187,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             position = position.content
                             embed = discord.Embed(title=f"Partner Request from {guildname} (Organization)",
                                                   description="The application process has concluded. Please wait for staff assistance.",
+                                                  url=guild_planke,
                                                   color=0x8368ff)
                             embed.set_footer(text=f"Position of Applicant: **{position}**")
                             embed.add_field(name="Level:", value=level, inline=True)
@@ -222,13 +221,13 @@ class Tickets(commands.Cog, name="Tickets"):
                         await channel.purge(limit=10)
                         await channel.send(embed=embed, components=[[approve, deny]])
                         while True:
-                            click = await self.bot.wait_for("button_click", check=lambda x: x.channel == channel and self.bot.staff in x.author.roles)
+                            click = await self.bot.wait_for("button_click", check=lambda
+                                x: x.channel == channel and self.bot.staff in x.author.roles)
                             if click.component.id == "approve":
                                 await author.add_roles(self.bot.guest, reason="Registration")
                                 await author.remove_roles(self.bot.awaiting_app, self.bot.new_member_role,
                                                           reason="Registration")
-                                success_embed = discord.Embed(title="Success", color=0x00A86B)
-                                await click.respond(embed=success_embed)
+                                await click.respond(type=6)
 
                                 embed = discord.Embed(title=f"{author}, welcome to the Miscellaneous discord!",
                                                       description="If you have any queries, you ask ask them in this ticket!\n"
@@ -249,8 +248,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                                         x.author.id).roles) and x.channel == channel))
 
                                 if click.component.id == "yes":
-                                    success_embed = discord.Embed(title="Success", color=0x00A86B)
-                                    await click.respond(embed=success_embed)
+                                    await click.respond(type=6)
                                     transcript = await chat_exporter.export(channel)
                                     if transcript is None:
                                         pass
@@ -259,9 +257,10 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                        filename=f"deleted-{channel.name}.html")
 
                                     if channel.category.name in self.bot.ticket_categories:
-                                        embed = discord.Embed(title='This registration ticket will be deleted in 10 seconds!',
-                                                              description='',
-                                                              color=0xDE3163)
+                                        embed = discord.Embed(
+                                            title='This registration ticket will be deleted in 10 seconds!',
+                                            description='',
+                                            color=0xDE3163)
                                         await channel.send(embed=embed)
                                         await asyncio.sleep(10)
                                         await discord.TextChannel.delete(channel)
@@ -274,8 +273,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                         await self.bot.log_channel.send(file=transcript_file)
                                         break
                                 elif click.component.id == "no":
-                                    success_embed = discord.Embed(title="Success", color=0x00A86B)
-                                    await click.respond(embed=success_embed)
+                                    await click.respond(type=6)
                                     embed = discord.Embed(title="The ticket will not be closed. ",
                                                           description="Kindly await staff assistance!", color=0xde3163)
                                     await channel.send(embed=embed)
@@ -283,14 +281,11 @@ class Tickets(commands.Cog, name="Tickets"):
                                 break
                             elif click.component.id == "deny":
                                 await channel.purge(limit=10)
-                                embed = discord.Embed(title = "Entry Denied!",
-                                                        description = "Your entry to the server has been denied!",
-                                                        color = 0xDE3163)
+                                embed = discord.Embed(title="Entry Denied!",
+                                                      description="Your entry to the server has been denied!",
+                                                      color=0xDE3163)
                                 await channel.send(embed=embed)
-                                success_embed = discord.Embed(title="Success",
-                                                              description="Please specify why you denied entry to this member!",
-                                                              color=0x00A86B)
-                                await click.respond(embed=success_embed)
+                                await click.respond(type=6)
                                 break
                         break
                     elif reply == "Other":
@@ -364,14 +359,13 @@ class Tickets(commands.Cog, name="Tickets"):
                 response_embed = discord.Embed(title="Ticket Reason Selected!", color=0x00A86B)
                 response_embed.set_footer(text=interaction.values[0])
                 await channel.send(embed=response_embed)
-                await interaction.respond(content="Great! Now answer the bot's prompts!")  # interaction.values is a list
+                await interaction.respond(type=6)  # interaction.values is a list
                 reply = interaction.values[0]
 
                 author = self.bot.guild.get_member(int(interaction.user.id))
                 name = await utils.name_grabber(author)
 
                 if reply == "Do not kick list application":
-
 
                     await channel.edit(name=f"DNKL-{name}",
                                        category=discord.utils.get(channel.guild.categories, name="DNKL"))
@@ -389,12 +383,14 @@ class Tickets(commands.Cog, name="Tickets"):
                         async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
                             data = await resp.json(content_type=None)
                             await session.close()
-                    if data['guild'] != None:
+
+                    if data['guild']:
                         gname = data['guild']['name']
                         if gname != 'Miscellaneous':
                             await channel.purge(limit=10)
                             embed = discord.Embed(title='DNKL Request Failed!',
-                                                  descrption='To apply for the do-not-kick-list, you must be in Miscellaneous!', color=0xDE3163)
+                                                  descrption='To apply for the do-not-kick-list, you must be in Miscellaneous!',
+                                                  color=0xDE3163)
                             await channel.send(embed=embed)
                         else:
                             for member in data["guild"]["members"]:
@@ -403,13 +399,13 @@ class Tickets(commands.Cog, name="Tickets"):
                                     totalexp = member['expHistory']
                                     totalexp = int(sum(totalexp.values()))
                                     if totalexp >= self.bot.dnkl:
-                                        eligiblity = True
+                                        eligibility = True
                                         footer_text = f"{name} meets the DNKL Requirements!"
                                     else:
-                                        eligiblity = False
+                                        eligibility = False
                                         footer_text = f"{name} doesn't meet the DNKL Requirements!"
                                     totalexp = (format(totalexp, ',d'))
-                                    if eligiblity is False:
+                                    if eligibility is False:
                                         embed = discord.Embed(title=f"{name} wishes to apply for the do-not-kick-list!",
                                                               description="They **DO NOT MEET** the requirements!",
                                                               url=f'https://minotar.net/helm/{uuid}/512.png',
@@ -424,7 +420,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                               f"\n You have {totalexp} weekly guild experience.",
                                                         inline=True),
                                         await channel.send(embed=embed)
-                                    if eligiblity is True:
+                                    if eligibility is True:
                                         embed = discord.Embed(title=f"{name} wishes to apply for the do-not-kick-list!",
                                                               description="They **MEET** the requirements!",
                                                               url=f'https://minotar.net/helm/{uuid}/512.png',
@@ -487,21 +483,20 @@ class Tickets(commands.Cog, name="Tickets"):
                                     end_month = dates.get(int(q))
 
                                     dnkl_staff_embed = discord.Embed(title=f"{rank} {ign}",
-                                                          url=f'https://plancke.io/hypixel/player/stats/{ign}',
-                                                          color=0x0ffff)
+                                                                     url=f'https://plancke.io/hypixel/player/stats/{ign}',
+                                                                     color=0x0ffff)
                                     dnkl_staff_embed.set_thumbnail(
                                         url=f'https://crafatar.com/renders/body/{uuid}')
                                     dnkl_staff_embed.add_field(name="IGN:", value=f"{ign}", inline=False)
                                     dnkl_staff_embed.add_field(name="Start:", value=f"{a} {start_month} {c}",
-                                                    inline=False)
+                                                               inline=False)
                                     dnkl_staff_embed.add_field(name="End:", value=f"{p} {end_month} {r}",
-                                                    inline=False)
+                                                               inline=False)
                                     dnkl_staff_embed.add_field(name="Reason", value=f"{reason}", inline=False)
                                     dnkl_staff_embed.set_author(name="Do not kick list")
                                     dnkl_embed = dnkl_staff_embed
                                     dnkl_staff_embed.set_footer(text=footer_text)
                                     await channel.send(embed=dnkl_staff_embed)
-
 
                                     dnkl_decision = discord.Embed(
                                         title="Staff, what do you wish to do with this dnkl request?",
@@ -527,25 +522,28 @@ class Tickets(commands.Cog, name="Tickets"):
                                         dnkl_staff_embed.set_footer(text="")
                                         message = await self.bot.dnkl_channel.send(embed=dnkl_embed)
 
-                                        cursor = await self.bot.db.execute("SELECT message_id FROM DNKL WHERE username = (?)", (ign,))
+                                        cursor = await self.bot.db.execute(
+                                            "SELECT message_id FROM DNKL WHERE username = (?)", (ign,))
                                         row = await cursor.fetchone()
                                         await cursor.close()
 
                                         if row == None:
-                                            await self.bot.db.execute("INSERT INTO DNKL VALUES (?, ?)", (message.id, ign,))
+                                            await self.bot.db.execute("INSERT INTO DNKL VALUES (?, ?)",
+                                                                      (message.id, ign,))
                                         else:
-                                            await self.bot.db.execute("UPDATE DNKL SET message_id = (?) WHERE username = (?)", (message.id, ign,))
+                                            await self.bot.db.execute(
+                                                "UPDATE DNKL SET message_id = (?) WHERE username = (?)",
+                                                (message.id, ign,))
                                         await self.bot.db.commit()
-                                        
+
                                         embed = discord.Embed(title="This DNKL Application has been accepted!",
                                                               description="The DNKL Embed has been sent to <#629564802812870657>",
                                                               color=0x00A86B)
                                         await channel.send(embed=embed)
-                                        success_embed = discord.Embed(title="Success", color=0x00A86B)
-                                        await click.respond(embed=success_embed)
+                                        await click.respond(type=6)
                                         break
                                     elif click.component.id == "deny":
-                                        if eligiblity is False:
+                                        if eligibility is False:
                                             description = "Your DNKL request was denied because of your inability to meet the guild requirements!"
                                         else:
                                             description = None
@@ -553,8 +551,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                               description=description,
                                                               color=0xDE3163)
                                         await channel.send(embed=embed)
-                                        success_embed = discord.Embed(title="Success", color=0x00A86B)
-                                        await click.respond(embed=success_embed)
+                                        await click.respond(type=6)
                                         break
 
                                     elif click.component.id == "error":
@@ -602,6 +599,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                     embed = discord.Embed(
                                                         title="What's the reason behind their inactivity?",
                                                         color=0x8368ff)
+                                                    await channel.send(embed=embed)
                                                     reason = await self.bot.wait_for('message',
                                                                                      check=lambda
                                                                                          x: x.channel == channel)
@@ -647,20 +645,23 @@ class Tickets(commands.Cog, name="Tickets"):
                                                         await channel.purge(limit=1)
 
                                                         message = await self.bot.dnkl_channel.send(embed=embed)
-                                                        
-                                                        cursor = await self.bot.db.execute("SELECT message_id FROM DNKL WHERE username = (?)", (ign,))
+
+                                                        cursor = await self.bot.db.execute(
+                                                            "SELECT message_id FROM DNKL WHERE username = (?)", (ign,))
                                                         row = await cursor.fetchone()
                                                         await cursor.close()
 
-                                                        if row == None:
-                                                            await self.bot.db.execute("INSERT INTO DNKL VALUES (?, ?)", (message.id, ign,))
+                                                        if not row:
+                                                            await self.bot.db.execute("INSERT INTO DNKL VALUES (?, ?)",
+                                                                                      (message.id, ign,))
                                                         else:
-                                                            await self.bot.db.execute("UPDATE DNKL SET message_id = (?) WHERE username = (?)", (message.id, ign,))
+                                                            await self.bot.db.execute(
+                                                                "UPDATE DNKL SET message_id = (?) WHERE username = (?)",
+                                                                (message.id, ign,))
                                                         await self.bot.db.commit()
 
                                                         await session.close()
-                                                        success_embed = discord.Embed(title="Success", color=0x00A86B)
-                                                        await click.respond(embed=success_embed)
+                                                        await click.respond(type=6)
                                                         break
                     else:
                         await channel.purge(limit=10)
@@ -686,8 +687,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                             x.author.id).roles) and x.channel == channel))
 
                     if click.component.id == "yes":
-                        success_embed = discord.Embed(title="Success", color=0x00A86B)
-                        await click.respond(embed=success_embed)
+                        await click.respond(type=6)
                         transcript = await chat_exporter.export(channel)
                         if transcript is None:
                             pass
@@ -710,8 +710,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             await self.bot.log_channel.send(file=transcript_file)
                             break
                     elif click.component.id == "no":
-                        success_embed = discord.Embed(title="Success", color=0x00A86B)
-                        await click.respond(embed=success_embed)
+                        await click.respond(type=6)
                         embed = discord.Embed(title="The ticket will not be closed. ",
                                               description="Kindly await staff assistance!", color=0xde3163)
                         await channel.send(embed=embed)
@@ -720,13 +719,14 @@ class Tickets(commands.Cog, name="Tickets"):
                         embed = discord.Embed(title="Restarting",
                                               description="The ticket process will restart in 5 seconds!",
                                               color=0x00a86b)
+                        await channel.send(embed=embed)
                         await asyncio.sleep(2)
                 elif reply == "Discord Nick Change":
                     await channel.edit(name=f"Role/Name/Tag-change-{name}",
                                        category=discord.utils.get(channel.guild.categories, name="OTHER"))
                     embed = discord.Embed(tile=f"{name} wishes to change their Role/Name/Tag",
-                                        description="Please proceed by answering the bot's prompts!",
-                                        color=0x8368ff)
+                                          description="Please proceed by answering the bot's prompts!",
+                                          color=0x8368ff)
                     await channel.purge(limit=10)
                     await channel.send(embed=embed)
                     embed = discord.Embed(title="What is your Minecraft username?",
@@ -757,8 +757,8 @@ class Tickets(commands.Cog, name="Tickets"):
                                     embed = await utils.get_tag_message()
                                     await channel.send(embed=embed)
                                     tag = await self.bot.wait_for('message',
-                                                                    check=lambda
-                                                                        x: x.channel == channel and x.author == author)
+                                                                  check=lambda
+                                                                      x: x.channel == channel and x.author == author)
                                     tag = tag.content
                                     tag_check_success, tag_check_reason = await utils.check_tag(tag)
 
@@ -832,8 +832,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                             self.bot.staff in x.author.roles and x.channel == channel))
 
                     if click.component.id == "yes":
-                        success_embed = discord.Embed(title="Success", color=0x00A86B)
-                        await click.respond(embed=success_embed)
+                        await click.respond(type=6)
                         transcript = await chat_exporter.export(channel)
                         if transcript is None:
                             pass
@@ -856,8 +855,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             await self.bot.log_channel.send(file=transcript_file)
                             break
                     elif click.component.id == "no":
-                        success_embed = discord.Embed(title="Success", color=0x00A86B)
-                        await click.respond(embed=success_embed)
+                        await click.respond(type=6)
                         embed = discord.Embed(title="The ticket will not be closed. ",
                                               description="Kindly await staff assistance!", color=0xde3163)
                         await channel.send(embed=embed)
@@ -866,8 +864,26 @@ class Tickets(commands.Cog, name="Tickets"):
                         embed = discord.Embed(title="Restarting",
                                               description="The ticket process will restart in 5 seconds!",
                                               color=0x00a86b)
+                        await channel.send(embed=embed)
                         await asyncio.sleep(2)
                 elif reply == "Player Report":
+                    stop_embed = discord.Embed(title="Is the user a Miscellaneous Staff Member? (Non-Admin)",
+                                               description="If it is an admin, please DM <@!326399363943497728>!",
+                                               color=0x8368ff)
+                    yes = Button(style=ButtonStyle.blue, label="Yes", id="yes")
+                    no = Button(style=ButtonStyle.red, label="No", id="no")
+
+                    await channel.send(embed=stop_embed, components=[yes, no])
+
+                    click = await self.bot.wait_for("button_click",
+                                                    check=lambda x: (
+                                                                            x.author == author and x.channel == channel) or (
+                                                                            self.bot.staff in x.author.roles and x.channel == channel))
+
+                    if click.component.id == "yes":
+                        pass
+
+
                     embed = discord.Embed(title=f"{name} wishes to file a player report!",
                                           description="You are expected to provide maximum detail about the offense.\n"
                                                       "Following is considered the bare minimum:\n"
@@ -903,8 +919,8 @@ class Tickets(commands.Cog, name="Tickets"):
                     break
                 elif reply == "Staff Application":
                     req_embed = discord.Embed(title=f"{name} wishes to apply for staff!",
-                                          description="Please respond to the bot's prompts appropriately!",
-                                          color=0x4b89e4)
+                                              description="Please respond to the bot's prompts appropriately!",
+                                              color=0x4b89e4)
                     req_embed.add_field(name="Do you meet the following requirements?",
                                         value="• You must be older than 13 years."
                                               "\n• You must have enough knowledge about the bots in this Discord."
@@ -912,7 +928,6 @@ class Tickets(commands.Cog, name="Tickets"):
                                               "\n• You must have a good reputation amongst guild members.",
                                         inline=False)
                     await channel.purge(limit=10)
-
 
                     yes = Button(style=ButtonStyle.blue, label="Yes", id="yes")
                     no = Button(style=ButtonStyle.red, label="No", id="no")
@@ -925,7 +940,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                             self.bot.staff in x.author.roles and x.channel == channel))
 
                     if click.component.id == "no":
-                        await click.respond(content=f"Alright let's proceed!")
+                        await click.respond(type=6)
                         stop_embed = discord.Embed(
                             title="Since you don't meet the requirements, can this ticket be closed?",
                             description="Click `Yes` if you wish to delete the ticket.\n Click `No` if you wish to wait for staff assistance\nClick `Restart` if you wish to restart the ticket process",
@@ -941,8 +956,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                 x.author == author and x.channel == channel))
 
                         if click.component.id == "yes":
-                            success_embed = discord.Embed(title="Success", color=0x00A86B)
-                            await click.respond(embed=success_embed)
+                            await click.respond(type=6)
                             transcript = await chat_exporter.export(channel)
                             if transcript is None:
                                 pass
@@ -965,8 +979,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                 await self.bot.log_channel.send(file=transcript_file)
                                 break
                         elif click.component.id == "no":
-                            success_embed = discord.Embed(title="Success", color=0x00A86B)
-                            await click.respond(embed=success_embed)
+                            await click.respond(type=6)
                             embed = discord.Embed(title="The ticket will not be closed. ",
                                                   description="Kindly await staff assistance!", color=0xde3163)
                             await channel.send(embed=embed)
@@ -993,10 +1006,10 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                 x.author == author and x.channel == channel))
 
                         if click.component.id == 'yes':
-                            await click.respond(content=f"Alright let's proceed!")
+                            await click.respond(type=6)
                             name = await utils.name_grabber(author)
                         else:
-                            await click.respond(content=f"Alright let's proceed!")
+                            await click.respond(type=6)
                             embed = discord.Embed(title="What is your Minecraft Username?",
                                                   color=0x4b89e4)
                             await channel.send(embed=embed)
@@ -1224,14 +1237,14 @@ class Tickets(commands.Cog, name="Tickets"):
                         y = 0
                         z = 0
                         # Bedwars
-                        bw_list_of_fields=['wins_bedwars','final_kills_bedwars','final_deaths_bedwars']
+                        bw_list_of_fields = ['wins_bedwars', 'final_kills_bedwars', 'final_deaths_bedwars']
 
-                        bw_wins=0
-                        final_kills_bedwars=1
-                        final_deaths_bedwars=2
-                        bw_fkdr=3
+                        bw_wins = 0
+                        final_kills_bedwars = 1
+                        final_deaths_bedwars = 2
+                        bw_fkdr = 3
 
-                        bedwars_stats=[]
+                        bedwars_stats = []
 
                         for field in bw_list_of_fields:
                             try:
@@ -1241,8 +1254,8 @@ class Tickets(commands.Cog, name="Tickets"):
                             bedwars_stats.append(stat)
                         if bedwars_stats[final_deaths_bedwars] == 0:
                             bedwars_stats[final_deaths_bedwars] = 1
-                        bedwars_stats.append(round((bedwars_stats[final_kills_bedwars]/bedwars_stats[final_deaths_bedwars]), 2))
-
+                        bedwars_stats.append(
+                            round((bedwars_stats[final_kills_bedwars] / bedwars_stats[final_deaths_bedwars]), 2))
 
                         if bedwars_stats[bw_wins] > 500:
                             x = x + 1
@@ -1267,9 +1280,8 @@ class Tickets(commands.Cog, name="Tickets"):
                                 stat = 0
                             skywars_stats.append(stat)
                         if skywars_stats[sw_deaths] == 0:
-                            skywars_stats[sw_deaths]=1
-                        skywars_stats.append(round((skywars_stats[sw_kills]/skywars_stats[sw_deaths]), 2))
-
+                            skywars_stats[sw_deaths] = 1
+                        skywars_stats.append(round((skywars_stats[sw_kills] / skywars_stats[sw_deaths]), 2))
 
                         if skywars_stats[sw_wins_overall] > 1000:
                             y = y + 1
@@ -1292,8 +1304,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             duels_stats.append(stat)
                         if duels_stats[duels_losses] == 0:
                             duels_stats[duels_losses] = 1
-                        duels_stats.append(round((duels_stats[duels_wins]/duels_stats[duels_losses]), 2))
-
+                        duels_stats.append(round((duels_stats[duels_wins] / duels_stats[duels_losses]), 2))
 
                         if duels_stats[duels_wins] > 2000:
                             z = z + 1
@@ -1341,7 +1352,8 @@ class Tickets(commands.Cog, name="Tickets"):
                             embed1.add_field(name="Skywars Wins (Solo)", value=f'`{skywars_stats[sw_wins_solo]}`')
                             embed1.add_field(name="Skywars Wins (doubles)", value=f'`{skywars_stats[sw_wins_doubles]}`')
                             embed1.add_field(name="Skywars KDR", value=f'`{skywars_stats[sw_kdr]}`')
-                            embed1.set_footer(text=f"Duels wins - {duels_stats[duels_wins]}`\nDuels WLR - {duels_stats[duels_wlr]}")
+                            embed1.set_footer(
+                                text=f"Duels wins - {duels_stats[duels_wins]}`\nDuels WLR - {duels_stats[duels_wlr]}")
                             await channel.send(embed=embed1)
                             break
 
@@ -1368,7 +1380,8 @@ class Tickets(commands.Cog, name="Tickets"):
                             embed1.add_field(name="Skywars KDR", value=f'`{skywars_stats[sw_kdr]}`')
                             embed1.add_field(name="Duels Wins", value=f'`{duels_stats[duels_wins]}`')
                             embed1.add_field(name="Duels WLR", value=f'`{duels_stats[duels_wlr]}`')
-                            embed1.set_footer(text=f"Bedwars Wins - {bedwars_stats[bw_wins]}\nBedwars FKDR - {bedwars_stats[bw_fkdr]}")
+                            embed1.set_footer(
+                                text=f"Bedwars Wins - {bedwars_stats[bw_wins]}\nBedwars FKDR - {bedwars_stats[bw_fkdr]}")
                             await channel.send(embed=embed1)
                             break
                         elif x >= 1:
@@ -1427,8 +1440,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                                                         self.bot.staff in x.author.roles and x.channel == channel))
 
                                 if click.component.id == "yes":
-                                    success_embed = discord.Embed(title="Success", color=0x00A86B)
-                                    await click.respond(embed=success_embed)
+                                    await click.respond(type=6)
                                     transcript = await chat_exporter.export(channel)
                                     if transcript is None:
                                         pass
@@ -1452,8 +1464,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                         await self.bot.log_channel.send(file=transcript_file)
                                         break
                                 elif click.component.id == "no":
-                                    success_embed = discord.Embed(title="Success", color=0x00A86B)
-                                    await click.respond(embed=success_embed)
+                                    await click.respond(type=6)
                                     embed = discord.Embed(title="The ticket will not be closed. ",
                                                           description="Kindly await staff assistance!", color=0xde3163)
                                     await channel.send(embed=embed)
@@ -1462,38 +1473,45 @@ class Tickets(commands.Cog, name="Tickets"):
                                     embed = discord.Embed(title="Restarting",
                                                           description="The ticket process will restart in 5 seconds!",
                                                           color=0x00a86b)
+                                    await click.respond(embed=embed)
                                     await asyncio.sleep(2)
                             break
 
-
                 if reply == "Christmas Event":
                     embed = discord.Embed(title="What is your Minecraft Username?",
-                        color=0x4b89e4)
+                                          color=0x4b89e4)
                     await channel.send(embed=embed)
-                    username = await self.bot.wait_for('message', check=lambda x: x.channel == channel and x.author == author)
+                    username = await self.bot.wait_for('message',
+                                                       check=lambda x: x.channel == channel and x.author == author)
                     name, uuid = await utils.get_dispnameID(username.content)
 
-                    if name != None:
+                    if name:
                         await channel.edit(name=f"Event-{name}",
-                            category=discord.utils.get(channel.guild.categories, name="CHRISTMAS COUNTDOWN"))
-                        embed = discord.Embed(title="General Information", description="Following is some general information surrounding the event.", color=0x8368ff)
+                                           category=discord.utils.get(channel.guild.categories,
+                                                                      name="CHRISTMAS COUNTDOWN"))
+                        embed = discord.Embed(title="General Information",
+                                              description="Following is some general information surrounding the event.",
+                                              color=0x8368ff)
                         embed.add_field(name="Miscellaneous Christmas Countdown", value="""Every day from the 1st to the 24th of December, a series of challenges
                                                                                             will be released for participants to complete.\n
-                                                                                            Additionally, there will be one extra member/ally only challenge, and an open challenge for everyone on weekends.""", inline=False)
+                                                                                            Additionally, there will be one extra member/ally only challenge, and an open challenge for everyone on weekends.""",
+                                        inline=False)
                         embed.add_field(name="Scaled challenges", value="""As part of the daily challenges, scaled challenges will reward differing points depending on how well you performed compared to other participants. Point distribution is as follows:\n
                                                                             1st-3rd - 3 points
                                                                             4th-10th - 2 points
-                                                                            Remaining players - 1 point""", inline=False)
+                                                                            Remaining players - 1 point""",
+                                        inline=False)
                         embed.add_field(name="Rules", value='''All Hypixel rules apply. This includes:
                                     - No cheating
                                     - No account sharing
-                                    - No boosting, etc''',inline=False)
+                                    - No boosting, etc''', inline=False)
                         embed.add_field(name="Submitting", value="""Every day, along with the challenges, a unique password will be given for that days challenges.
                         When submitting your challenges, you will be required to have the password written in your chat box (Example below).
                         Submissions can take the form of an unedited screenshot or short video, whatever works best.
                         You can only submit challenges from the day you're submitting, 
                         so previously given challenges will not be awarded with points.""", inline=False)
-                        embed.set_image(url="https://media.discordapp.net/attachments/911761019947352074/911792454099947580/unknown.png?width=1111&height=625")
+                        embed.set_image(
+                            url="https://media.discordapp.net/attachments/911761019947352074/911792454099947580/unknown.png?width=1111&height=625")
                         await channel.send(embed=embed)
 
                         await author.add_roles(self.bot.christmas_event)
@@ -1506,12 +1524,12 @@ class Tickets(commands.Cog, name="Tickets"):
 
                     else:
                         await channel.send("Unkown IGN! Restarting ticket process...")
-                
+
 
 
                 elif reply == "Other":
                     embed = discord.Embed(title=f"{name} created this ticket for an unspecified reason!",
-                                        description="Kindly specify your reason behind creating this ticket and wait for staff to help you!")
+                                          description="Kindly specify your reason behind creating this ticket and wait for staff to help you!")
                     await channel.edit(name=f"Unknown-{name}",
                                        category=discord.utils.get(channel.guild.categories, name="OTHER"))
                     await channel.purge(limit=10)
@@ -1541,7 +1559,8 @@ class Tickets(commands.Cog, name="Tickets"):
                             embed = discord.Embed(
                                 title="Alright, kindly specify why you created this ticket and then await staff assistance!",
                                 color=0x00A86B)
-                            await click.respond(embed=embed)
+                            await click.respond(type=6)
+                            await channel.send(embed=embed)
                             break
 
     @commands.command(aliases=['reg', 'verify'])
@@ -1833,7 +1852,7 @@ class Tickets(commands.Cog, name="Tickets"):
 
             while True:
                 more = await self.bot.wait_for('message',
-                                            check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+                                               check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
                 more = more.content
                 more = more.capitalize()
 
@@ -1860,9 +1879,9 @@ class Tickets(commands.Cog, name="Tickets"):
 
         category = discord.utils.get(self.bot.guild.categories, name="🎫 Ticket Section")
         ticket_channel = await self.bot.guild.create_text_channel(f"ticket-{name}",
-                                                                       category=category,
-                                                                       topic="<:t:869239368060112906><:i:869239367942697010><:c:869239368383074414>"
-                                                                             "<:k:869239367854612480><:e:869239368517287936><:t:869239368060112906>")
+                                                                  category=category,
+                                                                  topic="<:t:869239368060112906><:i:869239367942697010><:c:869239368383074414>"
+                                                                        "<:k:869239367854612480><:e:869239368517287936><:t:869239368060112906>")
         creating_ticket = discord.Embed(title="Click here to go to your ticket!",
                                         url=f"https://discord.com/channels/522586672148381726/{ticket_channel.id}",
                                         color=0x00A86B)
