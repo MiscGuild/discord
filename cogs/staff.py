@@ -282,7 +282,7 @@ class staff(commands.Cog, name="Staff"):
         admin = discord.utils.get(ctx.guild.roles, name="Admin")
         if moderator or admin in ctx.author.roles:
             ign, uuid = await utils.get_dispnameID(name)
-            if ign is None:
+            if not ign:
                 await ctx.send('Please enter a valid ign!')
             else:
                 guild_name = await utils.get_guild(name)
@@ -310,7 +310,7 @@ class staff(commands.Cog, name="Staff"):
                     for guild in self.bot.misc_allies:
                         if guild == guild_name:
                             gtag = await utils.get_gtag(guild)
-                            if member.nick is None or str(gtag) not in member.nick:
+                            if not member.nick or str(gtag) not in member.nick:
                                 ign = ign + " " + str(gtag)
                                 await member.edit(nick=ign)
                             await member.remove_roles(self.bot.new_member_role)
@@ -338,7 +338,7 @@ class staff(commands.Cog, name="Staff"):
                                           "\n• Guest was given")
 
                     await ctx.send(embed=embed)
-                elif guild_name is None:
+                elif not guild_name:
                     await member.remove_roles(member_, awaiting_app, newmember)
                     await member.add_roles(guest)
                     guild_name = "Guildless (No Guild)"
@@ -572,7 +572,7 @@ class staff(commands.Cog, name="Staff"):
                             for ally_guild in self.bot.misc_allies:
                                 if ally_guild == guild_name:
                                     gtag = await utils.get_gtag(guild_name)
-                                    if (member.nick is None or str(gtag) not in member.nick) and has_tag_perms is False:
+                                    if (not member.nick or str(gtag) not in member.nick) and has_tag_perms is False:
                                         ign = ign + " " + str(gtag)
                                         await member.edit(nick=ign)
                                     await member.add_roles(self.bot.guest,

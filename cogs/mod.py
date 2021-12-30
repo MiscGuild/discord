@@ -18,7 +18,7 @@ class Moderation(commands.Cog, name="Moderation"):
         """Mutes the mentioned user indefinitely!
         """
         name = await utils.name_grabber(ctx.author)
-        if reason is None:
+        if not reason:
             reason = f'Muted by: {name}'
 
         role = discord.utils.get(ctx.guild.roles, name="Muted")
@@ -38,7 +38,7 @@ class Moderation(commands.Cog, name="Moderation"):
         """Mutes the mentioned user
         """
         name = await utils.name_grabber(ctx.author)
-        if reason is None:
+        if not reason:
             reason = f'Unmuted by: {name}'
 
         muted_role = discord.utils.get(ctx.guild.roles, name="Muted")
@@ -59,7 +59,7 @@ class Moderation(commands.Cog, name="Moderation"):
         """
         name = await utils.name_grabber(ctx.author)
         transcript = await chat_exporter.export(ctx.channel, limit=amount)
-        if transcript is None:
+        if not transcript:
             pass
         else:
             transcript_file = discord.File(io.BytesIO(transcript.encode()),
@@ -80,7 +80,7 @@ class Moderation(commands.Cog, name="Moderation"):
         """Kicks the mentioned user!
         """
         name = await utils.name_grabber(ctx.author)
-        if reason is None:
+        if not reason:
             reason = f'Kicked by: {name}'
 
         await member.kick(reason=reason)
@@ -96,7 +96,7 @@ class Moderation(commands.Cog, name="Moderation"):
         """Bans the mentioned user!
         """
         name = await utils.name_grabber(ctx.author)
-        if reason is None:
+        if not reason:
             reason = f'Banned by: {name}'
 
         await member.ban(reason=reason)
@@ -112,7 +112,7 @@ class Moderation(commands.Cog, name="Moderation"):
         """Unbans the user!
         """
         name = await utils.name_grabber(ctx.author)
-        if reason is None:
+        if not reason:
             reason = f'Unbanned by: {name}'
 
         await ctx.guild.unban(member)
@@ -129,7 +129,7 @@ class Moderation(commands.Cog, name="Moderation"):
         Bans and then unbans a user to remove all of their messages
         """
         name = await utils.name_grabber(ctx.author)
-        if reason is None:
+        if not reason:
             reason = f'Softbanned by: {name}'
 
         await ctx.guild.ban(member, reason=reason)

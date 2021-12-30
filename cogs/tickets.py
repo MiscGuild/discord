@@ -250,7 +250,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                 if click.component.id == "yes":
                                     await click.respond(type=6)
                                     transcript = await chat_exporter.export(channel)
-                                    if transcript is None:
+                                    if not transcript:
                                         pass
                                     else:
                                         transcript_file = discord.File(io.BytesIO(transcript.encode()),
@@ -399,13 +399,13 @@ class Tickets(commands.Cog, name="Tickets"):
                                     totalexp = member['expHistory']
                                     totalexp = int(sum(totalexp.values()))
                                     if totalexp >= self.bot.dnkl:
-                                        eligibility = True
+                                        eligible = True
                                         footer_text = f"{name} meets the DNKL Requirements!"
                                     else:
-                                        eligibility = False
+                                        eligible = False
                                         footer_text = f"{name} doesn't meet the DNKL Requirements!"
                                     totalexp = (format(totalexp, ',d'))
-                                    if eligibility is False:
+                                    if not eligible:
                                         embed = discord.Embed(title=f"{name} wishes to apply for the do-not-kick-list!",
                                                               description="They **DO NOT MEET** the requirements!",
                                                               url=f'https://minotar.net/helm/{uuid}/512.png',
@@ -420,7 +420,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                               f"\n You have {totalexp} weekly guild experience.",
                                                         inline=True),
                                         await channel.send(embed=embed)
-                                    if eligibility is True:
+                                    if eligible:
                                         embed = discord.Embed(title=f"{name} wishes to apply for the do-not-kick-list!",
                                                               description="They **MEET** the requirements!",
                                                               url=f'https://minotar.net/helm/{uuid}/512.png',
@@ -527,7 +527,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                         row = await cursor.fetchone()
                                         await cursor.close()
 
-                                        if row == None:
+                                        if not row:
                                             await self.bot.db.execute("INSERT INTO DNKL VALUES (?, ?)",
                                                                       (message.id, ign,))
                                         else:
@@ -543,7 +543,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                         await click.respond(type=6)
                                         break
                                     elif click.component.id == "deny":
-                                        if eligibility is False:
+                                        if not eligible:
                                             description = "Your DNKL request was denied because of your inability to meet the guild requirements!"
                                         else:
                                             description = None
@@ -689,7 +689,7 @@ class Tickets(commands.Cog, name="Tickets"):
                     if click.component.id == "yes":
                         await click.respond(type=6)
                         transcript = await chat_exporter.export(channel)
-                        if transcript is None:
+                        if not transcript:
                             pass
                         else:
                             transcript_file = discord.File(io.BytesIO(transcript.encode()),
@@ -736,7 +736,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                                          check=lambda x: x.channel == channel and x.author == author)
                     name = role_reply.content
                     ign, uuid = await utils.get_dispnameID(name)
-                    if ign is None:
+                    if not ign:
                         embed = discord.Embed(title="Please enter a valid minecraft username!",
                                               description="The ticket process will be restarted so you can rectify your mistake!",
                                               color=0xDE3163)
@@ -751,8 +751,8 @@ class Tickets(commands.Cog, name="Tickets"):
                         await author.edit(nick=ign)
                         has_tag_perms = any(role in author.roles for role in self.bot.tag_allowed_roles)
 
-                        if guild_name == "Miscellaneous" or has_tag_perms is True:
-                            if has_tag_perms is True:
+                        if guild_name == "Miscellaneous" or has_tag_perms:
+                            if has_tag_perms:
                                 while True:
                                     embed = await utils.get_tag_message()
                                     await channel.send(embed=embed)
@@ -783,7 +783,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             for guild in self.bot.misc_allies:
                                 if guild == guild_name:
                                     gtag = await utils.get_gtag(guild)
-                                    if author.nick is None or str(gtag) not in author.nick:
+                                    if not author.nick or str(gtag) not in author.nick:
                                         new_nick = ign + " " + str(gtag)
                                         await author.edit(nick=new_nick)
 
@@ -834,7 +834,7 @@ class Tickets(commands.Cog, name="Tickets"):
                     if click.component.id == "yes":
                         await click.respond(type=6)
                         transcript = await chat_exporter.export(channel)
-                        if transcript is None:
+                        if not transcript:
                             pass
                         else:
                             transcript_file = discord.File(io.BytesIO(transcript.encode()),
@@ -977,7 +977,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         if click.component.id == "yes":
                             await click.respond(type=6)
                             transcript = await chat_exporter.export(channel)
-                            if transcript is None:
+                            if not transcript:
                                 pass
                             else:
                                 transcript_file = discord.File(io.BytesIO(transcript.encode()),
@@ -1244,7 +1244,7 @@ class Tickets(commands.Cog, name="Tickets"):
                     await channel.send(embed=embed)
 
                     req = await utils.get_data(name)
-                    if req["player"] is None:
+                    if not req["player"]:
                         embed = discord.Embed(title='Unknown IGN',
                                               description='Kindly create a new ticket to sync your name and then create another ticket for the GvG Application!',
                                               color=0xff0000)
@@ -1461,7 +1461,7 @@ class Tickets(commands.Cog, name="Tickets"):
                                 if click.component.id == "yes":
                                     await click.respond(type=6)
                                     transcript = await chat_exporter.export(channel)
-                                    if transcript is None:
+                                    if not transcript:
                                         pass
                                     else:
                                         transcript_file = discord.File(io.BytesIO(transcript.encode()),
@@ -1622,7 +1622,7 @@ class Tickets(commands.Cog, name="Tickets"):
                             for guild in self.bot.misc_allies:
                                 if guild == guild_name:
                                     gtag = await utils.get_gtag(guild)
-                                    if ctx.author.nick is None or str(gtag) not in ctx.author.nick:
+                                    if not ctx.author.nick or str(gtag) not in ctx.author.nick:
                                         ign = ign + " " + str(gtag)
                                     await ctx.author.edit(nick=ign)
                                     await ctx.author.remove_roles(self.bot.new_member_role, reason="Register")
@@ -1637,7 +1637,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         elif guild_name != "Miscellaneous" and guild_name not in self.bot.misc_allies:
                             await ctx.author.remove_roles(self.bot.new_member_role, reason="Register")
                             await ctx.author.add_roles(self.bot.awaiting_app, reason="Register")
-                            if nick is None:
+                            if not nick:
                                 nick = author.name
 
                             await ctx.channel.purge(limit=1)
@@ -1714,7 +1714,7 @@ class Tickets(commands.Cog, name="Tickets"):
                 await asyncio.sleep(10)
                 transcript = await chat_exporter.export(ctx.channel)
 
-                if transcript is None:
+                if not transcript:
                     embed = discord.Embed(text="Transcript creation failed!",
                                           color=0xDE3163)
                     await ctx.send(embed=embed)
@@ -1777,7 +1777,7 @@ class Tickets(commands.Cog, name="Tickets"):
         if ctx.channel.category.name in self.bot.ticket_categories:
             transcript = await chat_exporter.export(ctx.channel)
 
-            if transcript is None:
+            if not transcript:
                 embed = discord.Embed(text="Transcript creation failed!",
                                       color=0xDE3163)
                 await ctx.send(embed=embed)
@@ -1881,7 +1881,7 @@ class Tickets(commands.Cog, name="Tickets"):
                     await channel.send(embed=embed)
                     transcript = await chat_exporter.export(channel)
 
-                    if transcript is None:
+                    if not transcript:
                         embed = discord.Embed(text="Transcript creation failed!",
                                               color=0xDE3163)
                         await ctx.send(embed=embed)

@@ -53,7 +53,7 @@ async def get_leaderboards():
 
 async def name_grabber(author):
     name = author.nick
-    if name is None:
+    if not name:
         name = author.name
     else:
         name = name.split()[0]
@@ -63,7 +63,7 @@ async def name_grabber(author):
 
 async def get_level(name):
     data = await get_data(name)
-    if data["player"] is None:
+    if not data["player"]:
         return None
     exp = int(data["player"]["networkExp"])  # This just gets the player experience from our data
     exp = (math.sqrt((2 * exp) + 30625) / 50) - 2.5
@@ -74,7 +74,7 @@ async def get_karma(name):
     data = await get_data(name)
     if 'cause' in data:
         print(data['cause'])
-    if data["player"] is None:
+    if not data["player"]:
         return None
     karma = int(data["player"]["karma"])
     return (f"{karma:,d}")
@@ -92,7 +92,7 @@ async def get_ap(name):
 
 
 async def get_rank(name):
-    if len(name) < 20 and name.isascii() is True:
+    if len(name) < 20 and name.isascii():
         api = get_api()
         async with aiohttp.ClientSession() as session:
             async with session.get(f"https://api.hypixel.net/player?key={api}&name={name}") as resp:
@@ -102,7 +102,7 @@ async def get_rank(name):
         data = await get_data(name)
     if 'cause' in data:
         print(data['cause'])
-    if data["player"] is None:
+    if not data["player"]:
         return None
     if "prefix" in data["player"]:
         player_prefix = (data["player"]["prefix"])
@@ -161,7 +161,7 @@ async def get_guild(name):
                 await session.close()
     if 'cause' in req:
         print(req['cause'], api)
-    elif req['guild'] is not None:
+    elif req['guild']:
         gname = req["guild"]['name']
         return (f"{gname}")
     else:
@@ -176,7 +176,7 @@ async def get_gtag(name):
             await session.close()
     if len(req['guild']) < 2:
         return (" ")
-    if req["guild"]["tag"] is None:
+    if not req["guild"]["tag"]:
         return (" ")
     else:
         gtag = req["guild"]["tag"]
@@ -188,7 +188,7 @@ async def get_dispnameID(name):
         async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as resp:
             request = await resp.json(content_type=None)
             await session.close()
-    if request != None and 'error' not in request:
+    if request and 'error' not in request:
         ign = request["name"]
         id = request["id"]
         return ign, id
@@ -198,7 +198,7 @@ async def get_dispnameID(name):
 
 async def get_flogin(name):
     data = await get_data(name)
-    if data["player"] is None:
+    if not data["player"]:
         return None
     first_login = data["player"]["firstLogin"]
     time = datetime.fromtimestamp(int(str(first_login)[:-3]))
@@ -207,7 +207,7 @@ async def get_flogin(name):
 
 async def get_llogin(name):
     data = await get_data(name)
-    if data["player"] is None:
+    if not data["player"]:
         return None
     if "lastLogin" in data["player"]:
         Last_login = data["player"]["lastLogin"]
@@ -259,7 +259,7 @@ async def get_challenges_completed(name):
             if request.status != 200:
                 return None
     data = await get_data(name)
-    if data["player"] is None:
+    if not data["player"]:
         return None
     if "general_challenger" in data["player"]["achievements"]:
         cp = int(data["player"]["achievements"]['general_challenger'])
@@ -279,7 +279,7 @@ async def get_completed_quests(name):
 
 async def get_online_status(name):
     request = await get_data1(name)
-    if request["online"] is True:
+    if request["online"]:
         return True
     else:
         return False
@@ -328,7 +328,7 @@ def discord_member_check(session, member):
     base_url = "https://api.mojang.com/users/profiles/minecraft/"
 
     name = member.nick  # Obtaining their nick
-    if name is None:  # If they don't have a nick, it uses their name.
+    if not name:  # If they don't have a nick, it uses their name.
         name = member.name
 
     with session.get(base_url + name) as mojang:
@@ -388,7 +388,7 @@ async def check_tag(tag):
 
     if tag in badwords.split('\n'):
         return False, "The tag may not include profanity."
-    elif tag.isascii() is False:
+    elif not tag.isascii():
         return False, "Your tag may not include special characters unless it's the tag of an ally guild."
     elif len(tag) > 6:
         return False, "Your tag may not be longer than 6 characters."

@@ -146,7 +146,7 @@ class Fun(commands.Cog, name="Fun"):
         """
         if nbytes not in range(3, 1401):
             return await ctx.send("I only accept any numbers between 3-1400")
-        if hasattr(ctx, "guild") and ctx.guild is not None:
+        if hasattr(ctx, "guild") and ctx.guild:
             await ctx.send(f"Sending you a private message with your random generated password **{ctx.author.name}**")
         await ctx.author.send(f"🎁 **Here is your password:**\n{secrets.token_urlsafe(nbytes)}")
 
@@ -229,7 +229,7 @@ class Fun(commands.Cog, name="Fun"):
             async with session.get('https://some-random-api.ml/animu/pat') as resp:
                 req = await resp.json()
                 await session.close()
-        if user is None or ctx.author == user:
+        if not user or ctx.author == user:
             embed = discord.Embed(title=f"{author} pats themselves.", color=0x8368ff)
         else:
             user = await utils.name_grabber(user)
@@ -246,7 +246,7 @@ class Fun(commands.Cog, name="Fun"):
             async with session.get('https://some-random-api.ml/animu/hug') as resp:
                 req = await resp.json()
                 await session.close()
-        if user is None or ctx.author == user:
+        if not user or ctx.author == user:
             embed = discord.Embed(title=f"{author} hugs themself.", color=0x8368ff)
         else:
             user = await utils.name_grabber(user)
@@ -276,7 +276,7 @@ class Fun(commands.Cog, name="Fun"):
         embed.set_thumbnail(url=member.avatar_url)
         embed.add_field(name="Account created:", value=str(member.created_at)[:-7], inline=False)
         embed.add_field(name="Joined this discord on:", value=str(member.joined_at)[:-7], inline=False)
-        if member.premium_since is not None:
+        if member.premium_since:
             embed.add_field(name="Server booster since:", value=str(member.premium_since)[:-7], inline=False)
         else:
             embed.add_field(name="Server booster:", value="False", inline=False)
@@ -290,7 +290,7 @@ class Fun(commands.Cog, name="Fun"):
     async def lyrics(self, ctx, *, search=None):
         """A command to find lyrics easily!"""
 
-        if search is None:
+        if not search:
             embed = discord.Embed(title="No search argument!",
                                   description="You have not entered a song name!", color=0xDE3163)
             await ctx.reply(embed=embed)

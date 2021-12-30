@@ -34,13 +34,13 @@ class giveaways(commands.Cog, name="Giveaways"):
             elif destination[0] == "<":  # Channel shortcut was passed
                 destination = int(re.sub(r'[\W_]+', '', destination))
                 destination_channel = self.bot.get_channel(destination)
-            elif destination.isnumeric() == True:  # Channel ID was passed
+            elif destination.isnumeric():  # Channel ID was passed
                 destination_channel = self.bot.get_channel(int(destination))
             else:  # Channel name was passed
                 destination = re.sub(r"\s+", "-", destination)
                 destination_channel = discord.utils.get(ctx.guild.channels, name=destination)
 
-            if destination_channel == None:  # Channel exists
+            if not destination_channel:  # Channel exists
                 await ctx.send(f"The channel {destination} is invalid!")
                 break
 
@@ -134,9 +134,9 @@ class giveaways(commands.Cog, name="Giveaways"):
                     r_requirements = []
                     for required_role in required_roles:
                         required_role = required_role.title()
-                        if re.search("[a-zA-Z]", required_role) != None:  # Role name was passed
+                        if re.search("[a-zA-Z]", required_role):  # Role name was passed
                             req_role = discord.utils.get(ctx.guild.roles, name=required_role)
-                            if req_role != None:
+                            if req_role:
                                 r_requirements.append(req_role.id)
                             else:
                                 await ctx.send(f"The role {required_role} does not exist!")
@@ -147,7 +147,7 @@ class giveaways(commands.Cog, name="Giveaways"):
                             # Force to integer
                             required_role = int(required_role)
                             req_role = ctx.guild.get_role(required_role)
-                            if req_role != None:
+                            if req_role:
                                 r_requirements.append(req_role.id)
 
                             else:
@@ -275,14 +275,14 @@ class giveaways(commands.Cog, name="Giveaways"):
         """
         Prematurely ends the giveaway with the given message ID!
         """
-        if message_ID == None:
+        if not message_ID:
             await ctx.send("You must provide the message ID of a giveaway to end!")
         else:
             cursor = await self.bot.db.execute("SELECT status FROM Giveaways WHERE message_id = (?)", (message_ID,))
             row = await cursor.fetchone()
             await cursor.close()
 
-            if row == None:
+            if not row:
                 await ctx.send(
                     "The specified giveaway doesn't seem to exist!\n`Either this giveaway never existed, or the data for the giveaway was deleted after 10 days of disuse.`")
             else:
@@ -301,7 +301,7 @@ class giveaways(commands.Cog, name="Giveaways"):
         """
         Rerolls the giveaway with the given message ID and no. winners to reroll!
         """
-        if message_ID == None:
+        if not message_ID:
             await ctx.send("You must provide the message ID of a giveaway to reroll!")
         else:
             cursor = await self.bot.db.execute(
@@ -309,7 +309,7 @@ class giveaways(commands.Cog, name="Giveaways"):
             row = await cursor.fetchone()
             await cursor.close()
 
-            if row == None:
+            if not row:
                 await ctx.send(
                     "The specified giveaway doesn't seem to exist!\n`Either this giveaway never existed, or the data for the giveaway was deleted after 10 days of disuse.`")
             else:
@@ -317,7 +317,7 @@ class giveaways(commands.Cog, name="Giveaways"):
                 if status == "active":
                     await ctx.send(
                         "You cannot reroll an on-going giveaway! \n`To end this giveaway, use ',giveaway end'`.")
-                if reroll_number == None:  # Reroll whole giveaway
+                if not reroll_number:  # Reroll whole giveaway
                     await self.roll_giveaway(message_ID)
                 elif reroll_number.isnumeric() == False:
                     await ctx.send("The number of winners to reroll for must be numeric!")
@@ -389,7 +389,7 @@ class giveaways(commands.Cog, name="Giveaways"):
             await self.bot.db.commit()
             return
 
-        if reroll_number == None:
+        if not reroll_number:
             number_winners = int(number_winners)
         else:
             number_winners = reroll_number
@@ -483,7 +483,7 @@ class giveaways(commands.Cog, name="Giveaways"):
                         entrants.remove(winner)
 
                     else:
-                        if "guild" not in req or req['guild'] is None:  # Winner is guildless
+                        if "guild" not in req or not req['guild'] :  # Winner is guildless
                             entrants.remove(winner)
 
                         else:

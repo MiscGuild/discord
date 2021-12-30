@@ -21,7 +21,7 @@ class General(commands.Cog, name="General"):
         """
         source_url = 'https://github.com/MiscGuild/MiscBot'
         branch = 'main'
-        if command is None:
+        if command:
             return await ctx.send(source_url)
 
         if command == 'help':

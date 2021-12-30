@@ -18,16 +18,16 @@ class Events(commands.Cog, name="Events"):
 
         # Calculate points based on challenge
         if challenge_type in ["scaled", "s"]:
-            if scaled_challenge_score == None:
+            if not scaled_challenge_score:
                 await ctx.send("You must enter the player's score for this challenge!")
                 return
             
             # Get player data
             row = await self.get_player(uuid)
-            if row != None:
+            if row:
                 uuid, total_points, completed_challenges, orig_scaled_challenge_score = row
                 # Add 1 base point for first submission of the day
-                if orig_scaled_challenge_score == None or orig_scaled_challenge_score == 0:
+                if not orig_scaled_challenge_score or orig_scaled_challenge_score == 0:
                     total_points += 1
 
                 await self.update_value(uuid, total_points, completed_challenges, scaled_challenge_score)
@@ -65,7 +65,7 @@ class Events(commands.Cog, name="Events"):
         # Update player's statistics for general challenge
         # Get data from db
         row = await self.get_player(uuid)
-        if row != None:
+        if row:
             uuid, total_points, completed_challenges, scaled_challenge_score = row
             total_points += points_earned
             completed_challenges += 1
@@ -87,7 +87,7 @@ class Events(commands.Cog, name="Events"):
         name, uuid = await utils.get_dispnameID(await utils.name_grabber(member))
         row = await self.get_player_short(uuid)
 
-        if row == None:
+        if not row:
             await self.insert_new(uuid, points, None, 0)
             completed_challenges = 0
         else:
@@ -107,7 +107,7 @@ class Events(commands.Cog, name="Events"):
         name, uuid = await utils.get_dispnameID(await utils.name_grabber(member))
         row = await self.get_player_short(uuid)
 
-        if row != None:
+        if row:
             uuid, total_points, completed_challenges = row
             points = total_points - points
             await self.update_value(uuid, points)
@@ -178,7 +178,7 @@ class Events(commands.Cog, name="Events"):
 
         cursor = await self.bot.db.execute("SELECT date FROM event_challenge WHERE date = (?)", (target_date,))
 
-        if await cursor.fetchone() == None:
+        if not await cursor.fetchone():
             await self.bot.db.execute("INSERT INTO event_challenge VALUES (?, ?, ?, ?, ?)", (target_date, scaled_challenge, hard_challenge, easy_challenge, weekend_challenge,))
         else:
             await self.bot.db.execute("UPDATE event_challenge SET scaled_challenge = (?), hard_challenge = (?), easy_challenge = (?), weekend_challenge = (?) WHERE date = (?)", (scaled_challenge, hard_challenge, easy_challenge, weekend_challenge, target_date,))
@@ -186,7 +186,7 @@ class Events(commands.Cog, name="Events"):
 
         await ctx.send(f"Alright! The challenges for {target_date} have been set!")
         embed = await self.challenge_embed(target_date)
-        if embed != None:
+        if embed:
             await ctx.send(embed=embed)
 
 
@@ -199,7 +199,7 @@ class Events(commands.Cog, name="Events"):
             for data_set in await self.get_scaled_lb():
                 uuid, score = data_set
                 name = utils.fetch(session, uuid)
-                description = description + "\n**" + str(count) + " -**" + uuid + ": " + str(score) if name == None else description + "\n**" + str(count) + " -** " + name + ": " + str(score)
+                description = description + "\n**" + str(count) + " -**" + uuid + ": " + str(score) if not name else description + "\n**" + str(count) + " -** " + name + ": " + str(score)
                 count += 1
             session.close()
         await ctx.send(embed=discord.Embed(title="Scaled Challenge Leaderboard", description=description, color=0x8368ff))
@@ -218,7 +218,7 @@ class Events(commands.Cog, name="Events"):
             for data_set in rows:
                 uuid, score = data_set
                 name = utils.fetch(session, uuid)
-                description = description + "\n**" + str(count) + " -**" + uuid + ": " + str(score) if name == None else description + "\n**" + str(count) + " -** " + name + ": " + str(score)
+                description = description + "\n**" + str(count) + " -**" + uuid + ": " + str(score) if not name else description + "\n**" + str(count) + " -** " + name + ": " + str(score)
                 count += 1
             session.close()
         await ctx.send(embed=discord.Embed(title="Christmas Countdown Leaderboard", description=description, color=0x8368ff))
@@ -245,11 +245,11 @@ class Events(commands.Cog, name="Events"):
         await self.bot.db.commit()
 
     async def update_value(self, uuid, points, completed=None, scaled_challenge_score=None):
-        if all(_ is not None for _ in [uuid, points, completed, scaled_challenge_score]):
+        if all(_ for _ in [uuid, points, completed, scaled_challenge_score]):
             await self.bot.db.execute("UPDATE event SET points = (?), completed = (?), scaled_challenge_score = (?) WHERE uuid = (?)", (points, completed, scaled_challenge_score, uuid,))
-        elif scaled_challenge_score != None:
+        elif scaled_challenge_score:
             await self.bot.db.execute("UPDATE event SET points = (?), scaled_challenge_score = (?) WHERE uuid = (?)", (points, scaled_challenge_score, uuid,))
-        elif completed == None:
+        elif not completed:
             await self.bot.db.execute("UPDATE event SET points = (?) WHERE uuid = (?)", (points, uuid,))
         else:
             await self.bot.db.execute("UPDATE event SET points = (?), completed = (?) WHERE uuid = (?)", (points, completed, uuid,))
@@ -278,20 +278,20 @@ class Events(commands.Cog, name="Events"):
         row = await cursor.fetchone()
         await cursor.close()
 
-        if row != None:
+        if row:
             _, scaled_challenge, hard_challenge, easy_challenge, weekend_challenge = row
             embed=discord.Embed(title=f"Challenges for {date}", color=0x8368ff)
             embed.add_field(name="Scaled challenge", value=scaled_challenge, inline=False)
             embed.add_field(name="Hard challenge", value=hard_challenge, inline=False)
             embed.add_field(name="Easy challenge", value=easy_challenge, inline=False)
-            if weekend_challenge != None:
+            if weekend_challenge:
                 embed.add_field(name="Weekend challenge", value=weekend_challenge, inline=False)
             return embed
             
         return None
 
     async def is_weekend(self, date=None):
-        if date != None:
+        if date:
             return date.weekday() > 4
         return (datetime.utcnow() - timedelta(hours=5)).weekday() > 4
 
@@ -300,7 +300,7 @@ class Events(commands.Cog, name="Events"):
         current_date = (datetime.utcnow() - timedelta(hours=5)).strftime("%Y-%m-%d")
         embed = await self.challenge_embed(current_date)
 
-        if embed != None:
+        if embed:
             await self.bot.events_channel.send(embed=embed)
             await self.bot.events_channel.send(f"{self.bot.christmas_event.mention}")
 

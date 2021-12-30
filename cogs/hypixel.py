@@ -58,7 +58,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
                 elif guild_name in self.bot.misc_allies:
                     gtag = await utils.get_gtag(guild_name)
-                    if ctx.author.nick is None or gtag not in ctx.author.nick:
+                    if not ctx.author.nick or gtag not in ctx.author.nick:
                         ign = ign + " " + gtag
 
                     await ctx.author.edit(nick=ign)
@@ -72,7 +72,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     else:
                         roles_to_remove.extend([self.bot.member_role, self.bot.awaiting_app])
                         roles_to_add.append(self.bot.guest)
-                        if guild_name == None:
+                        if not guild_name:
                             guild_name = "no guild"
 
         else:
@@ -296,7 +296,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             else:
                 uuid = request['id']
 
-                if start != None and "/" in start and end != None and "/" in end:
+                if start and "/" in start and end and "/" in end:
                     sd, sm, sy = start.split('/')
                     ed, em, ey = end.split('/')
 
@@ -373,7 +373,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                                                  check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
                 reason = reason.content
 
-                if start_date != None and "/" in start_date and end_date != None and "/" in end_date:
+                if start_date and "/" in start_date and end_date and "/" in end_date:
                     sd, sm, sy = start_date.split('/')
                     ed, em, ey = end_date.split('/')
 
@@ -401,7 +401,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         row = await cursor.fetchone()
                         await cursor.close()
 
-                        if row == None:
+                        if not row:
                             await self.bot.db.execute("INSERT INTO DNKL VALUES (?, ?)", (message.id, ign,))
                         else:
                             msg_id = row
@@ -511,7 +511,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
                     if 'description' in req["guild"]:
                         gdesc = req["guild"]['description']
-                        if gdesc is None:
+                        if not gdesc:
                             gdesc = 'No guild description.'
                     else:
                         gdesc = 'No guild description.'
@@ -521,12 +521,12 @@ class Hypixel(commands.Cog, name="Hypixel"):
                     else:
                         glg = '-'
 
-                    if 'joinable' in req['guild'] and req['guild']['joinable'] is True:
+                    if 'joinable' in req['guild'] and req['guild']['joinable']:
                         joinable = "Yes"
                     else:
                         joinable = "No"
 
-                    if req["guild"]["publiclyListed"] is True:
+                    if req["guild"]["publiclyListed"]:
                         publiclisting = "Yes"
                     else:
                         publiclisting = "No"
@@ -772,7 +772,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
     async def gmember(self, ctx, name=None):
         """Gives the guild experience earned by the user over the course of a week.
         """
-        if name is None:
+        if not name:
             name = await utils.name_grabber(ctx.author)
         results = []
         dates = []
@@ -796,7 +796,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         req = await resp.json()
                         await session.close()
 
-                if "guild" not in req or req['guild'] is None:
+                if "guild" not in req or not req['guild']:
                     embed = discord.Embed(title=f"{name}", url=f'https://plancke.io/hypixel/player/stats/{name}',
                                           color=0xf04747)
                     embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
@@ -938,7 +938,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
             async with aiohttp.ClientSession() as session:
                 async with session.get(f'https://api.hypixel.net/guild?key={api}&player={uuid}') as resp:
                     data = await resp.json(content_type=None)
-                    if data['guild'] == None:
+                    if not data['guild']:
                         await ctx.send('You are not in a guild!')
                         return
                     await session.close()
@@ -954,11 +954,11 @@ class Hypixel(commands.Cog, name="Hypixel"):
                         totalexp = member['expHistory']
                         totalexp = int(sum(totalexp.values()))
                         if totalexp >= self.bot.dnkl:
-                            eligiblity = True
+                            eligible = True
                         else:
-                            eligiblity = False
+                            eligible = False
                         totalexp = (format(totalexp, ',d'))
-                        if eligiblity is False:
+                        if not eligible:
                             embed = discord.Embed(title=name,
                                                   url=f'https://plancke.io/hypixel/guild/player/{name}',
                                                   color=0xff3333)
@@ -1034,7 +1034,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
                             data = await resp.json(content_type=None)
                             await session.close()
 
-                    if data["player"] is None:
+                    if not data["player"]:
                         return None
                     if "prefix" in data["player"]:
                         player_prefix = (data["player"]["prefix"])
