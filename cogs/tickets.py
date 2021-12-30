@@ -873,16 +873,36 @@ class Tickets(commands.Cog, name="Tickets"):
                     yes = Button(style=ButtonStyle.blue, label="Yes", id="yes")
                     no = Button(style=ButtonStyle.red, label="No", id="no")
 
-                    await channel.send(embed=stop_embed, components=[yes, no])
+                    await channel.send(embed=stop_embed, components=[[yes, no]])
 
                     click = await self.bot.wait_for("button_click",
                                                     check=lambda x: (
                                                                             x.author == author and x.channel == channel) or (
                                                                             self.bot.staff in x.author.roles and x.channel == channel))
-
+                    await click.respond(type=6)
                     if click.component.id == "yes":
-                        pass
+                        embed = discord.Embed(title="Who is the staff member?",
+                                              description="Please mention the staff member!\n"
+                                                          "*For Example:*\n"
+                                                          "@abcd#1234",
+                                              color=0x8368ff)
+                        embed.set_footer(
+                            text="If the staff member is an admin, please respond with `None` and then DM Rowdies")
+                        await channel.send(embed=embed)
+                        user = await self.bot.wait_for('message',
+                                                       check=lambda
+                                                           x: x.channel == channel and x.author == author)
+                        user = user.content
+                        member = self.bot.guild.get_member(int(user[3:-1]))
 
+                        await channel.set_permissions(member, send_messages=False, read_messages=False,
+                                                      add_reactions=False, embed_links=False, attach_files=False,
+                                                      read_message_history=False, external_emojis=False)
+                        embed1 = discord.Embed(
+                            title=f"{await utils.name_grabber(member)} has been removed from the ticket!",
+                            description="Please respond to the following prompts!",
+                            color=0x00A86B)
+                        await channel.send(embed=embed1)
 
                     embed = discord.Embed(title=f"{name} wishes to file a player report!",
                                           description="You are expected to provide maximum detail about the offense.\n"
@@ -893,7 +913,6 @@ class Tickets(commands.Cog, name="Tickets"):
                                                       "> Proof of offense\n"
                                                       "If you wish to report a staff member, DM <@!326399363943497728>",
                                           color=0x8368ff)
-                    await channel.purge(limit=10)
                     await channel.send(embed=embed)
                     await channel.edit(name=f"Report-{name}",
                                        category=discord.utils.get(channel.guild.categories, name="REPORTS"))
