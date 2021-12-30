@@ -35,7 +35,7 @@ async def get_player_guild(uuid):
             await session.close()
 
     # Player is not in a guild
-    if not resp["guild"] or "guild" not in resp:
+    if "guild" not in resp or not resp["guild"]:
         return None
 
     # Player is in a guild
