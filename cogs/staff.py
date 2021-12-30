@@ -483,7 +483,7 @@ class staff(commands.Cog, name="Staff"):
                     if member.id not in self.bot.admin_ids and member.bot is False:
                         name = await utils.name_grabber(member)
                         has_tag_perms = any(role in ctx.author.roles for role in self.bot.tag_allowed_roles)
-                        await msg.edit(content=f"Checking {name} - \\{member}"
+                        await msg.edit(content=f"Checking {name} - {member}"
                                                f"\n*If you see that the checking is stuck on a member, check <#523743721443950612>, if you see an error forcesync the user the bot got stuck on and then rerun rolecheck!*")
 
                         async with aiohttp.ClientSession() as session:
