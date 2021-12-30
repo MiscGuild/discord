@@ -1,5 +1,7 @@
 from discord.ext import commands
 
+from func.classes.String import String
+
 
 class Tickets(commands.Cog, name="Tickets"):
     def __init__(self, bot):
@@ -19,9 +21,11 @@ class Tickets(commands.Cog, name="Tickets"):
     # @commands.has_role("Staff")
     # async def remove(self, ctx, member: discord.Member):
 
-    # @commands.command()
-    # @commands.has_role("Staff")
-    # async def rename(self, ctx, *, channel_name: str):
+    @commands.command()
+    @commands.has_role("Staff")
+    async def rename(self, ctx, *, channel_name: str):
+        """Rename a ticket!"""
+        await String(string=channel_name).rename(ctx)
 
     # @commands.command()
     # @commands.has_role("Staff")

@@ -1,4 +1,4 @@
-# The following file contains: source, ginfo, grank, gmember, sync, info, dnkladd, dnklremove, dnkllist, dnklcheck
+# The following file contains: source, ginfo, grank, gmember, sync, info, dnkladd, dnklremove, dnkllist, dnklcheck, register, rename
 
 import discord
 import inspect
@@ -253,3 +253,15 @@ class String:
         embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
         embed.set_author(name="Do-not-kick-list: Eligibility Check")
         return embed
+
+    # async def register(self):
+
+    async def rename(self, ctx):
+        await ctx.message.delete()
+        # Channel is not a ticket
+        if ctx.channel.category.name not in bot.ticket_categories:
+            return await ctx.send("This command can only be used in tickets!")
+        
+        # Channel is a ticket
+        channel_name = self.string.replace(" ", "-")
+        await ctx.channel.edit(name=channel_name)
