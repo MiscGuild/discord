@@ -431,7 +431,7 @@ class staff(commands.Cog, name="Staff"):
         discord_member_count = 0
         for x in self.bot.misc_allies:
             ally_uuids = ally_uuids + await utils.get_guild_members(x)      #Fetches the uuids of all ally guild members
-
+            await msg.edit(content=f"**Getting Ally UUIDs** - {x}")
 
         cursor = await self.bot.db.execute("SELECT username FROM DNKL")
         rows = await cursor.fetchall()
