@@ -19,6 +19,7 @@ bot.config = config
 bot.token = config["bot"]["token"]
 bot.api_tokens = config["hypixel"]["api_keys"]
 bot.owner_id = config["bot"]["ownerID"]
+bot.guild_name = config["bot"]["hypixel_guild_name"]
 bot.resident_req = 50000
 bot.active_req = 285000
 bot.member_req = 115000

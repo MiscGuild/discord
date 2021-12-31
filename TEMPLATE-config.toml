@@ -1,14 +1,15 @@
 [bot]
-prefix = ''
+prefix = ""
 token = ""
-ownerID = 
-status = ''
+ownerID = XXXXXXXXXXXXXXXXXX
+status = ""
 error_channel_id = XXXXXXXXXXXXXXXXXX
 dnkl_channel_id = XXXXXXXXXXXXXXXXXX
 ticket_channel_id = XXXXXXXXXXXXXXXXXX
 log_channel_id = XXXXXXXXXXXXXXXXXX
 registration_channel_id = XXXXXXXXXXXXXXXXXX
 guild_id = XXXXXXXXXXXXXXXXXX
+hypixel_guild_name = ""
 
 [hypixel]
 api_keys = [
