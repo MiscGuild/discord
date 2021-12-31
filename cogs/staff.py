@@ -429,9 +429,9 @@ class staff(commands.Cog, name="Staff"):
         misc_members, ally_members, ally_uuids = [], [], []
         start_time = time.time()
         discord_member_count = 0
-        for x in self.bot.misc_allies:
-            ally_uuids = ally_uuids + await utils.get_guild_members(x)      #Fetches the uuids of all ally guild members
-            await msg.edit(content=f"**Getting Ally UUIDs** - {x}")
+        for ally in self.bot.misc_allies:
+            ally_uuids = ally_uuids + await utils.get_guild_members(ally)      #Fetches the uuids of all ally guild members
+            await msg.edit(content=f"**Getting Ally UUIDs** - {ally}")
 
         cursor = await self.bot.db.execute("SELECT username FROM DNKL")
         rows = await cursor.fetchall()
@@ -479,7 +479,7 @@ class staff(commands.Cog, name="Staff"):
         for guild in self.bot.guilds:
             if str(guild) == "Miscellaneous [MISC]":  # Check if the Discord is Miscellaneous
                 for member in guild.members:  # For loop for all members in the Discord
-                    discord_member_count+=1
+                    discord_member_count += 1
                     if member.id not in self.bot.admin_ids and member.bot is False:
                         name = await utils.name_grabber(member)
                         has_tag_perms = any(role in ctx.author.roles for role in self.bot.tag_allowed_roles)
@@ -492,9 +492,9 @@ class staff(commands.Cog, name="Staff"):
                                 if mojang.status != 200:  # If the IGN is invalid
                                     await member.remove_roles(self.bot.member_role,
                                                               self.bot.guest,
-                                                              reason="Rolecheck")
+                                                              reason="Rolecheck - Invalid IGN - Removed Member &/or Guest")
                                     await member.add_roles(self.bot.new_member_role,
-                                                           reason="Rolecheck"),
+                                                           reason="Rolecheck - Invalid IGN - Given New Member"),
                                     continue
                                 elif self.bot.guild_master not in member.roles:
                                     mojang_json = await mojang.json()
@@ -539,7 +539,7 @@ class staff(commands.Cog, name="Staff"):
                                                 await member.edit(nick=name)
                                             if name not in dnkl_names:  # If the member doesn't meet base guild requirements
                                                 await member.add_roles(self.bot.inactive_role,
-                                                                       reason="Rolecheck - Guild Requirements not met - Given Active role")
+                                                                       reason="Rolecheck - Guild Requirements not met - Given Inactive role")
                                             await member.remove_roles(self.bot.active_role,
                                                                       reason="Rolecheck - Guild Requirements not met - Removed Active role")
 
@@ -555,9 +555,9 @@ class staff(commands.Cog, name="Staff"):
                                         if totalexp < self.bot.resident_req:    # Base requirement check for residents
                                             if has_tag_perms is False:
                                                 await member.edit(nick=name)
-                                            await member.add_roles(self.bot.inactive_role, reason="Rolecheck")
-                                            await member.remove_roles(self.bot.active_role, self.bot.ally,
-                                                                      reason="Rolecheck")
+                                            await member.add_roles(self.bot.inactive_role, reason="Rolecheck - Resident Requirements not met - Added Inactive")
+                                            await member.remove_roles(self.bot.active_role,
+                                                                      reason="Rolecheck - Resident Requirements not met - Removed Active")
 
                                         else:  # If the resident meets base resident requirements
                                             if has_tag_perms is False:
@@ -594,17 +594,27 @@ class staff(commands.Cog, name="Staff"):
                                                       self.bot.inactive_role,
                                                       self.bot.ally,
                                                       reason="Rolecheck - Guest - Removed Member, New Member, Active, Inactive &/or Ally")
-                end_time = time.time()
                 await msg.edit(content=f"**Completed rolecheck for {discord_member_count} discord members!**\n"
-                                       f"Time Taken for execution- {round(end_time-start_time)}")
+                                       f"Time Taken for execution- {round(time.time()-start_time)}")
         if not send_ping:
             inactivity_channel = self.bot.get_channel(848067712156434462)
+            reg_channel = self.bot.get_channel(714882620001091585)
 
-            embed = discord.Embed(title="You do not meet the guild requirements!",
-                                  description=f"Member requirement - **{format(self.bot.inactive, ',d')}** Weekly Guild Experience\nResident requirement - **{format(self.bot.resident_req, ',d')}** Weekly Guild Experience",
-                                  color=0xDC143C)
-            await inactivity_channel.send(f"<@&848051215287058443>")
-            await inactivity_channel.send(embed=embed)
+            inactive_embed = discord.Embed(title="You do not meet the guild requirements!",
+                                           description=f"Member requirement - **{format(self.bot.inactive, ',d')}** Weekly Guild Experience\nResident requirement - **{format(self.bot.resident_req, ',d')}** Weekly Guild Experience",
+                                           color=0xDC143C)
+
+
+            registration_embed = discord.Embed(title="Rolecheck: The bot removed your access to the guild discord!",
+                                               description="The bot removed your Member/Guest role because you discord nick didn't match your minecraft IGN!",
+                                               color=0x8368ff)
+            registration_embed.add_field(name="To register do the following:",
+                                         value="**,register** `Your Minecraft name`\n\n*Example:*\n,register John")
+
+            await inactivity_channel.send(f"<@&848051215287058443>", embed=inactive_embed)
+            await reg_channel.send(f"<@&714863380707409980>", embed=registration_embed)
+
+
 
 
 def setup(bot):
