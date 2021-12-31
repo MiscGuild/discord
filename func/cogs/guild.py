@@ -55,10 +55,14 @@ class Guild(commands.Cog, name="Guild"):
     # @commands.command(aliases=["gt"])
     # async def gtop(self, ctx):
 
-    # @commands.command()
-    # async def dailylb(self, ctx, day=1):
-    #     msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
-    #     await ctx.send(await Integer(integer=day).dailylb(msg))
+    @commands.command()
+    async def gtop(self, ctx, day=1):
+        """View the daily guild experience leaderboard!"""
+        res = await Integer(integer=day).gtop(ctx=ctx)
+        if isinstance(res, discord.File):
+            await ctx.send(file=res)
+        elif isinstance(res, discord.Embed):
+            await ctx.send(embed=res)
 
     # @commands.command(aliases=['req', 'requirement'])
     # async def requirements(self, ctx):

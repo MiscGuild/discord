@@ -1,4 +1,5 @@
 import discord
+from enum import Enum
 
 # Colors
 neg_color = 0xff3333
@@ -9,6 +10,7 @@ error_color = 0xDE3163
 # General information
 staff_impersonation_embed = discord.Embed(title="Staff impersonation is a punishable offense!", color=neg_color)
 guildless_embed = discord.Embed(title="Guildless!", description="This player is not in a guild!", color=neg_color)
+invalid_guild_embed = discord.Embed(title="Invalid guild!", description="This guild doesn't seem to exist!", color=neg_color)
 unknown_ign_embed = discord.Embed(title="Please enter a valid Minecraft username!", color=neg_color)
 unknown_ign_msg = "Unknown IGN!"
 
@@ -44,3 +46,19 @@ err_404_embed = discord.Embed(title="404 - Not Found",
 bot_missing_perms_embed = discord.Embed(title="Missing permissions!",
                                         description="Due to the role hierarchy, the bot does not have the permission to do that!",
                                         color=error_color)
+
+class ChatColor(Enum):
+    RED = "&c"
+    GOLD = "&6"
+    GREEN = "&a"
+    YELLOW = "&e"
+    LIGHT_PURPLE = "&d"
+    WHITE = "&f"
+    BLUE = "&9"
+    DARK_GREEN = "&2"
+    DARK_RED = "&4"
+    DARK_AQUA = "&3"
+    DARK_PURPLE = "&5"
+    DARK_GRAY = "&8"
+    BLACK = "&0"
+    DARK_BLUE = "&1"
