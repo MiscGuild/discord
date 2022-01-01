@@ -1,4 +1,4 @@
-# The following file contains: source, grank, gmember, sync, info, dnkladd, dnklremove, dnkllist, dnklcheck, register, rename
+# The following file contains: source, gmember, sync, info, dnkladd, dnklremove, dnkllist, dnklcheck, register, rename
 
 import discord
 import inspect
@@ -52,9 +52,6 @@ class String:
 
         final_url = f"<{source_url}/blob/{branch}/{location}#L{firstlineno}-L{firstlineno + len(lines) - 1}>"
         return f"Following is the source code for {self.string}\n{final_url}"
-
-
-    # async def grank(msg):
 
     async def gmember(self, ctx):
         name, uuid = await get_mojang_profile(self.string)

@@ -10,17 +10,11 @@ class Guild(commands.Cog, name="Guild"):
     def __init__(self, bot):
         self.bot = bot
 
-
     # @commands.command()
     # async def gactive(self, ctx):
 
     # @commands.command()
     # async def ginactive(self, ctx):
-
-    # @commands.command(aliases=['gr'])
-    # async def grank(self, ctx, reqrank: str):
-    #     msg = await ctx.send("**Please wait!**\n `Approximate wait time: Calculating`")
-    #     await ctx.send(embed=await String(string=reqrank).grank(msg))
 
     @commands.command(aliases=['gm', 'g'])
     async def gmember(self, ctx, name=None):
