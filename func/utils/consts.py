@@ -9,9 +9,9 @@ error_color = 0xDE3163
 
 # General information
 staff_impersonation_embed = discord.Embed(title="Staff impersonation is a punishable offense!", color=neg_color)
-guildless_embed = discord.Embed(title="Guildless!", description="This player is not in a guild!", color=neg_color)
-invalid_guild_embed = discord.Embed(title="Invalid guild!", description="This guild doesn't seem to exist!", color=neg_color)
-unknown_ign_embed = discord.Embed(title="Please enter a valid Minecraft username!", color=neg_color)
+guildless_embed = discord.Embed(title="Guildless!", description="This player is not in a guild!", color=error_color)
+invalid_guild_embed = discord.Embed(title="Invalid guild!", description="This guild doesn't seem to exist!", color=error_color)
+unknown_ign_embed = discord.Embed(title="Please enter a valid Minecraft username!", color=error_color)
 unknown_ign_msg = "Unknown IGN!"
 
 # General embeds
