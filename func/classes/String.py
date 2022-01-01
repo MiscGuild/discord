@@ -1,4 +1,4 @@
-# The following file contains: source, ginfo, grank, gmember, sync, info, dnkladd, dnklremove, dnkllist, dnklcheck, register, rename
+# The following file contains: source, grank, gmember, sync, info, dnkladd, dnklremove, dnkllist, dnklcheck, register, rename
 
 import discord
 import inspect
@@ -8,8 +8,7 @@ from datetime import datetime
 from discord.errors import Forbidden
 from quickchart import QuickChart
 
-from func.utils.consts import pos_color, neg_color, neutral_color, guildless_embed, unknown_ign_embed, \
-    staff_impersonation_embed, bot_missing_perms_embed
+from func.utils.consts import pos_color, neg_color, neutral_color, guildless_embed, unknown_ign_embed, staff_impersonation_embed, bot_missing_perms_embed
 from func.utils.discord_utils import has_tag_perms, check_tag
 from func.utils.minecraft_utils import get_player_gexp, get_graph_color_by_rank
 from func.utils.request_utils import get_mojang_profile, get_player_guild, get_gtag
@@ -21,9 +20,6 @@ class String:
 
     # Command from https://github.com/Rapptz/RoboDanny
     async def source(self):
-        """
-        Displays the source code for the given command!
-        """
         source_url = "https://github.com/MiscGuild/MiscBot"
         branch = "main"
 
@@ -57,7 +53,6 @@ class String:
         final_url = f"<{source_url}/blob/{branch}/{location}#L{firstlineno}-L{firstlineno + len(lines) - 1}>"
         return f"Following is the source code for {self.string}\n{final_url}"
 
-    # async def ginfo():
 
     # async def gexp():
 
