@@ -151,7 +151,7 @@ class String:
         new_nick = ign
 
         guild_name = await get_player_guild(uuid)
-        guild_name = guild_name["guild"]["name"]
+        guild_name = "no guild" if not guild_name else guild_name["guild"]["name"]
         can_tag = await has_tag_perms(ctx.author)
 
         # Check tag before other logic
@@ -182,8 +182,6 @@ class String:
             if str(ctx.channel.category.name) == "RTickets" and not is_fs:
                 return "You cannot use this command in a registration ticket!\nKindly await staff assistance!"
 
-            if not guild_name:
-                guild_name = "no guild"
             roles_to_add.append(bot.guest)
             roles_to_remove.extend([bot.member_role, bot.awaiting_app])
 
