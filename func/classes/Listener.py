@@ -6,7 +6,7 @@ from discord.ext import commands
 import discord
 import traceback
 
-from func.utils.consts import registration_embed, not_owner_embed, missing_role_embed, missing_permissions_embed, member_not_found_embed
+from func.utils.consts import invalid_command_embed, registration_embed, not_owner_embed, missing_role_embed, missing_permissions_embed, member_not_found_embed
 
 class Listener:
     def __init__(self, res):
@@ -25,10 +25,7 @@ class Listener:
     async def on_command_error(ctx, error):
         # Prevents commands with local handlers or cogs with overwrritten on_command_errors being handled here
         if isinstance(error, commands.CommandNotFound):
-            embed = discord.Embed(title=f"Invalid Command!",
-                                descrption="Use `,help` to view a list of all commands!", color=0xDE3163)
-            await ctx.send(embed=embed)
-            return
+            return await ctx.send(embed=invalid_command_embed)
         elif ctx.command.has_error_handler() or ctx.cog.has_error_handler():
             return
 
