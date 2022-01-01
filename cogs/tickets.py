@@ -73,7 +73,7 @@ class Tickets(commands.Cog, name="Tickets"):
                         ]
                     )
                     interaction = await self.bot.wait_for("select_option")
-                    await click.respond(type=6)  # interaction.values is a list
+                    await interaction.respond(type=6)  # interaction.values is a list
                     reply = interaction.values[0]
 
                     if reply == "Alliance":

@@ -595,7 +595,7 @@ class staff(commands.Cog, name="Staff"):
                                                       self.bot.ally,
                                                       reason="Rolecheck - Guest - Removed Member, New Member, Active, Inactive &/or Ally")
                 await msg.edit(content=f"**Completed rolecheck for {discord_member_count} discord members!**\n"
-                                       f"Time Taken for execution- {round(time.time()-start_time)}")
+                                       f"Time Taken for execution- {round((time.time()-start_time)/60)} Minutes")
         if not send_ping:
             inactivity_channel = self.bot.get_channel(848067712156434462)
             reg_channel = self.bot.get_channel(714882620001091585)
