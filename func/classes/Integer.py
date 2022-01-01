@@ -1,13 +1,11 @@
 # The following file contains: giveawayend, giveawayreroll, gtop, purge
 from __main__ import bot
-from io import BytesIO
-import aiohttp
 import discord
 
 from func.utils.discord_utils import name_grabber, log_event, get_giveaway_status, roll_giveaway
 from func.utils.minecraft_utils import get_hypixel_player_rank
 from func.utils.request_utils import get_guild_by_name, get_name_by_uuid, get_hypixel_player, get_gtop
-from func.utils.consts import invalid_guild_embed
+from func.utils.consts import invalid_guild_embed, error_color
 
 class Integer:
     def __init__(self, integer: int):
@@ -42,6 +40,10 @@ class Integer:
             return "This giveaway hasn't ended yet!\n`To end it, use ,giveawayend`"
 
     async def gtop(self, ctx):
+        # Check no. days requested to prevent errors
+        if self.integer > 6:
+            return discord.Embed(title="Invalid timestamp!", description="You cannot request data this old!", color=error_color)
+
         await ctx.message.delete()
         async with ctx.channel.typing():
             guild_data = await get_guild_by_name(bot.guild_name)
@@ -65,7 +67,6 @@ class Integer:
                 user_data = member_gexp[i]
                 name = await get_name_by_uuid(user_data[0])
                 rank = await get_hypixel_player_rank(await get_hypixel_player(name))
-                print(rank, name, user_data)
 
                 # Add new entry to image content
                 image_content += f"&6{i + 1}. {rank} {name} &2{format(user_data[1], ',d')} Guild Experience"
