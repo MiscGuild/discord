@@ -9,16 +9,7 @@ from func.utils.discord_utils import name_grabber
 class Guild(commands.Cog, name="Guild"):
     def __init__(self, bot):
         self.bot = bot
-        
 
-    # @commands.command(aliases=['ge'])
-    # async def gexp(self, ctx, *, name: str):
-    #     result = await String(string=name).gexp()
-    #     # Send result according to returned value
-    #     if isinstance(result, discord.Embed):
-    #         await ctx.send(embed=result)
-    #     elif isinstance(result, str):
-    #         await ctx.send(result)
 
     # @commands.command()
     # async def gactive(self, ctx):

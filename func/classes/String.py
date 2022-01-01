@@ -54,8 +54,6 @@ class String:
         return f"Following is the source code for {self.string}\n{final_url}"
 
 
-    # async def gexp():
-
     # async def grank(msg):
 
     async def gmember(self, ctx):
