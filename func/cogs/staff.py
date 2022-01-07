@@ -1,7 +1,7 @@
 from discord.ext import commands
 import discord
 
-from func.classes.String import String
+from func.classes.Union import Union
 
 class Staff(commands.Cog, name="Staff"):
     def __init__(self, bot):
@@ -15,7 +15,7 @@ class Staff(commands.Cog, name="Staff"):
     @commands.has_role("Staff")
     async def forcesync(self, ctx, member: discord.Member, name):
         """Update a user's discord nick, tag and roles for them!"""
-        result = await String(string=name).sync(ctx, None, True)
+        result = await Union(user=member).sync(ctx, name, None, True)
         if isinstance(result, discord.Embed):
             await ctx.send(embed=result)
         elif isinstance(result, str):

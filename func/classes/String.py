@@ -1,17 +1,15 @@
-# The following file contains: source, gmember, sync, info, dnkladd, dnklremove, dnkllist, dnklcheck, register, rename
+# The following file contains: source, gmember, info, dnkladd, dnklremove, dnkllist, dnklcheck, register, rename
 
 import discord
 import inspect
 import os
 from __main__ import bot
 from datetime import datetime
-from discord.errors import Forbidden
 from quickchart import QuickChart
 
-from func.utils.consts import pos_color, neg_color, neutral_color, guildless_embed, unknown_ign_embed, staff_impersonation_embed, bot_missing_perms_embed
-from func.utils.discord_utils import has_tag_perms, check_tag
 from func.utils.minecraft_utils import get_player_gexp, get_graph_color_by_rank
-from func.utils.request_utils import get_mojang_profile, get_player_guild, get_gtag
+from func.utils.request_utils import get_mojang_profile, get_player_guild
+from func.utils.consts import pos_color, neg_color, guildless_embed
 
 
 class String:
@@ -134,78 +132,6 @@ class String:
                     }
                 }
                 return embed.set_image(url=chart.get_url())
-
-    async def sync(self, ctx, tag=None, is_fs=False):
-        ign, uuid = await get_mojang_profile(self.string)
-
-        # Invalid username
-        if not ign:
-            return unknown_ign_embed
-        # User trying to sync with staff name
-        elif ign in bot.staff_names and bot.staff not in ctx.author.roles:
-            return staff_impersonation_embed
-
-        # Initialize vars for storing changes
-        roles_to_add = []
-        roles_to_remove = []
-        new_nick = ign
-
-        guild_name = await get_player_guild(uuid)
-        guild_name = "no guild" if not guild_name else guild_name["guild"]["name"]
-        can_tag = await has_tag_perms(ctx.author)
-
-        # Check tag before other logic
-        if tag and can_tag:
-            tag_check_success, tag_check_reason = await check_tag(tag)
-            if tag_check_success:
-                new_nick += f"[{tag}]"
-            else:
-                return tag_check_reason
-
-        # Users is in Misc
-        if guild_name == "Miscellaneous":
-            roles_to_add.append(bot.member_role)
-            roles_to_remove.extend([bot.guest, bot.awaiting_app])
-
-        # User is an ally
-        elif guild_name in bot.misc_allies:
-            gtag = await get_gtag(guild_name)
-
-            # Account for if user has nick perms
-            new_nick = ign + " " + gtag
-            roles_to_remove.extend([self.bot.new_member_role, self.bot.awaiting_app, self.bot.member_role])
-            roles_to_add.extend([self.bot.guest, self.bot.ally])
-
-        # User is a guest
-        else:
-            # Filter people who have not been approved to join the discord
-            if str(ctx.channel.category.name) == "RTickets" and not is_fs:
-                return "You cannot use this command in a registration ticket!\nKindly await staff assistance!"
-
-            roles_to_add.append(bot.guest)
-            roles_to_remove.extend([bot.member_role, bot.awaiting_app])
-
-        # Create embed
-        footer = f"• Member of {guild_name}"
-        for role in roles_to_remove:
-            footer += f"\n• Removed {role.name}"
-        for role in roles_to_add:
-            footer += f"\n• Added {role.name}"
-
-        embed = discord.Embed(title="Your nick, roles, and tag have been successfully changed!",
-                              description="If this wasn't the change you anticipated, please create a ticket!",
-                              color=neutral_color)
-        embed.set_footer(text=footer)
-
-        # Set roles and nick
-        await ctx.author.add_roles(*roles_to_add, reason="Sync")
-        await ctx.author.remove_roles(*roles_to_remove, reason="Sync")
-        try:
-            await ctx.author.edit(nick=new_nick)
-        except Forbidden:
-            return bot_missing_perms_embed
-
-        return embed
 
     # async def info():
 
