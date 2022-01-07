@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 
+from func.classes.Union import Union
 from func.classes.String import String
 from func.utils.discord_utils import name_grabber
 
@@ -12,7 +13,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
     @commands.command()
     async def sync(self, ctx, name: str, tag: str = None):
         """Update your discord nick, tag and roles!"""
-        result = await String(string=name).sync(ctx, tag)
+        result = await Union(user=ctx.author).sync(ctx, name, tag)
         if isinstance(result, discord.Embed):
             await ctx.send(embed=result)
         elif isinstance(result, str):
