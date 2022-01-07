@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from discord.ext import commands, tasks
 
 from func.classes.Integer import Integer
+from func.utils.discord_utils import roll_giveaway
 
 
 class Giveaways(commands.Cog, name="Giveaways"):
@@ -40,7 +41,7 @@ class Giveaways(commands.Cog, name="Giveaways"):
 
             # Giveaway needs to be ended
             if status == "active" and datetime_end < datetime.utcnow():
-                await self.roll_giveaway(message_id)
+                await roll_giveaway(message_id)
 
             # Giveaway ended more than 10 days ago, delete it
             elif status == "inactive" and datetime.utcnow() > datetime_end + timedelta(days=10):
