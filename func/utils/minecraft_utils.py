@@ -1,6 +1,7 @@
 # The following file contains: get_player_gexp, get_graph_color_by_rank
 
 from __main__ import bot
+import math
 
 from func.utils.request_utils import get_mojang_profile, get_player_guild
 from func.utils.consts import ChatColor
@@ -100,3 +101,8 @@ async def get_hypixel_player_rank(player_data: dict):
                     return "&b[MVP&c+&b]"
     else:
         return "&7"
+
+
+# Returns player's network level from total exp
+async def calculate_network_level(total_exp: int):
+    return round((math.sqrt((2 * total_exp) + 30625) / 50) - 2.5, 2)

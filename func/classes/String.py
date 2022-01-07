@@ -7,9 +7,9 @@ from __main__ import bot
 from datetime import datetime
 from quickchart import QuickChart
 
-from func.utils.minecraft_utils import get_player_gexp, get_graph_color_by_rank
-from func.utils.request_utils import get_mojang_profile, get_player_guild
-from func.utils.consts import pos_color, neg_color, guildless_embed
+from func.utils.minecraft_utils import get_hypixel_player_rank, get_player_gexp, get_graph_color_by_rank, calculate_network_level
+from func.utils.request_utils import get_gtag, get_hypixel_player, get_mojang_profile, get_player_guild
+from func.utils.consts import pos_color, neg_color, guildless_embed, unknown_ign_embed
 
 
 class String:
@@ -133,7 +133,37 @@ class String:
                 }
                 return embed.set_image(url=chart.get_url())
 
-    # async def info():
+    async def info(self):
+        player_data = await get_hypixel_player(self.string)
+        # Player doesn't exist
+        if not player_data:
+            return unknown_ign_embed
+
+        # Gather info
+        ign = player_data["displayname"]
+        uuid = player_data["uuid"]
+        rank = await get_hypixel_player_rank(player_data)
+        nwl = await calculate_network_level(player_data["networkExp"])
+        karma = f"{int(player_data['karma']):,d}"
+        achievement_points =  "-"  if not player_data["achievementPoints"] else f"{int(player_data['achievementPoints']):,d}"
+        completed_challenges = "0" if not player_data["achievements"]["general_challenger"] else f"{int(player_data['achievements']['general_challenger']):,d}"
+        completed_quests = "-" if not player_data["quests"] else f"{len(player_data['quests']):,d}"
+        first_login = datetime.fromtimestamp(int(str(player_data["firstLogin"])[:-3]))
+        last_login = "Unkown" if not player_data["lastLogin"] else  datetime.fromtimestamp(int(str(player_data["lastLogin"])[:-3]))
+        gtag = await get_player_guild(uuid)
+        gtag = "" if not gtag or not gtag["guild"]["tag"] else f"[{gtag['guild']['tag']}]"
+
+        embed = discord.Embed(title=f"{rank} {ign} {gtag}",
+                                url=f'https://plancke.io/hypixel/player/stats/{ign}',
+                                color=0x8368ff)
+        embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
+        embed.add_field(name="Network Level:", value=f"`{nwl}`", inline=True)
+        embed.add_field(name="Karma:", value=f"`{karma}`", inline=True)
+        embed.add_field(name="Achievement Points:", value=f"`{achievement_points}`", inline=False)
+        embed.add_field(name="Challenges Finished:", value=f"`{completed_challenges}`", inline=True)
+        embed.add_field(name="Quests Completed:", value=f"`{completed_quests}`", inline=True)
+        embed.add_field(name="First • Last login", value=f"`{first_login} • {last_login}`", inline=False)
+        return embed.set_image(url=f"https://gen.plancke.io/exp/{ign}.png")
 
     # async def dnkladd(start: str, end: str, *, reason: str):
 

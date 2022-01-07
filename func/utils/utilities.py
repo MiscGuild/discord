@@ -38,15 +38,6 @@ async def get_leaderboards():
         return None
 
 
-async def get_level(name):
-    data = await get_data(name)
-    if not data["player"]:
-        return None
-    exp = int(data["player"]["networkExp"])  # This just gets the player experience from our data
-    exp = (math.sqrt((2 * exp) + 30625) / 50) - 2.5
-    return round(exp, 2)
-
-
 async def get_karma(name):
     data = await get_data(name)
     if 'cause' in data:

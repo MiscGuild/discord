@@ -19,9 +19,12 @@ class Hypixel(commands.Cog, name="Hypixel"):
         elif isinstance(result, str):
             await ctx.send(result)
 
-    # @commands.command(aliases=["i"])
-    # async def info(self, ctx, name: str=None):
-    #     await ctx.send(embed=await String(string=name).info())
+    @commands.command()
+    async def info(self, ctx, name: str=None):
+        """View Hyipxel stats of the given user!"""
+        if name == None:
+            name = await name_grabber(ctx.author)
+        await ctx.send(embed=await String(string=name).info())
 
     # @commands.command()
     # @commands.has_permissions(manage_messages=True)
