@@ -6,10 +6,12 @@ import os
 from __main__ import bot
 from datetime import datetime
 from quickchart import QuickChart
+from func.utils.discord_utils import is_valid_date
 
 from func.utils.minecraft_utils import get_hypixel_player_rank, get_player_gexp, get_graph_color_by_rank, calculate_network_level
-from func.utils.request_utils import get_gtag, get_hypixel_player, get_mojang_profile, get_player_guild
-from func.utils.consts import pos_color, neg_color, guildless_embed, unknown_ign_embed
+from func.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild
+from func.utils.db_utils import select_one, insert_new_dnkl, update_dnkl
+from func.utils.consts import pos_color, neutral_color, neg_color, guildless_embed, unknown_ign_embed, invalid_date_msg, months
 
 
 class String:
@@ -165,7 +167,69 @@ class String:
         embed.add_field(name="First • Last login", value=f"`{first_login} • {last_login}`", inline=False)
         return embed.set_image(url=f"https://gen.plancke.io/exp/{ign}.png")
 
-    # async def dnkladd(start: str, end: str, *, reason: str):
+    async def dnkladd(self, ctx):
+        # start, end, reason
+        ign, uuid = await get_mojang_profile(self.string)
+        if not ign:
+            return unknown_ign_embed
+
+        # Ask for start date
+        await ctx.send("**What is the start date?** (YYYY/MM/DD)")
+        start_date = await bot.wait_for("message",
+                                            check=lambda
+                                            x: x.channel == ctx.channel and x.author == ctx.author)
+        valid_date, sd, sm, sy = await is_valid_date(start_date.content)
+        if not valid_date:
+            return invalid_date_msg
+
+        # Ask for end date
+        await ctx.send("**What is the end date?** (YYYY/MM/DD)")
+        end_date = await bot.wait_for("message",
+                                            check=lambda
+                                            x: x.channel == ctx.channel and x.author == ctx.author)
+        valid_date, ed, em, ey = await is_valid_date(end_date.content)
+        if not valid_date:
+            return invalid_date_msg
+
+        # Ask for reason
+        await ctx.send("**What is the reason for their inactivity?**")
+        reason = await bot.wait_for("message",
+                                            check=lambda
+                                            x: x.channel == ctx.channel and x.author == ctx.author)
+        reason = reason.content
+
+        # Get worded months (1 = January)
+        sm = months[sm]
+        em = months[em]
+
+        # Send embed to DNKL channel
+        embed = discord.Embed(title=ign,
+                                url=f'https://plancke.io/hypixel/player/stats/{ign}',
+                                color=neutral_color)
+        embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
+        embed.add_field(name="IGN:", value=f"{ign}", inline=False)
+        embed.add_field(name="Start:", value=f"{sd} {sm} {sy}", inline=False)
+        embed.add_field(name="End:", value=f"{ed} {em} {ey}", inline=False)
+        embed.add_field(name="Reason", value=f"{reason}", inline=False)
+        dnkl_message = await bot.dnkl_channel.send(embed=embed.set_author(name="Do-not-kick-list"))
+
+        # Check if user is already on DNKL
+        current_message = await select_one("SELECT message_id FROM dnkl WHERE uuid = (?)", (uuid,))
+        # User is not currently on DNKL
+        if not current_message:
+            await insert_new_dnkl(dnkl_message.id, uuid, ign)
+            return "This user has been added to the do-not-kick-list!"
+
+        # User is already on DNKl
+        # Try to delete current message
+        try:
+            current_message = await bot.dnkl_channel.fetch_message(current_message)
+            await current_message.delete()
+        except Exception:
+            pass
+
+        await update_dnkl(dnkl_message.id, uuid)
+        return "Since this user was already on the do-not-kick-list, their entry has been updated."
 
     # async def dnklremove():
 

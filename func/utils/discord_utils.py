@@ -1,5 +1,7 @@
 # The following file includes: name_grabber, log_event, has_tag_perms, check_tag, get_giveaway_status, roll_giveaway
 
+from datetime import datetime, timedelta
+from re import T
 import discord
 from __main__ import bot
 
@@ -51,3 +53,16 @@ async def get_giveaway_status(id: int):
 # Roll a giveaway
 async def roll_giveaway(reroll_target: int = None):
     return True
+
+
+# Returns if a string is a valid and parseable to a date
+async def is_valid_date(date: str):
+    # Return False if parsing fails
+    try:
+        parsed = datetime.strptime(date, "%Y/%m/%d")
+        # Validate time is within the last week
+        if parsed < datetime.utcnow() - timedelta(days=7):
+            return False, None, None, None
+        return True, parsed.day, parsed.month, parsed.year
+    except ValueError:
+        return False, None, None, None

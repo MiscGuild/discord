@@ -60,6 +60,8 @@ unknown_ign_embed = discord.Embed(title="Please enter a valid Minecraft username
 
 unknown_ign_msg = "Unknown IGN!"
 
+invalid_date_msg = "This date is invalid! This date may not be within the last week. Enter dates in the form `YYYY/MM/DD`"
+
 class ChatColor(Enum):
     RED = "&c"
     GOLD = "&6"
@@ -75,3 +77,18 @@ class ChatColor(Enum):
     DARK_GRAY = "&8"
     BLACK = "&0"
     DARK_BLUE = "&1"
+
+months = {
+    1: "January",
+    2: "February", 
+    3: "March", 
+    4: "April",
+    5: "May",
+    6: "June", 
+    7: "July", 
+    8: "August", 
+    9: "September",
+    10: "October", 
+    11: "November", 
+    12: "December"
+}

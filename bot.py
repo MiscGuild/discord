@@ -62,7 +62,9 @@ if __name__ == "__main__":
 
 
 async def connect_db():
+    from func.utils.db_utils import create_tables
     bot.db = await aiosqlite.connect("database.db")
+    await create_tables()
 
 
 bot.loop.run_until_complete(connect_db())

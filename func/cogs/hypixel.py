@@ -1,3 +1,4 @@
+from re import S
 import discord
 from discord.ext import commands
 
@@ -26,9 +27,15 @@ class Hypixel(commands.Cog, name="Hypixel"):
             name = await name_grabber(ctx.author)
         await ctx.send(embed=await String(string=name).info())
 
-    # @commands.command()
-    # @commands.has_permissions(manage_messages=True)
-    # async def dnkladd(self, ctx, name=None, start=None, end=None, *, reason=None):
+    @commands.command()
+    @commands.has_permissions(manage_messages=True)
+    async def dnkladd(self, ctx, name: str):
+        """Add a user to the do-not-kick-list!"""
+        res = await String(string=name).dnkladd(ctx)
+        if isinstance(res, str):
+            await ctx.send(res)
+        elif isinstance(res, discord.Embed):
+            await ctx.send(embed=res)
 
     # @commands.command(aliases=['dnklrmv'])
     # @commands.has_permissions(manage_messages=True)
