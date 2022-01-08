@@ -52,3 +52,6 @@ async def update_dnkl(message_id: int, uuid: str):
     await bot.db.commit()
 
 ### Giveaways
+# Get the activity status of a giveaway
+async def get_giveaway_status(id: int):
+    return await select_one("SELECT status FROM giveaways WHERE message_id = (?)", (id,))

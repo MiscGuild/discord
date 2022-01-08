@@ -2,9 +2,10 @@
 from __main__ import bot
 import discord
 
-from func.utils.discord_utils import name_grabber, log_event, get_giveaway_status, roll_giveaway
+from func.utils.discord_utils import name_grabber, log_event, roll_giveaway
 from func.utils.minecraft_utils import get_hypixel_player_rank
 from func.utils.request_utils import get_guild_by_name, get_name_by_uuid, get_hypixel_player, get_gtop
+from func.utils.db_utils import get_giveaway_status
 from func.utils.consts import invalid_guild_embed, error_color
 
 class Integer:
