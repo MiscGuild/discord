@@ -1,14 +1,10 @@
-from datetime import datetime, timedelta
-from discord.ext import commands, tasks
-
+from discord.ext import commands
 from func.classes.Integer import Integer
-from func.utils.discord_utils import roll_giveaway
 
 
 class Giveaways(commands.Cog, name="Giveaways"):
     def __init__(self, bot):
         self.bot = bot
-        self.check_giveaways.start()
 
     # @commands.command(aliases=["gcreate"])
     # @commands.has_role("Giveaway Creator")
@@ -28,29 +24,6 @@ class Giveaways(commands.Cog, name="Giveaways"):
 
     # @commands.command(aliases=["glist"])
     # async def giveawaylist(self, ctx):
-
-    @tasks.loop(minutes=1)
-    async def check_giveaways(self):
-        cursor = await self.bot.db.execute("SELECT message_id, status, time_of_finish FROM Giveaways")
-        rows = await cursor.fetchall()
-        await cursor.close()
-
-        for row in rows:
-            message_id, status, datetime_end_str = row
-            datetime_end = datetime.strptime(datetime_end_str, "%Y-%m-%d %H:%M:%S")
-
-            # Giveaway needs to be ended
-            if status == "active" and datetime_end < datetime.utcnow():
-                await roll_giveaway(message_id)
-
-            # Giveaway ended more than 10 days ago, delete it
-            elif status == "inactive" and datetime.utcnow() > datetime_end + timedelta(days=10):
-                await self.bot.db.execute("DELETE FROM Giveaways WHERE message_id = (?)", (message_id,))
-                await self.bot.db.commit()
-
-    @check_giveaways.before_loop
-    async def before_giveaway_check(self):
-        await self.bot.wait_until_ready()
 
 
 def setup(bot):

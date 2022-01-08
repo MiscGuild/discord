@@ -1,9 +1,16 @@
 # This file contains all db-related functions for inserting, updating, deleting rows etc
 
 from __main__ import bot
+from discord.ext import tasks
 from typing import Tuple
+import aiosqlite
 
-async def create_tables():
+from func.utils.discord_utils import roll_giveaway
+from datetime import datetime, timedelta
+
+async def connect_db():
+    bot.db = await aiosqlite.connect("database.db")
+
     # DNKL table:
     await bot.db.execute("""CREATE TABLE IF NOT EXISTS dnkl (
         message_id integer NOT NULL,
@@ -55,3 +62,28 @@ async def update_dnkl(message_id: int, uuid: str):
 # Get the activity status of a giveaway
 async def get_giveaway_status(id: int):
     return await select_one("SELECT status FROM giveaways WHERE message_id = (?)", (id,))
+
+@tasks.loop(minutes=1)
+async def check_giveaways(self):
+    cursor = await self.bot.db.execute("SELECT message_id, status, time_of_finish FROM Giveaways")
+    rows = await cursor.fetchall()
+    await cursor.close()
+
+    for row in rows:
+        message_id, status, datetime_end_str = row
+        datetime_end = datetime.strptime(datetime_end_str, "%Y-%m-%d %H:%M:%S")
+
+        # Giveaway needs to be ended
+        if status == "active" and datetime_end < datetime.utcnow():
+            await roll_giveaway(message_id)
+
+        # Giveaway ended more than 10 days ago, delete it
+        elif status == "inactive" and datetime.utcnow() > datetime_end + timedelta(days=10):
+            await self.bot.db.execute("DELETE FROM Giveaways WHERE message_id = (?)", (message_id,))
+            await self.bot.db.commit()
+
+@check_giveaways.before_loop
+async def before_giveaway_check(self):
+    await self.bot.wait_until_ready()
+
+check_giveaways.start()

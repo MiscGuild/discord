@@ -1,4 +1,3 @@
-import aiosqlite
 import chat_exporter
 import discord
 import logging
@@ -25,7 +24,6 @@ bot.active_req = 285000
 bot.member_req = 115000
 bot.dnkl = bot.member_req * 2
 bot.new_member = 20000
-
 
 class HelpCommand(commands.MinimalHelpCommand):
     async def send_pages(self):
@@ -61,15 +59,6 @@ if __name__ == "__main__":
             print(e)
 
 
-async def connect_db():
-    from func.utils.db_utils import create_tables
-    bot.db = await aiosqlite.connect("database.db")
-    await create_tables()
-
-
-bot.loop.run_until_complete(connect_db())
-
-
 @tasks.loop(count=1)
 async def after_cache_ready():
     bot.error_channel = bot.get_channel(config["bot"]["error_channel_id"])
@@ -103,6 +92,9 @@ async def after_cache_ready():
     bot.admin_ids = [member.id for member in bot.admin.members]
     bot.admin_names = [await name_grabber(member) for member in bot.admin.members]
     bot.staff_names = [await name_grabber(member) for member in bot.staff.members]
+
+    from func.utils.db_utils import connect_db
+    await connect_db()
 
     chat_exporter.init_exporter(bot)
 
