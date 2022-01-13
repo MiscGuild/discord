@@ -144,7 +144,7 @@ class String:
         # Gather info
         ign = player_data["displayname"]
         uuid = player_data["uuid"]
-        rank = await get_hypixel_player_rank(player_data)
+        _, rank = await get_hypixel_player_rank(player_data)
         nwl = await calculate_network_level(player_data["networkExp"])
         karma = f"{int(player_data['karma']):,d}"
         achievement_points =  "-"  if not player_data["achievementPoints"] else f"{int(player_data['achievementPoints']):,d}"
