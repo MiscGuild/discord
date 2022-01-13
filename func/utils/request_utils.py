@@ -56,7 +56,7 @@ async def get_player_guild(uuid):
         return None
 
     # Player is in a guild
-    return resp
+    return resp["guild"]
 
 
 # Returns guild data by name
@@ -73,7 +73,7 @@ async def get_guild_by_name(name):
         return None
 
     # Player is in a guild
-    return resp
+    return resp["guild"]
 
 
 # Returns the tag of a given guild

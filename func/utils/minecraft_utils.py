@@ -14,7 +14,7 @@ async def get_player_gexp(name: str):
 
     # Player is in a guild
     if guild_data:
-        for member in guild_data["guild"]["members"]:
+        for member in guild_data["members"]:
             if member["uuid"] == uuid:
                 return member["expHistory"], sum(member["expHistory"].values())
 

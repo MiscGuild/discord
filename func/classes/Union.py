@@ -98,7 +98,7 @@ class Union:
         new_nick = ign
 
         guild_name = await get_player_guild(uuid)
-        guild_name = "no guild" if not guild_name else guild_name["guild"]["name"]
+        guild_name = "no guild" if not guild_name else guild_name["name"]
         can_tag = await has_tag_perms(self.user)
 
         # Check tag before other logic

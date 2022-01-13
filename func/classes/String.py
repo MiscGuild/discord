@@ -62,11 +62,11 @@ class String:
             return guildless_embed
 
         # Get guild data
-        gname = guild["guild"]["name"]
-        gtag = gname if not guild["guild"]["tag"] else guild["guild"]["tag"]
+        gname = guild["name"]
+        gtag = gname if not guild["tag"] else guild["tag"]
 
         # Find player in req
-        for member in guild["guild"]["members"]:
+        for member in guild["members"]:
             if member["uuid"] == uuid:
                 # Get player data
                 gexp_history = member["expHistory"]
@@ -153,7 +153,7 @@ class String:
         first_login = datetime.fromtimestamp(int(str(player_data["firstLogin"])[:-3]))
         last_login = "Unkown" if not player_data["lastLogin"] else  datetime.fromtimestamp(int(str(player_data["lastLogin"])[:-3]))
         gtag = await get_player_guild(uuid)
-        gtag = "" if not gtag or not gtag["guild"]["tag"] else f"[{gtag['guild']['tag']}]"
+        gtag = "" if not gtag or not gtag["tag"] else f"[{gtag['tag']}]"
 
         embed = discord.Embed(title=f"{rank} {ign} {gtag}",
                                 url=f'https://plancke.io/hypixel/player/stats/{ign}',

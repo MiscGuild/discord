@@ -54,7 +54,7 @@ class Integer:
             member_gexp = {}
             date = None
             # Loop through all members to find top 10
-            for member in guild_data["guild"]["members"]:
+            for member in guild_data["members"]:
                 if date == None:
                     date = list(member["expHistory"].keys())[self.integer]
                 member_gexp[member["uuid"]] = list(member["expHistory"].values())[self.integer]
