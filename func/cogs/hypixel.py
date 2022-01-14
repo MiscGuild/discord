@@ -49,7 +49,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
     #     if isinstance(result, discord.Embed):
     #         await ctx.send(embed=result)
 
-    @commands.command(aliases=['dnklchk'])
+    @commands.command(aliases=["dnklchk"])
     async def dnklcheck(self, ctx, name: str = None):
         """Check whether you are eligible for the do-not-kick-list!"""
         if name == None:

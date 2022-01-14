@@ -12,7 +12,7 @@ class Staff(commands.Cog, name="Staff"):
     # @commands.has_role("Staff")
     # async def inactive(self, ctx):
 
-    @commands.command(aliases=['fs'])
+    @commands.command(aliases=["fs"])
     @commands.has_role("Staff")
     async def forcesync(self, ctx, member: discord.Member, name):
         """Update a user's discord nick, tag and roles for them!"""
