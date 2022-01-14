@@ -2,6 +2,7 @@
 
 from __main__ import bot
 from datetime import datetime
+from re import U
 import discord
 import inspect
 import os
@@ -10,7 +11,7 @@ from quickchart import QuickChart
 from func.utils.minecraft_utils import get_hypixel_player_rank, get_player_gexp, get_graph_color_by_rank, calculate_network_level
 from func.utils.discord_utils import is_valid_date
 from func.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild
-from func.utils.db_utils import select_one, insert_new_dnkl, update_dnkl
+from func.utils.db_utils import delete_dnkl, select_one, insert_new_dnkl, update_dnkl
 from func.utils.consts import pos_color, neutral_color, neg_color, guildless_embed, unknown_ign_embed, invalid_date_msg, months
 
 
@@ -231,9 +232,26 @@ class String:
         await update_dnkl(dnkl_message.id, uuid)
         return "Since this user was already on the do-not-kick-list, their entry has been updated."
 
-    # async def dnklremove():
+    async def dnklremove(self):
+        row = await select_one("SELECT * FROM dnkl WHERE username = (?)", (self.string,))
 
-    # async def dnkllist():
+        if not row:
+            return "This player is not on the do-not-kick-list!"
+        else:
+            message_id, _, username = row
+            # Delete row
+            await delete_dnkl(username)
+
+            # Delete DNKL message
+            try:
+                msg = await self.bot.dnkl_channel.fetch_message(message_id)
+                await msg.delete()
+            except Exception:
+                return f"{username} has been removed from the do-not-kick-list, however the message was not found."
+                
+            return f"{username} has been removed from the do-not-kick-list!"
+
+    # async def dnkllist(self):
 
     async def dnklcheck(self):
         _, weeklygexp = await get_player_gexp(self.string)

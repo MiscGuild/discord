@@ -36,15 +36,11 @@ class Hypixel(commands.Cog, name="Hypixel"):
         elif isinstance(res, discord.Embed):
             await ctx.send(embed=res)
 
-    # @commands.command(aliases=['dnklrmv'])
-    # @commands.has_permissions(manage_messages=True)
-    # async def dnklremove(self, ctx, name: str):
-    #     result = await String(string=name).dnklremove()
-    #     # Send result according to returned value
-    #     if isinstance(result, discord.Embed):
-    #         await ctx.send(embed=result)
-    #     elif isinstance(result, str):
-    #         await ctx.send(result)
+    @commands.command(aliases=["dnklrmv"])
+    @commands.has_permissions(manage_messages=True)
+    async def dnklremove(self, ctx, name: str):
+        """Remove a player from the do-not-kick-list"""
+        await ctx.send(await String(string=name).dnklremove())
 
     # @commands.command()
     # async def dnkllist(self, ctx, raw: str=None):

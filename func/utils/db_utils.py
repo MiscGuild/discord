@@ -59,6 +59,10 @@ async def update_dnkl(message_id: int, uuid: str):
     await bot.db.execute("UPDATE dnkl SET message_id = (?) WHERE uuid = (?)", (message_id, uuid,))
     await bot.db.commit()
 
+async def delete_dnkl(username: str):
+    await bot.db.execute("DELETE FROM dnkl WHERE username = (?)", (username,))
+    await bot.db.commit()
+
 ### Giveaways
 # Get the activity status of a giveaway
 async def get_giveaway_status(id: int):
