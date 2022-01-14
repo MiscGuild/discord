@@ -109,8 +109,8 @@ class Union:
             else:
                 return tag_check_reason
 
-        # Users is in Misc
-        if guild_name == "Miscellaneous":
+        # Users is a member
+        if guild_name == bot.guild_name:
             roles_to_add.append(bot.member_role)
             roles_to_remove.extend([bot.guest, bot.awaiting_app])
 

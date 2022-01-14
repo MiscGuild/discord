@@ -296,14 +296,14 @@ class String:
             guild = await get_player_guild(uuid)
             guild_name = None if guild == None else guild["name"]
 
-            # User is a member of Miscellaneous
-            if guild_name == "Miscellaneous":
+            # User is a member
+            if guild_name == bot.guild_name:
                 # Add member role and delete message
                 await ctx.author.add_roles(bot.member_role, reason="Register")
                 await ctx.message.delete()
                 embed = discord.Embed(title="Registration successful!")
                 embed.add_field(name=ign,
-                                value="Member of Miscellaneous")
+                                value="Member of " + bot.guild_name)
                 return embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
 
             # User is in an allied guild
