@@ -154,11 +154,11 @@ async def after_cache_ready():
         async def send_pages(self):
             destination = self.get_destination()
             for page in self.paginator.pages:
-                embed = discord.Embed(description=page, color=0x8368ff)
+                embed = discord.Embed(description=page, color=neutral_color)
                 await destination.send(embed=embed)
 
         async def send_command_help(self, command):
-            embed = discord.Embed(title=self.get_command_signature(command), color=0x8368ff)
+            embed = discord.Embed(title=self.get_command_signature(command), color=neutral_color)
             embed.add_field(name="Help", value=command.help)
             alias = command.aliases
             if alias:
