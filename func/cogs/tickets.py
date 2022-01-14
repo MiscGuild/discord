@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 
 from func.classes.String import String
@@ -7,8 +8,14 @@ class Tickets(commands.Cog, name="Tickets"):
     def __init__(self, bot):
         self.bot = bot
 
-    # @commands.command(aliases=['reg', 'verify'])
-    # async def register(self, ctx, name: str):
+    @commands.command(aliases=["reg", "verify"])
+    async def register(self, ctx, name: str):
+        """Register with your IGN to sync your roles!"""
+        res = await String(string=name).register(ctx)
+        if isinstance(res, discord.Embed):
+            await ctx.send(embed=res)
+        if isinstance(res, String):
+            await ctx.send(res)
 
     # @commands.command(aliases=['del'])
     # async def delete(self, ctx):

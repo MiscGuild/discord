@@ -2,17 +2,16 @@
 
 from __main__ import bot
 from datetime import datetime
-from re import U
 import discord
 import inspect
 import os
 from quickchart import QuickChart
 
 from func.utils.minecraft_utils import get_hypixel_player_rank, get_player_gexp, get_graph_color_by_rank, calculate_network_level
-from func.utils.discord_utils import is_valid_date
+from func.utils.discord_utils import create_ticket, is_valid_date
 from func.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild
 from func.utils.db_utils import delete_dnkl, select_one, insert_new_dnkl, update_dnkl
-from func.utils.consts import pos_color, neutral_color, neg_color, guildless_embed, unknown_ign_embed, invalid_date_msg, months
+from func.utils.consts import pos_color, neutral_color, neg_color, guildless_embed, unknown_ign_embed, staff_impersonation_embed, invalid_date_msg, months
 
 
 class String:
@@ -280,7 +279,61 @@ class String:
         embed.set_author(name="Do-not-kick-list: Eligibility Check")
         return embed
 
-    # async def register(self):
+    async def register(self, ctx):
+        async with ctx.channel.typing():
+            # Make sure it is only used in registration channel
+            if ctx.channel != bot.registration_channel:
+                return "This command can only be used in the registration channel!"
+                
+            ign, uuid = await get_mojang_profile(self.string)
+
+            if ign == None:
+                return unknown_ign_embed
+            # Filter out people impersonating staff
+            if ign in bot.staff_names:
+                return staff_impersonation_embed
+
+            guild = await get_player_guild(uuid)
+            guild_name = None if guild == None else guild["name"]
+
+            # User is a member of Miscellaneous
+            if guild_name == "Miscellaneous":
+                # Add member role and delete message
+                await ctx.author.add_roles(self.bot.member_role, reason="Register")
+                await ctx.message.delete()
+                embed = discord.Embed(title="Registration successful!")
+                embed.add_field(name=ign,
+                                value="Member of Miscellaneous")
+                return embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
+
+            # User is in an allied guild
+            if guild_name in bot.misc_allies:
+                # Add guild tag as nick
+                gtag = "" if "tag" not in guild else guild["tag"]
+                if not ctx.author.nick or gtag not in ctx.author.nick:
+                    ign = ign + " " + gtag
+                    await ctx.author.edit(nick=ign)
+
+                    # Add and remove roles and delete message
+                    await ctx.author.remove_roles(self.bot.new_member_role, reason="Register")
+                    await ctx.author.add_roles(self.bot.guest, self.bot.ally, reason="Register")
+                    await ctx.message.delete()
+
+                    embed = discord.Embed(title="Registration successful!")
+                    embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
+                    return embed.add_field(name=ign, value=f"Member of {guild}")
+
+            # User is a guest
+            await ctx.author.remove_roles(self.bot.new_member_role, reason="Register")
+            await ctx.author.add_roles(self.bot.awaiting_app, reason="Register")
+            await ctx.message.delete()
+
+            # Create registration ticket
+            await create_ticket("RTickets", f"registration-ticket-{ctx.author.name}", ctx.author)
+
+            embed = discord.Embed(title="Registration successful!")
+            embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
+            return embed.add_field(name=ign, value="New Member")
 
     async def rename(self, ctx):
         await ctx.message.delete()
