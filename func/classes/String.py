@@ -147,13 +147,13 @@ class String:
         _, rank = await get_hypixel_player_rank(player_data)
         nwl = await calculate_network_level(player_data["networkExp"])
         karma = f"{int(player_data['karma']):,d}"
-        achievement_points =  "-"  if not player_data["achievementPoints"] else f"{int(player_data['achievementPoints']):,d}"
-        completed_challenges = "0" if not player_data["achievements"]["general_challenger"] else f"{int(player_data['achievements']['general_challenger']):,d}"
-        completed_quests = "-" if not player_data["quests"] else f"{len(player_data['quests']):,d}"
+        achievement_points =  "-"  if "achievementPoints" not in player_data else f"{int(player_data['achievementPoints']):,d}"
+        completed_challenges = "0" if "general_challenger" not in player_data["achievements"] else f"{int(player_data['achievements']['general_challenger']):,d}"
+        completed_quests = "-" if "quests" not in player_data else f"{len(player_data['quests']):,d}"
         first_login = datetime.fromtimestamp(int(str(player_data["firstLogin"])[:-3]))
-        last_login = "Unkown" if not player_data["lastLogin"] else  datetime.fromtimestamp(int(str(player_data["lastLogin"])[:-3]))
-        gtag = await get_player_guild(uuid)
-        gtag = "" if not gtag or not gtag["tag"] else f"[{gtag['tag']}]"
+        last_login = "Unkown" if "lastLogin" not in player_data else datetime.fromtimestamp(int(str(player_data["lastLogin"])[:-3]))
+        guild = await get_player_guild(uuid)
+        gtag = "" if not guild or "tag" not in guild else f"[{guild['tag']}]"
 
         embed = discord.Embed(title=f"{rank} {ign} {gtag}",
                                 url=f'https://plancke.io/hypixel/player/stats/{ign}',
