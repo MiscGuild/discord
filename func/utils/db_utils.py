@@ -1,12 +1,13 @@
 # This file contains all db-related functions for inserting, updating, deleting rows etc
 
 from __main__ import bot
+from datetime import datetime, timedelta
 from discord.ext import tasks
 from typing import Tuple
 import aiosqlite
 
 from func.utils.discord_utils import roll_giveaway
-from datetime import datetime, timedelta
+
 
 async def connect_db():
     bot.db = await aiosqlite.connect("database.db")

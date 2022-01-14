@@ -1,7 +1,8 @@
-from discord.ext import commands
 import discord
+from discord.ext import commands
 
 from func.classes.Union import Union
+
 
 class Staff(commands.Cog, name="Staff"):
     def __init__(self, bot):

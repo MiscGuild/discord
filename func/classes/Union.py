@@ -1,7 +1,7 @@
 # The following file contains: mute, unmute, kick, ban, softban, unban, sync/forcesync, add, remove, accept, avatar
 
-import discord
 from __main__ import bot
+import discord
 from discord.errors import Forbidden, NotFound
 from typing import Union
 
@@ -14,7 +14,7 @@ class Union:
     def __init__(self, user: Union[discord.Member, discord.User]):
         self.user = user
 
-    async def mute(self, author, guild_roles, reason: str = None):
+    async def mute(self, author, guild_roles, reason: str=None):
         # Default reason is responsible moderator
         if reason == None:
             reason == f"Responsible moderator: {author}"
@@ -29,7 +29,7 @@ class Union:
                               color=neutral_color)
         return embed
 
-    async def kick(self, author, reason: str = None):
+    async def kick(self, author, reason: str=None):
         # Default reason is responsible moderator
         if not reason:
             reason = f"Responsible moderator: {author}"
@@ -39,7 +39,7 @@ class Union:
                              description=f"{self.user} was kicked by {author}",
                              color=neg_color)
 
-    async def ban(self, guild, author, reason: str = None):
+    async def ban(self, guild, author, reason: str=None):
         # Default reason is responsible moderator
         if not reason:
             reason = f"Responsible moderator: {author}"
@@ -53,7 +53,7 @@ class Union:
         except Forbidden:
             return bot_missing_perms_embed
 
-    async def softban(self, guild, author, reason: str = None):
+    async def softban(self, guild, author, reason: str=None):
         # Default reason is responsible moderator
         if not reason:
             reason = f"Responsible moderator: {author}"
@@ -68,7 +68,7 @@ class Union:
         except Forbidden:
             return bot_missing_perms_embed
 
-    async def unban(self, guild, author, reason: str = None):
+    async def unban(self, guild, author, reason: str=None):
         # Default reason is responsible moderator
         if not reason:
             reason = f"Responsible moderator: {author}"

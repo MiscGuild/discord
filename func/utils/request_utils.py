@@ -1,9 +1,9 @@
 import aiohttp
-import toml
-import random
-import re
 import discord
 from io import BytesIO
+import random
+import re
+import toml
 
 api_keys = toml.load("config.toml")["hypixel"]["api_keys"]
 
