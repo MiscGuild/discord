@@ -337,7 +337,6 @@ class Tickets(commands.Cog, name="Tickets"):
                     components=[
                         [
                             Select(placeholder="Select your reason!", options=[
-                                SelectOption(label="Christmas Event", value="Christmas Event", emoji="🎅"),
                                 SelectOption(label="Update your Role/Username/Tag", value="Discord Nick Change",
                                              emoji="👨"),
                                 SelectOption(label="Register a Milestone", value="Milestone Registration", emoji="🏆"),
@@ -1495,56 +1494,6 @@ class Tickets(commands.Cog, name="Tickets"):
                                     await click.respond(embed=embed)
                                     await asyncio.sleep(2)
                             break
-
-                if reply == "Christmas Event":
-                    embed = discord.Embed(title="What is your Minecraft Username?",
-                                          color=0x4b89e4)
-                    await channel.send(embed=embed)
-                    username = await self.bot.wait_for('message',
-                                                       check=lambda x: x.channel == channel and x.author == author)
-                    name, uuid = await utils.get_dispnameID(username.content)
-
-                    if name:
-                        await channel.edit(name=f"Event-{name}",
-                                           category=discord.utils.get(channel.guild.categories,
-                                                                      name="CHRISTMAS COUNTDOWN"))
-                        embed = discord.Embed(title="General Information",
-                                              description="Following is some general information surrounding the event.",
-                                              color=0x8368ff)
-                        embed.add_field(name="Miscellaneous Christmas Countdown", value="""Every day from the 1st to the 24th of December, a series of challenges
-                                                                                            will be released for participants to complete.\n
-                                                                                            Additionally, there will be one extra member/ally only challenge, and an open challenge for everyone on weekends.""",
-                                        inline=False)
-                        embed.add_field(name="Scaled challenges", value="""As part of the daily challenges, scaled challenges will reward differing points depending on how well you performed compared to other participants. Point distribution is as follows:\n
-                                                                            1st-3rd - 3 points
-                                                                            4th-10th - 2 points
-                                                                            Remaining players - 1 point""",
-                                        inline=False)
-                        embed.add_field(name="Rules", value='''All Hypixel rules apply. This includes:
-                                    - No cheating
-                                    - No account sharing
-                                    - No boosting, etc''', inline=False)
-                        embed.add_field(name="Submitting", value="""Every day, along with the challenges, a unique password will be given for that days challenges.
-                        When submitting your challenges, you will be required to have the password written in your chat box (Example below).
-                        Submissions can take the form of an unedited screenshot or short video, whatever works best.
-                        You can only submit challenges from the day you're submitting, 
-                        so previously given challenges will not be awarded with points.""", inline=False)
-                        embed.set_image(
-                            url="https://media.discordapp.net/attachments/911761019947352074/911792454099947580/unknown.png?width=1111&height=625")
-                        await channel.send(embed=embed)
-
-                        await author.add_roles(self.bot.christmas_event)
-
-                        embed = discord.Embed(title=":ballot_box_with_check: Registration Successful!", color=0xFFFDD0)
-                        embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
-                        embed.add_field(name=name, value="To unregister, please ping a staff member!", inline=False)
-                        await channel.send(embed=embed)
-                        break
-
-                    else:
-                        await channel.send("Unkown IGN! Restarting ticket process...")
-
-
 
                 elif reply == "Other":
                     embed = discord.Embed(title=f"{name} created this ticket for an unspecified reason!",
