@@ -243,7 +243,7 @@ class String:
 
             # Delete DNKL message
             try:
-                msg = await self.bot.dnkl_channel.fetch_message(message_id)
+                msg = await bot.dnkl_channel.fetch_message(message_id)
                 await msg.delete()
             except Exception:
                 return f"{username} has been removed from the do-not-kick-list, however the message was not found."
@@ -299,7 +299,7 @@ class String:
             # User is a member of Miscellaneous
             if guild_name == "Miscellaneous":
                 # Add member role and delete message
-                await ctx.author.add_roles(self.bot.member_role, reason="Register")
+                await ctx.author.add_roles(bot.member_role, reason="Register")
                 await ctx.message.delete()
                 embed = discord.Embed(title="Registration successful!")
                 embed.add_field(name=ign,
@@ -315,8 +315,8 @@ class String:
                     await ctx.author.edit(nick=ign)
 
                     # Add and remove roles and delete message
-                    await ctx.author.remove_roles(self.bot.new_member_role, reason="Register")
-                    await ctx.author.add_roles(self.bot.guest, self.bot.ally, reason="Register")
+                    await ctx.author.remove_roles(bot.new_member_role, reason="Register")
+                    await ctx.author.add_roles(bot.guest, bot.ally, reason="Register")
                     await ctx.message.delete()
 
                     embed = discord.Embed(title="Registration successful!")
@@ -324,14 +324,14 @@ class String:
                     return embed.add_field(name=ign, value=f"Member of {guild}")
 
             # User is a guest
-            await ctx.author.remove_roles(self.bot.new_member_role, reason="Register")
-            await ctx.author.add_roles(self.bot.awaiting_app, reason="Register")
+            await ctx.author.remove_roles(bot.new_member_role, reason="Register")
+            await ctx.author.add_roles(bot.awaiting_app, reason="Register")
             await ctx.message.delete()
 
             # Create registration ticket
             await create_ticket("RTickets", f"registration-ticket-{ctx.author.name}", ctx.author)
 
-            embed = discord.Embed(title="Registration successful!")
+            embed = discord.Embed(title="Registration successful!", color=neutral_color)
             embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
             return embed.add_field(name=ign, value="New Member")
 

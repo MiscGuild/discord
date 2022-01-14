@@ -17,6 +17,37 @@ async def name_grabber(author: discord.User):
     return author.nick.split()[0]
 
 
+# Create a ticket with user's perms
+async def create_ticket(category_name: str, ticket_name: str, user: discord.Member):
+    # Create ticket
+    ticket = await bot.guild.create_text_channel(ticket_name, category=discord.utils.get(bot.guild.categories, name=category_name))
+
+    # Set perms
+    await ticket.set_permissions(bot.guild.get_role(bot.guild.id), send_messages=False,
+                                            read_messages=False)
+    await ticket.set_permissions(bot.staff, send_messages=True, read_messages=True,
+                                            add_reactions=True, embed_links=True,
+                                            attach_files=True,
+                                            read_message_history=True, external_emojis=True)
+    await ticket.set_permissions(bot.helper, send_messages=True,
+                                            read_messages=True,
+                                            add_reactions=True, embed_links=True,
+                                            attach_files=True,
+                                            read_message_history=True, external_emojis=True)
+    await ticket.set_permissions(user, send_messages=True, read_messages=True,
+                                            add_reactions=True, embed_links=True,
+                                            attach_files=True,
+                                            read_message_history=True, external_emojis=True)
+    await ticket.set_permissions(bot.new_member_role, send_messages=False,
+                                            read_messages=False,
+                                            add_reactions=True, embed_links=True,
+                                            attach_files=True,
+                                            read_message_history=True, external_emojis=True)
+
+    # Return ticket for use
+    return ticket
+
+
 # Log a given event in logging channel
 async def log_event(title: str, description: str):
     embed = discord.Embed(title=title, description=description, color=neutral_color)

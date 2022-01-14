@@ -19,7 +19,7 @@ registration_embed = discord.Embed(title="Welcome to the Miscellaneous Discord!"
 staff_impersonation_embed = discord.Embed(title="Staff impersonation is a punishable offense!",
                                         color=neg_color)
 
-requirements_embed = discord.Embed(title="Miscellaneous Guild Requirements", description="These requirements are subject to change!", color=neutral_color).add_field(
+async def get_requirements_embed(): return discord.Embed(title="Miscellaneous Guild Requirements", description="These requirements are subject to change!", color=neutral_color).add_field(
                                                 name="Active",
                                                 value=f"•  {format(bot.active_req, ',d')} Weekly Guild Experience",
                                                 inline=False).add_field(name="DNKL Eligibility",
