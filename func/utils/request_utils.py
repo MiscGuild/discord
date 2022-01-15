@@ -76,6 +76,13 @@ async def get_guild_by_name(name):
     # Player is in a guild
     return resp["guild"]
 
+# Returns an array of all members' uuids
+async def get_guild_uuids(guild_name: str):
+    resp = await get_guild_by_name(guild_name)
+    if resp == None:
+        return None
+    return [member["uuid"] for member in resp["members"]]
+
 
 # Returns the tag of a given guild
 async def get_gtag(name):
