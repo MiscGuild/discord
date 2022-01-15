@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 
+from func.classes.Boolean import Boolean
 from func.classes.Union import Union
 from func.classes.String import String
 from func.utils.discord_utils import name_grabber
@@ -43,8 +44,8 @@ class Hypixel(commands.Cog, name="Hypixel"):
         await ctx.send(await String(string=name).dnklremove())
 
     # @commands.command()
-    # async def dnkllist(self, ctx, raw: str=None):
-    #     result = await String(string=raw).dnkllist()
+    # async def dnkllist(self, ctx, raw: bool=False):
+    #     result = await Boolean(boolean=raw).dnkllist()
     #     # Send result according to returned value
     #     if isinstance(result, discord.Embed):
     #         await ctx.send(embed=result)

@@ -14,7 +14,7 @@ class Staff(commands.Cog, name="Staff"):
 
     @commands.command(aliases=["fs"])
     @commands.has_role("Staff")
-    async def forcesync(self, ctx, member: discord.Member, name):
+    async def forcesync(self, ctx, member: discord.Member, name: str):
         """Update a user's discord nick, tag and roles for them!"""
         result = await Union(user=member).sync(ctx, name, None, True)
         if isinstance(result, discord.Embed):
@@ -32,7 +32,8 @@ class Staff(commands.Cog, name="Staff"):
 
     # @commands.command()
     # @commands.has_role("Staff")
-    # async def rolecheck(self, ctx, send_ping=None):
+    # async def rolecheck(self, ctx, send_ping: bool=True):
+    #     """Sync the names and roles of everyone in the discord!"""
 
 
 def setup(bot):
