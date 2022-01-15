@@ -135,7 +135,7 @@ async def after_cache_ready():
 
     # Set other names
     bot.ticket_categories = ("RTickets", "🎫 Ticket Section", "OTHER", "REPORTS", "MILESTONES", "DNKL")
-    bot.misc_allies = ("XL", "Lucid", "Cronos", "OUT", "Betrayed", "Blight", "TheNinjaWarriors")
+    bot.misc_allies = ("XL", "Lucid", "OUT", "Betrayed", "Blight", "TheNinjaWarriors")
 
     from func.utils.discord_utils import name_grabber
     bot.admin_ids = [member.id for member in bot.admin.members]
