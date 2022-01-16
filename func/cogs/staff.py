@@ -31,11 +31,11 @@ class Staff(commands.Cog, name="Staff"):
     # @commands.has_role("Admin")
     # async def partner(self, ctx):
 
-    # @commands.command()
-    # @commands.has_role("Staff")
-    # async def rolecheck(self, ctx, send_ping: bool=True):
-    #     """Sync the names and roles of everyone in the discord!"""
-    #     await Boolean(boolean=send_ping).rolecheck(ctx)
+    @commands.command()
+    @commands.has_role("Staff")
+    async def rolecheck(self, ctx, send_ping: bool=True):
+        """Sync the names and roles of everyone in the discord!"""
+        await Boolean(boolean=send_ping).rolecheck(ctx)
 
 
 def setup(bot):

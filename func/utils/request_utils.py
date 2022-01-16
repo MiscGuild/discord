@@ -38,6 +38,15 @@ async def get_mojang_profile(name: str):
     # Player does not exist
     return None, None
 
+def session_get_name_by_uuid(session, uuid):
+    with session.get(f"https://sessionserver.mojang.com/session/minecraft/profile/{uuid}") as resp:
+        data = resp.json()
+
+        if resp.status_code != 200:
+            return None
+
+        return data["name"]
+
 
 # Returns the Mojang profile of a player (including skin)
 async def get_name_by_uuid(uuid: str):
