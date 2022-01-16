@@ -23,11 +23,11 @@ async def get_requirements_embed(): return discord.Embed(title="Miscellaneous Gu
                                                 name="Active",
                                                 value=f"•  {format(bot.active_req, ',d')} Weekly Guild Experience",
                                                 inline=False).add_field(name="DNKL Eligibility",
-                                                value=f"•  {format(bot.dnkl_req, ',d')} Weekly Guild Experience",
+                                                value=f"•  {format(bot.dnkl, ',d')} Weekly Guild Experience",
                                                 inline=False).add_field(name="Resident",
                                                 value=f"•  {format(bot.resident_req, ',d')} Weekly Guild Experience",
                                                 inline=False).add_field(name="Member",
-                                                value=f"•  {format(bot.inactive, ',d')} Weekly Guild Experience",
+                                                value=f"•  {format(bot.member_req, ',d')} Weekly Guild Experience",
                                                 inline=False).add_field(name="New Member",
                                                 value=f"•  {format(bot.new_member, ',d')} Daily Guild Experience",
                                                 inline=False).set_footer(

@@ -4,6 +4,7 @@ from discord.ext import commands
 from func.classes.Integer import Integer
 from func.classes.String import String
 from func.utils.discord_utils import name_grabber
+from func.utils.consts import get_requirements_embed
 
 
 class Guild(commands.Cog, name="Guild"):
@@ -38,8 +39,10 @@ class Guild(commands.Cog, name="Guild"):
         elif isinstance(res, discord.Embed):
             await ctx.send(embed=res)
 
-    # @commands.command(aliases=['req', 'requirement'])
-    # async def requirements(self, ctx):
+    @commands.command(aliases=["req", "reqs"])
+    async def requirements(self, ctx):
+        # Just send the reqs embed straight away
+        await ctx.send(embed=await get_requirements_embed())
 
     # @commands.command(aliases=['res'])
     # async def resident(self, ctx):
