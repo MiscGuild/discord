@@ -20,19 +20,20 @@ staff_impersonation_embed = discord.Embed(title="Staff impersonation is a punish
                                         color=neg_color)
 
 async def get_requirements_embed(): return discord.Embed(title="Miscellaneous Guild Requirements", description="These requirements are subject to change!", color=neutral_color).add_field(
-                                                name="Active",
-                                                value=f"•  {format(bot.active_req, ',d')} Weekly Guild Experience",
-                                                inline=False).add_field(name="DNKL Eligibility",
-                                                value=f"•  {format(bot.dnkl, ',d')} Weekly Guild Experience",
-                                                inline=False).add_field(name="Resident",
-                                                value=f"•  {format(bot.resident_req, ',d')} Weekly Guild Experience",
+                                                name="New Member",
+                                                value=f"•  {format(bot.new_member, ',d')} Daily Guild Experience",
                                                 inline=False).add_field(name="Member",
                                                 value=f"•  {format(bot.member_req, ',d')} Weekly Guild Experience",
-                                                inline=False).add_field(name="New Member",
-                                                value=f"•  {format(bot.new_member, ',d')} Daily Guild Experience",
+                                                inline=False).add_field(name="Resident",
+                                                value=f"•  {format(bot.resident_req, ',d')} Weekly Guild Experience",
+                                                inline=False).add_field(
+                                                name="Active",
+                                                value=f"•  {format(bot.active_req, ',d')} Weekly Guild Experience",
+                                                inline=False).add_field(name="Do-not-kick-list Eligibility",
+                                                value=f"•  {format(bot.dnkl, ',d')} Weekly Guild Experience",
                                                 inline=False).set_footer(
                                                 text="You are considered a New Member for the first 7 days after joining the guild"
-                                                    "\nIf you fail to meet the New Member/Member requirements, you will be kicked!")
+                                                    "\nIf you fail to meet these requirements, you will be kicked!")
 
 # Errors
 invalid_command_embed = discord.Embed(title=f"Invalid Command!",
