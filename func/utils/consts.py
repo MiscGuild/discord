@@ -19,6 +19,10 @@ registration_embed = discord.Embed(title="Welcome to the Miscellaneous Discord!"
 staff_impersonation_embed = discord.Embed(title="Staff impersonation is a punishable offense!",
                                         color=neg_color)
 
+accepted_staff_application_embed = discord.Embed(title=f"Congratulations, your staff application has been accepted!",
+                                                description="Please view `https://bit.ly/MiscStaffGuide` and the `#staff-faq` channel to help you get started!",
+                                                color=neutral_color)
+
 async def get_requirements_embed(): return discord.Embed(title="Miscellaneous Guild Requirements", description="These requirements are subject to change!", color=neutral_color).add_field(
                                                 name="New Member",
                                                 value=f"•  {format(bot.new_member, ',d')} Daily Guild Experience",

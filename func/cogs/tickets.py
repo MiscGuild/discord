@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
-from func.classes.Func import Func
 
+from func.classes.Func import Func
 from func.classes.String import String
 from func.classes.Union import Union
 
@@ -57,9 +57,15 @@ class Tickets(commands.Cog, name="Tickets"):
     # @commands.has_role("Staff")
     # async def transcript(self, ctx):
 
-    # @commands.command()
-    # @commands.has_role("Admin")
-    # async def accept(self, ctx, member: discord.Member):
+    @commands.command()
+    @commands.has_role("Admin")
+    async def accept(self, ctx):
+        """Accept a staff application!"""
+        res = await Func.accept(ctx)
+        if isinstance(res, str):
+            await ctx.send(res)
+        if isinstance(res, discord.Embed):
+            await ctx.send(embed=res)
 
     # @commands.command()
     # @commands.has_any_role("Admin", "Moderator")

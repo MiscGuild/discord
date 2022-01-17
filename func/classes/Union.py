@@ -1,4 +1,4 @@
-# The following file contains: mute, unmute, kick, ban, softban, unban, sync/forcesync, add, remove, accept, avatar
+# The following file contains: mute, unmute, kick, ban, softban, unban, sync/forcesync, add, remove, avatar
 
 from __main__ import bot
 import discord
@@ -166,8 +166,6 @@ class Union:
                                             attach_files=False,
                                             read_message_history=False, external_emojis=False)
         return discord.Embed(title=f"{self.user.name} has been removed from the ticket!", color=pos_color)
-
-    # async def accept():
 
     async def avatar(self):
         embed = discord.Embed(title=f"{self.user}'s avatar:", color=neutral_color)
