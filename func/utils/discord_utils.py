@@ -5,9 +5,10 @@ import chat_exporter
 from datetime import datetime, timedelta
 import discord
 from discord.ext import commands, tasks
+from io import BytesIO
 import toml
 
-from func.utils.consts import neutral_color
+from func.utils.consts import neutral_color, error_color
 
 
 # Return user's displaying name
@@ -91,6 +92,16 @@ async def is_valid_date(date: str):
         return True, parsed.day, parsed.month, parsed.year
     except ValueError:
         return False, None, None, None
+
+
+# Returns a transcript for a channel
+async def create_transcript(channel: discord.TextChannel):
+    transcript = await chat_exporter.export(channel)
+
+    if not transcript: return None
+
+    # Create and return file
+    return discord.File(BytesIO(transcript.encode()), filename=f"transcript-{channel.name}.html")
 
 
 @tasks.loop(count=1)

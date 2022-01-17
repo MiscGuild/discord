@@ -53,9 +53,17 @@ class Tickets(commands.Cog, name="Tickets"):
         """Rename a ticket!"""
         await String(string=channel_name).rename(ctx)
 
-    # @commands.command()
-    # @commands.has_role("Staff")
-    # async def transcript(self, ctx):
+    @commands.command()
+    @commands.has_role("Staff")
+    async def transcript(self, ctx):
+        """Create a transcript for a ticket!"""
+        res = await Func.transcript(ctx)
+        if isinstance(res, discord.Embed):
+            await ctx.send(embed=res)
+        elif isinstance(res, discord.File):
+            await ctx.send(file=res)
+        elif isinstance(res, str):
+            await ctx.send(res)
 
     @commands.command()
     @commands.has_role("Admin")

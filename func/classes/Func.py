@@ -1,4 +1,4 @@
-# The following file contains: weeklylb, dnkllist, rolecheck, delete, accept
+# The following file contains: weeklylb, dnkllist, rolecheck, delete, accept, transcript
 
 from __main__ import bot
 import asyncio
@@ -8,11 +8,11 @@ import discord
 from io import BytesIO
 import requests
 
-from func.utils.discord_utils import name_grabber, log_event
+from func.utils.discord_utils import create_transcript, name_grabber, log_event
 from func.utils.minecraft_utils import get_hypixel_player_rank
 from func.utils.request_utils import get_mojang_profile, get_player_guild, get_guild_by_name, get_name_by_uuid, get_hypixel_player, get_gtop, get_guild_uuids, session_get_name_by_uuid
 from func.utils.db_utils import select_all
-from func.utils.consts import neg_color, neutral_color, invalid_guild_embed, registration_embed, accepted_staff_application_embed
+from func.utils.consts import neg_color, neutral_color, error_color, invalid_guild_embed, registration_embed, accepted_staff_application_embed
 
 
 class Func:
@@ -212,3 +212,16 @@ class Func:
             return "This command can only be used in tickets!"
 
         return accepted_staff_application_embed
+
+    async def transcript(ctx):
+        if ctx.channel.category.name not in bot.ticket_categories:
+            return "This command can only be used in tickets!"
+
+        # Create transcript
+        transcript = await create_transcript(ctx.channel)
+        if not transcript:
+            return discord.Embed(text="Transcript creation failed!", color=error_color)
+
+        # Transcript is valid
+        return transcript
+    
