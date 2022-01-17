@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 
+from func.classes.Func import Func
 from func.classes.Integer import Integer
 from func.classes.String import String
 from func.utils.discord_utils import name_grabber
@@ -27,8 +28,14 @@ class Guild(commands.Cog, name="Guild"):
         if isinstance(result, str):
             await ctx.send(result)
 
-    # @commands.command(aliases=["gt"])
-    # async def gtop(self, ctx):
+    @commands.command()
+    async def weeklylb(self, ctx):
+        """View the weekly gexp leaderboard!"""
+        res = await Func.weeklylb(ctx)
+        if isinstance(res, discord.File):
+            await ctx.send(file=res)
+        if isinstance(res, discord.Embed):
+            await ctx.send(embed=res)
 
     @commands.command()
     async def gtop(self, ctx, day=1):
@@ -41,6 +48,7 @@ class Guild(commands.Cog, name="Guild"):
 
     @commands.command(aliases=["req", "reqs"])
     async def requirements(self, ctx):
+        """View the guild gexp requirements!"""
         # Just send the reqs embed straight away
         await ctx.send(embed=await get_requirements_embed())
 
