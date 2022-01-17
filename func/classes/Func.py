@@ -1,12 +1,14 @@
-# The following file contains: weeklylb, dnkllist, rolecheck
+# The following file contains: weeklylb, dnkllist, rolecheck, delete
 
 from __main__ import bot
 import asyncio
+import chat_exporter
 from concurrent.futures import ThreadPoolExecutor
 import discord
+from io import BytesIO
 import requests
 
-from func.utils.discord_utils import name_grabber
+from func.utils.discord_utils import name_grabber, log_event
 from func.utils.minecraft_utils import get_hypixel_player_rank
 from func.utils.request_utils import get_mojang_profile, get_player_guild, get_guild_by_name, get_name_by_uuid, get_hypixel_player, get_gtop, get_guild_uuids, session_get_name_by_uuid
 from func.utils.db_utils import select_all
@@ -187,3 +189,20 @@ class Func:
             if more in ("y", "yes", "ye"):
                 continue
             return embed
+
+    async def delete(ctx):
+        if ctx.channel.category.name not in bot.ticket_categories:
+            return "This command can only be used in tickets!"
+        
+        # Send deletion warning and gather transcript
+        await ctx.send(embed=discord.Embed(title="This ticket will be deleted in 10 seconds!", color=neg_color))
+        transcript = await chat_exporter(ctx.channel)
+            
+        # Sleep and delete channel
+        await asyncio.sleep(10)
+        await discord.TextChannel.delete(ctx.channel)
+
+        if transcript != None:
+            # Log outcome
+            await log_event(f"{ctx.channel.name} was deleted by {ctx.author}")
+            await bot.log_channel.send(discord.File(BytesIO(transcript.encode()), filename=f"transcript-{ctx.channel.name}.html"))

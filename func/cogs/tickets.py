@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from func.classes.Func import Func
 
 from func.classes.String import String
 from func.classes.Union import Union
@@ -18,8 +19,13 @@ class Tickets(commands.Cog, name="Tickets"):
         if isinstance(res, String):
             await ctx.send(res)
 
-    # @commands.command(aliases=['del'])
-    # async def delete(self, ctx):
+    @commands.command(aliases=["del"])
+    @commands.has_role("Staff")
+    async def delete(self, ctx):
+        """Delete a ticket!"""
+        res = await Func.delete(ctx)
+        if res != None:
+            await ctx.send(res)
 
     @commands.command()
     @commands.has_role("Staff")
