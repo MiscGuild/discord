@@ -79,8 +79,10 @@ class Tickets(commands.Cog, name="Tickets"):
     # @commands.has_any_role("Admin", "Moderator")
     # async def deny(self, ctx, channel: discord.TextChannel):
 
-    # @commands.command()
-    # async def new(self, ctx):
+    @commands.command()
+    async def new(self, ctx):
+        """Create a new ticket!"""
+        await ctx.send(await Func.new(ctx))
 
 
 def setup(bot):

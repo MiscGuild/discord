@@ -1,4 +1,4 @@
-# The following file contains: weeklylb, dnkllist, rolecheck, delete, accept, transcript
+# The following file contains: weeklylb, dnkllist, rolecheck, delete, accept, transcript, new
 
 from __main__ import bot
 import asyncio
@@ -8,7 +8,7 @@ import discord
 from io import BytesIO
 import requests
 
-from func.utils.discord_utils import create_transcript, name_grabber, log_event
+from func.utils.discord_utils import create_ticket, create_transcript, name_grabber, log_event
 from func.utils.minecraft_utils import get_hypixel_player_rank
 from func.utils.request_utils import get_mojang_profile, get_player_guild, get_guild_by_name, get_name_by_uuid, get_hypixel_player, get_gtop, get_guild_uuids, session_get_name_by_uuid
 from func.utils.db_utils import select_all
@@ -225,3 +225,9 @@ class Func:
         # Transcript is valid
         return transcript
     
+    async def new(ctx):
+        # Create ticket
+        ticket = await create_ticket("🎫 Ticket Section", f"ticket-{await name_grabber(ctx.author)}", ctx.author)
+
+        # Return message with link to ticket
+        return f"Click the following link to go to your ticket! <#{ticket.id}>"
