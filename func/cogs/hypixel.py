@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 
-from func.classes.Boolean import Boolean
 from func.classes.Func import Func
 from func.classes.Union import Union
 from func.classes.String import String

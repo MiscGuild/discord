@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-from func.classes.Boolean import Boolean
+from func.classes.Func import Func
 from func.classes.Union import Union
 
 
@@ -35,7 +35,7 @@ class Staff(commands.Cog, name="Staff"):
     @commands.has_role("Staff")
     async def rolecheck(self, ctx, send_ping: bool=True):
         """Sync the names and roles of everyone in the discord!"""
-        await Boolean(boolean=send_ping).rolecheck(ctx)
+        await Func.rolecheck(ctx, send_ping)
 
 
 def setup(bot):
