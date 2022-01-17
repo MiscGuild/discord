@@ -46,6 +46,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
 
     @commands.command()
     async def dnkllist(self, ctx):
+        """View all users on the do-not-kick-list!"""
         await ctx.send(embed=await Func.dnkllist())
 
     @commands.command(aliases=["dnklchk"])
