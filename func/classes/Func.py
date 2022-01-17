@@ -196,7 +196,7 @@ class Func:
         
         # Send deletion warning and gather transcript
         await ctx.send(embed=discord.Embed(title="This ticket will be deleted in 10 seconds!", color=neg_color))
-        transcript = await chat_exporter(ctx.channel)
+        transcript = await create_transcript(ctx.channel)
             
         # Sleep and delete channel
         await asyncio.sleep(10)
@@ -205,7 +205,7 @@ class Func:
         if transcript != None:
             # Log outcome
             await log_event(f"{ctx.channel.name} was deleted by {ctx.author}")
-            await bot.log_channel.send(discord.File(BytesIO(transcript.encode()), filename=f"transcript-{ctx.channel.name}.html"))
+            await bot.log_channel.send(file=transcript)
     
     async def accept(ctx):
         if ctx.channel.category.name not in bot.ticket_categories:
