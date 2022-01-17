@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 from func.classes.Boolean import Boolean
+from func.classes.Func import Func
 from func.classes.Union import Union
 from func.classes.String import String
 from func.utils.discord_utils import name_grabber
@@ -43,12 +44,9 @@ class Hypixel(commands.Cog, name="Hypixel"):
         """Remove a player from the do-not-kick-list"""
         await ctx.send(await String(string=name).dnklremove())
 
-    # @commands.command()
-    # async def dnkllist(self, ctx, raw: bool=False):
-    #     result = await Boolean(boolean=raw).dnkllist()
-    #     # Send result according to returned value
-    #     if isinstance(result, discord.Embed):
-    #         await ctx.send(embed=result)
+    @commands.command()
+    async def dnkllist(self, ctx):
+        await ctx.send(embed=await Func.dnkllist())
 
     @commands.command(aliases=["dnklchk"])
     async def dnklcheck(self, ctx, name: str = None):

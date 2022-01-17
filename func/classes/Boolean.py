@@ -91,6 +91,3 @@ class Boolean:
         if self.boolean: await bot.registration_channel.send(bot.new_member_role.mention, embed=registration_embed)
 
         await progress_message.edit(content="Rolecheck complete!")
-
-    # async def dnkllist(self):
-    #     return True

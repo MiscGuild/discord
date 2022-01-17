@@ -50,6 +50,12 @@ async def select_one(query: str, values: Tuple=None):
     await cursor.close()
     return row
 
+# Generic select many rows functions
+async def select_all(query: str, values: Tuple=None):
+    cursor = await base_query(query, values)
+    rows = await cursor.fetchall()
+    await cursor.close()
+    return rows
 
 ### DNKL
 async def insert_new_dnkl(message_id: int, uuid: str, username: str):
