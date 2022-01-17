@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 from func.classes.String import String
+from func.classes.Union import Union
 
 
 class Tickets(commands.Cog, name="Tickets"):
@@ -20,9 +21,15 @@ class Tickets(commands.Cog, name="Tickets"):
     # @commands.command(aliases=['del'])
     # async def delete(self, ctx):
 
-    # @commands.command()
-    # @commands.has_role("Staff")
-    # async def add(self, ctx, member: discord.Member):
+    @commands.command()
+    @commands.has_role("Staff")
+    async def add(self, ctx, member: discord.Member):
+        """Add a user to a ticket!"""
+        res = await Union(user=member).add(ctx)
+        if isinstance(res, str):
+            await ctx.send(res)
+        elif isinstance(res, discord.Embed):
+            await ctx.send(embed=res)
 
     # @commands.command()
     # @commands.has_role("Staff")

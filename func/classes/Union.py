@@ -7,7 +7,7 @@ from typing import Union
 
 from func.utils.discord_utils import has_tag_perms, check_tag
 from func.utils.request_utils import get_mojang_profile, get_player_guild, get_gtag
-from func.utils.consts import neg_color, neutral_color, err_404_embed, unknown_ign_embed, staff_impersonation_embed, bot_missing_perms_embed
+from func.utils.consts import pos_color, neg_color, neutral_color, err_404_embed, unknown_ign_embed, staff_impersonation_embed, bot_missing_perms_embed
 
 
 class Union:
@@ -148,8 +148,14 @@ class Union:
 
         return embed
 
-    # async def add():
+    async def add(self, ctx):
+        if ctx.channel.category.name not in bot.ticket_categories:
+            return "This command can only be used in tickets!"
 
+        # Set perms
+        await ctx.channel.set_permissions(self.user, send_messages=True, read_messages=True, add_reactions=True, embed_links=True, attach_files=True, read_message_history=True, external_emojis=True)
+        return discord.Embed(title=f"{self.user.name} has been added to the ticket!", color=pos_color)
+       
     # async def remove():
 
     # async def accept():
