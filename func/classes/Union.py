@@ -156,7 +156,16 @@ class Union:
         await ctx.channel.set_permissions(self.user, send_messages=True, read_messages=True, add_reactions=True, embed_links=True, attach_files=True, read_message_history=True, external_emojis=True)
         return discord.Embed(title=f"{self.user.name} has been added to the ticket!", color=pos_color)
        
-    # async def remove():
+    async def remove(self, ctx):
+        if ctx.channel.category.name not in bot.ticket_categories:
+            return "This command can only be used in tickets!"
+
+        # Set perms
+        await ctx.channel.set_permissions(self.user, send_messages=False, read_messages=False,
+                                            add_reactions=False, embed_links=False,
+                                            attach_files=False,
+                                            read_message_history=False, external_emojis=False)
+        return discord.Embed(title=f"{self.user.name} has been removed from the ticket!", color=pos_color)
 
     # async def accept():
 

@@ -31,9 +31,15 @@ class Tickets(commands.Cog, name="Tickets"):
         elif isinstance(res, discord.Embed):
             await ctx.send(embed=res)
 
-    # @commands.command()
-    # @commands.has_role("Staff")
-    # async def remove(self, ctx, member: discord.Member):
+    @commands.command()
+    @commands.has_role("Staff")
+    async def remove(self, ctx, member: discord.Member):
+        """Remove a user from a ticket!"""
+        res = await Union(user=member).remove(ctx)
+        if isinstance(res, str):
+            await ctx.send(res)
+        elif isinstance(res, discord.Embed):
+            await ctx.send(embed=res)
 
     @commands.command()
     @commands.has_role("Staff")
