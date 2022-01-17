@@ -57,9 +57,6 @@ class Guild(commands.Cog, name="Guild"):
         """See the different ways of obtaining the resident rank!"""
         await ctx.send(embed=await get_resident_embed())
 
-    # @commands.command(aliases=['ticket'])
-    # async def tickets(self, ctx):
-
 
 def setup(bot):
     bot.add_cog(Guild(bot))
