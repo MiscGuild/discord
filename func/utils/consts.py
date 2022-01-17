@@ -35,6 +35,15 @@ async def get_requirements_embed(): return discord.Embed(title="Miscellaneous Gu
                                                 text="You are considered a New Member for the first 7 days after joining the guild"
                                                     "\nIf you fail to meet these requirements, you will be kicked!")
 
+async def get_resident_embed(): return discord.Embed(title="How can I get Resident?",
+                                description="To be eligible for Resident, you must be satisfy at least one of the following requirements:", color=neutral_color).add_field(name="Youtuber",
+                                value="If you're a youtuber with more than 5,000 subscribers, you aren't subject to any guild requirements.",
+                                inline=False).add_field(name="Rich Kid", value="Spend Money on the guild by doing giveaways and or sponsoring events!",
+                                inline=False).add_field(name="Server Booster", value="Boost the guild discord!",
+                                inline=False).add_field(name="GvG Team", value="Be an exceptional GvG player.",
+                                inline=False).set_footer(
+                                text=f"Unless otherwise specified, all residents must get {format(bot.resident_req, ',d')} weekly guild experience.")
+
 # Errors
 invalid_command_embed = discord.Embed(title=f"Invalid Command!",
                                     descrption="Use `,help` to view a list of all commands!",
