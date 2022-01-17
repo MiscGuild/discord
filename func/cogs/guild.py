@@ -12,9 +12,6 @@ class Guild(commands.Cog, name="Guild"):
     def __init__(self, bot):
         self.bot = bot
 
-    # @commands.command()
-    # async def gactive(self, ctx):
-
     @commands.command(aliases=["gm", "g"])
     async def gmember(self, ctx, name=None):
         """View the given user's gexp over the past week!"""
