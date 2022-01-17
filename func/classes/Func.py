@@ -68,7 +68,7 @@ class Func:
 
         return discord.Embed(title="The people on the do-not-kick-list are as follows:", description=content, color=neutral_color).set_footer(text=f"Total: {len(content.split())}")
 
-    async def rolecheck(self, ctx, send_ping: bool):
+    async def rolecheck(ctx, send_ping: bool):
         # Define a message for sending progress updates
         progress_message = await ctx.send("Processing prerequisites...")
 
@@ -142,6 +142,6 @@ class Func:
 
 
         # Send ping to new member role in registration channel
-        if self.boolean: await bot.registration_channel.send(bot.new_member_role.mention, embed=registration_embed)
+        if send_ping: await bot.registration_channel.send(bot.new_member_role.mention, embed=registration_embed)
 
         await progress_message.edit(content="Rolecheck complete!")

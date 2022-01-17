@@ -23,9 +23,10 @@ class Staff(commands.Cog, name="Staff"):
         elif isinstance(result, str):
             await ctx.send(result)
 
-    # @commands.command()
-    # @commands.has_role("Admin")
-    # async def staffreview(self, ctx):
+    @commands.command()
+    @commands.has_role("Admin")
+    async def staffreview(self, ctx):
+        await Func.
 
     # @commands.command()
     # @commands.has_role("Admin")
