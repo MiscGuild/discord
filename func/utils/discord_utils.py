@@ -113,6 +113,7 @@ async def after_cache_ready():
     bot.ticket_channel = bot.get_channel(config["bot"]["ticket_channel_id"])
     bot.log_channel = bot.get_channel(config["bot"]["log_channel_id"])
     bot.registration_channel = bot.get_channel(config["bot"]["registration_channel_id"])
+    bot.staff_announcements = bot.get_channel(config["bot"]["staff_announcements_channel_id"])
     bot.guild = bot.get_guild(config["bot"]["guild_id"])
 
     # Set roles

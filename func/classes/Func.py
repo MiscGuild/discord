@@ -145,3 +145,45 @@ class Func:
         if send_ping: await bot.registration_channel.send(bot.new_member_role.mention, embed=registration_embed)
 
         await progress_message.edit(content="Rolecheck complete!")
+
+    async def staffreview(ctx):
+        # Define embed to edit
+        embed = discord.Embed(title="Staff checkup", color=neutral_color)
+
+        progress_message = await ctx.send("Waiting...")
+        # Indefinite loop for collecting info
+        while True:
+            # Ask for name
+            await progress_message.edit(content="What is the name of the staff member? (say 'cancel' to void this command)")
+
+            # Wait for reply and delete message
+            staff_name = await bot.wait_for("message", check=lambda
+                x: x.author == ctx.message.author and x.channel == ctx.channel)
+            await staff_name.delete()
+            staff_name = staff_name.content
+
+            # Check for cancellation
+            if staff_name.lower() == "cancel": 
+                await progress_message.edit(content="Cancelled")
+                return
+
+            # Ask for feedback
+            await progress_message.edit(content=f"What are your comments about {staff_name}?")
+            # Wait for reply and delete message
+            staff_comm = await bot.wait_for("message", check=lambda
+                x: x.author == ctx.message.author and x.channel == ctx.channel)
+            await staff_comm.delete()
+            staff_comm = staff_comm.content
+
+            embed.add_field(name=staff_name, value=staff_comm, inline=False)
+
+            # Ask for another staff member
+            await progress_message.edit(content="Do you want to add another staff member? (y/n)")
+            # Wait for reply and delete message
+            more = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel)
+            await more.delete()
+            more = more.content.lower()
+
+            if more in ("y", "yes", "ye"):
+                continue
+            return embed

@@ -1,3 +1,4 @@
+from __main__ import bot
 import discord
 from discord.ext import commands
 
@@ -26,7 +27,10 @@ class Staff(commands.Cog, name="Staff"):
     @commands.command()
     @commands.has_role("Admin")
     async def staffreview(self, ctx):
-        await Func.
+        res = await Func.staffreview(ctx)
+        # Result may be empty
+        if res != None:
+            await bot.staff_announcements.send(embed=res)
 
     # @commands.command()
     # @commands.has_role("Admin")
