@@ -27,6 +27,7 @@ class Staff(commands.Cog, name="Staff"):
     @commands.command()
     @commands.has_role("Admin")
     async def staffreview(self, ctx):
+        """Send a progress update and review for staff members!"""
         res = await Func.staffreview(ctx)
         # Result may be empty
         if res != None:
