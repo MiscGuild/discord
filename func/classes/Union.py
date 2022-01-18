@@ -7,7 +7,7 @@ from typing import Union
 
 from func.utils.discord_utils import has_tag_perms, check_tag
 from func.utils.request_utils import get_mojang_profile, get_player_guild, get_gtag
-from func.utils.consts import pos_color, neg_color, neutral_color, err_404_embed, unknown_ign_embed, staff_impersonation_embed, bot_missing_perms_embed
+from func.utils.consts import guild_handle, allies, pos_color, neg_color, neutral_color, err_404_embed, unknown_ign_embed, staff_impersonation_embed, bot_missing_perms_embed
 
 
 class Union:
@@ -110,12 +110,12 @@ class Union:
                 return tag_check_reason
 
         # Users is a member
-        if guild_name == bot.guild_name:
+        if guild_name == guild_handle:
             roles_to_add.append(bot.member_role)
             roles_to_remove.extend([bot.guest, bot.awaiting_app])
 
         # User is an ally
-        elif guild_name in bot.misc_allies:
+        elif guild_name in allies:
             gtag = await get_gtag(guild_name)
 
             # Account for if user has nick perms

@@ -2,24 +2,22 @@
 
 from __main__ import bot
 import asyncio
-import chat_exporter
 from concurrent.futures import ThreadPoolExecutor
 import discord
-from io import BytesIO
 import requests
 
 from func.utils.discord_utils import create_ticket, create_transcript, name_grabber, log_event
 from func.utils.minecraft_utils import get_hypixel_player_rank
 from func.utils.request_utils import get_mojang_profile, get_player_guild, get_guild_by_name, get_name_by_uuid, get_hypixel_player, get_gtop, get_guild_uuids, session_get_name_by_uuid
 from func.utils.db_utils import select_all
-from func.utils.consts import neg_color, neutral_color, error_color, invalid_guild_embed, registration_embed, accepted_staff_application_embed
+from func.utils.consts import guild_handle, allies, neg_color, neutral_color, error_color, invalid_guild_embed, registration_embed, accepted_staff_application_embed
 
 
 class Func:
     async def weeklylb(ctx):
         async with ctx.channel.typing():
             # Get guild data
-            guild_data = await get_guild_by_name(bot.guild_name)
+            guild_data = await get_guild_by_name(guild_handle)
 
             if guild_data == None:
                 return invalid_guild_embed
@@ -75,10 +73,10 @@ class Func:
         progress_message = await ctx.send("Processing prerequisites...")
 
         # Define arrays for guild and ally uuids and names
-        guild_uuids = await get_guild_uuids(bot.guild_name)
+        guild_uuids = await get_guild_uuids(guild_handle)
         guild_names, ally_names, ally_uuids = [], [], []
         
-        for ally in bot.misc_allies:
+        for ally in allies:
             await progress_message.edit(content=f"Fetching ally UUIDs - {ally}")
             ally_uuids.extend(await get_guild_uuids(ally))
 

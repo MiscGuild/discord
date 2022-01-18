@@ -1,17 +1,55 @@
-[bot]
-prefix = ""
+# Discord bot token
 token = ""
-ownerID = XXXXXXXXXXXXXXXXXX
-status = ""
-error_channel_id = XXXXXXXXXXXXXXXXXX
-dnkl_channel_id = XXXXXXXXXXXXXXXXXX
-ticket_channel_id = XXXXXXXXXXXXXXXXXX
-log_channel_id = XXXXXXXXXXXXXXXXXX
-registration_channel_id = XXXXXXXXXXXXXXXXXX
-guild_id = XXXXXXXXXXXXXXXXXX
-hypixel_guild_name = ""
 
-[hypixel]
+# Bot prefix and status
+prefix = ""
+status = ""
+
+# The ids of all users who will have acces to owner commands
+owner_ids = [
+    XXXXXXXXXXXXXXXXXX,
+    XXXXXXXXXXXXXXXXXX,
+    XXXXXXXXXXXXXXXXXX,
+]
+
+# The ids for your discord server and channel
+guild_id = XXXXXXXXXXXXXXXXXX
+error_channel = XXXXXXXXXXXXXXXXXX
+dnkl_channel = XXXXXXXXXXXXXXXXXX
+ticket_channel = XXXXXXXXXXXXXXXXXX
+log_channel = XXXXXXXXXXXXXXXXXX
+registration_channel = XXXXXXXXXXXXXXXXXX
+
+# The name of your Hypixel guild
+guild_handle = ""
+
+# Gexp requirements for the guild
+new_member_req = XXXX
+member_req = XXXX
+resident_req = XXXX
+active_req = XXXX
+dnkl_req = XXXX
+
+# Name of ticket categories (It is not recommended to change these values)
+ticket_categories = [
+    "🎫 Ticket Section",
+    "RTickets",
+    "OTHER",
+    "REPORTS",
+    "MILESTONES",
+    "DNKL"
+]
+
+# Names of allied guilds
+allies = [
+    "",
+    "",
+    "",
+    "",
+    ""
+]
+
+# A list of Hypixel API keys for making requests
 api_keys = [
 "",
 "",

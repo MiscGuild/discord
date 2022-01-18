@@ -1,11 +1,10 @@
 # The following file contains: get_player_gexp, get_graph_color_by_rank
 
-from __main__ import bot
 import math
 import re
 
 from func.utils.request_utils import get_mojang_profile, get_player_guild
-from func.utils.consts import ChatColor
+from func.utils.consts import member_req, resident_req, active_req, ChatColor
 
 
 # Returns player's gexp history and total
@@ -27,7 +26,7 @@ async def get_player_gexp(name: str):
 async def get_graph_color_by_rank(rank: str, weekly_gexp: int):
     if rank == "Resident":
         # Member meets res reqs
-        if weekly_gexp > bot.resident_req:
+        if weekly_gexp > resident_req:
             return 0x64ffb4, "rgba(100, 255, 180,0.3)", "rgba(100, 255, 180,0.3)"
 
         # Member does not meet res reqs
@@ -35,11 +34,11 @@ async def get_graph_color_by_rank(rank: str, weekly_gexp: int):
 
     else:
         # Member meets active reqs
-        if weekly_gexp > bot.active_req:
+        if weekly_gexp > active_req:
             return 0x64b4ff, "rgba(100, 180, 255,0.3)", "rgba(100, 180, 255,0.3)"
 
         # Member meets normal reqs
-        if weekly_gexp > bot.member_req:
+        if weekly_gexp > member_req:
             return 0x64ffff, "rgba(100, 255, 255,0.3)", "rgba(100, 255, 255,0.3)"
 
         # Member is inactive

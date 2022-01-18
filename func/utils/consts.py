@@ -1,6 +1,21 @@
-from __main__ import bot
 import discord
 from enum import Enum
+import toml
+
+# Define config
+config = toml.load("config.toml")
+
+# Requirements
+new_member_req = config["new_member_req"]
+member_req = config["member_req"]
+resident_req = config["resident_req"]
+active_req = config["active_req"]
+dnkl_req = config["dnkl_req"]
+
+# Other variables
+guild_handle = config["guild_handle"]
+ticket_categories = config["ticket_categories"]
+allies = config["allies"]
 
 # Colors
 neg_color = 0xff3333
@@ -23,30 +38,30 @@ accepted_staff_application_embed = discord.Embed(title=f"Congratulations, your s
                                                 description="Please view `https://bit.ly/MiscStaffGuide` and the `#staff-faq` channel to help you get started!",
                                                 color=neutral_color)
 
-async def get_requirements_embed(): return discord.Embed(title="Miscellaneous Guild Requirements", description="These requirements are subject to change!", color=neutral_color).add_field(
+requirements_embed = discord.Embed(title="Miscellaneous Guild Requirements", description="These requirements are subject to change!", color=neutral_color).add_field(
                                                 name="New Member",
-                                                value=f"•  {format(bot.new_member, ',d')} Daily Guild Experience",
+                                                value=f"•  {format(new_member_req, ',d')} Daily Guild Experience",
                                                 inline=False).add_field(name="Member",
-                                                value=f"•  {format(bot.member_req, ',d')} Weekly Guild Experience",
+                                                value=f"•  {format(member_req, ',d')} Weekly Guild Experience",
                                                 inline=False).add_field(name="Resident",
-                                                value=f"•  {format(bot.resident_req, ',d')} Weekly Guild Experience",
+                                                value=f"•  {format(resident_req, ',d')} Weekly Guild Experience",
                                                 inline=False).add_field(
                                                 name="Active",
-                                                value=f"•  {format(bot.active_req, ',d')} Weekly Guild Experience",
+                                                value=f"•  {format(active_req, ',d')} Weekly Guild Experience",
                                                 inline=False).add_field(name="Do-not-kick-list Eligibility",
-                                                value=f"•  {format(bot.dnkl, ',d')} Weekly Guild Experience",
+                                                value=f"•  {format(dnkl_req, ',d')} Weekly Guild Experience",
                                                 inline=False).set_footer(
                                                 text="You are considered a New Member for the first 7 days after joining the guild"
                                                     "\nIf you fail to meet these requirements, you will be kicked!")
 
-async def get_resident_embed(): return discord.Embed(title="How can I get Resident?",
+resident_embed = discord.Embed(title="How can I get Resident?",
                                 description="To be eligible for Resident, you must be satisfy at least one of the following requirements:", color=neutral_color).add_field(name="Youtuber",
                                 value="If you're a youtuber with more than 5,000 subscribers, you aren't subject to any guild requirements.",
                                 inline=False).add_field(name="Rich Kid", value="Spend Money on the guild by doing giveaways and or sponsoring events!",
                                 inline=False).add_field(name="Server Booster", value="Boost the guild discord!",
                                 inline=False).add_field(name="GvG Team", value="Be an exceptional GvG player.",
                                 inline=False).set_footer(
-                                text=f"Unless otherwise specified, all residents must get {format(bot.resident_req, ',d')} weekly guild experience.")
+                                text=f"Unless otherwise specified, all residents must get {format(resident_req, ',d')} weekly guild experience.")
 
 # Errors
 invalid_command_embed = discord.Embed(title=f"Invalid Command!",

@@ -1,19 +1,18 @@
 import discord
 from discord.ext import commands
 import sys
-import toml
+
+from func.utils.consts import config
 
 if __name__ != "__main__":
     sys.exit("Bot.py is not the __main__ file. Please run it from the bot.py file.")
-
-config = toml.load("config.toml")
 
 # Create bot
 intents = discord.Intents.default()
 intents.reactions = True
 intents.members = True
-bot = commands.Bot(command_prefix=commands.when_mentioned_or(config["bot"]["prefix"]), intents=intents,
-                status=discord.Status.idle, activity=discord.Game(config["bot"]["status"]), case_insensitive=True)
+bot = commands.Bot(command_prefix=commands.when_mentioned_or(config["prefix"]), intents=intents,
+                status=discord.Status.idle, activity=discord.Game(config["status"]), case_insensitive=True)
 
 # Load all bot vars once cache is ready
 from func.utils.discord_utils import after_cache_ready
@@ -31,4 +30,4 @@ for extension in ["func.cogs.general", "func.cogs.giveaways", "func.cogs.guild",
         print(e)
 
 # Run bot
-bot.run(config["bot"]["token"])
+bot.run(config["token"])

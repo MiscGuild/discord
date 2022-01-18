@@ -3,14 +3,12 @@ import discord
 from io import BytesIO
 import random
 import re
-import toml
 
-api_keys = toml.load("config.toml")["hypixel"]["api_keys"]
-
+from func.utils.consts import config
 
 # Returns a random Hypixel API key for requests
 async def get_hyapi_key():
-    return random.choice(api_keys)
+    return random.choice(config["api_keys"])
 
 # Base JSON-getter for all JSON based requests. Catches Invalid API Key errors
 async def get_json_response(url: str):

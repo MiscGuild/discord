@@ -5,7 +5,7 @@ from func.classes.Func import Func
 from func.classes.Integer import Integer
 from func.classes.String import String
 from func.utils.discord_utils import name_grabber
-from func.utils.consts import get_requirements_embed, get_resident_embed
+from func.utils.consts import requirements_embed, resident_embed
 
 
 class Guild(commands.Cog, name="Guild"):
@@ -47,12 +47,12 @@ class Guild(commands.Cog, name="Guild"):
     async def requirements(self, ctx):
         """View the guild gexp requirements!"""
         # Just send the reqs embed straight away
-        await ctx.send(embed=await get_requirements_embed())
+        await ctx.send(embed=requirements_embed)
 
     @commands.command(aliases=["res"])
     async def resident(self, ctx):
         """See the different ways of obtaining the resident rank!"""
-        await ctx.send(embed=await get_resident_embed())
+        await ctx.send(embed=resident_embed)
 
 
 def setup(bot):

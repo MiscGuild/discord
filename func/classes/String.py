@@ -11,7 +11,7 @@ from func.utils.minecraft_utils import get_hypixel_player_rank, get_player_gexp,
 from func.utils.discord_utils import create_ticket, is_valid_date
 from func.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild
 from func.utils.db_utils import delete_dnkl, select_one, insert_new_dnkl, update_dnkl
-from func.utils.consts import pos_color, neutral_color, neg_color, guildless_embed, unknown_ign_embed, staff_impersonation_embed, invalid_date_msg, months
+from func.utils.consts import dnkl_req, guild_handle, allies, pos_color, neutral_color, neg_color, guildless_embed, unknown_ign_embed, staff_impersonation_embed, invalid_date_msg, months
 
 
 class String:
@@ -261,10 +261,10 @@ class String:
 
         self.string, uuid = await get_mojang_profile(self.string)
         # Player is eligible
-        if weeklygexp > bot.dnkl:
+        if weeklygexp > dnkl_req:
             embed = discord.Embed(title=self.string, color=pos_color)
             embed.add_field(name="This player is eligible to apply for the do-not-kick-list.",
-                            value=f"They have {weeklygexp}/{bot.dnkl} weekly guild experience.",
+                            value=f"They have {weeklygexp}/{dnkl_req} weekly guild experience.",
                             inline=True)
 
 
@@ -272,7 +272,7 @@ class String:
         else:
             embed = discord.Embed(title=self.string, color=neg_color)
             embed.add_field(name="This player is not eligible to apply for the do-not-kick-list.",
-                            value=f"They have {weeklygexp}/{bot.dnkl} weekly guild experience to be eligible.",
+                            value=f"They have {weeklygexp}/{dnkl_req} weekly guild experience to be eligible.",
                             inline=True)
 
         embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
@@ -297,17 +297,17 @@ class String:
             guild_name = None if guild == None else guild["name"]
 
             # User is a member
-            if guild_name == bot.guild_name:
+            if guild_name == guild_handle:
                 # Add member role and delete message
                 await ctx.author.add_roles(bot.member_role, reason="Register")
                 await ctx.message.delete()
                 embed = discord.Embed(title="Registration successful!")
                 embed.add_field(name=ign,
-                                value="Member of " + bot.guild_name)
+                                value="Member of " + guild_handle)
                 return embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
 
             # User is in an allied guild
-            if guild_name in bot.misc_allies:
+            if guild_name in allies:
                 # Add guild tag as nick
                 gtag = "" if "tag" not in guild else guild["tag"]
                 if not ctx.author.nick or gtag not in ctx.author.nick:

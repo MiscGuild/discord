@@ -8,7 +8,7 @@ from discord.ext import commands, tasks
 from io import BytesIO
 import toml
 
-from func.utils.consts import neutral_color, error_color
+from func.utils.consts import config, neutral_color
 
 
 # Return user's displaying name
@@ -97,7 +97,6 @@ async def is_valid_date(date: str):
 # Returns a transcript for a channel
 async def create_transcript(channel: discord.TextChannel):
     transcript = await chat_exporter.export(channel)
-
     if not transcript: return None
 
     # Create and return file
@@ -106,26 +105,17 @@ async def create_transcript(channel: discord.TextChannel):
 
 @tasks.loop(count=1)
 async def after_cache_ready():
-    config = toml.load("config.toml")
-
-    # Set arbitrary values
-    bot.api_tokens = config["hypixel"]["api_keys"]
-    bot.owner_id = config["bot"]["ownerID"]
-    bot.guild_name = config["bot"]["hypixel_guild_name"]
-    bot.resident_req = 50000
-    bot.active_req = 285000
-    bot.member_req = 115000
-    bot.dnkl = bot.member_req * 2
-    bot.new_member = 20000
+    # Set owner id(s)
+    bot.owner_ids = config["owner_ids"]
 
     # Set channels
-    bot.error_channel = bot.get_channel(config["bot"]["error_channel_id"])
-    bot.dnkl_channel = bot.get_channel(config["bot"]["dnkl_channel_id"])
-    bot.ticket_channel = bot.get_channel(config["bot"]["ticket_channel_id"])
-    bot.log_channel = bot.get_channel(config["bot"]["log_channel_id"])
-    bot.registration_channel = bot.get_channel(config["bot"]["registration_channel_id"])
-    bot.staff_announcements = bot.get_channel(config["bot"]["staff_announcements_channel_id"])
-    bot.guild = bot.get_guild(config["bot"]["guild_id"])
+    bot.error_channel = bot.get_channel(config["error_channel"])
+    bot.dnkl_channel = bot.get_channel(config["dnkl_channel"])
+    bot.ticket_channel = bot.get_channel(config["ticket_channel"])
+    bot.log_channel = bot.get_channel(config["log_channel"])
+    bot.registration_channel = bot.get_channel(config["registration_channel"])
+    bot.staff_announcements = bot.get_channel(config["staff_announcements_channel"])
+    bot.guild = bot.get_guild(config["guild_id"])
 
     # Set roles
     bot.guild_master = discord.utils.get(bot.guild.roles, name="Guild Master")
@@ -144,10 +134,6 @@ async def after_cache_ready():
     bot.rich_kid = discord.utils.get(bot.guild.roles, name="Rich Kid")
     bot.giveaways_events = discord.utils.get(bot.guild.roles, name="Giveaways/Events")
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster, bot.rich_kid)
-
-    # Set other names
-    bot.ticket_categories = ("RTickets", "🎫 Ticket Section", "OTHER", "REPORTS", "MILESTONES", "DNKL")
-    bot.misc_allies = ("XL", "Lucid", "OUT", "Betrayed", "Blight", "TheNinjaWarriors")
 
     from func.utils.discord_utils import name_grabber
     bot.admin_ids = [member.id for member in bot.admin.members]
