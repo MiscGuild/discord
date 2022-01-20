@@ -5,7 +5,7 @@ import discord
 from discord.ext import commands
 import traceback
 
-from func.utils.consts import invalid_command_embed, registration_embed, not_owner_embed, missing_role_embed, missing_permissions_embed, member_not_found_embed
+from func.utils.consts import registration_channel_id, error_channel_id, invalid_command_embed, registration_embed, not_owner_embed, missing_role_embed, missing_permissions_embed, member_not_found_embed
 
 
 class Listener:
@@ -15,12 +15,12 @@ class Listener:
     async def on_member_join(member):
         # Remove user's speaking perms and send info embed
         await member.add_roles(bot.new_member_role)
-        await bot.registration_channel.send(embed=registration_embed)
+        await bot.get_channel(registration_channel_id).send(embed=registration_embed)
 
     async def on_error(event):
         # Grabs the error being handled, formats it and sends it to the error channel
         tb = traceback.format_exc()
-        await bot.error_channel.send(f"Ignoring exception in event {event}:\n```py\n{tb}\n```")
+        await bot.get_channel(error_channel_id).send(f"Ignoring exception in event {event}:\n```py\n{tb}\n```")
 
     async def on_command_error(ctx, error):
         # Prevents commands with local handlers or cogs with overwrritten on_command_errors being handled here
@@ -57,7 +57,7 @@ class Listener:
         else:
             tb = "".join(traceback.format_exception(type(error), error, error.__traceback__))
             if len(tb) <= 2000:
-                await bot.error_channel.send(f"Ignoring exception in command {ctx.command}:\n```py\n{tb}\n```")
+                await bot.get_channel(error_channel_id).send(f"Ignoring exception in command {ctx.command}:\n```py\n{tb}\n```")
             else:
                 await bot.error_channel.send(
                     f"```An error occurred in command '{ctx.command}' that could not be sent in this channel, check the console for the traceback. \n\n'{error}'```")

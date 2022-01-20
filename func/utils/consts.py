@@ -13,6 +13,12 @@ active_req = config["active_req"]
 dnkl_req = config["dnkl_req"]
 
 # Define channels
+error_channel_id = config["error_channel"]
+dnkl_channel_id = config["dnkl_channel"]
+ticket_channel_id = config["ticket_channel"]
+log_channel_id = config["log_channel"]
+registration_channel_id = config["registration_channel"]
+staff_announcements_id = config["staff_announcements_channel"]
 partner_channel_id = config["partner_channel"]
 
 # Other variables

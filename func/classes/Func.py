@@ -10,7 +10,7 @@ from func.utils.discord_utils import create_ticket, create_transcript, name_grab
 from func.utils.minecraft_utils import get_hypixel_player_rank
 from func.utils.request_utils import get_mojang_profile, get_player_guild, get_guild_by_name, get_name_by_uuid, get_hypixel_player, get_gtop, get_guild_uuids, session_get_name_by_uuid
 from func.utils.db_utils import select_all
-from func.utils.consts import guild_handle, allies, neg_color, neutral_color, error_color, invalid_guild_embed, registration_embed, accepted_staff_application_embed
+from func.utils.consts import registration_channel_id, log_channel_id, guild_handle, allies, neg_color, neutral_color, error_color, invalid_guild_embed, registration_embed, accepted_staff_application_embed
 
 
 class Func:
@@ -142,7 +142,7 @@ class Func:
 
 
         # Send ping to new member role in registration channel
-        if send_ping: await bot.registration_channel.send(bot.new_member_role.mention, embed=registration_embed)
+        if send_ping: await bot.get_channel(registration_channel_id).send(bot.new_member_role.mention, embed=registration_embed)
 
         await progress_message.edit(content="Rolecheck complete!")
 
@@ -203,7 +203,7 @@ class Func:
         if transcript != None:
             # Log outcome
             await log_event(f"{ctx.channel.name} was deleted by {ctx.author}")
-            await bot.log_channel.send(file=transcript)
+            await bot.get_channel(log_channel_id).send(file=transcript)
     
     async def accept(ctx):
         if ctx.channel.category.name not in bot.ticket_categories:

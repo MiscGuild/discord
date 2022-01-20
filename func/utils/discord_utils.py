@@ -105,16 +105,8 @@ async def create_transcript(channel: discord.TextChannel):
 
 @tasks.loop(count=1)
 async def after_cache_ready():
-    # Set owner id(s)
+    # Set owner id(s) and guild
     bot.owner_ids = config["owner_ids"]
-
-    # Set channels
-    bot.error_channel = bot.get_channel(config["error_channel"])
-    bot.dnkl_channel = bot.get_channel(config["dnkl_channel"])
-    bot.ticket_channel = bot.get_channel(config["ticket_channel"])
-    bot.log_channel = bot.get_channel(config["log_channel"])
-    bot.registration_channel = bot.get_channel(config["registration_channel"])
-    bot.staff_announcements = bot.get_channel(config["staff_announcements_channel"])
     bot.guild = bot.get_guild(config["guild_id"])
 
     # Set roles

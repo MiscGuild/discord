@@ -11,7 +11,7 @@ from func.utils.minecraft_utils import get_hypixel_player_rank, get_player_gexp,
 from func.utils.discord_utils import create_ticket, is_valid_date
 from func.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild
 from func.utils.db_utils import delete_dnkl, select_one, insert_new_dnkl, update_dnkl
-from func.utils.consts import dnkl_req, guild_handle, allies, pos_color, neutral_color, neg_color, guildless_embed, unknown_ign_embed, staff_impersonation_embed, invalid_date_msg, months
+from func.utils.consts import dnkl_channel_id, registration_channel_id, dnkl_req, guild_handle, allies, pos_color, neutral_color, neg_color, guildless_embed, unknown_ign_embed, staff_impersonation_embed, invalid_date_msg, months
 
 
 class String:
@@ -211,7 +211,7 @@ class String:
         embed.add_field(name="Start:", value=f"{sd} {sm} {sy}", inline=False)
         embed.add_field(name="End:", value=f"{ed} {em} {ey}", inline=False)
         embed.add_field(name="Reason", value=f"{reason}", inline=False)
-        dnkl_message = await bot.dnkl_channel.send(embed=embed.set_author(name="Do-not-kick-list"))
+        dnkl_message = await bot.get_channel(dnkl_channel_id).send(embed=embed.set_author(name="Do-not-kick-list"))
 
         # Check if user is already on DNKL
         current_message = await select_one("SELECT message_id FROM dnkl WHERE uuid = (?)", (uuid,))
@@ -223,7 +223,7 @@ class String:
         # User is already on DNKl
         # Try to delete current message
         try:
-            current_message = await bot.dnkl_channel.fetch_message(current_message)
+            current_message = await bot.get_channel(dnkl_channel_id).fetch_message(current_message)
             await current_message.delete()
         except Exception:
             pass
@@ -243,7 +243,7 @@ class String:
 
             # Delete DNKL message
             try:
-                msg = await bot.dnkl_channel.fetch_message(message_id)
+                msg = await bot.get_channel(dnkl_channel_id).fetch_message(message_id)
                 await msg.delete()
             except Exception:
                 return f"{username} has been removed from the do-not-kick-list, however the message was not found."
@@ -282,7 +282,7 @@ class String:
     async def register(self, ctx):
         async with ctx.channel.typing():
             # Make sure it is only used in registration channel
-            if ctx.channel != bot.registration_channel:
+            if ctx.channel.id != registration_channel_id:
                 return "This command can only be used in the registration channel!"
                 
             ign, uuid = await get_mojang_profile(self.string)
