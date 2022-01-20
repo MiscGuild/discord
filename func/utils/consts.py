@@ -12,6 +12,9 @@ resident_req = config["resident_req"]
 active_req = config["active_req"]
 dnkl_req = config["dnkl_req"]
 
+# Define channels
+partner_channel_id = config["partner_channel"]
+
 # Other variables
 guild_handle = config["guild_handle"]
 ticket_categories = config["ticket_categories"]

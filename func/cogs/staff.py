@@ -5,6 +5,8 @@ from discord.ext import commands
 from func.classes.Func import Func
 from func.classes.Union import Union
 
+from func.utils.consts import partner_channel_id
+
 
 class Staff(commands.Cog, name="Staff"):
     def __init__(self, bot):
@@ -33,9 +35,11 @@ class Staff(commands.Cog, name="Staff"):
         if res != None:
             await bot.staff_announcements.send(embed=res)
 
-    # @commands.command()
-    # @commands.has_role("Admin")
-    # async def partner(self, ctx):
+    @commands.command()
+    @commands.has_role("Admin")
+    async def partner(self, ctx,  organization_name: str):
+        """Create an embed with information about a partner!"""
+        await bot.get_channel(partner_channel_id).send(embed=await Func.partner(ctx, organization_name))
 
     @commands.command()
     @commands.has_role("Staff")

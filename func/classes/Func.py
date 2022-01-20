@@ -1,4 +1,4 @@
-# The following file contains: weeklylb, dnkllist, rolecheck, delete, accept, transcript, new
+# The following file contains: weeklylb, dnkllist, rolecheck, delete, accept, transcript, new, partner
 
 from __main__ import bot
 import asyncio
@@ -229,3 +229,12 @@ class Func:
 
         # Return message with link to ticket
         return f"Click the following link to go to your ticket! <#{ticket.id}>"
+
+    async def partner(ctx, organization_name: str):
+        await ctx.send("In one message, please provide a brief description of the guild/organization being patnered.")
+
+        # Wait for description
+        description = await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)
+        description = description.content
+
+        return discord.Embed(title=organization_name, description=description, color=neutral_color)
