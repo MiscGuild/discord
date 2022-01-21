@@ -75,9 +75,15 @@ class Tickets(commands.Cog, name="Tickets"):
         if isinstance(res, discord.Embed):
             await ctx.send(embed=res)
 
-    # @commands.command()
-    # @commands.has_any_role("Admin", "Moderator")
-    # async def deny(self, ctx, channel: discord.TextChannel):
+    @commands.command()
+    @commands.has_any_role("Admin", "Moderator")
+    async def deny(self, ctx, channel: discord.TextChannel):
+        """Deny a staff application!"""
+        # Get result and send file if it is returned
+        embed, file = await Func.deny(ctx, channel)
+        await channel.send(embed=embed)
+        if file != None:
+            return await channel.send(file=file)
 
     @commands.command()
     async def new(self, ctx):

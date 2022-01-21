@@ -10,7 +10,7 @@ from func.utils.discord_utils import create_ticket, create_transcript, name_grab
 from func.utils.minecraft_utils import get_hypixel_player_rank
 from func.utils.request_utils import get_mojang_profile, get_player_guild, get_guild_by_name, get_name_by_uuid, get_hypixel_player, get_gtop, get_guild_uuids, session_get_name_by_uuid
 from func.utils.db_utils import select_all
-from func.utils.consts import registration_channel_id, log_channel_id, guild_handle, allies, neg_color, neutral_color, error_color, invalid_guild_embed, registration_embed, accepted_staff_application_embed
+from func.utils.consts import registration_channel_id, log_channel_id, guild_handle, allies, neg_color, neutral_color, error_color, invalid_guild_embed, registration_embed, accepted_staff_application_embed, staff_application_questions
 
 
 class Func:
@@ -238,3 +238,58 @@ class Func:
         description = description.content
 
         return discord.Embed(title=organization_name, description=description, color=neutral_color)
+
+    async def deny(ctx, channel: discord.TextChannel):
+        # Copy real question list and append 0th element for general critiquing
+        application_questions = staff_application_questions.copy()
+        application_questions[0] = "General critiquing"
+
+        # Send the list of questions and their associated numbers
+        all_questions = ""
+        for key, value in application_questions.items():
+            all_questions += f"**{key})** {value}\n\n"
+        await ctx.send(embed=discord.Embed(title="Questions", description=all_questions, color=neutral_color))
+
+        # Define the embed to be sent to the applicant
+        denial_embed = discord.Embed(title="Your staff application has been denied!", description="The reasons have been listed below", color=error_color)
+
+        # Loop for getting question feedback
+        while True:
+            while True:
+                await ctx.send("What is the question number of the reply that you would like to critique?\nIf you would like to critique something in general, reply with `0`")
+                question = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+
+                # Try-except for checking if the given number is valid
+                try:
+                    question = application_questions[int(question.content)]
+                    break
+                # Catch KeyError if number is invalid
+                except KeyError:
+                    await ctx.send("Please respond with a valid question number.")
+
+            await ctx.send(f"`{question}`\n**What was the issue that you found with their reply?**")
+            critique = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+
+            # Update embed and send preview
+            denial_embed.add_field(name=question, value=critique.content, inline=False)
+            await ctx.send(embed=denial_embed)
+
+            # Ask user if they want to critique more questions and wait for reply
+            await ctx.send("Would you like to critique more questions? (y/n)")
+            while True:
+                more = await bot.wait_for("message",
+                                               check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+                more = more.content.lower()
+
+                # User does not want to critique more questions
+                if more in ["n", "no"]:
+                    transcript = await create_transcript(channel)
+
+                    # Notify the user that the transcript failed
+                    if not transcript:
+                        return denial_embed.set_footer(text="Transcript creation failed!"), None
+
+                    return denial_embed.set_footer(text="You may reapply in 2 weeks.\nFollowing is the transcript so that you can refer to it while reapplying."), transcript
+                
+                # Break inner loop and let user answer more questions
+                break

@@ -146,3 +146,19 @@ months = {
     11: "November", 
     12: "December"
 }
+
+staff_application_questions = {
+    1: "What is your age?",
+    2: "How long have you been in the guild for?",
+    3: "Have you had any past infractions on Hypixel?",
+    4: "Why have you decided to apply for staff?",
+    5: "What has brought you to Miscellaneous, and what has kept you here?",
+    6: "What is something you could suggest that would improve the guild?",
+    7: "You have just started as a helper and a moderator starts arguing with another member. This argument starts to get serious quite quickly. What do you do?",
+    8: "Suppose it's your first week of being a helper and you guild-mute a well-known player. Your guildmates start spamming you calling you a bad moderator and telling you to unmute them. What would you do?",
+    9: "Upon joining a game and you discover that a guild member is in your game and is hacking. What do you do?",
+    10: "Have you been staff in any other guild or on any server? If yes, which one?",
+    11: "How much time do you have to contribute to the role? (Per day)",
+    12: "Tell us about a time you made a mistake within the last year. How did you deal with it? What did you learn?",
+    13: "Anything else you would us to know?"
+}
