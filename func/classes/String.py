@@ -250,8 +250,6 @@ class String:
                 
             return f"{username} has been removed from the do-not-kick-list!"
 
-    # async def dnkllist(self):
-
     async def dnklcheck(self):
         _, weeklygexp = await get_player_gexp(self.string)
 

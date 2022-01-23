@@ -1,7 +1,6 @@
 # The following file contains: weeklylb, dnkllist, rolecheck, delete, accept, transcript, new, partner, inactive
 
 from __main__ import bot
-import aiohttp
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
