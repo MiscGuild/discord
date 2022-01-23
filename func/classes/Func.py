@@ -1,8 +1,10 @@
-# The following file contains: weeklylb, dnkllist, rolecheck, delete, accept, transcript, new, partner
+# The following file contains: weeklylb, dnkllist, rolecheck, delete, accept, transcript, new, partner, inactive
 
 from __main__ import bot
+import aiohttp
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 import discord
 import requests
 
@@ -10,7 +12,7 @@ from func.utils.discord_utils import create_ticket, create_transcript, name_grab
 from func.utils.minecraft_utils import get_hypixel_player_rank
 from func.utils.request_utils import get_mojang_profile, get_player_guild, get_guild_by_name, get_name_by_uuid, get_hypixel_player, get_gtop, get_guild_uuids, session_get_name_by_uuid
 from func.utils.db_utils import select_all
-from func.utils.consts import registration_channel_id, log_channel_id, guild_handle, allies, neg_color, neutral_color, error_color, invalid_guild_embed, registration_embed, accepted_staff_application_embed, staff_application_questions
+from func.utils.consts import member_req, active_req, registration_channel_id, log_channel_id, guild_handle, allies, neg_color, neutral_color, pos_color, error_color, invalid_guild_embed, registration_embed, accepted_staff_application_embed, staff_application_questions
 
 
 class Func:
@@ -293,3 +295,73 @@ class Func:
                 
                 # Break inner loop and let user answer more questions
                 break
+
+    async def inactive(ctx):
+        with ctx.channel.typing():
+            # Fetch guid data
+            guild_data = await get_guild_by_name(guild_handle)
+            if guild_data == None:
+                return invalid_guild_embed
+
+            # Retrieve DNKL users so they can be filtered out
+            dnkl_uuids = await select_all("SELECT uuid FROM dnkl")
+
+            # Define dicts for each category of users
+            to_promote, to_demote, inactive, residents = {}, {}, {}, {}
+
+            # Loop through all guild members with a session to fetch names
+            for member in guild_data["members"]:
+                uuid = member["uuid"]
+
+                # Remove dnkl users from list
+                if uuid in dnkl_uuids:
+                    continue
+
+                # Gather data
+                guild_rank = member["rank"]
+                weekly_exp = sum(member["expHistory"].values())
+                name = await get_name_by_uuid(uuid)
+                name +=  f"[{guild_rank}]\n" + str(datetime.fromtimestamp(int(str(member["joined"])[:-3])))[0:10]
+
+                # Members who need to be promoted
+                if guild_rank == "Member" and weekly_exp >= active_req:
+                    to_promote[name] = weekly_exp
+                # Active members who need to be demoted
+                elif guild_rank == "Active" and weekly_exp < active_req:
+                    to_demote[name] = weekly_exp
+                # Members who do not meet the requirements
+                elif weekly_exp < member_req:
+                    if guild_rank == "Member":
+                        inactive[name] = weekly_exp
+                    elif guild_rank == "Resident":
+                        residents[name] = weekly_exp
+
+            # Define embeds array to be returned
+            embeds = []
+
+            # Loop through dicts, descriptions and colors
+            for _dict, title, color in [[to_promote, "Promote the following users:", pos_color], 
+                                        [to_demote, "Demote the following users:", neg_color],
+                                        [residents, "Following are the inactive residents:", 0xe5ba6c],
+                                        [inactive, "Following are the users to be kicked:", neg_color]]:
+                # Filter categories with no users
+                if _dict:
+                    # Sort values from lowest-highest
+                    _dict = sorted(_dict.items(), key=lambda item: item[1], reverse=True)
+
+                    length = len(_dict)
+
+                    # Create embed, append fields with data
+                    embed = discord.Embed(title=title, description=f"Total: {length}", color=color)
+                    for user in _dict:
+                        embed.add_field(name=f"{user[0]}", value=f"```cs\n{format(user[1], ',d')}```", inline=True)
+                        
+                        # If the embed is getting too large, append it and create a new one
+                        if len(embed.fields) >= 25 and length != 25:
+                            embeds.append(embed)
+                            embed = discord.Embed(color=color)
+
+                    # Append embed to array
+                    embeds.append(embed)
+
+            return embeds

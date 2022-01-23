@@ -12,9 +12,12 @@ class Staff(commands.Cog, name="Staff"):
     def __init__(self, bot):
         self.bot = bot
 
-    # @commands.command()
-    # @commands.has_role("Staff")
-    # async def inactive(self, ctx):
+    @commands.command()
+    @commands.has_role("Staff")
+    async def inactive(self, ctx):
+        """View all inactive users in the guild!"""
+        for embed in await Func.inactive(ctx):
+            await ctx.send(embed=embed)
 
     @commands.command(aliases=["fs"])
     @commands.has_role("Staff")
