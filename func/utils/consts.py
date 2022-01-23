@@ -74,7 +74,7 @@ resident_embed = discord.Embed(title="How can I get Resident?",
 
 # Errors
 invalid_command_embed = discord.Embed(title=f"Invalid Command!",
-                                    descrption="Use `,help` to view a list of all commands!",
+                                    description="Use `,help` to view a list of all commands!",
                                     color=error_color)
 
 not_owner_embed = discord.Embed(title=f"Your soul lacks the strength to utilize this command!",
