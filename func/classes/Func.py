@@ -1,10 +1,12 @@
-# The following file contains: weeklylb, dnkllist, rolecheck, delete, accept, transcript, new, partner, inactive
+# The following file contains: weeklylb, dnkllist, rolecheck, delete, accept, transcript, new, partner, inactive, reactionroles
 
 from __main__ import bot
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
-import discord
+import discord 
+from discord import SelectOption
+from discord.ui import View, Button, Select
 import requests
 
 from func.utils.discord_utils import create_ticket, create_transcript, name_grabber, log_event
@@ -364,3 +366,38 @@ class Func:
                     embeds.append(embed)
 
             return embeds
+
+    async def reactionroles():
+        # Reaction roles
+        reaction_roles_embed = discord.Embed(title="To get your desired role, click its respective button!",
+                                            description="🪓 __**SkyBlock**__\n*Gives you the access to the SkyBlock category!*\n\n"
+                                                        "🕹 __**Discord Minigames**__\n*Allows you to play some Discord minigames!*\n\n"
+                                                        "❓  __**QOTD Ping**__\n*The staff team will mention this role when there's a new question of the day!*\n\n"
+                                                        "🎉 __**Giveaways/Events**__\n*React so you don't miss any giveaway or event*\n\n"
+                                                        "📖 __**Storytimes**__\n*Get pinged whenever a storytime happens* ",
+                                            color=neutral_color)
+
+        reaction_roles_view = View()
+        reaction_roles_view.add_item(Button(label="Skyblock", custom_id="732279654261588048", emoji="🪓"))
+        reaction_roles_view.add_item(Button(label="Discord Minigames", custom_id="732824611175006239", emoji="🕹"))
+        reaction_roles_view.add_item(Button(label="QOTD Ping", custom_id="923978802818871356", emoji="❓"))
+        reaction_roles_view.add_item(Button(label="Giveaways/Events", custom_id="780717935140012052", emoji="🎉"))
+        reaction_roles_view.add_item(Button(label="Storytimes", custom_id="855657894518325258", emoji="📖"))
+
+        # Pronouns
+        pronouns_embed = discord.Embed(title="Please select your pronouns",
+                                        description=":man: He/Him"
+                                                    "\n:woman: She/Her"
+                                                    "\n:rainbow_flag: They/Them"
+                                                    "\n:question: Other",
+                                        color=neutral_color)
+
+        pronouns_view = View()
+        Select(placeholder="Select max 1!", options=[
+            SelectOption(label="He/Him", value="849830869036040212", emoji="👨"),
+            SelectOption(label="She/Her", value="849830936434704404", emoji="👩"),
+            SelectOption(label="They/Them", value="849831004310077441", emoji="🏳️‍🌈"),
+            SelectOption(label="Other", value="855598846843551744", emoji="❓")
+        ], max_values=1, min_values=0)
+
+        return [reaction_roles_embed, reaction_roles_view], [pronouns_embed, pronouns_view]
