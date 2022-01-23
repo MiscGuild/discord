@@ -393,11 +393,11 @@ class Func:
                                         color=neutral_color)
 
         pronouns_view = View()
-        Select(placeholder="Select max 1!", options=[
+        pronouns_view.add_item(Select(placeholder="Select your pronouns!", options=[
             SelectOption(label="He/Him", value="849830869036040212", emoji="👨"),
             SelectOption(label="She/Her", value="849830936434704404", emoji="👩"),
             SelectOption(label="They/Them", value="849831004310077441", emoji="🏳️‍🌈"),
             SelectOption(label="Other", value="855598846843551744", emoji="❓")
-        ], max_values=1, min_values=0)
+        ], max_values=1, min_values=0))
 
         return [reaction_roles_embed, reaction_roles_view], [pronouns_embed, pronouns_view]
