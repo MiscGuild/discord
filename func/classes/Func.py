@@ -370,11 +370,11 @@ class Func:
     async def reactionroles():
         # Reaction roles
         reaction_roles_embed = discord.Embed(title="To get your desired role, click its respective button!",
-                                            description="🪓 __**SkyBlock**__\n*Gives you the access to the SkyBlock category!*\n\n"
-                                                        "🕹 __**Discord Minigames**__\n*Allows you to play some Discord minigames!*\n\n"
-                                                        "❓  __**QOTD Ping**__\n*The staff team will mention this role when there's a new question of the day!*\n\n"
-                                                        "🎉 __**Giveaways/Events**__\n*React so you don't miss any giveaway or event*\n\n"
-                                                        "📖 __**Storytimes**__\n*Get pinged whenever a storytime happens* ",
+                                            description="🪓 __**SkyBlock**__\nGives you the access to the SkyBlock category!\n\n"
+                                                        "🕹 __**Discord Minigames**__\nAllows you to play some Discord minigames!\n\n"
+                                                        "❓  __**QOTD Ping**__\nThe staff team will mention this role when there's a new question of the day!\n\n"
+                                                        "🎉 __**Giveaways/Events**__\nReact so you don't miss any giveaway or event\n\n"
+                                                        "📖 __**Storytimes**__\nGet pinged whenever a storytime happens",
                                             color=neutral_color)
 
         reaction_roles_view = View()
@@ -386,10 +386,10 @@ class Func:
 
         # Pronouns
         pronouns_embed = discord.Embed(title="Please select your pronouns",
-                                        description=":man: He/Him"
-                                                    "\n:woman: She/Her"
-                                                    "\n:rainbow_flag: They/Them"
-                                                    "\n:question: Other",
+                                        description="👨 He/Him"
+                                                    "\n👩 She/Her"
+                                                    "\n🏳‍🌈 They/Them"
+                                                    "\n❓ Other",
                                         color=neutral_color)
 
         pronouns_view = View()
