@@ -13,7 +13,7 @@ class Guild(commands.Cog, name="Guild"):
         self.bot = bot
 
     @commands.command(aliases=["gm", "g"])
-    async def gmember(self, ctx, name=None):
+    async def gmember(self, ctx, name: str=None):
         """View the given user's gexp over the past week!"""
         if not name:
             name = await name_grabber(ctx.author)
@@ -35,7 +35,7 @@ class Guild(commands.Cog, name="Guild"):
             await ctx.send(embed=res)
 
     @commands.command()
-    async def gtop(self, ctx, day=1):
+    async def gtop(self, ctx, day: int=1):
         """View the daily guild experience leaderboard!"""
         res = await Integer(integer=day).gtop(ctx=ctx)
         if isinstance(res, discord.File):

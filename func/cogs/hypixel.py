@@ -12,7 +12,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         self.bot = bot
 
     @commands.command()
-    async def sync(self, ctx, name: str, tag: str = None):
+    async def sync(self, ctx, name: str, tag: str=None):
         """Update your discord nick, tag and roles!"""
         result = await Union(user=ctx.author).sync(ctx, name, tag)
         if isinstance(result, discord.Embed):
@@ -49,7 +49,7 @@ class Hypixel(commands.Cog, name="Hypixel"):
         await ctx.send(embed=await Func.dnkllist())
 
     @commands.command(aliases=["dnklchk"])
-    async def dnklcheck(self, ctx, name: str = None):
+    async def dnklcheck(self, ctx, name: str=None):
         """Check whether you are eligible for the do-not-kick-list!"""
         if name == None:
             name = await name_grabber(ctx.author)
