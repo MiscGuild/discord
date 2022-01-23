@@ -43,7 +43,7 @@ registration_embed = discord.Embed(title="Welcome to the Miscellaneous Discord!"
 staff_impersonation_embed = discord.Embed(title="Staff impersonation is a punishable offense!",
                                         color=neg_color)
 
-accepted_staff_application_embed = discord.Embed(title=f"Congratulations, your staff application has been accepted!",
+accepted_staff_application_embed = discord.Embed(title="Congratulations, your staff application has been accepted!",
                                                 description="Please view `https://bit.ly/MiscStaffGuide` and the `#staff-faq` channel to help you get started!",
                                                 color=neutral_color)
 
@@ -73,23 +73,23 @@ resident_embed = discord.Embed(title="How can I get Resident?",
                                 text=f"Unless otherwise specified, all residents must get {format(resident_req, ',d')} weekly guild experience.")
 
 # Errors
-invalid_command_embed = discord.Embed(title=f"Invalid Command!",
+invalid_command_embed = discord.Embed(title="Invalid Command!",
                                     description="Use `,help` to view a list of all commands!",
                                     color=error_color)
 
-not_owner_embed = discord.Embed(title=f"Your soul lacks the strength to utilize this command!",
+not_owner_embed = discord.Embed(title="Your soul lacks the strength to utilize this command!",
                                 description="You are not the owner of this bot!",
                                 color=error_color)
 
-missing_role_embed = discord.Embed(title=f"Your soul lacks the strength to utilize this command!",
+missing_role_embed = discord.Embed(title="Your soul lacks the strength to utilize this command!",
                                 description="You do not have the required roles to access this restricted command!",
                                 color=error_color)
 
-missing_permissions_embed = discord.Embed(title=f"Your soul lacks the strength to utilize this command!",
+missing_permissions_embed = discord.Embed(title="Your soul lacks the strength to utilize this command!",
                                     description="You do not have the required permissions to access this restricted command!",
                                     color=error_color)
 
-member_not_found_embed = discord.Embed(title=f"Member not found",
+member_not_found_embed = discord.Embed(title="Member not found",
                                     description="This member doesn't seem to exist.\nCheck you have their ID or tag's capitalization and spelling correct!",
                                     color=error_color)
 
