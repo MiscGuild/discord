@@ -7,7 +7,7 @@ from func.classes.String import String
 from func.utils.discord_utils import name_grabber
 
 
-class Hypixel(commands.Cog, name="Hypixel"):
+class Hypixel(commands.Cog, name="hypixel"):
     def __init__(self, bot):
         self.bot = bot
 

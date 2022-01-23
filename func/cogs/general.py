@@ -5,7 +5,7 @@ from func.classes.String import String
 from func.classes.Union import Union
 
 
-class General(commands.Cog, name="General"):
+class General(commands.Cog, name="general"):
     def __init__(self, bot):
         self.bot = bot
 

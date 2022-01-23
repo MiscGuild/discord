@@ -3,7 +3,7 @@ from discord.ext import commands
 from func.classes.Integer import Integer
 
 
-class Giveaways(commands.Cog, name="Giveaways"):
+class Giveaways(commands.Cog, name="giveaways"):
     def __init__(self, bot):
         self.bot = bot
 

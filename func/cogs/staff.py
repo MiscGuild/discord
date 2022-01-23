@@ -8,7 +8,7 @@ from func.classes.Union import Union
 from func.utils.consts import partner_channel_id
 
 
-class Staff(commands.Cog, name="Staff"):
+class Staff(commands.Cog, name="staff"):
     def __init__(self, bot):
         self.bot = bot
 

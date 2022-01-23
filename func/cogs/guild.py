@@ -8,7 +8,7 @@ from func.utils.discord_utils import name_grabber
 from func.utils.consts import requirements_embed, resident_embed
 
 
-class Guild(commands.Cog, name="Guild"):
+class Guild(commands.Cog, name="guild"):
     def __init__(self, bot):
         self.bot = bot
 

@@ -3,7 +3,7 @@ from discord.ext import commands
 from func.classes.Listener import Listener
 
 
-class Menus(commands.Cog, command_attrs=dict(hidden=True)):
+class Menus(commands.Cog, command_attrs=dict(hidden=True), name="menus"):
     def __init__(self, bot):
         self.bot = bot
 

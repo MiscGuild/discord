@@ -6,7 +6,7 @@ from func.classes.String import String
 from func.classes.Union import Union
 
 
-class Tickets(commands.Cog, name="Tickets"):
+class Tickets(commands.Cog, name="tickets"):
     def __init__(self, bot):
         self.bot = bot
 

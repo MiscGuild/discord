@@ -5,7 +5,7 @@ from func.classes.Integer import Integer
 from func.classes.Union import Union
 
 
-class Moderation(commands.Cog, name="Moderation"):
+class Moderation(commands.Cog, name="moderation"):
     def __init__(self, bot):
         self.bot = bot
 
