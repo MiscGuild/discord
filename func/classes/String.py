@@ -1,4 +1,4 @@
-# The following file contains: source, gmember, info, dnkladd, dnklremove, dnkllist, dnklcheck, register, rename
+# The following file contains: source, gmember, info, dnkladd, dnklremove, dnklcheck, register, rename
 
 from __main__ import bot
 from datetime import datetime
