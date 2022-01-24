@@ -11,6 +11,7 @@ from func.utils.consts import (error_channel_id, invalid_command_embed,
                                missing_permissions_embed, missing_role_embed,
                                neutral_color, not_owner_embed,
                                registration_channel_id, registration_embed)
+from func.utils.discord_utils import create_ticket
 from func.utils.request_utils import get_jpg_file
 
 
@@ -181,6 +182,7 @@ class Listener:
             @discord.ui.button(label="Create Ticket", style=discord.ButtonStyle.blurple, emoji="✉️")
 
             async def callback(self, button, interaction: discord.Interaction):
-                return True
+                ticket = await create_ticket(interaction.user, f"ticket-{interaction.user.display_name}")
+                await interaction.response.send_message(f"Click the following link to go to your ticket! <#{ticket.id}>", ephemeral=True)
 
         return image, embed, TicketView()
