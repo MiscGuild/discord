@@ -1,17 +1,27 @@
 # The following file contains: weeklylb, dnkllist, rolecheck, staffreview, delete, accept, transcript, new, partner, deny, inactive
 
-from __main__ import bot
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
+
 import discord
 import requests
-
-from func.utils.discord_utils import create_ticket, create_transcript, name_grabber, log_event
-from func.utils.minecraft_utils import get_hypixel_player_rank
-from func.utils.request_utils import get_mojang_profile, get_player_guild, get_guild_by_name, get_name_by_uuid, get_hypixel_player, get_jpg_file, get_guild_uuids, session_get_name_by_uuid
+from __main__ import bot
+from func.utils.consts import (accepted_staff_application_embed, active_req,
+                               allies, error_color, guild_handle,
+                               invalid_guild_embed, log_channel_id, member_req,
+                               neg_color, neutral_color, pos_color,
+                               registration_channel_id, registration_embed,
+                               staff_application_questions)
 from func.utils.db_utils import select_all
-from func.utils.consts import member_req, active_req, registration_channel_id, log_channel_id, guild_handle, allies, neg_color, neutral_color, pos_color, error_color, invalid_guild_embed, registration_embed, accepted_staff_application_embed, staff_application_questions
+from func.utils.discord_utils import (create_ticket, create_transcript,
+                                      log_event, name_grabber)
+from func.utils.minecraft_utils import get_hypixel_player_rank
+from func.utils.request_utils import (get_guild_by_name, get_guild_uuids,
+                                      get_hypixel_player, get_jpg_file,
+                                      get_mojang_profile, get_name_by_uuid,
+                                      get_player_guild,
+                                      session_get_name_by_uuid)
 
 
 class Func:

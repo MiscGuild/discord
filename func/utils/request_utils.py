@@ -1,10 +1,11 @@
-import aiohttp
-import discord
-from io import BytesIO
 import random
 import re
+from io import BytesIO
 
+import aiohttp
+import discord
 from func.utils.consts import config
+
 
 # Returns a random Hypixel API key for requests
 async def get_hyapi_key():

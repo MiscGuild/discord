@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-
 from func.classes.Integer import Integer
 from func.classes.Union import Union
 

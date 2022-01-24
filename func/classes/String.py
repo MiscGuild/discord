@@ -1,17 +1,26 @@
 # The following file contains: source, gmember, info, dnkladd, dnklremove, dnklcheck, register, rename
 
-from __main__ import bot
-from datetime import datetime
-import discord
 import inspect
 import os
-from quickchart import QuickChart
+from datetime import datetime
 
-from func.utils.minecraft_utils import get_hypixel_player_rank, get_player_gexp, get_graph_color_by_rank, calculate_network_level
+import discord
+from __main__ import bot
+from func.utils.consts import (allies, dnkl_channel_id, dnkl_req, guild_handle,
+                               guildless_embed, invalid_date_msg, months,
+                               neg_color, neutral_color, pos_color,
+                               registration_channel_id,
+                               staff_impersonation_embed, unknown_ign_embed)
+from func.utils.db_utils import (delete_dnkl, insert_new_dnkl, select_one,
+                                 update_dnkl)
 from func.utils.discord_utils import create_ticket, is_valid_date
-from func.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild
-from func.utils.db_utils import delete_dnkl, select_one, insert_new_dnkl, update_dnkl
-from func.utils.consts import dnkl_channel_id, registration_channel_id, dnkl_req, guild_handle, allies, pos_color, neutral_color, neg_color, guildless_embed, unknown_ign_embed, staff_impersonation_embed, invalid_date_msg, months
+from func.utils.minecraft_utils import (calculate_network_level,
+                                        get_graph_color_by_rank,
+                                        get_hypixel_player_rank,
+                                        get_player_gexp)
+from func.utils.request_utils import (get_hypixel_player, get_mojang_profile,
+                                      get_player_guild)
+from quickchart import QuickChart
 
 
 class String:

@@ -1,13 +1,17 @@
 # The following file contains: mute, unmute, kick, ban, softban, unban, sync/forcesync, add, remove, avatar
 
-from __main__ import bot
-import discord
-from discord.errors import Forbidden, NotFound
 from typing import Union
 
-from func.utils.discord_utils import has_tag_perms, check_tag
-from func.utils.request_utils import get_mojang_profile, get_player_guild, get_gtag
-from func.utils.consts import guild_handle, allies, pos_color, neg_color, neutral_color, err_404_embed, unknown_ign_embed, staff_impersonation_embed, bot_missing_perms_embed
+import discord
+from __main__ import bot
+from discord.errors import Forbidden, NotFound
+from func.utils.consts import (allies, bot_missing_perms_embed, err_404_embed,
+                               guild_handle, neg_color, neutral_color,
+                               pos_color, staff_impersonation_embed,
+                               unknown_ign_embed)
+from func.utils.discord_utils import check_tag, has_tag_perms
+from func.utils.request_utils import (get_gtag, get_mojang_profile,
+                                      get_player_guild)
 
 
 class Union:

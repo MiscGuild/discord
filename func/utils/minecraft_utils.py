@@ -3,8 +3,8 @@
 import math
 import re
 
+from func.utils.consts import ChatColor, active_req, member_req, resident_req
 from func.utils.request_utils import get_mojang_profile, get_player_guild
-from func.utils.consts import member_req, resident_req, active_req, ChatColor
 
 
 # Returns player's gexp history and total

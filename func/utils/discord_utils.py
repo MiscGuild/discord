@@ -1,13 +1,12 @@
 # The following file includes: name_grabber, log_event, has_tag_perms, check_tag, get_giveaway_status, roll_giveaway
 
-from __main__ import bot
-import chat_exporter
 from datetime import datetime, timedelta
-import discord
-from discord.ext import commands, tasks
 from io import BytesIO
-import toml
 
+import chat_exporter
+import discord
+from __main__ import bot
+from discord.ext import commands, tasks
 from func.utils.consts import config, neutral_color
 
 

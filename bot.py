@@ -1,6 +1,7 @@
+import sys
+
 import discord
 from discord.ext import commands
-import sys
 
 from func.utils.consts import config
 
@@ -16,6 +17,7 @@ bot = commands.Bot(command_prefix=commands.when_mentioned_or(config["prefix"]), 
 
 # Load all bot vars once cache is ready
 from func.utils.discord_utils import after_cache_ready
+
 after_cache_ready.start()
 
 # Load extensions

@@ -1,5 +1,4 @@
 from discord.ext import commands
-
 from func.classes.Integer import Integer
 
 

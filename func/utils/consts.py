@@ -1,5 +1,6 @@
-import discord
 from enum import Enum
+
+import discord
 import toml
 
 # Define config
