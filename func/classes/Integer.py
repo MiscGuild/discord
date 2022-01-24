@@ -7,7 +7,7 @@ from func.utils.discord_utils import name_grabber, log_event, roll_giveaway
 from func.utils.minecraft_utils import get_hypixel_player_rank
 from func.utils.request_utils import get_guild_by_name, get_name_by_uuid, get_hypixel_player, get_jpg_file
 from func.utils.db_utils import get_giveaway_status
-from func.utils.consts import invalid_guild_embed, error_color
+from func.utils.consts import guild_handle, invalid_guild_embed, error_color
 
 
 class Integer:
@@ -49,7 +49,7 @@ class Integer:
 
         await ctx.message.delete()
         async with ctx.channel.typing():
-            guild_data = await get_guild_by_name(bot.guild_name)
+            guild_data = await get_guild_by_name(guild_handle)
             if guild_data == None:
                 return invalid_guild_embed
 
