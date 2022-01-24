@@ -1,11 +1,13 @@
-# The following file contains: on_member_join, on_error, on_command_error, on_button_click, on_select_option, on_guild_channel_create
+# The following file contains: on_member_join, on_error, on_command_error, on_select_option, on_guild_channel_create
 
 from __main__ import bot
+from time import time
 import discord
 from discord.ext import commands
+from discord.ui import View, Select
 import traceback
 
-from func.utils.consts import registration_channel_id, error_channel_id, invalid_command_embed, registration_embed, not_owner_embed, missing_role_embed, missing_permissions_embed, member_not_found_embed
+from func.utils.consts import neutral_color, registration_channel_id, error_channel_id, invalid_command_embed, registration_embed, not_owner_embed, missing_role_embed, missing_permissions_embed, member_not_found_embed
 
 
 class Listener:
@@ -64,8 +66,62 @@ class Listener:
                 print("The below exception could not be sent to the error channel:")
                 print(tb)
 
-    # async def on_button_click():
-
     # async def on_select_option():
 
     # async def on_guild_channel_create():
+
+    async def reactionroles():
+        # Reaction roles
+        reaction_roles_embed = discord.Embed(title="To get your desired role, click its respective button!",
+                                    description="🪓 __**SkyBlock**__\nGives you the access to the SkyBlock category!\n\n"
+                                                "🕹 __**Discord Minigames**__\nAllows you to play some Discord minigames!\n\n"
+                                                "❓  __**QOTD Ping**__\nThe staff team will mention this role when there's a new question of the day!\n\n"
+                                                "🎉 __**Giveaways/Events**__\nReact so you don't miss any giveaway or event\n\n"
+                                                "📖 __**Storytimes**__\nGet pinged whenever a storytime happens",
+                                    color=neutral_color)
+
+        class ReactionRolesView(View):
+            @discord.ui.button(label="Skyblock", emoji="🪓")
+            async def skyblock_callback(self, button, interaction):
+                return True
+
+            @discord.ui.button(label="Discord Minigames", emoji="🕹")
+            async def minigames_callback(self, button, interaction):
+                return True
+
+            @discord.ui.button(label="QOTD Ping", emoji="❓")
+            async def qotd_callback(self, button, interaction):
+                return True
+
+            @discord.ui.button(label="Giveaways/Events", emoji="🎉")
+            async def events_callback(self, button, interaction):
+                return True
+
+            @discord.ui.button(label="Storytimes", emoji="📖")
+            async def storytime_callback(self, button, interaction):
+                return True
+
+        # Pronouns
+        pronouns_embed = discord.Embed(title="Please select your pronouns",
+                                        description="👨 He/Him"
+                                                    "\n👩 She/Her"
+                                                    "\n🏳‍🌈 They/Them"
+                                                    "\n❓ Other",
+                                        color=neutral_color)
+
+        class PronounsSelect(Select):
+            def __init__(self):
+                super().__init__(placeholder="Select your pronouns (Max 1)", min_values=1, max_values=1, options=[
+                    discord.SelectOption(label="He/Him", value="849830869036040212", emoji="👨"),
+                    discord.SelectOption(label="She/Her", value="849830936434704404", emoji="👩"),
+                    discord.SelectOption(label="They/Them", value="849831004310077441", emoji="🏳️‍🌈"),
+                    discord.SelectOption(label="Other", value="855598846843551744", emoji="❓"),
+                ])
+
+            async def callback(self, interaction: discord.Interaction):
+                return True
+
+        pronouns_view = View(timeout=10.0)
+        pronouns_view.add_item(PronounsSelect())
+
+        return [reaction_roles_embed, ReactionRolesView()], [pronouns_embed, pronouns_view]
