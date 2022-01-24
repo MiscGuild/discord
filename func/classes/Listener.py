@@ -1,7 +1,6 @@
-# The following file contains: on_member_join, on_error, on_command_error, on_select_option, on_guild_channel_create
+# The following file contains: on_member_join, on_error, on_command_error, on_guild_channel_create, reactionroles, tickets
 
 from __main__ import bot
-from time import time
 import discord
 from discord.ext import commands
 from discord.ui import View, Select
@@ -66,8 +65,6 @@ class Listener:
                     f"```An error occurred in command '{ctx.command}' that could not be sent in this channel, check the console for the traceback. \n\n'{error}'```")
                 print("The below exception could not be sent to the error channel:")
                 print(tb)
-
-    # async def on_select_option():
 
     # async def on_guild_channel_create():
 

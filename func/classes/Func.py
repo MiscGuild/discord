@@ -1,4 +1,4 @@
-# The following file contains: weeklylb, dnkllist, rolecheck, delete, accept, transcript, new, partner, inactive, reactionroles, tickets
+# The following file contains: weeklylb, dnkllist, rolecheck, delete, accept, transcript, new, partner, inactive
 
 from __main__ import bot
 import asyncio
