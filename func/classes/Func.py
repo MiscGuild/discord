@@ -226,7 +226,7 @@ class Func:
     
     async def new(ctx):
         # Create ticket
-        ticket = await create_ticket("🎫 Ticket Section", f"ticket-{await name_grabber(ctx.author)}", ctx.author)
+        ticket = await create_ticket(ctx.author, f"ticket-{await name_grabber(ctx.author)}")
 
         # Return message with link to ticket
         return f"Click the following link to go to your ticket! <#{ticket.id}>"

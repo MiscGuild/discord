@@ -327,7 +327,7 @@ class String:
             await ctx.message.delete()
 
             # Create registration ticket
-            await create_ticket("RTickets", f"registration-ticket-{ctx.author.name}", ctx.author)
+            await create_ticket(ctx.author, f"registration-ticket-{ctx.author.name}", "RTickets")
 
             embed = discord.Embed(title="Registration successful!", color=neutral_color)
             embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')

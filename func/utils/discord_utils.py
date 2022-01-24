@@ -19,7 +19,7 @@ async def name_grabber(author: discord.User):
 
 
 # Create a ticket with user's perms
-async def create_ticket(category_name: str, ticket_name: str, user: discord.Member):
+async def create_ticket(user: discord.Member, ticket_name: str, category_name: str="🎫 Ticket Section"):
     # Create ticket
     ticket = await bot.guild.create_text_channel(ticket_name, category=discord.utils.get(bot.guild.categories, name=category_name))
 
