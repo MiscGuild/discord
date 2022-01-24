@@ -9,7 +9,7 @@ import requests
 
 from func.utils.discord_utils import create_ticket, create_transcript, name_grabber, log_event
 from func.utils.minecraft_utils import get_hypixel_player_rank
-from func.utils.request_utils import get_mojang_profile, get_player_guild, get_guild_by_name, get_name_by_uuid, get_hypixel_player, get_gtop, get_guild_uuids, session_get_name_by_uuid
+from func.utils.request_utils import get_mojang_profile, get_player_guild, get_guild_by_name, get_name_by_uuid, get_hypixel_player, get_jpg_file, get_guild_uuids, session_get_name_by_uuid
 from func.utils.db_utils import select_all
 from func.utils.consts import member_req, active_req, registration_channel_id, log_channel_id, guild_handle, allies, neg_color, neutral_color, pos_color, error_color, invalid_guild_embed, registration_embed, accepted_staff_application_embed, staff_application_questions
 
@@ -52,7 +52,7 @@ class Func:
             url = url.replace(",", "%2C")
 
             # Return image
-            return await get_gtop(f"https://chat.miscguild.xyz/render.png?m=custom&d={url}&t=1")
+            return await get_jpg_file(f"https://chat.miscguild.xyz/render.png?m=custom&d={url}&t=1")
 
     async def dnkllist():
         # Fetch all rows

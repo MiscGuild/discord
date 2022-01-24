@@ -6,7 +6,7 @@ from discord.ext import commands
 from discord.ui import View, Select
 import traceback
 
-from func.utils.request_utils import get_gtop
+from func.utils.request_utils import get_jpg_file
 from func.utils.consts import neutral_color, registration_channel_id, error_channel_id, invalid_command_embed, registration_embed, not_owner_embed, missing_role_embed, missing_permissions_embed, member_not_found_embed
 
 
@@ -171,7 +171,7 @@ class Listener:
         embed.set_thumbnail(
             url=f"https://images-ext-1.discordapp.net/external/ziYSZZe7dPyKDYLxA1s2jqpKi-kdCvPFpPaz3zft-wo/%3Fwidth%3D671%26height%3D671/https/media.discordapp.net/attachments/523227151240134664/803843877999607818/misc.png")
 
-        image = await get_gtop("https://media.discordapp.net/attachments/650248396480970782/873866686049189898/tickets.jpg")
+        image = await get_jpg_file("https://media.discordapp.net/attachments/650248396480970782/873866686049189898/tickets.jpg")
 
         class TicketView(View):
             @discord.ui.button(label="Create Ticket", style=discord.ButtonStyle.blurple, emoji="✉️")

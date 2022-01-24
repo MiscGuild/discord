@@ -5,7 +5,7 @@ import discord
 
 from func.utils.discord_utils import name_grabber, log_event, roll_giveaway
 from func.utils.minecraft_utils import get_hypixel_player_rank
-from func.utils.request_utils import get_guild_by_name, get_name_by_uuid, get_hypixel_player, get_gtop
+from func.utils.request_utils import get_guild_by_name, get_name_by_uuid, get_hypixel_player, get_jpg_file
 from func.utils.db_utils import get_giveaway_status
 from func.utils.consts import invalid_guild_embed, error_color
 
@@ -84,7 +84,7 @@ class Integer:
         image_content = image_content.replace(",", "%2C")
 
         # Return image
-        return await get_gtop(f"https://chat.miscguild.xyz/render.png?m=custom&d={image_content}&t=1")
+        return await get_jpg_file(f"https://chat.miscguild.xyz/render.png?m=custom&d={image_content}&t=1")
 
     async def purge(self, ctx, reason):
         await ctx.message.delete()

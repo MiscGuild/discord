@@ -119,9 +119,9 @@ async def get_hypixel_player(name: str):
 
 
 # Returns the value of a given url
-async def get_gtop(url: str):
+async def get_jpg_file(url: str):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
             resp = BytesIO(await resp.read())
             await session.close()
-    return discord.File(resp, "gtop.jpg")
+    return discord.File(resp, "image.jpg")
