@@ -1,4 +1,5 @@
 from discord.ext import commands
+from func.classes.Func import Func
 from func.classes.Integer import Integer
 
 
@@ -6,9 +7,11 @@ class Giveaways(commands.Cog, name="giveaways"):
     def __init__(self, bot):
         self.bot = bot
 
-    # @commands.command(aliases=["gcreate"])
-    # @commands.has_role("Giveaway Creator")
-    # async def giveawaycreate(self, ctx):
+    @commands.command(aliases=["gcreate"])
+    @commands.has_role("Giveaway Creator")
+    async def giveawaycreate(self, ctx):
+        """Create a giveaway!"""
+        await ctx.send(await Func.giveawaycreate(ctx))
 
     @commands.command(aliases=["gend", "giveawayfinish", "gfinish"])
     @commands.has_role("Giveaway Creator")

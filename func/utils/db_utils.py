@@ -25,7 +25,7 @@ async def connect_db():
         prize text NOT NULL,
         number_winners integer NOT NULL,
         time_of_finish text NOT NULL,
-        role_requirement_type text NOT NULL,
+        all_roles_required boolean NOT NULL,
         required_roles text,
         required_gexp integer NOT NULL,
         sponsors text NOT NULL,

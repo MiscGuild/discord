@@ -1,8 +1,9 @@
-# The following file contains: weeklylb, dnkllist, rolecheck, staffreview, delete, accept, transcript, new, partner, deny, inactive
+# The following file contains: weeklylb, dnkllist, rolecheck, staffreview, delete, accept, transcript, new, partner, deny, inactive, giveawaycreate
 
 import asyncio
+import re
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import discord
 import requests
@@ -374,3 +375,196 @@ class Func:
                     embeds.append(embed)
 
             return embeds
+
+    async def giveawaycreate(ctx):
+        # Define progress message for asking questions
+        progress_message = await ctx.send("Which channel should the giveaway be hosted in?\n\n`Please respond with a channel shortcut or ID`\n\n**At any time, you can cancel the giveaway by replying with `cancel` to one of the upcoming prompts.**")
+        
+        while True:
+            # Wait for answer and check for cancellation
+            destination = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+            destination = destination.content.lower()
+            if destination == "cancel":
+                return "Giveaway cancelled!"
+
+            # Parse channel ID
+            if destination[0] == "<":
+                # Try to get channel ID, returns None if doesn't exist
+                destination = bot.get_channel(int(re.sub(r"[\W_]+", "", destination)))
+            elif destination.isnumeric():
+                # Returns None if doesn't exist
+                destination = bot.get_channel(int(destination))
+
+            # If destination is invalid, ask again
+            if destination == None:
+                await ctx.send("Invalid channel! Please respond with a channel shortcut or ID", delete_after=3)
+                continue
+
+            # Continue with questioning
+            break
+        
+        # Ask for prize
+        await progress_message.edit(content=f"Sweet! The giveaway will be held in <#{destination.id}>. What is the prize going to be?\n\n`Please respond with a small description of the prize.`") 
+
+        # Wait for answer and check for cancellation
+        prize = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+        prize = prize.content
+        if prize == "cancel":
+            return "Giveaway cancelled!"
+
+        # Ask for no. winners
+        await progress_message.edit(content=f"Ok great! The prize is set to be {prize}. How many winners should the giveaway have?\n\n`Please respond with a number from 1-20.`")
+
+        while True:
+            # Wait for answer and check for cancellation
+            number_winners = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+            number_winners = number_winners.content
+            if number_winners == "cancel":
+                return "Giveaway cancelled!"
+
+            # Ensure no. winners is a number
+            if not number_winners.isnumeric():
+                await ctx.send("Invalid number of winners! Please respond with a number from 1-20", delete_after=3)
+                continue
+
+            # Ensure no. winners is within bounds
+            number_winners = round(int(number_winners))
+            if number_winners > 20 or number_winners < 1:
+                await ctx.send("Invalid number of winners! Please respond with a number from 1-20", delete_after=3)
+                continue
+
+            break
+
+        # Ask for duration
+        await progress_message.edit(content=f"Neat! There will be {number_winners} winner(s). How long should the giveaway last?\n\n`Please enter a duration. Use an 'm' for minutes, 'd' for days, etc.`") 
+
+        while True:
+            # Wait for answer and check for cancellation
+            duration = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+            duration = duration.content.lower()
+            if duration == "cancel":
+                return "Giveaway cancelled!"
+
+            # Convert letters to seconds
+            seconds_per_unit = {"m": 60, "h": 3600, "d": 86400, "w": 604800}
+            try:
+                end_date = datetime.utcnow() + timedelta(int(duration[:-1]) * seconds_per_unit[duration[-1]]) 
+                end_date = end_date.strftime("%Y-%m-%d %H:%M:%S.%f")[:-7]
+            except Exception:
+                await ctx.send("Invalid duration! Please try again.", delete_after=3)
+                continue
+        
+            break
+
+        # Ask for gexp requirements
+        await progress_message.edit(content=f"Awesome! The giveaway will last for {duration}. Should there be a weekly gexp requirement?\n\n`If you don't want a gexp requirement, reply with 0.`\n`Otherwise, enter a required amount of weekly gexp. Use 'k' for thousands, or 'm' for millions.`")
+
+        while True:
+            # Wait for answer and check for cancellation
+            required_gexp = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+            required_gexp = required_gexp.content.lower()
+            if required_gexp == "cancel":
+                return "Giveaway cancelled!"
+
+            # Check user wants gexp req
+            if required_gexp != 0:
+                # No multiplier attached
+                if required_gexp.isnumeric():
+                    required_gexp = int(required_gexp)
+
+                else:
+                    unit_multiplier = {"k": 1000, "m": 1000000}
+                    try:
+                        required_gexp = int(required_gexp[:-1]) * unit_multiplier[required_gexp[-1]]
+                    except Exception:
+                        await ctx.send("Invalid gexp requirement! Please try again.", delete_after=3)
+                        continue
+                
+            break
+
+        # Ask for role requirements
+        await progress_message.edit(content=f"Ok, there will be a gexp requirement of {format(required_gexp, ',d')}. Should there be any role requirements for the giveaway?\n\n`Please enter role names or role IDs.`\n`If you don't want any role requirements, reply with 'none'`.\n`If entrants only need ONE of the required roles, use ',' between roles.`\n`If entrants must have ALL required roles, use '&'.`")
+
+        while True:
+            # Wait for answer and check for cancellation
+            required_roles = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+            required_roles = re.sub(r"\s+", "", required_roles.content)
+            if required_roles == "cancel":
+                return "Giveaway cancelled!" 
+
+            # Check if user wants role reqs
+            if required_roles == "none":
+                required_roles = None
+                break
+
+            # Convert string to list of all required roles, set requirement type
+            all_roles_required = False
+            if "," in required_roles:
+                required_roles = required_roles.split(",")
+            elif "&" in required_roles:
+                all_roles_required = True
+                required_roles = required_roles.split("&")
+            else:
+                required_roles = [required_roles]
+
+            # Function for checking all roles are valid
+            async def check_roles():
+                role_ids = []
+                for name in required_roles:
+                    role = discord.utils.get(ctx.guild.roles, name=name)
+                    if role == None:
+                        await ctx.send(f"Invalid role: {name}. Please try again.", delete_after=5)
+                        return False
+                    role_ids.append(role.id)
+
+                return role_ids
+
+            # If not all roles are valid, redo
+            res = await check_roles()
+            if not res:
+                continue
+
+            # Set required_roles to res for simplicity
+            required_roles = res
+            break
+
+        # Ask for sponsor(s)
+        await progress_message.edit(content=f"Excellent! There will be {len(required_roles)} required role(s). Finally, who has sponsored this giveaway?\n\n`Please ping the sponsor(s) of this giveaway.`")
+        # Wait for answer and check for cancellation
+        sponsors = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+        sponsors = sponsors.content
+        if sponsors == "cancel":
+            return "Giveaway cancelled!"
+
+        # Finish gexp requirement text fore embed
+        gexp_requirement_text = "There is no gexp requirement." if required_gexp == 0 else f"You must have at least {required_gexp} weekly gexp."
+
+        # Finish role requirement text for embed
+        if required_roles == None:
+            role_requirement_text = "There are no required roles."
+        else:
+            role_requirement_text = "You must have all of the following roles:" if all_roles_required else "You must have at least one of the following roles:"
+            for id in required_roles:
+                role_requirement_text += f"\n- <@&{id}>"
+
+        # Create embed
+        embed = discord.Embed(title=f"{prize}", color=0x8368ff)
+        embed.set_footer(text=f"{number_winners} Winner(s), Ends at {end_date} UTC/GMT")
+        embed.add_field(name="[-] Information:", value=f"Sponsored by: {sponsors} \nDuration: {duration}", inline=False)
+        embed.add_field(name="[-] Requirements:", value=f"{role_requirement_text} \n{gexp_requirement_text}", inline=False)
+
+        # Ask for confirmation
+        await progress_message.edit(content="This is your last chance to confirm the giveaway, are you sure you want to continue? (y/n)", embed=embed)
+
+        # Wait for answer and check confirmation
+        confirmation = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+        confirmation = confirmation.content.lower()
+        if confirmation not in ["y", "yes"]:
+            return "Giveaway cancelled!"
+
+        # Send the giveaway in destination channel and add 🎉 reaction
+        msg = await destination.send(f"{bot.giveaways_events.mention} React with 🎉 to enter! If you win this giveaway, make a ticket to claim it!", embed=embed)
+        await msg.add_reaction("\U0001F389")
+        
+        # Return confirmation
+        return f"Ok! The giveaway has been set up in <#{destination.id}>!"
