@@ -60,6 +60,7 @@ async def select_all(query: str, values: Tuple=None):
 ### DNKL
 async def insert_new_dnkl(message_id: int, uuid: str, username: str):
     await bot.db.execute("INSERT INTO dnkl VALUES (?, ?, ?)", (message_id, uuid, username,))
+    await bot.db.commit()
 
 async def update_dnkl(message_id: int, uuid: str):
     await bot.db.execute("UPDATE dnkl SET message_id = (?) WHERE uuid = (?)", (message_id, uuid,))
@@ -70,7 +71,6 @@ async def delete_dnkl(username: str):
     await bot.db.commit()
 
 ### Giveaways
-# Get the activity status of a giveaway
 async def get_giveaway_status(id: int):
     return await select_one("SELECT status FROM giveaways WHERE message_id = (?)", (id,))
 
