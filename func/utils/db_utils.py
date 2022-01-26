@@ -25,11 +25,11 @@ async def connect_db():
         prize text NOT NULL,
         number_winners integer NOT NULL,
         time_of_finish text NOT NULL,
+        required_gexp integer NOT NULL,
         all_roles_required boolean NOT NULL,
         required_roles text,
-        required_gexp integer NOT NULL,
         sponsors text NOT NULL,
-        status text NOT NULL)""")
+        is_active boolean NOT NULL)""")
 
     # Commit any changes
     await bot.db.commit()
@@ -71,8 +71,12 @@ async def delete_dnkl(username: str):
     await bot.db.commit()
 
 ### Giveaways
+async def insert_new_giveaway(msg_id: int, channel_id: int, prize: str, number_winners: int, time_of_finish: str, req_gexp: int, all_roles_required: bool, req_roles: str, sponsors: str):
+    await bot.db.execute("INSERT INTO Giveaways VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (msg_id, channel_id, prize, number_winners, time_of_finish, req_gexp, all_roles_required, req_roles, sponsors, True))
+    await bot.db.commit()
+
 async def get_giveaway_status(id: int):
-    return await select_one("SELECT status FROM giveaways WHERE message_id = (?)", (id,))
+    return await select_one("SELECT is_active FROM giveaways WHERE message_id = (?)", (id,))
 
 @tasks.loop(minutes=1)
 async def check_giveaways(self):

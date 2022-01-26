@@ -14,7 +14,7 @@ from func.utils.consts import (accepted_staff_application_embed, active_req,
                                neg_color, neutral_color, pos_color,
                                registration_channel_id, registration_embed,
                                staff_application_questions)
-from func.utils.db_utils import select_all
+from func.utils.db_utils import select_all, insert_new_giveaway
 from func.utils.discord_utils import (create_ticket, create_transcript,
                                       log_event, name_grabber)
 from func.utils.minecraft_utils import get_hypixel_player_rank
@@ -537,7 +537,7 @@ class Func:
             return "Giveaway cancelled!"
 
         # Finish gexp requirement text fore embed
-        gexp_requirement_text = "There is no gexp requirement." if required_gexp == 0 else f"You must have at least {required_gexp} weekly gexp."
+        gexp_requirement_text = "There is no gexp requirement." if required_gexp == 0 else f"You must have at least {format(required_gexp, ',d')} weekly gexp."
 
         # Finish role requirement text for embed
         if required_roles == None:
@@ -565,6 +565,10 @@ class Func:
         # Send the giveaway in destination channel and add 🎉 reaction
         msg = await destination.send(f"{bot.giveaways_events.mention} React with 🎉 to enter! If you win this giveaway, make a ticket to claim it!", embed=embed)
         await msg.add_reaction("\U0001F389")
+
+        # Enter data into db (Make required roles a str for db)
+        required_roles = " ".join(required_roles)
+        await insert_new_giveaway(msg.id, destination.id, prize, number_winners, end_date, required_gexp, all_roles_required, required_roles, sponsors)
         
         # Return confirmation
         return f"Ok! The giveaway has been set up in <#{destination.id}>!"
