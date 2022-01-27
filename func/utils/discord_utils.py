@@ -131,10 +131,6 @@ async def after_cache_ready():
     bot.admin_names = [await name_grabber(member) for member in bot.admin.members]
     bot.staff_names = [await name_grabber(member) for member in bot.staff.members]
 
-    # Connect database and set tables
-    from func.utils.db_utils import connect_db
-    await connect_db()
-
     # Initialise chat_exporter
     chat_exporter.init_exporter(bot)
 
