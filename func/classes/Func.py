@@ -572,3 +572,25 @@ class Func:
         
         # Return confirmation
         return f"Ok! The giveaway has been set up in <#{destination.id}>!"
+
+    async def giveawaylist():
+        all_giveaways = await select_all("SELECT prize, channel_id, message_id, number_winners, time_of_finish FROM giveaways")
+        
+        # There have been no recent giveaways
+        if not all_giveaways:
+            return discord.Embed(title="There have been no giveaways in the last 10 days!",
+                                description="To make a new giveaway, use the command `,giveawaycreate`",
+                                color=neg_color)
+        else:
+            # Define embed
+            embed = discord.Embed(title="Giveaways:",
+                                    description="Listed below are all giveaways from the last 10 days.",
+                                    color=neutral_color)
+
+            # Add info to embed
+            for giveaway in all_giveaways:
+                prize, channel_id, message_id, number_winners, finish = giveaway
+                embed.add_field(name=f"{prize}",
+                                value=f"Channel: <#{channel_id}> \nMessage ID: {message_id} \nNumber Of Winners: {number_winners} \nEnds At: {finish}")
+
+            return embed

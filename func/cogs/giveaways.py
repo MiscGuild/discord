@@ -25,8 +25,10 @@ class Giveaways(commands.Cog, name="giveaways"):
         """Rerolls the giveaway with the given message ID!"""
         await ctx.send(await Integer(integer=message_ID).giveawayreroll(reroll_number))
 
-    # @commands.command(aliases=["glist"])
-    # async def giveawaylist(self, ctx):
+    @commands.command(aliases=["glist"])
+    async def giveawaylist(self, ctx):
+        """View all giveaway from the last 10 days!"""
+        await ctx.send(embed=await Func.giveawaylist())
 
 
 def setup(bot):
