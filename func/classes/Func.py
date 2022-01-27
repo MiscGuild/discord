@@ -494,7 +494,7 @@ class Func:
 
             # Check if user wants role reqs
             if required_roles == "none":
-                required_roles = None
+                required_roles = []
                 break
 
             # Convert string to list of all required roles, set requirement type
@@ -540,7 +540,7 @@ class Func:
         gexp_requirement_text = "There is no gexp requirement." if required_gexp == 0 else f"You must have at least {format(required_gexp, ',d')} weekly gexp."
 
         # Finish role requirement text for embed
-        if required_roles == None:
+        if not required_roles:
             role_requirement_text = "There are no required roles."
         else:
             role_requirement_text = "You must have all of the following roles:" if all_roles_required else "You must have at least one of the following roles:"
@@ -567,7 +567,7 @@ class Func:
         await msg.add_reaction("\U0001F389")
 
         # Enter data into db (Make required roles a str for db)
-        required_roles = " ".join(required_roles)
+        required_roles = " ".join([str(role) for role in required_roles])
         await insert_new_giveaway(msg.id, destination.id, prize, number_winners, end_date, required_gexp, all_roles_required, required_roles, sponsors)
         
         # Return confirmation
