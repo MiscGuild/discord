@@ -109,7 +109,6 @@ async def after_cache_ready():
     bot.guild = bot.get_guild(config["guild_id"])
 
     # Set roles
-    bot.guild_master = discord.utils.get(bot.guild.roles, name="Guild Master")
     bot.admin = discord.utils.get(bot.guild.roles, name="Admin")
     bot.staff = discord.utils.get(bot.guild.roles, name="Staff")
     bot.helper = discord.utils.get(bot.guild.roles, name="Helper")
