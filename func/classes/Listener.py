@@ -120,10 +120,10 @@ class Listener:
         class PronounsSelect(Select):
             def __init__(self):
                 super().__init__(placeholder="Select your pronouns (Max 1)", min_values=1, max_values=1, options=[
-                    discord.SelectOption(label="He/Him", value="849830869036040212", emoji="👨"),
-                    discord.SelectOption(label="She/Her", value="849830936434704404", emoji="👩"),
-                    discord.SelectOption(label="They/Them", value="849831004310077441", emoji="🏳️‍🌈"),
-                    discord.SelectOption(label="Other", value="855598846843551744", emoji="❓"),
+                    discord.SelectOption(label="He/Him", emoji="👨"),
+                    discord.SelectOption(label="She/Her", emoji="👩"),
+                    discord.SelectOption(label="They/Them", emoji="🏳️‍🌈"),
+                    discord.SelectOption(label="Other", emoji="❓"),
                 ])
 
             async def callback(self, interaction: discord.Interaction):
