@@ -115,6 +115,7 @@ class Func:
 
         # Loop through discord members, send warning message
         await ctx.send("If you see the bot is stuck on a member, forcesync that user in the event of an error.")
+        bot.admin_ids = [member.id for member in bot.admin.members]
         for member in bot.guild.members:
             # Do not check admins and bots
             if member.id in bot.admin_ids or member.bot: continue
