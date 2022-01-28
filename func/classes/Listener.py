@@ -127,7 +127,25 @@ class Listener:
                 ])
 
             async def callback(self, interaction: discord.Interaction):
-                return True
+                if not isinstance(interaction.user, discord.Member): return
+                label = list(interaction.data.values())[0][0] if interaction.data.values() else None
+                
+                # User selected none, remove all roles
+                if label == None:
+                    await interaction.user.remove_roles(*[discord.utils.get(interaction.guild.roles, name=item.label) for item in self.options])
+                    await interaction.respond(content=f"Removed all pronoun roles!")
+                else:
+                    # Fetch role
+                    role = discord.utils.get(interaction.guild.roles, name=label)
+                    # Remove single role if user already has it
+                    if role in interaction.user.roles:
+                        await interaction.user.remove_roles(role)
+                        await interaction.respond(content=f"Removed {label}")
+                    # Add the clicked role and remove all others
+                    else:
+                        await interaction.user.remove_roles(*[discord.utils.get(interaction.guild.roles, name=item.label) for item in self.options])
+                        await interaction.user.add_roles(role)
+                        await interaction.respond(content=f"Added {label}")
 
         pronouns_view = View(timeout=10.0)
         pronouns_view.add_item(PronounsSelect())
