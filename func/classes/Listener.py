@@ -5,7 +5,7 @@ import traceback
 import discord
 from __main__ import bot
 from discord.ext import commands
-from discord.ui import Select, View
+from discord.ui import Select, View, Button
 from func.utils.consts import (error_channel_id, invalid_command_embed,
                                member_not_found_embed,
                                missing_permissions_embed, missing_role_embed,
@@ -76,33 +76,38 @@ class Listener:
     async def reactionroles():
         # Reaction roles
         reaction_roles_embed = discord.Embed(title="To get your desired role, click its respective button!",
-                                    description="🪓 __**SkyBlock**__\nGives you the access to the SkyBlock category!\n\n"
-                                                "🕹 __**Discord Minigames**__\nAllows you to play some Discord minigames!\n\n"
-                                                "❓  __**QOTD Ping**__\nThe staff team will mention this role when there's a new question of the day!\n\n"
-                                                "🎉 __**Giveaways/Events**__\nReact so you don't miss any giveaway or event\n\n"
-                                                "📖 __**Storytimes**__\nGet pinged whenever a storytime happens",
-                                    color=neutral_color)
+                                            description="🪓 __**SkyBlock**__\nGives you the access to the SkyBlock category!\n\n"
+                                                        "🕹 __**Minigames**__\nAllows you to play some Discord minigames!\n\n"
+                                                        "❓  __**QOTD Ping**__\nThe staff team will mention this role when there's a new question of the day!\n\n"
+                                                        "🎉 __**Giveaways/Events**__\nReact so you don't miss any giveaway or event\n\n"
+                                                        "📖 __**Storytime Pings**__\nGet pinged whenever a storytime happens",
+                                            color=neutral_color)
+
+        class ReactionRoleButton(Button):
+            def __init__(self, label: str, emoji: str):
+                super().__init__(label=label, emoji=emoji)
+
+            async def callback(self, interaction: discord.Interaction):
+                if not isinstance(interaction.user, discord.Member): return
+
+                role = discord.utils.get(interaction.guild.roles, name=self.label)
+                if role in interaction.user.roles:
+                    await interaction.user.remove_roles(role, reason="Pressed Button, removed role")
+                    await interaction.response.send_message(f"Removed {self.label} role from you.", ephemeral=True)
+                elif role not in interaction.user.roles:
+                    await interaction.user.add_roles(role, reason="Pressed Button, added role")
+                    await interaction.response.send_message(f"Added {self.label} role to you.", ephemeral=True)
 
         class ReactionRolesView(View):
-            @discord.ui.button(label="Skyblock", emoji="🪓")
-            async def skyblock_callback(self, button, interaction):
-                return True
+            def __init__(self):
+                super().__init__()
 
-            @discord.ui.button(label="Discord Minigames", emoji="🕹")
-            async def minigames_callback(self, button, interaction):
-                return True
-
-            @discord.ui.button(label="QOTD Ping", emoji="❓")
-            async def qotd_callback(self, button, interaction):
-                return True
-
-            @discord.ui.button(label="Giveaways/Events", emoji="🎉")
-            async def events_callback(self, button, interaction):
-                return True
-
-            @discord.ui.button(label="Storytimes", emoji="📖")
-            async def storytime_callback(self, button, interaction):
-                return True
+                for name, emoji, in [["Skyblock", "🪓",],
+                                    ["Minigames", "🕹"],
+                                    ["QOTD Ping", "❓"],
+                                    ["Giveaways/Events", "🎉"],
+                                    ["Storytimes", "📖"]]:
+                    self.add_item(ReactionRoleButton(name, emoji))
 
         # Pronouns
         pronouns_embed = discord.Embed(title="Please select your pronouns",
