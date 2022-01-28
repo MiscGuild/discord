@@ -94,7 +94,7 @@ class Listener:
                 if role in interaction.user.roles:
                     await interaction.user.remove_roles(role, reason="Pressed Button, removed role")
                     await interaction.response.send_message(f"Removed {self.label} role from you.", ephemeral=True)
-                elif role not in interaction.user.roles:
+                else:
                     await interaction.user.add_roles(role, reason="Pressed Button, added role")
                     await interaction.response.send_message(f"Added {self.label} role to you.", ephemeral=True)
 
