@@ -118,7 +118,6 @@ async def after_cache_ready():
     bot.guest = discord.utils.get(bot.guild.roles, name="Guest")
     bot.member_role = discord.utils.get(bot.guild.roles, name="Member")
     bot.active_role = discord.utils.get(bot.guild.roles, name="Active")
-    bot.inactive_role = discord.utils.get(bot.guild.roles, name="Inactive")
     bot.awaiting_app = discord.utils.get(bot.guild.roles, name="Awaiting Approval")
     bot.ally = discord.utils.get(bot.guild.roles, name="Ally")
     bot.server_booster = discord.utils.get(bot.guild.roles, name="Server Booster")
