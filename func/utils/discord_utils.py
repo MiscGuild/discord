@@ -18,7 +18,7 @@ async def name_grabber(author: discord.User):
 
 
 # Create a ticket with user's perms
-async def create_ticket(user: discord.Member, ticket_name: str, category_name: str="🎫 Ticket Section"):
+async def create_ticket(user: discord.Member, ticket_name: str, category_name: str=bot.ticket_categories["generic"]):
     # Create ticket
     ticket = await bot.guild.create_text_channel(ticket_name, category=discord.utils.get(bot.guild.categories, name=category_name))
 
@@ -123,6 +123,8 @@ async def after_cache_ready():
     bot.rich_kid = discord.utils.get(bot.guild.roles, name="Rich Kid")
     bot.giveaways_events = discord.utils.get(bot.guild.roles, name="Giveaways/Events")
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster, bot.rich_kid)
+
+    bot.ticket_categories = config["ticket_categories"]
 
     from func.utils.discord_utils import name_grabber
     bot.staff_names = [await name_grabber(member) for member in bot.staff.members]

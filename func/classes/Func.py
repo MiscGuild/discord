@@ -202,7 +202,7 @@ class Func:
             return embed
 
     async def delete(ctx):
-        if ctx.channel.category.name not in bot.ticket_categories:
+        if ctx.channel.category.name not in bot.ticket_categories.values():
             return "This command can only be used in tickets!"
         
         # Send deletion warning and gather transcript
@@ -219,13 +219,13 @@ class Func:
             await bot.get_channel(log_channel_id).send(file=transcript)
     
     async def accept(ctx):
-        if ctx.channel.category.name not in bot.ticket_categories:
+        if ctx.channel.category.name not in bot.ticket_categories.values():
             return "This command can only be used in tickets!"
 
         return accepted_staff_application_embed
 
     async def transcript(ctx):
-        if ctx.channel.category.name not in bot.ticket_categories:
+        if ctx.channel.category.name not in bot.ticket_categories.values():
             return "This command can only be used in tickets!"
 
         # Create transcript

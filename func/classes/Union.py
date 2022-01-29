@@ -153,7 +153,7 @@ class Union:
         return embed
 
     async def add(self, ctx):
-        if ctx.channel.category.name not in bot.ticket_categories:
+        if ctx.channel.category.name not in bot.ticket_categories.values():
             return "This command can only be used in tickets!"
 
         # Set perms
@@ -161,7 +161,7 @@ class Union:
         return discord.Embed(title=f"{self.user.name} has been added to the ticket!", color=pos_color)
        
     async def remove(self, ctx):
-        if ctx.channel.category.name not in bot.ticket_categories:
+        if ctx.channel.category.name not in bot.ticket_categories.values():
             return "This command can only be used in tickets!"
 
         # Set perms

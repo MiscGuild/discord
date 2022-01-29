@@ -31,15 +31,6 @@ resident_req = XXXX
 active_req = XXXX
 dnkl_req = XXXX
 
-# Name of ticket categories (It is not recommended to change these values)
-ticket_categories = [
-    "🎫 Ticket Section",
-    "RTickets",
-    "OTHER",
-    "REPORTS",
-    "MILESTONES",
-    "DNKL"
-]
 
 # Names of allied guilds
 allies = [
@@ -59,3 +50,12 @@ api_keys = [
 "",
 "",
 ]
+
+# The names of discord ticket categories
+[ticket_categories]
+generic = ""
+registration = ""
+other = ""
+reports = ""
+milestones = ""
+dnkl = ""

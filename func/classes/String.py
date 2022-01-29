@@ -336,7 +336,7 @@ class String:
             await ctx.message.delete()
 
             # Create registration ticket
-            await create_ticket(ctx.author, f"registration-ticket-{ctx.author.name}", "RTickets")
+            await create_ticket(ctx.author, f"registration-ticket-{ctx.author.name}", bot.ticket_categories["registration"])
 
             embed = discord.Embed(title="Registration successful!", color=neutral_color)
             embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
@@ -345,7 +345,7 @@ class String:
     async def rename(self, ctx):
         await ctx.message.delete()
         # Channel is not a ticket
-        if ctx.channel.category.name not in bot.ticket_categories:
+        if ctx.channel.category.name not in bot.ticket_categories.values():
             return await ctx.send("This command can only be used in tickets!")
         
         # Channel is a ticket
