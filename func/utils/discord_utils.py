@@ -66,10 +66,8 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
 
         # Override default callback
         async def callback(self, interaction: discord.Interaction):
-            # Set option var
+            # Set option var and delete Select so it cannot be used twice
             option = list(interaction.data.values())[0][0]
-
-            # Delete Select
             await interaction.message.delete()
 
             # Logic for handling ticket types
@@ -78,7 +76,10 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
             if option == "Query/Problem":
                 return True
             if option == "Register a milestone":
-                return True
+                await interaction.channel.edit(name=f"milestone-{interaction.user.display_name}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories["milestone"]))
+                await interaction.channel.send(embed=discord.Embed(title=f"{interaction.user.display_name} would like to register a milestone!",
+                                                description="Please provide a small description and proof of your milestone!\nIf your milestone is approved, it'll be included in next week's milestone post!",
+                                                color=neutral_color))
             if option == "Do-not-kick-list application":
                 return True
             if option == "Staff application":
