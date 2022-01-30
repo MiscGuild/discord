@@ -75,7 +75,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
             else: category = "generic"
 
             # Delete Select
-            # await interaction.delete_original_message()
+            await interaction.message.delete()
 
             # Logic for handling ticket types
             if option == "Report a player":
