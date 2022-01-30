@@ -10,7 +10,8 @@ from func.utils.consts import (allies, dnkl_channel_id, dnkl_req, guild_handle,
                                guildless_embed, invalid_date_msg, months,
                                neg_color, neutral_color, pos_color,
                                registration_channel_id,
-                               staff_impersonation_embed, unknown_ign_embed)
+                               staff_impersonation_embed, ticket_categories,
+                               unknown_ign_embed)
 from func.utils.db_utils import (delete_dnkl, insert_new_dnkl, select_one,
                                  update_dnkl)
 from func.utils.discord_utils import create_ticket, is_valid_date
@@ -336,7 +337,7 @@ class String:
             await ctx.message.delete()
 
             # Create registration ticket
-            await create_ticket(ctx.author, f"registration-ticket-{ctx.author.name}", bot.ticket_categories["registration"])
+            await create_ticket(ctx.author, f"registration-ticket-{ctx.author.name}", ticket_categories["registration"])
 
             embed = discord.Embed(title="Registration successful!", color=neutral_color)
             embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
@@ -345,7 +346,7 @@ class String:
     async def rename(self, ctx):
         await ctx.message.delete()
         # Channel is not a ticket
-        if ctx.channel.category.name not in bot.ticket_categories.values():
+        if ctx.channel.category.name not in ticket_categories.values():
             return await ctx.send("This command can only be used in tickets!")
         
         # Channel is a ticket

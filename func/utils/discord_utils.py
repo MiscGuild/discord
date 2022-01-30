@@ -7,7 +7,8 @@ import chat_exporter
 import discord
 from __main__ import bot
 from discord.ext import commands, tasks
-from func.utils.consts import config, neutral_color
+from discord.ui import Select, View
+from func.utils.consts import config, neutral_color, ticket_categories
 
 
 # Return user's displaying name
@@ -18,7 +19,7 @@ async def name_grabber(author: discord.User):
 
 
 # Create a ticket with user's perms
-async def create_ticket(user: discord.Member, ticket_name: str, category_name: str=bot.ticket_categories["generic"]):
+async def create_ticket(user: discord.Member, ticket_name: str, category_name: str=ticket_categories["generic"]):
     # Create ticket
     ticket = await bot.guild.create_text_channel(ticket_name, category=discord.utils.get(bot.guild.categories, name=category_name))
 
@@ -43,6 +44,64 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                             add_reactions=True, embed_links=True,
                                             attach_files=True,
                                             read_message_history=True, external_emojis=True)
+
+    # Send the dropdown for ticket creation
+    class TicketTypeSelect(Select):
+        def __init__(self):
+            super().__init__()
+
+            # Add default options
+            self.add_option(label="Report a player", emoji="🗒️")
+            self.add_option(label="Query/Problem", emoji="🤔")
+            
+            # Add milestone, DNKL application, staff application, GvG application if user is a member
+            if bot.member_role in user.roles:
+                self.add_option(label="Register a milestone", emoji="🏆")
+                self.add_option(label="Do-not-kick-list application", emoji="🚫")
+                self.add_option(label="Staff application", emoji="🤵")
+                self.add_option(label="GvG Team application", emoji="⚔️")
+
+            # Add "Other" option last
+            self.add_option(label="Other", emoji="❓")
+
+        # Override default callback
+        async def callback(self, interaction: discord.Interaction):
+            # Set option and category vars
+            option = list(interaction.data.values())[0][0]
+            if option == "Report a player": category = "report"
+            elif option == "Register a milestone": category = "milestone"
+            elif option == "Do-not-kick-list application": category = "dnkl"
+            elif option == "Other": category = "other"
+            else: category = "generic"
+
+            # Delete Select and move ticket to category
+            await interaction.delete_original_message()
+            await interaction.channel.edit(category=ticket_categories[category])
+
+            # Logic for handling ticket types
+            if option == "Report a player":
+                return True
+            if option == "Report a player":
+                return True
+            if option == "Report a player":
+                return True
+            if option == "Report a player":
+                return True
+            if option == "Report a player":
+                return True
+            if option == "Report a player":
+                return True
+            if option == "Report a player":
+                return True
+            
+
+    # Create view and embed, send to ticket
+    view = View()
+    view.add_item(TicketTypeSelect())
+    embed = discord.Embed(title="What did you make this ticket?",
+                        description="Please select your reason from the dropdown given below!",
+                        color=neutral_color)
+    await ticket.send(embed=embed, view=view)
 
     # Return ticket for use
     return ticket
@@ -123,8 +182,6 @@ async def after_cache_ready():
     bot.rich_kid = discord.utils.get(bot.guild.roles, name="Rich Kid")
     bot.giveaways_events = discord.utils.get(bot.guild.roles, name="Giveaways/Events")
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster, bot.rich_kid)
-
-    bot.ticket_categories = config["ticket_categories"]
 
     from func.utils.discord_utils import name_grabber
     bot.staff_names = [await name_grabber(member) for member in bot.staff.members]
