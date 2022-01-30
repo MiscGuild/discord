@@ -74,25 +74,27 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
             elif option == "Other": category = "other"
             else: category = "generic"
 
-            # Delete Select and move ticket to category
-            await interaction.delete_original_message()
-            await interaction.channel.edit(category=ticket_categories[category])
+            # Delete Select
+            # await interaction.delete_original_message()
 
             # Logic for handling ticket types
             if option == "Report a player":
                 return True
-            if option == "Report a player":
+            if option == "Query/Problem":
                 return True
-            if option == "Report a player":
+            if option == "Register a milestone":
                 return True
-            if option == "Report a player":
+            if option == "Do-not-kick-list application":
                 return True
-            if option == "Report a player":
+            if option == "Staff application":
                 return True
-            if option == "Report a player":
+            if option == "GvG Team application":
                 return True
-            if option == "Report a player":
-                return True
+            if option == "Other":
+                await interaction.channel.edit(name=f"other-{interaction.user.display_name}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories[category]))
+                await interaction.channel.send(embed=discord.Embed(title="This ticket has been create for an unkown reason!", 
+                                                                    description="Please specify why you have created this ticket!",
+                                                                    color=neutral_color))
             
 
     # Create view and embed, send to ticket
