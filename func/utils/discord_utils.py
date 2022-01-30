@@ -72,10 +72,15 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
 
             # Logic for handling ticket types
             if option == "Report a player":
-                return True
+                await interaction.channel.edit(name=f"report-{interaction.user.display_name}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories["report"]))
+                await interaction.channel.send(embed=discord.Embed(title=f"{interaction.user.display_name} wishes to file a player report!",
+                                                description="You are expected to provide maximum detail about the offense.\n"
+                                                            "> Username of the accused\n> Time of offense\n> Explanation of offense\n> Proof of offense\n"
+                                                            "If you wish to report a staff member, please DM the guild master or an admin.",
+                                                color=neutral_color))
             if option == "Query/Problem":
                 await interaction.channel.edit(name=f"general-{interaction.user.display_name}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories["generic"]))
-                await interaction.channel.send(embed=discord.Embed(title=f"{interaction.user.display_name} has a query/problem",
+                await interaction.channel.send(embed=discord.Embed(title=f"{interaction.user.display_name} has a query/problem!",
                                         description="Please elaborate on your problem/query so that the staff team can help you out!",
                                         color=neutral_color))
             if option == "Register a milestone":
@@ -91,7 +96,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                 return True
             if option == "Other":
                 await interaction.channel.edit(name=f"other-{interaction.user.display_name}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories["dnkl"]))
-                await interaction.channel.send(embed=discord.Embed(title="This ticket has been create for an unkown reason!", 
+                await interaction.channel.send(embed=discord.Embed(title="This ticket has been created for an unkown reason!", 
                                                                     description="Please specify why you have created this ticket!",
                                                                     color=neutral_color))
             
