@@ -66,13 +66,8 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
 
         # Override default callback
         async def callback(self, interaction: discord.Interaction):
-            # Set option and category vars
+            # Set option var
             option = list(interaction.data.values())[0][0]
-            if option == "Report a player": category = "report"
-            elif option == "Register a milestone": category = "milestone"
-            elif option == "Do-not-kick-list application": category = "dnkl"
-            elif option == "Other": category = "other"
-            else: category = "generic"
 
             # Delete Select
             await interaction.message.delete()
@@ -91,7 +86,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
             if option == "GvG Team application":
                 return True
             if option == "Other":
-                await interaction.channel.edit(name=f"other-{interaction.user.display_name}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories[category]))
+                await interaction.channel.edit(name=f"other-{interaction.user.display_name}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories["dnkl"]))
                 await interaction.channel.send(embed=discord.Embed(title="This ticket has been create for an unkown reason!", 
                                                                     description="Please specify why you have created this ticket!",
                                                                     color=neutral_color))
