@@ -8,7 +8,7 @@ import discord
 from __main__ import bot
 from discord.ext import commands, tasks
 from discord.ui import Select, View
-from func.utils.consts import config, neutral_color, ticket_categories
+from func.utils.consts import config, neg_color, neutral_color, ticket_categories, staff_application_questions
 
 
 # Return user's displaying name
@@ -91,7 +91,46 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
             if option == "Do-not-kick-list application":
                 return True
             if option == "Staff application":
-                return True
+                # Edit category and send info embed with requirements
+                await interaction.channel.edit(name=f"staff-application-{interaction.user.display_name}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories["generic"]))
+                await interaction.channel.send(embed=discord.Embed(title=f"{interaction.user.display_name} wishes to apply for staff!",
+                                        description="Please respond to the bot's prompts appropriately!",
+                                        color=neutral_color).add_field(
+                                        name="Do you meet the following requirements? (y/n)",
+                                        value="• You must be older than 13 years.\n• You must have sufficient knowledge of the bots in this Discord."
+                                                "\n• You must be active both on Hypixel and in the guild Discord.\n• You must have a good reputation amongst guild members.",
+                                        inline=False))
+
+                meets_requirements = await bot.wait_for("message", check=lambda x: x.channel == interaction.channel and x.author == interaction.user)
+
+                # If user doesn't meet requirements, deny application
+                if meets_requirements.content not in ["y", "yes"]:
+                    return await interaction.channel.send(embed=discord.Embed(title="Your staff application has been denied!",
+                                                                        description="Since you do not meet the requirements, your staff application has been denied.",
+                                                                        color=neg_color))
+
+                # Loop for all questions to gather info
+                answers = {}
+                for number, question in staff_application_questions.items():
+                    # Ask question and wait for answer
+                    await interaction.channel.send(embed=discord.Embed(title=f"{number}. {question}", description="You must answer in one message.", color=neutral_color)) 
+                    answer = await bot.wait_for("message", check=lambda x: x.channel == interaction.channel and x.author == interaction.user)
+
+                    # Place answer into array with question number
+                    answers[number] = answer.content
+
+                # Send completion message
+                await interaction.channel.send("Your staff application has been completed! Please wait while your answers are compiled.")
+
+                # Create overview embed
+                review_embed = discord.Embed(title=f"{interaction.user.display_name}'s Staff Application", color=neutral_color)
+                review_embed.set_footer(text="If you made a mistake, please notify a staff member.")
+                for number, answer in answers.items():
+                    review_embed.add_field(name=f"{number}. {staff_application_questions[number]}", value=answer, inline=False)
+                
+                # Send embed
+                await interaction.channel.send(embed=review_embed)
+
             if option == "GvG Team application":
                 return True
             if option == "Other":
