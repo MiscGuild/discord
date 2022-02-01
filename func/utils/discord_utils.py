@@ -8,7 +8,8 @@ import discord
 from __main__ import bot
 from discord.ext import commands, tasks
 from discord.ui import Select, View
-from func.utils.consts import config, neg_color, neutral_color, ticket_categories, staff_application_questions
+from func.utils.request_utils import  get_hypixel_player
+from func.utils.consts import config, gvg_requirements, neg_color, neutral_color, ticket_categories, unknown_ign_embed, staff_application_questions
 
 
 # Return user's displaying name
@@ -130,9 +131,63 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                 
                 # Send embed
                 await interaction.channel.send(embed=review_embed)
-
             if option == "GvG Team application":
-                return True
+                # Edit channel name and category
+                await interaction.channel.edit(name=f"gvg-application-{interaction.user.display_name}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories["generic"]))
+                
+                # Fetch player data
+                player_data = await get_hypixel_player(interaction.user.display_name)
+                if player_data == None:
+                    return await interaction.channel.send(unknown_ign_embed)
+                player_data = player_data["stats"]
+
+                # Set vars for each stat
+                bw_wins = player_data["Bedwars"]["wins_bedwars"]
+                bw_fkdr = round(player_data["Bedwars"]["final_kills_bedwars"] / player_data["Bedwars"]["final_deaths_bedwars"], 2)
+                sw_wins = player_data["SkyWars"]["wins"]
+                sw_kdr = round(player_data["SkyWars"]["kills"] / player_data["SkyWars"]["deaths"], 2)
+                duels_wlr = round(player_data["Duels"]["wins"] / player_data["Duels"]["losses"], 2)
+                duels_kills = player_data["Duels"]["kills"]
+
+                # Define dict for eligibility and set each gamemode boolean
+                eligibility = {}
+                eligibility["bedwars"] = False if bw_wins < gvg_requirements["bw_wins"] and bw_fkdr < gvg_requirements["bw_fkdr"] else True
+                eligibility["skywars"] = False if sw_wins < gvg_requirements["sw_wins"] and sw_kdr < gvg_requirements["sw_kdr"] else True
+                eligibility["duels"] = False if duels_wlr < gvg_requirements["duels_wlr"] and duels_kills < gvg_requirements["duels_kills"] else True
+                
+                # Polyvalent eligibility
+                if all(eligibility.values()):
+                    embed = discord.Embed(title="You are eligible for the polyvalent team!", color=neutral_color)
+                    embed.set_footer(text="Please await staff assistance for further information!")
+                    embed.add_field(name="Bedwars Wins", value=f"`{bw_wins}`")
+                    embed.add_field(name="Bedwars FKDR", value=f"`{bw_fkdr}`")
+                    embed.add_field(name="Skywars Wins", value=f"`{sw_wins}`")
+                    embed.add_field(name="Skywars KDR", value=f"`{sw_kdr}`")
+                    embed.add_field(name="Duels WLR", value=f"`{duels_wlr}`")
+                    embed.add_field(name="Duels Kills", value=f"`{duels_kills}`")
+                    await interaction.channel.send(embed=embed)
+
+                # User is not eligible for any team
+                elif not all(eligibility.values()):
+                    await interaction.channel.send(embed=discord.Embed(title="You are ineligible for the GvG Team as you do not meet the requirements!",
+                                                                        description="Please await staff assistance for further information!",
+                                                                        color=neg_color))
+
+                # User is eligible for at least one gamemode
+                else:
+                    # loop through all GvG gamemodes
+                    for mode, req1_name, req1, req2_name, req2 in [["bedwars", "Wins", bw_wins, "FKDR", bw_fkdr], ["skywars", "Wins", sw_wins, "KDR", sw_kdr],
+                                                                    ["duels", "WLR", duels_wlr, "Kills", duels_kills]]: 
+                        # If user is eligible for that gamemode, create embed
+                        if eligibility[mode]:
+                            embed = discord.Embed(title=f"You are eiligible for the {mode.capitalize()} team!", color=neutral_color)
+                            embed.set_footer(text="Please await staff assistance for further information!")
+                            embed.add_field(title=req1_name, value=f"`{req1}`")
+                            embed.add_field(title=req2_name, value=f"`{req2}`")
+
+                            # Send embed and end loop
+                            await interaction.channel.send(embed=embed)
+
             if option == "Other":
                 await interaction.channel.edit(name=f"other-{interaction.user.display_name}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories["dnkl"]))
                 await interaction.channel.send(embed=discord.Embed(title="This ticket has been created for an unkown reason!", 

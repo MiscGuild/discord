@@ -31,6 +31,13 @@ resident_req = XXXX
 active_req = XXXX
 dnkl_req = XXXX
 
+# The requirements for joining the GvG team
+gvg_bw_fkdr = XXXX
+gvg_bw_wins = XXXX
+gvg_sw_kdr = XXXX
+gvg_sw_wins = XXXX
+gvg_duels_kills = XXXX
+gvg_duels_wlr = XXXX
 
 # Names of allied guilds
 allies = [
