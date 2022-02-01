@@ -187,7 +187,6 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
 
                             # Send embed and end loop
                             await interaction.channel.send(embed=embed)
-
             if option == "Other":
                 await interaction.channel.edit(name=f"other-{interaction.user.display_name}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories["dnkl"]))
                 await interaction.channel.send(embed=discord.Embed(title="This ticket has been created for an unkown reason!", 

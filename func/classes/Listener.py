@@ -155,13 +155,13 @@ class Listener:
     async def tickets():
         embed = discord.Embed(title="Tickets",
                     description="""Tickets can be created for any of the following reasons:
-                                > Do-not-kick-list Application
-                                > Discord Nick/Role Change
-                                > Problems/Queries/Complaints
                                 > Player Report
+                                > Problems/Queries
                                 > Milestone
+                                > Do-not-kick-list Application
                                 > Staff Application
-                                > Event
+                                > GvG Team Application
+                                > Event (When applicable)
                                 > Other
                                 Once you have created a ticket by clicking the button, you will be linked to your ticket\n
                                 The bot will ask you to choose the reason behind the creation of your ticket from a given list. Choose the appropriate reason and then proceed!\n
