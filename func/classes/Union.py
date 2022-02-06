@@ -8,7 +8,7 @@ from discord.errors import Forbidden, NotFound
 from func.utils.consts import (allies, bot_missing_perms_embed, err_404_embed,
                                guild_handle, neg_color, neutral_color,
                                pos_color, staff_impersonation_embed,
-                               unknown_ign_embed)
+                               ticket_categories, unknown_ign_embed)
 from func.utils.discord_utils import check_tag, has_tag_perms
 from func.utils.request_utils import (get_gtag, get_mojang_profile,
                                       get_player_guild)
@@ -153,7 +153,7 @@ class Union:
         return embed
 
     async def add(self, ctx):
-        if ctx.channel.category.name not in bot.ticket_categories:
+        if ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
 
         # Set perms
@@ -161,7 +161,7 @@ class Union:
         return discord.Embed(title=f"{self.user.name} has been added to the ticket!", color=pos_color)
        
     async def remove(self, ctx):
-        if ctx.channel.category.name not in bot.ticket_categories:
+        if ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
 
         # Set perms

@@ -13,8 +13,8 @@ from func.utils.consts import (accepted_staff_application_embed, active_req,
                                invalid_guild_embed, log_channel_id, member_req,
                                neg_color, neutral_color, pos_color,
                                registration_channel_id, registration_embed,
-                               staff_application_questions)
-from func.utils.db_utils import select_all, insert_new_giveaway
+                               staff_application_questions, ticket_categories)
+from func.utils.db_utils import insert_new_giveaway, select_all
 from func.utils.discord_utils import (create_ticket, create_transcript,
                                       log_event, name_grabber)
 from func.utils.minecraft_utils import get_hypixel_player_rank
@@ -151,7 +151,7 @@ class Func:
 
                 # Edit roles
                 await member.add_roles(bot.guest, bot.ally)
-                await member.remove_roles(bot.new_member_role, bot.member_role, bot.active_role, bot.inactive_role)
+                await member.remove_roles(bot.new_member_role, bot.member_role, bot.active_role)
 
 
         # Send ping to new member role in registration channel
@@ -202,7 +202,7 @@ class Func:
             return embed
 
     async def delete(ctx):
-        if ctx.channel.category.name not in bot.ticket_categories:
+        if ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
         
         # Send deletion warning and gather transcript
@@ -219,13 +219,13 @@ class Func:
             await bot.get_channel(log_channel_id).send(file=transcript)
     
     async def accept(ctx):
-        if ctx.channel.category.name not in bot.ticket_categories:
+        if ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
 
         return accepted_staff_application_embed
 
     async def transcript(ctx):
-        if ctx.channel.category.name not in bot.ticket_categories:
+        if ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
 
         # Create transcript

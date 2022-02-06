@@ -6,12 +6,22 @@ import toml
 # Define config
 config = toml.load("config.toml")
 
-# Requirements
+# Gexp requirements
 new_member_req = config["new_member_req"]
 member_req = config["member_req"]
 resident_req = config["resident_req"]
 active_req = config["active_req"]
 dnkl_req = config["dnkl_req"]
+
+# GvG team requirements
+gvg_requirements = {
+    "bw_fkdr":  config["gvg_bw_fkdr"],
+    "bw_wins":  config["gvg_bw_wins"],
+    "sw_kdr": config["gvg_sw_kdr"],
+    "sw_wins": config["gvg_sw_wins"],
+    "duels_kills": config["gvg_duels_kills"],
+    "duels_wlr": config["gvg_duels_wlr"],
+}
 
 # Define channels
 error_channel_id = config["error_channel"]
@@ -115,7 +125,7 @@ unknown_ign_embed = discord.Embed(title="Please enter a valid Minecraft username
 
 unknown_ign_msg = "Unknown IGN!"
 
-invalid_date_msg = "This date is invalid! This date may not be within the last week. Enter dates in the form `YYYY/MM/DD`"
+invalid_date_msg = "This date is invalid! This date may not be from before the last week. Enter dates in the form `YYYY/MM/DD`"
 
 class ChatColor(Enum):
     RED = "&c"
