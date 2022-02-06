@@ -264,7 +264,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
     return ticket
 
 # Log a given event in logging channel
-async def log_event(title: str, description: str):
+async def log_event(title: str, description: str=None):
     embed = discord.Embed(title=title, description=description, color=neutral_color)
     await bot.log_channel.send(embed=embed)
 
