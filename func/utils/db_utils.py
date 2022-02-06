@@ -6,7 +6,6 @@ from typing import Tuple
 import aiosqlite
 from __main__ import bot
 from discord.ext import tasks
-from func.utils.discord_utils import roll_giveaway
 
 
 async def connect_db():
@@ -70,6 +69,9 @@ async def delete_dnkl(username: str):
     await bot.db.commit()
 
 ### Giveaways
+async def roll_giveaway(reroll_target: int = None):
+    return True
+
 async def insert_new_giveaway(msg_id: int, channel_id: int, prize: str, number_winners: int, time_of_finish: str, req_gexp: int, all_roles_required: bool, req_roles: str, sponsors: str):
     await bot.db.execute("INSERT INTO Giveaways VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (msg_id, channel_id, prize, number_winners, time_of_finish, req_gexp, all_roles_required, req_roles, sponsors, True))
     await bot.db.commit()

@@ -6,10 +6,15 @@ from io import BytesIO
 import chat_exporter
 import discord
 from __main__ import bot
+
 from discord.ext import commands, tasks
 from discord.ui import Select, View
-from func.utils.request_utils import  get_hypixel_player
-from func.utils.consts import config, gvg_requirements, neg_color, neutral_color, ticket_categories, unknown_ign_embed, staff_application_questions
+from func.utils.db_utils import select_one, insert_new_dnkl, update_dnkl
+from func.utils.consts import (config, dnkl_req, gvg_requirements, neg_color,
+                               neutral_color, dnkl_channel_id, invalid_date_msg, staff_application_questions,
+                               ticket_categories, unknown_ign_embed, months)
+from func.utils.minecraft_utils import get_player_gexp
+from func.utils.request_utils import get_hypixel_player, get_mojang_profile
 
 
 # Return user's displaying name
@@ -67,6 +72,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
 
         # Override default callback
         async def callback(self, interaction: discord.Interaction):
+            ign, uuid = await get_mojang_profile(await name_grabber(interaction.user))
             # Set option var and delete Select so it cannot be used twice
             option = list(interaction.data.values())[0][0]
             await interaction.message.delete()
@@ -90,7 +96,59 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                                 description="Please provide a small description and proof of your milestone!\nIf your milestone is approved, it'll be included in next week's milestone post!",
                                                 color=neutral_color))
             if option == "Do-not-kick-list application":
-                return True
+                # Edit channel name and category
+                await interaction.channel.edit(name=f"dnkl-{interaction.user.display_name}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories["dnkl"]))
+
+                # Notify user if they don't meet gexp req, however ask questions anyway
+                _, weekly_gexp = await get_player_gexp(interaction.user.display_name)
+                if weekly_gexp == None:
+                    return await interaction.channel.send(embed=unknown_ign_embed)
+                if weekly_gexp < dnkl_req:
+                    await interaction.channel.send(embed=discord.Embed(title="You do not meet the do-not-kick-list requirements!",
+                                                                        description="Even though you do not meet the requirements, your application may still be accepted.",
+                                                                        color=neg_color))
+
+                # DNKL application view
+                class DnklApplicationView(View):
+                    def __init__(self):
+                        super().__init__()
+
+                    @discord.ui.button(label="Approve", style=discord.ButtonStyle.green, emoji="✅")
+                    async def approve_callback(self, _: discord.ui.Button, interaction: discord.Interaction):
+                        msg = await bot.get_channel(dnkl_channel_id).send(embed=embed) 
+
+                        # Check if user is already on DNKL
+                        current_message = await select_one("SELECT message_id FROM dnkl WHERE uuid = (?)", (uuid,))
+                        # User is not currently on DNKL
+                        if not current_message:
+                            await insert_new_dnkl(msg.id, uuid, ign)
+                            return await interaction.channel.send("This user has been added to the do-not-kick-list!")
+
+                        # User is already on DNKl
+                        # Try to delete current message
+                        try:
+                            current_message = await bot.get_channel(dnkl_channel_id).fetch_message(current_message)
+                            await current_message.delete()
+                        except Exception:
+                            pass
+
+                        await update_dnkl(msg.id, uuid)
+                        await interaction.channel.send("Since this user was already on the do-not-kick-list, their entry has been updated.")
+
+                    @discord.ui.button(label="Deny", style=discord.ButtonStyle.red, emoji="❌")
+                    async def deny_callback(self, _: discord.ui.Button, interaction: discord.Interaction):
+                        await interaction.channel.send(embed=discord.Embed(title="Your do-not-kick-list application has been denied!",
+                                                                            color=neg_color))
+
+                    @discord.ui.button(label="Error", emoji="📔")
+                    async def error_callback(self, _: discord.ui.Button, interaction: discord.Interaction):
+                        await interaction.channel.send(embed=discord.Embed(title="Your application has been accepted, however there was an error!",
+                                                                            description="Please await staff assistance!",
+                                                                            color=neutral_color))
+
+                # Ask DNKL application questions and send preview embed
+                embed = await dnkl_application(ign, uuid, interaction.channel, interaction.user)
+                await interaction.channel.send("Staff, what do you wish to do with this application?", embed=embed, view=DnklApplicationView())
             if option == "Staff application":
                 # Edit category and send info embed with requirements
                 await interaction.channel.edit(name=f"staff-application-{interaction.user.display_name}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories["generic"]))
@@ -205,7 +263,6 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
     # Return ticket for use
     return ticket
 
-
 # Log a given event in logging channel
 async def log_event(title: str, description: str):
     embed = discord.Embed(title=title, description=description, color=neutral_color)
@@ -233,11 +290,6 @@ async def check_tag(tag: str):
     return True, None
 
 
-# Roll a giveaway
-async def roll_giveaway(reroll_target: int = None):
-    return True
-
-
 # Returns if a string is a valid and parseable to a date
 async def is_valid_date(date: str):
     # Return False if parsing fails
@@ -258,6 +310,46 @@ async def create_transcript(channel: discord.TextChannel):
 
     # Create and return file
     return discord.File(BytesIO(transcript.encode()), filename=f"transcript-{channel.name}.html")
+
+
+async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, author: discord.User):
+    # Recursively ask for start date
+    while True:
+        await channel.send("**What is the start date?** (YYYY/MM/DD)")
+        start_date = await bot.wait_for("message", check=lambda x: x.channel == channel and x.author == author)
+        valid_date, sd, sm, sy = await is_valid_date(start_date.content)
+        if valid_date:
+            break
+        await channel.send(invalid_date_msg)
+        
+
+    # Recursively ask for end date
+    while True:
+        await channel.send("**What is the end date?** (YYYY/MM/DD)")
+        end_date = await bot.wait_for("message", check=lambda x: x.channel == channel and x.author == author)
+        valid_date, ed, em, ey = await is_valid_date(end_date.content)
+        if valid_date:
+            break
+        await channel.send(invalid_date_msg)
+
+    # Ask for reason
+    await channel.send("**What is the reason for their inactivity?**")
+    reason = await bot.wait_for("message", check=lambda x: x.channel == channel and x.author == author)
+    reason = reason.content
+
+    # Get worded months (1 = January)
+    sm = months[sm]
+    em = months[em]
+
+    # Create and return embed
+    embed = discord.Embed(title=ign, url=f'https://plancke.io/hypixel/player/stats/{ign}', color=neutral_color)
+    embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
+    embed.add_field(name="IGN:", value=f"{ign}", inline=False)
+    embed.add_field(name="Start:", value=f"{sd} {sm} {sy}", inline=False)
+    embed.add_field(name="End:", value=f"{ed} {em} {ey}", inline=False)
+    embed.add_field(name="Reason", value=f"{reason}", inline=False)
+
+    return embed
 
 
 @tasks.loop(count=1)

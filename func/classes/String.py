@@ -14,7 +14,7 @@ from func.utils.consts import (allies, dnkl_channel_id, dnkl_req, guild_handle,
                                unknown_ign_embed)
 from func.utils.db_utils import (delete_dnkl, insert_new_dnkl, select_one,
                                  update_dnkl)
-from func.utils.discord_utils import create_ticket, is_valid_date
+from func.utils.discord_utils import dnkl_application, create_ticket, is_valid_date
 from func.utils.minecraft_utils import (calculate_network_level,
                                         get_graph_color_by_rank,
                                         get_hypixel_player_rank,
@@ -183,44 +183,8 @@ class String:
         if not ign:
             return unknown_ign_embed
 
-        # Ask for start date
-        await ctx.send("**What is the start date?** (YYYY/MM/DD)")
-        start_date = await bot.wait_for("message",
-                                            check=lambda
-                                            x: x.channel == ctx.channel and x.author == ctx.author)
-        valid_date, sd, sm, sy = await is_valid_date(start_date.content)
-        if not valid_date:
-            return invalid_date_msg
-
-        # Ask for end date
-        await ctx.send("**What is the end date?** (YYYY/MM/DD)")
-        end_date = await bot.wait_for("message",
-                                            check=lambda
-                                            x: x.channel == ctx.channel and x.author == ctx.author)
-        valid_date, ed, em, ey = await is_valid_date(end_date.content)
-        if not valid_date:
-            return invalid_date_msg
-
-        # Ask for reason
-        await ctx.send("**What is the reason for their inactivity?**")
-        reason = await bot.wait_for("message",
-                                            check=lambda
-                                            x: x.channel == ctx.channel and x.author == ctx.author)
-        reason = reason.content
-
-        # Get worded months (1 = January)
-        sm = months[sm]
-        em = months[em]
-
-        # Send embed to DNKL channel
-        embed = discord.Embed(title=ign,
-                                url=f'https://plancke.io/hypixel/player/stats/{ign}',
-                                color=neutral_color)
-        embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
-        embed.add_field(name="IGN:", value=f"{ign}", inline=False)
-        embed.add_field(name="Start:", value=f"{sd} {sm} {sy}", inline=False)
-        embed.add_field(name="End:", value=f"{ed} {em} {ey}", inline=False)
-        embed.add_field(name="Reason", value=f"{reason}", inline=False)
+        # Ask DNKL application questions
+        embed = await dnkl_application(ign, uuid, ctx.channel, ctx.author)
         dnkl_message = await bot.get_channel(dnkl_channel_id).send(embed=embed.set_author(name="Do-not-kick-list"))
 
         # Check if user is already on DNKL

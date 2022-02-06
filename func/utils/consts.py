@@ -125,7 +125,7 @@ unknown_ign_embed = discord.Embed(title="Please enter a valid Minecraft username
 
 unknown_ign_msg = "Unknown IGN!"
 
-invalid_date_msg = "This date is invalid! This date may not be within the last week. Enter dates in the form `YYYY/MM/DD`"
+invalid_date_msg = "This date is invalid! This date may not be from before the last week. Enter dates in the form `YYYY/MM/DD`"
 
 class ChatColor(Enum):
     RED = "&c"
