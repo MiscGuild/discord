@@ -115,6 +115,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
 
                     @discord.ui.button(label="Approve", style=discord.ButtonStyle.green, emoji="✅")
                     async def approve_callback(self, _: discord.ui.Button, interaction: discord.Interaction):
+                        if bot.staff not in interaction.user.roles: return
                         msg = await bot.get_channel(dnkl_channel_id).send(embed=embed) 
 
                         # Check if user is already on DNKL
@@ -137,14 +138,16 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
 
                     @discord.ui.button(label="Deny", style=discord.ButtonStyle.red, emoji="❌")
                     async def deny_callback(self, _: discord.ui.Button, interaction: discord.Interaction):
-                        await ticket.send(embed=discord.Embed(title="Your do-not-kick-list application has been denied!",
-                                                                            color=neg_color))
+                        if bot.staff in interaction.user.roles:
+                            await ticket.send(embed=discord.Embed(title="Your do-not-kick-list application has been denied!",
+                                                                                color=neg_color))
 
                     @discord.ui.button(label="Error", emoji="📔")
                     async def error_callback(self, _: discord.ui.Button, interaction: discord.Interaction):
-                        await ticket.send(embed=discord.Embed(title="Your application has been accepted, however there was an error!",
-                                                                            description="Please await staff assistance!",
-                                                                            color=neutral_color))
+                        if bot.staff in interaction.user.roles:
+                            await ticket.send(embed=discord.Embed(title="Your application has been accepted, however there was an error!",
+                                                                                description="Please await staff assistance!",
+                                                                                color=neutral_color))
 
                 # Ask DNKL application questions and send preview embed
                 embed = await dnkl_application(ign, uuid, ticket, interaction.user)
