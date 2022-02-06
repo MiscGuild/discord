@@ -202,7 +202,7 @@ class Func:
             return embed
 
     async def delete(ctx):
-        if ctx.channel.category.name not in ticket_categories.values():
+        if not ctx.channel.category or ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
         
         # Send deletion warning and gather transcript
