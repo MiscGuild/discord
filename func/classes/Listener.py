@@ -5,7 +5,7 @@ import traceback
 import discord
 from __main__ import bot
 from discord.ext import commands
-from discord.ui import Select, View, Button
+from discord.ui import Button, Select, View
 from func.utils.consts import (error_channel_id, invalid_command_embed,
                                member_not_found_embed,
                                missing_permissions_embed, missing_role_embed,

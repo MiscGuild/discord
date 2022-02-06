@@ -7,14 +7,13 @@ from datetime import datetime
 import discord
 from __main__ import bot
 from func.utils.consts import (allies, dnkl_channel_id, dnkl_req, guild_handle,
-                               guildless_embed, invalid_date_msg, months,
-                               neg_color, neutral_color, pos_color,
-                               registration_channel_id,
+                               guildless_embed, neg_color, neutral_color,
+                               pos_color, registration_channel_id,
                                staff_impersonation_embed, ticket_categories,
                                unknown_ign_embed)
 from func.utils.db_utils import (delete_dnkl, insert_new_dnkl, select_one,
                                  update_dnkl)
-from func.utils.discord_utils import dnkl_application, create_ticket, is_valid_date
+from func.utils.discord_utils import create_ticket, dnkl_application
 from func.utils.minecraft_utils import (calculate_network_level,
                                         get_graph_color_by_rank,
                                         get_hypixel_player_rank,
