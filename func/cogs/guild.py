@@ -3,7 +3,7 @@ from discord.ext import commands
 from func.classes.Func import Func
 from func.classes.Integer import Integer
 from func.classes.String import String
-from func.utils.consts import requirements_embed, resident_embed
+from func.utils.consts import requirements_embed, resident_embed, gvg_info_embed
 from func.utils.discord_utils import name_grabber
 
 
@@ -53,6 +53,10 @@ class Guild(commands.Cog, name="guild"):
         """See the different ways of obtaining the resident rank!"""
         await ctx.send(embed=resident_embed)
 
+    @commands.command()
+    async def gvg(self, ctx):
+        """View information about GvG's and GvG requirements!"""
+        await ctx.send(embed=gvg_info_embed)
 
 def setup(bot):
     bot.add_cog(Guild(bot))

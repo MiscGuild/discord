@@ -83,6 +83,23 @@ resident_embed = discord.Embed(title="How can I get Resident?",
                                 inline=False).set_footer(
                                 text=f"Unless otherwise specified, all residents must get {format(resident_req, ',d')} weekly guild experience.")
 
+gvg_info_embed = discord.Embed(title="GvG Information", 
+                                description="Following is some general information and the requiurements for the GvG team.",
+                                color=neutral_color).add_field(
+                                    name="Information",
+                                    value="In a GvG (Guild vs Guild), players are organised by guild and play various gamemodes. The guild that wins the most games wins the GvG.",
+                                    inline=False
+                                ).add_field(
+                                    name="Requirements",
+                                    value=f"""Bedwars Wins: `{gvg_requirements["bw_wins"]}`
+                                            Bedwars FKDR: `{gvg_requirements["bw_fkdr"]}`
+                                            Skywars Wins: `{gvg_requirements["sw_wins"]}`
+                                            Skywars KDR: `{gvg_requirements["sw_kdr"]}`
+                                            Duels WLR: `{gvg_requirements["duels_wlr"]}`
+                                            Duels Kills: `{gvg_requirements["duels_kills"]}`""",
+                                    inline=False
+                                )
+
 # Errors
 invalid_command_embed = discord.Embed(title="Invalid Command!",
                                     description="Use `,help` to view a list of all commands!",
