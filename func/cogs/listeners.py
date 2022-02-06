@@ -18,17 +18,6 @@ class Listeners(commands.Cog, name="listeners"):
     async def on_command_error(self, ctx, error):
        await Listener(obj=error).on_command_error(ctx)
 
-    # @commands.Cog.listener()
-    # async def on_guild_channel_create(self, channel):
-
-    # @commands.Cog.listener()
-    # async def on_button_click(self, res):
-    #     await Listener(res=res).on_button_click()
-
-    # @commands.Cog.listener()
-    # async def on_select_option(self, res):
-    #     await Listener(res=res).on_select_option()
-
 
 def setup(bot):
     bot.add_cog(Listeners(bot))
