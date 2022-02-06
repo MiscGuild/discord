@@ -16,39 +16,39 @@ from func.utils.request_utils import get_jpg_file
 
 
 class Listener:
-    def __init__(self, res):
-        self.obj = res
+    def __init__(self, obj):
+        self.obj = obj
 
-    async def on_member_join(member):
+    async def on_member_join(self):
         # Remove user's speaking perms and send info embed
-        await member.add_roles(bot.new_member_role)
+        await self.obj.add_roles(bot.new_member_role)
         await bot.get_channel(registration_channel_id).send(embed=registration_embed)
 
-    async def on_error(event):
+    async def on_error(self):
         # Grabs the error being handled, formats it and sends it to the error channel
         tb = traceback.format_exc()
-        await bot.get_channel(error_channel_id).send(f"Ignoring exception in event {event}:\n```py\n{tb}\n```")
+        await bot.get_channel(error_channel_id).send(f"Ignoring exception in event {self.obj}:\n```py\n{tb}\n```")
 
-    async def on_command_error(ctx, error):
+    async def on_command_error(self, ctx):
         # Prevents commands with local handlers or cogs with overwrritten on_command_errors being handled here
-        if isinstance(error, commands.CommandNotFound):
+        if isinstance(self.obj, commands.CommandNotFound):
             return await ctx.send(embed=invalid_command_embed)
         elif ctx.command.has_error_handler() or ctx.cog.has_error_handler():
             return
 
         # Checks for the original exception raised and send to CommandInvokeError
-        error = getattr(error, "original", error)
+        self.obj = getattr(self.obj, "original", self.obj)
 
         # Catch a series of common errors
-        if isinstance(error, commands.NotOwner):
+        if isinstance(self.obj, commands.NotOwner):
             await ctx.send(embed=not_owner_embed)
-        elif isinstance(error, commands.MissingRole):
+        elif isinstance(self.obj, commands.MissingRole):
             await ctx.send(embed=missing_role_embed)
-        elif isinstance(error, commands.MissingPermissions):
+        elif isinstance(self.obj, commands.MissingPermissions):
             await ctx.send(embed=missing_permissions_embed)
-        elif isinstance(error, commands.MemberNotFound):
+        elif isinstance(self.obj, commands.MemberNotFound):
             await ctx.send(embed=member_not_found_embed)
-        elif isinstance(error, commands.MissingRequiredArgument):
+        elif isinstance(self.obj, commands.MissingRequiredArgument):
             usage = f"{ctx.prefix}{ctx.command.name}"
             for key, value in ctx.command.clean_params.items():
                 if not value.default:
@@ -62,12 +62,12 @@ class Listener:
 
         # All other errors get sent to the error channel
         else:
-            tb = "".join(traceback.format_exception(type(error), error, error.__traceback__))
+            tb = "".join(traceback.format_exception(type(self.obj), self.obj, self.obj.__traceback__))
             if len(tb) <= 2000:
                 await bot.get_channel(error_channel_id).send(f"Ignoring exception in command {ctx.command}:\n```py\n{tb}\n```")
             else:
                 await bot.error_channel.send(
-                    f"```An error occurred in command '{ctx.command}' that could not be sent in this channel, check the console for the traceback. \n\n'{error}'```")
+                    f"```An error occurred in command '{ctx.command}' that could not be sent in this channel, check the console for the traceback. \n\n'{self.obj}'```")
                 print("The below exception could not be sent to the error channel:")
                 print(tb)
 

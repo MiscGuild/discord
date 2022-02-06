@@ -8,15 +8,15 @@ class Listeners(commands.Cog, name="listeners"):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        await Listener.on_member_join(member)
+        await Listener(obj=member).on_member_join()
 
     @commands.Cog.listener()
     async def on_error(self, event, *args, **kwargs):
-        await Listener.on_error(event)
+        await Listener(obj=event).on_error()
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-       await Listener.on_command_error(ctx, error)
+       await Listener(obj=error).on_command_error(ctx)
 
     # @commands.Cog.listener()
     # async def on_guild_channel_create(self, channel):
