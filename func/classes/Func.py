@@ -11,9 +11,10 @@ from __main__ import bot
 from func.utils.consts import (accepted_staff_application_embed, active_req,
                                allies, error_color, guild_handle,
                                invalid_guild_embed, log_channel_id, member_req,
-                               neg_color, neutral_color, pos_color,
-                               registration_channel_id, registration_embed,
-                               staff_application_questions, ticket_categories)
+                               neg_color, neutral_color, new_member_req,
+                               pos_color, registration_channel_id,
+                               registration_embed, staff_application_questions,
+                               ticket_categories)
 from func.utils.db_utils import insert_new_giveaway, select_all
 from func.utils.discord_utils import (create_ticket, create_transcript,
                                       log_event, name_grabber)
@@ -343,6 +344,9 @@ class Func:
                 # Members who do not meet the requirements
                 elif weekly_exp < member_req:
                     if guild_rank == "Member":
+                        # Filter new members who meet their requirements
+                        days_since_join = (datetime.now() - datetime.fromtimestamp(member["joined"] / 1000.0)).days
+                        if days_since_join <= 7 and weekly_exp > new_member_req * days_since_join: continue
                         inactive[name] = weekly_exp
                     elif guild_rank == "Resident":
                         residents[name] = weekly_exp
@@ -359,7 +363,6 @@ class Func:
                 if _dict:
                     # Sort values from lowest-highest
                     _dict = sorted(_dict.items(), key=lambda item: item[1], reverse=True)
-
                     length = len(_dict)
 
                     # Create embed, append fields with data
