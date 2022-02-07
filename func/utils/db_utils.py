@@ -33,13 +33,11 @@ async def connect_db():
     # Commit any changes
     await bot.db.commit()
 
-
 async def base_query(query: str, values: Tuple=None):
     # Insert values into query if necessary
     if values == None:
         return await bot.db.execute(query)
     return await bot.db.execute(query, values)
-
 
 # Generic select one row function
 async def select_one(query: str, values: Tuple=None):

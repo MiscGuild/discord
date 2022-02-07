@@ -15,7 +15,7 @@ from func.utils.db_utils import (delete_dnkl, insert_new_dnkl, select_one,
                                  update_dnkl)
 from func.utils.discord_utils import create_ticket, dnkl_application
 from func.utils.minecraft_utils import (calculate_network_level,
-                                        get_graph_color_by_rank,
+                                        get_color_by_gexp,
                                         get_hypixel_player_rank,
                                         get_player_gexp)
 from func.utils.request_utils import (get_hypixel_player, get_mojang_profile,
@@ -108,7 +108,7 @@ class String:
                     gexp_history_text = gexp_history_text + f"**▸** {date} **{format(gexp_vals[i], ',d')}**\n"
 
                 # Get graph color
-                color, graph_color, graph_border = await get_graph_color_by_rank(rank, weekly_gexp)
+                color, graph_color, graph_border = await get_color_by_gexp(rank, weekly_gexp)
 
                 # Create embed
                 embed = discord.Embed(title=name, url=f"https://plancke.io/hypixel/player/stats/{name}", color=color)

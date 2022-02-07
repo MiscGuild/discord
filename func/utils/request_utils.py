@@ -7,7 +7,6 @@ import discord
 from func.utils.consts import config
 
 
-# Returns a random Hypixel API key for requests
 async def get_hyapi_key():
     return random.choice(config["api_keys"])
 
@@ -25,8 +24,6 @@ async def get_json_response(url: str):
     # Return JSON response
     return resp
 
-
-# Returns the Mojang profile of a player
 async def get_mojang_profile(name: str):
     resp = await get_json_response(f"https://api.mojang.com/users/profiles/minecraft/{name}")
 
@@ -37,17 +34,17 @@ async def get_mojang_profile(name: str):
     # Player does not exist
     return None, None
 
-def session_get_name_by_uuid(session, uuid):
-    with session.get(f"https://sessionserver.mojang.com/session/minecraft/profile/{uuid}") as resp:
-        data = resp.json()
+async def get_hypixel_player(name: str):
+    api_key = await get_hyapi_key()
+    resp = await get_json_response(f"https://api.hypixel.net/player?key={api_key}&name={name}")
 
-        if resp.status_code != 200:
-            return None
+    # Player doesn't exist
+    if "player" not in resp or not resp["player"]:
+        return None
 
-        return data["name"]
+    # Player exists
+    return resp["player"]
 
-
-# Returns the Mojang profile of a player (including skin)
 async def get_name_by_uuid(uuid: str):
     resp = await get_json_response(f"https://api.mojang.com/user/profiles/{uuid}/names")
 
@@ -58,8 +55,15 @@ async def get_name_by_uuid(uuid: str):
     # Player does not exist
     return None
 
+def session_get_name_by_uuid(session, uuid):
+    with session.get(f"https://sessionserver.mojang.com/session/minecraft/profile/{uuid}") as resp:
+        data = resp.json()
 
-# Returns a player's guild if they're in one
+        if resp.status_code != 200:
+            return None
+
+        return data["name"]
+
 async def get_player_guild(uuid):
     api_key = await get_hyapi_key()
     resp = await get_json_response(f"https://api.hypixel.net/guild?key={api_key}&player={uuid}")
@@ -71,8 +75,6 @@ async def get_player_guild(uuid):
     # Player is in a guild
     return resp["guild"]
 
-
-# Returns guild data by name
 async def get_guild_by_name(name):
     api_key = await get_hyapi_key()
     resp = await get_json_response(f"https://api.hypixel.net/guild?key={api_key}&name={name}")
@@ -84,15 +86,12 @@ async def get_guild_by_name(name):
     # Player is in a guild
     return resp["guild"]
 
-# Returns an array of all members' uuids
 async def get_guild_uuids(guild_name: str):
     resp = await get_guild_by_name(guild_name)
     if resp == None:
         return None
     return [member["uuid"] for member in resp["members"]]
 
-
-# Returns the tag of a given guild
 async def get_gtag(name):
     api_key = await get_hyapi_key()
     resp = await get_json_response(f"https://api.hypixel.net/guild?key={api_key}&name={name}")
@@ -105,21 +104,6 @@ async def get_gtag(name):
         gtag = resp["guild"]["tag"]
         return (f"[{gtag}]")
 
-
-# Returns Hypixel player data
-async def get_hypixel_player(name: str):
-    api_key = await get_hyapi_key()
-    resp = await get_json_response(f"https://api.hypixel.net/player?key={api_key}&name={name}")
-
-    # Player doesn't exist
-    if "player" not in resp or not resp["player"]:
-        return None
-
-    # Player exists
-    return resp["player"]
-
-
-# Returns the value of a given url
 async def get_jpg_file(url: str):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:

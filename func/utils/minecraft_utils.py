@@ -7,7 +7,6 @@ from func.utils.consts import ChatColor, active_req, member_req, resident_req
 from func.utils.request_utils import get_mojang_profile, get_player_guild
 
 
-# Returns player's gexp history and total
 async def get_player_gexp(name: str):
     name, uuid = await get_mojang_profile(name)
     guild_data = await get_player_guild(uuid)
@@ -21,9 +20,7 @@ async def get_player_gexp(name: str):
     # Player is not in a guild
     return None, None
 
-
-# Returns a color based on player's gexp and their guild rank
-async def get_graph_color_by_rank(rank: str, weekly_gexp: int):
+async def get_color_by_gexp(rank: str, weekly_gexp: int):
     if rank == "Resident":
         # Member meets res reqs
         if weekly_gexp > resident_req:
@@ -44,8 +41,6 @@ async def get_graph_color_by_rank(rank: str, weekly_gexp: int):
         # Member is inactive
         return 0xff6464, "rgba(255, 100, 100,0.3)", "rgba(255, 100, 100,0.3)"
 
-
-# Returns player's Hypixel rank with chat color
 async def get_hypixel_player_rank(player_data: dict):
     if player_data == None:
         return None, None
@@ -103,7 +98,5 @@ async def get_hypixel_player_rank(player_data: dict):
     else:
         return "&7", ""
 
-
-# Returns player's network level from total exp
 async def calculate_network_level(total_exp: int):
     return round((math.sqrt((2 * total_exp) + 30625) / 50) - 2.5, 2)
