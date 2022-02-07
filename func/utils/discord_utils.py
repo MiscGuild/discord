@@ -18,16 +18,15 @@ from func.utils.request_utils import get_hypixel_player, get_mojang_profile
 
 
 # Return user's displaying name
-async def name_grabber(author: discord.User):
+async def name_grabber(author: discord.User) -> str:
     if not author.nick:
         return author.name
     return author.nick.split()[0]
 
-
 # Create a ticket with user's perms
 async def create_ticket(user: discord.Member, ticket_name: str, category_name: str=ticket_categories["generic"]):
     # Create ticket
-    ticket = await bot.guild.create_text_channel(ticket_name, category=discord.utils.get(bot.guild.categories, name=category_name))
+    ticket: discord.TextChannel = await bot.guild.create_text_channel(ticket_name, category=discord.utils.get(bot.guild.categories, name=category_name))
 
     # Set perms
     await ticket.set_permissions(bot.guild.get_role(bot.guild.id), send_messages=False,
@@ -271,11 +270,9 @@ async def log_event(title: str, description: str=None):
     embed = discord.Embed(title=title, description=description, color=neutral_color)
     await bot.log_channel.send(embed=embed)
 
-
 # Return if user can change their tag
 async def has_tag_perms(user: discord.User):
     return any(role in user.roles for role in bot.tag_allowed_roles)
-
 
 # Check tag for
 async def check_tag(tag: str):
@@ -292,7 +289,6 @@ async def check_tag(tag: str):
     # Tag is okay to use
     return True, None
 
-
 # Returns if a string is a valid and parseable to a date
 async def is_valid_date(date: str):
     # Return False if parsing fails
@@ -305,7 +301,6 @@ async def is_valid_date(date: str):
     except ValueError:
         return False, None, None, None
 
-
 # Returns a transcript for a channel
 async def create_transcript(channel: discord.TextChannel):
     transcript = await chat_exporter.export(channel)
@@ -313,7 +308,6 @@ async def create_transcript(channel: discord.TextChannel):
 
     # Create and return file
     return discord.File(BytesIO(transcript.encode()), filename=f"transcript-{channel.name}.html")
-
 
 async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, author: discord.User):
     # Recursively ask for start date
@@ -353,7 +347,6 @@ async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, au
     embed.add_field(name="Reason", value=f"{reason}", inline=False)
 
     return embed
-
 
 @tasks.loop(count=1)
 async def after_cache_ready():
