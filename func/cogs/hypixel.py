@@ -13,11 +13,11 @@ class Hypixel(commands.Cog, name="hypixel"):
     @commands.command()
     async def sync(self, ctx, name: str, tag: str=None):
         """Update your discord nick, tag and roles!"""
-        result = await Union(user=ctx.author).sync(ctx, name, tag)
-        if isinstance(result, discord.Embed):
-            await ctx.send(embed=result)
-        elif isinstance(result, str):
-            await ctx.send(result)
+        res = await Union(user=ctx.author).sync(ctx, name, tag)
+        if isinstance(res, discord.Embed):
+            await ctx.send(embed=res)
+        elif isinstance(res, str):
+            await ctx.send(res)
 
     @commands.command()
     async def info(self, ctx, name: str=None):
@@ -53,12 +53,11 @@ class Hypixel(commands.Cog, name="hypixel"):
         if name == None:
             name = await name_grabber(ctx.author)
 
-        result = await String(string=name).dnklcheck()
-        # Send result according to returned value
-        if isinstance(result, discord.Embed):
-            await ctx.send(embed=result)
-        elif isinstance(result, str):
-            await ctx.send(result)
+        res = await String(string=name).dnklcheck()
+        if isinstance(res, discord.Embed):
+            await ctx.send(embed=res)
+        elif isinstance(res, str):
+            await ctx.send(res)
 
 
 def setup(bot):

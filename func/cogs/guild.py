@@ -17,12 +17,11 @@ class Guild(commands.Cog, name="guild"):
         if not name:
             name = await name_grabber(ctx.author)
 
-        result = await String(string=name).gmember(ctx)
-        # Send result according to returned value
-        if isinstance(result, discord.Embed):
-            await ctx.send(embed=result)
-        if isinstance(result, str):
-            await ctx.send(result)
+        res = await String(string=name).gmember(ctx)
+        if isinstance(res, discord.Embed):
+            await ctx.send(embed=res)
+        if isinstance(res, str):
+            await ctx.send(res)
 
     @commands.command()
     async def weeklylb(self, ctx):
@@ -45,7 +44,6 @@ class Guild(commands.Cog, name="guild"):
     @commands.command(aliases=["req", "reqs"])
     async def requirements(self, ctx):
         """View the guild gexp requirements!"""
-        # Just send the reqs embed straight away
         await ctx.send(embed=requirements_embed)
 
     @commands.command(aliases=["res"])

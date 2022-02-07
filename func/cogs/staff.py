@@ -21,11 +21,11 @@ class Staff(commands.Cog, name="staff"):
     @commands.has_role("Staff")
     async def forcesync(self, ctx, member: discord.Member, name: str):
         """Update a user's discord nick, tag and roles for them!"""
-        result = await Union(user=member).sync(ctx, name, None, True)
-        if isinstance(result, discord.Embed):
-            await ctx.send(embed=result)
-        elif isinstance(result, str):
-            await ctx.send(result)
+        res = await Union(user=member).sync(ctx, name, None, True)
+        if isinstance(res, discord.Embed):
+            await ctx.send(embed=res)
+        elif isinstance(res, str):
+            await ctx.send(res)
 
     @commands.command()
     @commands.has_role("Admin")
