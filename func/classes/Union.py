@@ -131,8 +131,8 @@ class Union:
 
             # Account for if user has nick perms
             new_nick = ign + " " + gtag
-            roles_to_remove.extend([self.bot.new_member_role, self.bot.awaiting_app, self.bot.member_role])
-            roles_to_add.extend([self.bot.guest, self.bot.ally])
+            roles_to_remove.extend([bot.new_member_role, bot.awaiting_app, bot.member_role])
+            roles_to_add.extend([bot.guest, bot.ally])
 
         # User is a guest
         else:
