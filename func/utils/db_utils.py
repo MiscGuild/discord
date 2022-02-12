@@ -1,11 +1,9 @@
 # This file contains all db-related functions for inserting, updating, deleting rows etc
 
-from datetime import datetime, timedelta
 from typing import Tuple
 
 import aiosqlite
 from __main__ import bot
-from discord.ext import tasks
 
 
 async def connect_db():
@@ -67,9 +65,6 @@ async def delete_dnkl(username: str):
     await bot.db.commit()
 
 ### Giveaways
-async def roll_giveaway(reroll_target: int = None):
-    return True
-
 async def insert_new_giveaway(msg_id: int, channel_id: int, prize: str, number_winners: int, time_of_finish: str, req_gexp: int, all_roles_required: bool, req_roles: str, sponsors: str):
     await bot.db.execute("INSERT INTO Giveaways VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (msg_id, channel_id, prize, number_winners, time_of_finish, req_gexp, all_roles_required, req_roles, sponsors, True))
     await bot.db.commit()
@@ -77,26 +72,6 @@ async def insert_new_giveaway(msg_id: int, channel_id: int, prize: str, number_w
 async def get_giveaway_status(id: int):
     return await select_one("SELECT is_active FROM giveaways WHERE message_id = (?)", (id,))
 
-@tasks.loop(minutes=1)
-async def check_giveaways():
-    # Get all giveaway data
-    all_giveaways = await select_all("SELECT message_id, time_of_finish, is_active FROM giveaways")
-
-    for message_id, time_of_finish, is_active in all_giveaways:
-        time_of_finish = datetime.strptime(time_of_finish, "%Y-%m-%d %H:%M:%S")
-
-        # Giveaway needs to be ended
-        if is_active and time_of_finish < datetime.utcnow():
-            await roll_giveaway(message_id)
-
-        # Giveaway ended more than 10 days ago, delete it
-        elif not is_active and datetime.utcnow() > time_of_finish + timedelta(days=10):
-            await bot.db.execute("DELETE FROM Giveaways WHERE message_id = (?)", (message_id,))
-            await bot.db.commit()
-
-@check_giveaways.before_loop
-async def before_giveaway_check():
-    await bot.wait_until_ready()
-    await connect_db()
-
-check_giveaways.start()
+async def set_giveaway_inactive(id: int):
+    await bot.db.execute(f"Update giveaways SET is_active = 0 WHERE message_id = (?)", (id,))
+    await bot.db.commit()

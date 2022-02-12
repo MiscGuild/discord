@@ -400,7 +400,7 @@ class Func:
                 destination = bot.get_channel(int(destination))
 
             # If destination is invalid, ask again
-            if destination == None:
+            else:
                 await ctx.send("Invalid channel! Please respond with a channel shortcut or ID", delete_after=3)
                 continue
 

@@ -2,7 +2,8 @@
 
 import discord
 from func.utils.consts import error_color, guild_handle, invalid_guild_embed
-from func.utils.db_utils import get_giveaway_status, roll_giveaway
+from func.utils.db_utils import get_giveaway_status
+from func.utils.giveaway_utils import roll_giveaway
 from func.utils.discord_utils import log_event, name_grabber
 from func.utils.minecraft_utils import get_hypixel_player_rank
 from func.utils.request_utils import (get_guild_by_name, get_hypixel_player,
