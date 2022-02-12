@@ -9,6 +9,7 @@ from func.utils.discord_utils import name_grabber
 from func.utils.minecraft_utils import get_player_gexp
 from func.utils.consts import neutral_color
 from func.utils.db_utils import select_one, select_all, set_giveaway_inactive, connect_db
+from func.utils.request_utils import get_mojang_profile
 
 async def roll_giveaway(message_id: int, reroll_target: int=None):
     # Fetch data
@@ -26,7 +27,9 @@ async def roll_giveaway(message_id: int, reroll_target: int=None):
         # Set vars
         if reroll_target:
             number_winners = reroll_target
+        # Get all users, remove bot's own reaction
         entrants = await reaction.users().flatten()
+        del entrants[0]
         winners: list[discord.User] = []
 
         # Pick winners
@@ -43,16 +46,17 @@ async def roll_giveaway(message_id: int, reroll_target: int=None):
                 return await channel.send(f"🎉 Congrats {announcement} you won the giveaway for {prize}! Please make a ticket to claim.\nThere were less eligible winners than the expected number.")
 
             # Otherwise pick a new entrant and check they meet reqs
-            winner = random.choice(entrants) 
+            winner = random.choice(entrants)
 
             # Remove entrant if they do not meet role reqs
-            if len(req_roles) and (not all_roles_required and not any(role.id in req_roles for role in winner.roles)) or not all(role.id in req_roles for role in winner.roles):
-                entrants.remove(winner)
-                continue
+            if len(req_roles):
+                if not all_roles_required and not any(role.id in req_roles for role in winner.roles) or all_roles_required and not all(role.id in req_roles for role in winner.roles):
+                    entrants.remove(winner)
+                    continue
 
             # Gexp requirements
             if req_gexp != 0:
-                _, uuid = await get_player_gexp(await name_grabber(winner))
+                _, uuid = await get_mojang_profile(await name_grabber(winner))
                 _, weekly_exp = await get_player_gexp(uuid)
 
                 # Player meets gexp req
@@ -71,7 +75,7 @@ async def roll_giveaway(message_id: int, reroll_target: int=None):
         # Edit embed
         embed = discord.Embed(title=prize, description=f"Winners: {announcement}\nSponsored by: {sponsors}", color=neutral_color)
         embed.set_footer(text=f"This giveaway ended at  {time_of_finish}")
-        await message.edit(embed=embed)
+        return await message.edit(embed=embed)
 
     # Message does not have 🎉 reaction
     await set_giveaway_inactive(message_id)
