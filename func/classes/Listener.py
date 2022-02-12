@@ -63,10 +63,10 @@ class Listener:
         # All other errors get sent to the error channel
         else:
             tb = "".join(traceback.format_exception(type(self.obj), self.obj, self.obj.__traceback__))
-            if len(tb) <= 2000:
+            if len(tb) <= 1955:
                 await bot.get_channel(error_channel_id).send(f"Ignoring exception in command {ctx.command}:\n```py\n{tb}\n```")
             else:
-                await bot.error_channel.send(
+                await bot.get_channel(error_channel_id).send(
                     f"```An error occurred in command '{ctx.command}' that could not be sent in this channel, check the console for the traceback. \n\n'{self.obj}'```")
                 print("The below exception could not be sent to the error channel:")
                 print(tb)
