@@ -5,10 +5,11 @@ from typing import Union
 import discord
 from __main__ import bot
 from discord.errors import Forbidden, NotFound
-from func.utils.consts import (allies, bot_missing_perms_embed, err_404_embed,
-                               guild_handle, neg_color, neutral_color,
-                               pos_color, staff_impersonation_embed,
-                               ticket_categories, unknown_ign_embed)
+from func.utils.consts import (active_req, allies, bot_missing_perms_embed,
+                               err_404_embed, guild_handle, neg_color,
+                               neutral_color, pos_color,
+                               staff_impersonation_embed, ticket_categories,
+                               unknown_ign_embed)
 from func.utils.discord_utils import check_tag, has_tag_perms
 from func.utils.request_utils import (get_gtag, get_mojang_profile,
                                       get_player_guild)
@@ -101,8 +102,8 @@ class Union:
         roles_to_remove = []
         new_nick = ign
 
-        guild_name = await get_player_guild(uuid)
-        guild_name = "no guild" if not guild_name else guild_name["name"]
+        guild_data = await get_player_guild(uuid)
+        guild_name = "no guild" if not guild_data else guild_data["name"]
         can_tag = await has_tag_perms(self.user)
 
         # Check tag before other logic
@@ -117,6 +118,12 @@ class Union:
         if guild_name == guild_handle:
             roles_to_add.append(bot.member_role)
             roles_to_remove.extend([bot.guest, bot.awaiting_app])
+
+            # Add active role if eligible
+            for member in guild_data["members"]:
+                if member["uuid"] == uuid and sum(member["expHistory"].values()) > active_req:
+                    roles_to_add.append(bot.active_role)
+                    break
 
         # User is an ally
         elif guild_name in allies:
