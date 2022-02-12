@@ -224,13 +224,13 @@ class String:
             return f"{username} has been removed from the do-not-kick-list!"
 
     async def dnklcheck(self):
-        _, weeklygexp = await get_player_gexp(self.string)
+        self.string, uuid = await get_mojang_profile(self.string)
+        _, weeklygexp = await get_player_gexp(uuid)
 
         # Player is not in a guild
         if not weeklygexp:
             return guildless_embed
 
-        self.string, uuid = await get_mojang_profile(self.string)
         # Player is eligible
         if weeklygexp > dnkl_req:
             embed = discord.Embed(title=self.string, color=pos_color)

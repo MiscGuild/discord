@@ -97,7 +97,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                 await ticket.edit(name=f"dnkl-{ign}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories["dnkl"]))
 
                 # Notify user if they don't meet gexp req, however ask questions anyway
-                _, weekly_gexp = await get_player_gexp(ign)
+                _, weekly_gexp = await get_player_gexp(uuid)
                 if weekly_gexp == None:
                     return await ticket.send(embed=unknown_ign_embed)
                 if weekly_gexp < dnkl_req:

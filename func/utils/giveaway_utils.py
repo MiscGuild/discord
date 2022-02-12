@@ -44,7 +44,6 @@ async def roll_giveaway(message_id: int, reroll_target: int = None):
 
             # Otherwise pick a new entrant and check they meet reqs
             winner = random.choice(entrants) 
-            name = await name_grabber(winner)
 
             # Remove entrant if they do not meet role reqs
             if len(req_roles) and (not all_roles_required and not any(role.id in req_roles for role in winner.roles)) or not all(role.id in req_roles for role in winner.roles):
@@ -53,7 +52,8 @@ async def roll_giveaway(message_id: int, reroll_target: int = None):
 
             # Gexp requirements
             if req_gexp != 0:
-                _, weekly_exp = await get_player_gexp(name)
+                _, uuid = await get_player_gexp(await name_grabber(winner))
+                _, weekly_exp = await get_player_gexp(uuid)
 
                 # Player meets gexp req
                 if weekly_exp and weekly_exp >= req_gexp:

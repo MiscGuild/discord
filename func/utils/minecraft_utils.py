@@ -7,8 +7,7 @@ from func.utils.consts import ChatColor, active_req, member_req, resident_req
 from func.utils.request_utils import get_mojang_profile, get_player_guild
 
 
-async def get_player_gexp(name: str):
-    name, uuid = await get_mojang_profile(name)
+async def get_player_gexp(uuid: str):
     guild_data = await get_player_guild(uuid)
 
     # Player is in a guild
