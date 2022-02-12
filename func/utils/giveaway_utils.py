@@ -10,13 +10,13 @@ from func.utils.minecraft_utils import get_player_gexp
 from func.utils.consts import neutral_color
 from func.utils.db_utils import select_one, select_all, set_giveaway_inactive, connect_db
 
-async def roll_giveaway(message_id: int, reroll_target: int = None):
+async def roll_giveaway(message_id: int, reroll_target: int=None):
     # Fetch data
-    channel_id, prize, number_winners, time_of_finish, req_gexp, all_roles_required, req_roles, sponsors = await select_one("SELECT channel_id, prize, number_winners, time_of_finish, req_gexp, all_roles_required, req_roles, sponsors FROM giveaways WHERE message_id = (?)", (message_id,))
+    channel_id, prize, number_winners, time_of_finish, req_gexp, all_roles_required, req_roles, sponsors = await select_one("SELECT channel_id, prize, number_winners, time_of_finish, required_gexp, all_roles_required, required_roles, sponsors FROM giveaways WHERE message_id = (?)", (message_id,))
     req_roles = [int(role) for role in req_roles.split(" ")]
 
     # Channel and message vars
-    channel: discord.TextChannel = await bot.get_channel(channel_id)
+    channel: discord.TextChannel = bot.get_channel(channel_id)
     message: discord.Message = await channel.fetch_message(message_id)
     
     # Only fetch 🎉 reaction

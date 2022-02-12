@@ -17,13 +17,17 @@ class Giveaways(commands.Cog, name="giveaways"):
     @commands.has_role("Giveaway Creator")
     async def giveawayend(self, ctx, message_ID: int):
         """Ends the giveaway with the given message ID!"""
-        await ctx.send(await Integer(integer=message_ID).giveawayend())
+        res = await Integer(integer=message_ID).giveawayend()
+        if res != None:
+            await ctx.send()
 
     @commands.command(aliases=["greroll", "reroll"])
     @commands.has_role("Giveaway Creator")
     async def giveawayreroll(self, ctx, message_ID: int, reroll_number: int=None):
         """Rerolls the giveaway with the given message ID!"""
-        await ctx.send(await Integer(integer=message_ID).giveawayreroll(reroll_number))
+        res = await Integer(integer=message_ID).giveawayreroll(reroll_number)
+        if res != None:
+            await ctx.send(res)
 
     @commands.command(aliases=["glist"])
     async def giveawaylist(self, ctx):

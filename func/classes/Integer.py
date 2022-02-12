@@ -27,7 +27,7 @@ class Integer:
             return "This giveaway has already ended!\n`To re-roll it use ,giveawayreroll`"
         await roll_giveaway(self.integer)
 
-    async def giveawayreroll(self, reroll_number: int = None):
+    async def giveawayreroll(self, reroll_number: int=None):
         # Get giveaway status
         status = await get_giveaway_status(self.integer)
 
