@@ -16,7 +16,7 @@ class Integer:
 
     async def giveawayend(self):
         # Get giveaway status
-        status = await get_giveaway_status(self.integer)
+        status, = await get_giveaway_status(self.integer)
 
         # Giveaway does not exist
         if status == None:
@@ -29,7 +29,7 @@ class Integer:
 
     async def giveawayreroll(self, reroll_number: int=None):
         # Get giveaway status
-        status = await get_giveaway_status(self.integer)
+        status, = await get_giveaway_status(self.integer)
 
         # Giveaway does not exist
         if status == None:

@@ -19,7 +19,7 @@ class Giveaways(commands.Cog, name="giveaways"):
         """Ends the giveaway with the given message ID!"""
         res = await Integer(integer=message_ID).giveawayend()
         if res != None:
-            await ctx.send()
+            await ctx.send(res)
 
     @commands.command(aliases=["greroll", "reroll"])
     @commands.has_role("Giveaway Creator")
