@@ -21,6 +21,7 @@ The bot used by the Miscellaneous Hypixel guild's discord.
 
 * Install [Python](https://www.python.org/) version 3.x.x or later. 
 * Fill out the template toml config file with your credentials and rename it to `config.toml`
+* Create a file named `database.db` in the bot's directory
 * Run the following commands in a terminal or command prompt in the bot's directory:
   * Install all packages
   ```
