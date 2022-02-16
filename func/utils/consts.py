@@ -44,7 +44,7 @@ neutral_color = 0x8368ff
 error_color = 0xDE3163
 
 # General embeds
-registration_embed = discord.Embed(title="Welcome to the Miscellaneous Discord!",
+registration_embed = discord.Embed(title=f"Welcome to the {guild_handle} Discord!",
                     description="Before you can view the server, please register with your Minecraft username.",
                     color=neutral_color)\
                         .add_field(name="To register use the following command:",

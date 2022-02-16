@@ -22,6 +22,10 @@ async def name_grabber(author: discord.User) -> str:
         return author.name
     return author.nick.split()[0]
 
+async def is_linked_discord(user: discord.User, ign: str) -> bool:
+    player_data = await get_hypixel_player(ign)
+    return player_data["socialMedia"]["links"]["DISCORD"] == user.name
+
 async def create_ticket(user: discord.Member, ticket_name: str, category_name: str=ticket_categories["generic"]):
     # Create ticket
     ticket: discord.TextChannel = await bot.guild.create_text_channel(ticket_name, category=discord.utils.get(bot.guild.categories, name=category_name))

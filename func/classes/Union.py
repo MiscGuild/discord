@@ -10,7 +10,7 @@ from func.utils.consts import (active_req, allies, bot_missing_perms_embed,
                                neutral_color, pos_color,
                                staff_impersonation_embed, ticket_categories,
                                unknown_ign_embed)
-from func.utils.discord_utils import check_tag, has_tag_perms
+from func.utils.discord_utils import check_tag, has_tag_perms, is_linked_discord
 from func.utils.request_utils import (get_gtag, get_mojang_profile,
                                       get_player_guild)
 
@@ -96,6 +96,9 @@ class Union:
         # User trying to sync with staff name
         elif ign in bot.staff_names and bot.staff not in self.user.roles:
             return staff_impersonation_embed
+
+        if not await is_linked_discord(ctx.author, ign):
+            return
 
         # Initialize vars for storing changes
         roles_to_add = []
