@@ -22,7 +22,7 @@ async def roll_giveaway(message_id: int, reroll_target: int=None):
     
     # Only fetch 🎉 reaction
     for reaction in message.reactions:
-        if reaction.emoji.encode("unicode-escape") != b"\\U0001f389": continue
+        if str(reaction.emoji) != "🎉": continue
 
         # Set vars
         if reroll_target:
