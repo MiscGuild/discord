@@ -108,7 +108,7 @@ class Union:
         roles_to_remove = []
         new_nick = ign
 
-        guild_data = player_data["guild"]
+        guild_data = None if "guild" not in player_data else player_data["guild"]
         guild_name = "no guild" if not guild_data else guild_data["name"]
         can_tag = await has_tag_perms(self.user)
 
@@ -186,7 +186,7 @@ class Union:
             if not await is_linked_discord(player_data, self.user):
                 return discord_not_linked_embed
 
-            guild_data = player_data["guild"]
+            guild_data = None if "guild" not in player_data else player_data["guild"]
             guild_name = None if guild_data == None else guild_data["name"]
 
             # User is a member
