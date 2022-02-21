@@ -1,10 +1,11 @@
+from __main__ import bot
 import random
 import re
 from io import BytesIO
 
 import aiohttp
 import discord
-from func.utils.consts import config
+from func.utils.consts import config, error_channel_id
 
 
 async def get_hyapi_key():
@@ -19,7 +20,7 @@ async def get_json_response(url: str):
 
     # Check for invalid API keys
     if "cause" in resp and resp["cause"] == "Invalid API key":
-        print(f"WARNING: The API key {re.search(r'(?<=key=)(.*?)(?=&)', url).group(0)} is invalid!")
+        bot.get_channel(error_channel_id).send(f"WARNING: The API key {re.search(r'(?<=key=)(.*?)(?=&)', url).group(0)} is invalid!")
 
     # Return JSON response
     return resp
