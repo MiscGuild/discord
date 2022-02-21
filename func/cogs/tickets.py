@@ -12,7 +12,7 @@ class Tickets(commands.Cog, name="tickets"):
     @commands.command(aliases=["reg", "verify"])
     async def register(self, ctx, name: str):
         """Register with your IGN to sync your roles!"""
-        res = await String(string=name).register(ctx)
+        res = await Union(user=ctx.author).register(ctx, name)
         if isinstance(res, discord.Embed):
             await ctx.send(embed=res)
         if isinstance(res, String):

@@ -140,6 +140,10 @@ invalid_guild_embed = discord.Embed(title="Invalid guild!",
 unknown_ign_embed = discord.Embed(title="Please enter a valid Minecraft username!",
                                 color=error_color)
 
+discord_not_linked_embed = discord.Embed(title="This account is not linked to your discord account!",
+                                        description="Please follow the following steps to link your Hypixel profile with discord:\nGo to 'Your Profile' > Social Media > DISCORD and paste your discord info.",
+                                        color=error_color)
+
 unknown_ign_msg = "Unknown IGN!"
 
 invalid_date_msg = "This date is invalid! This date may not be from before the last week. Enter dates in the form `YYYY/MM/DD`"

@@ -1,18 +1,17 @@
-# The following file contains: mute, unmute, kick, ban, softban, unban, sync/forcesync, add, remove, avatar
+# The following file contains: mute, unmute, kick, ban, softban, unban, sync/forcesync, register, add, remove, avatar
 
 from typing import Union
 
 import discord
 from __main__ import bot
 from discord.errors import Forbidden, NotFound
-from func.utils.consts import (active_req, allies, bot_missing_perms_embed,
-                               err_404_embed, guild_handle, neg_color,
-                               neutral_color, pos_color,
-                               staff_impersonation_embed, ticket_categories,
-                               unknown_ign_embed)
-from func.utils.discord_utils import check_tag, has_tag_perms, is_linked_discord
-from func.utils.request_utils import (get_gtag, get_mojang_profile,
-                                      get_player_guild)
+from func.utils.consts import (registration_channel_id, active_req, allies, bot_missing_perms_embed,
+                               discord_not_linked_embed, err_404_embed,
+                               guild_handle, neg_color, neutral_color,
+                               pos_color, staff_impersonation_embed,
+                               ticket_categories, unknown_ign_embed)
+from func.utils.discord_utils import (create_ticket, check_tag, has_tag_perms, is_linked_discord)
+from func.utils.request_utils import (get_gtag, get_hypixel_player, get_mojang_profile)
 
 
 class Union:
@@ -87,7 +86,7 @@ class Union:
         except NotFound:
             return err_404_embed
 
-    async def sync(self, ctx, name, tag=None, is_fs=False):
+    async def sync(self, ctx, name: str, tag: str=None, is_fs=False):
         ign, uuid = await get_mojang_profile(name)
         # Invalid username
         if not ign:
@@ -97,15 +96,19 @@ class Union:
         elif ign in bot.staff_names and bot.staff not in self.user.roles:
             return staff_impersonation_embed
 
-        if not await is_linked_discord(ctx.author, ign):
-            return
+        # Fetch player data
+        player_data = await get_hypixel_player(ign)
+
+        # Account is not linked to discord
+        if not await is_linked_discord(player_data, self.user):
+            return discord_not_linked_embed
 
         # Initialize vars for storing changes
         roles_to_add = []
         roles_to_remove = []
         new_nick = ign
 
-        guild_data = await get_player_guild(uuid)
+        guild_data = player_data["guild"]
         guild_name = "no guild" if not guild_data else guild_data["name"]
         can_tag = await has_tag_perms(self.user)
 
@@ -161,6 +164,69 @@ class Union:
             return bot_missing_perms_embed
 
         return embed
+
+    async def register(self, ctx, name):
+        async with ctx.channel.typing():
+            # Make sure it is only used in registration channel
+            if ctx.channel.id != registration_channel_id:
+                return "This command can only be used in the registration channel!"
+                
+            ign, uuid = await get_mojang_profile(name)
+
+            if ign == None:
+                return unknown_ign_embed
+            # Filter out people impersonating staff
+            if ign in bot.staff_names:
+                return staff_impersonation_embed
+
+            # Fetch player data
+            player_data = await get_hypixel_player(ign)
+
+            # Account is not linked to discord
+            if not await is_linked_discord(player_data, self.user):
+                return discord_not_linked_embed
+
+            guild_data = player_data["guild"]
+            guild_name = None if guild_data == None else guild_data["name"]
+
+            # User is a member
+            if guild_name == guild_handle:
+                # Add member role and delete message
+                await ctx.author.add_roles(bot.member_role, reason="Register")
+                await ctx.message.delete()
+                embed = discord.Embed(title="Registration successful!")
+                embed.add_field(name=ign,
+                                value="Member of " + guild_handle)
+                return embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
+
+            # User is in an allied guild
+            if guild_name in allies:
+                # Add guild tag as nick
+                gtag = "" if "tag" not in guild_data else guild_data["tag"]
+                if not ctx.author.nick or gtag not in ctx.author.nick:
+                    ign = ign + " " + gtag
+                    await ctx.author.edit(nick=ign)
+
+                    # Add and remove roles and delete message
+                    await ctx.author.remove_roles(bot.new_member_role, reason="Register")
+                    await ctx.author.add_roles(bot.guest, bot.ally, reason="Register")
+                    await ctx.message.delete()
+
+                    embed = discord.Embed(title="Registration successful!")
+                    embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
+                    return embed.add_field(name=ign, value=f"Member of {guild_data}")
+
+            # User is a guest
+            await ctx.author.remove_roles(bot.new_member_role, reason="Register")
+            await ctx.author.add_roles(bot.awaiting_app, reason="Register")
+            await ctx.message.delete()
+
+            # Create registration ticket
+            await create_ticket(ctx.author, f"registration-ticket-{ctx.author.name}", ticket_categories["registration"])
+
+            embed = discord.Embed(title="Registration successful!", color=neutral_color)
+            embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
+            return embed.add_field(name=ign, value="New Member")
 
     async def add(self, ctx):
         if ctx.channel.category.name not in ticket_categories.values():

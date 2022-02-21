@@ -1,4 +1,4 @@
-# The following file contains: source, gmember, info, dnkladd, dnklremove, dnklcheck, register, rename
+# The following file contains: source, gmember, info, dnkladd, dnklremove, dnklcheck, rename
 
 import inspect
 import os
@@ -6,14 +6,12 @@ from datetime import datetime
 
 import discord
 from __main__ import bot
-from func.utils.consts import (allies, dnkl_channel_id, dnkl_req, guild_handle,
-                               guildless_embed, neg_color, neutral_color,
-                               pos_color, registration_channel_id,
-                               staff_impersonation_embed, ticket_categories,
+from func.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed,
+                               neg_color, pos_color, ticket_categories,
                                unknown_ign_embed)
 from func.utils.db_utils import (delete_dnkl, insert_new_dnkl, select_one,
                                  update_dnkl)
-from func.utils.discord_utils import create_ticket, dnkl_application
+from func.utils.discord_utils import dnkl_application
 from func.utils.minecraft_utils import (calculate_network_level,
                                         get_color_by_gexp,
                                         get_hypixel_player_rank,
@@ -249,62 +247,6 @@ class String:
         embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
         embed.set_author(name="Do-not-kick-list: Eligibility Check")
         return embed
-
-    async def register(self, ctx):
-        async with ctx.channel.typing():
-            # Make sure it is only used in registration channel
-            if ctx.channel.id != registration_channel_id:
-                return "This command can only be used in the registration channel!"
-                
-            ign, uuid = await get_mojang_profile(self.string)
-
-            if ign == None:
-                return unknown_ign_embed
-            # Filter out people impersonating staff
-            if ign in bot.staff_names:
-                return staff_impersonation_embed
-
-            guild = await get_player_guild(uuid)
-            guild_name = None if guild == None else guild["name"]
-
-            # User is a member
-            if guild_name == guild_handle:
-                # Add member role and delete message
-                await ctx.author.add_roles(bot.member_role, reason="Register")
-                await ctx.message.delete()
-                embed = discord.Embed(title="Registration successful!")
-                embed.add_field(name=ign,
-                                value="Member of " + guild_handle)
-                return embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
-
-            # User is in an allied guild
-            if guild_name in allies:
-                # Add guild tag as nick
-                gtag = "" if "tag" not in guild else guild["tag"]
-                if not ctx.author.nick or gtag not in ctx.author.nick:
-                    ign = ign + " " + gtag
-                    await ctx.author.edit(nick=ign)
-
-                    # Add and remove roles and delete message
-                    await ctx.author.remove_roles(bot.new_member_role, reason="Register")
-                    await ctx.author.add_roles(bot.guest, bot.ally, reason="Register")
-                    await ctx.message.delete()
-
-                    embed = discord.Embed(title="Registration successful!")
-                    embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
-                    return embed.add_field(name=ign, value=f"Member of {guild}")
-
-            # User is a guest
-            await ctx.author.remove_roles(bot.new_member_role, reason="Register")
-            await ctx.author.add_roles(bot.awaiting_app, reason="Register")
-            await ctx.message.delete()
-
-            # Create registration ticket
-            await create_ticket(ctx.author, f"registration-ticket-{ctx.author.name}", ticket_categories["registration"])
-
-            embed = discord.Embed(title="Registration successful!", color=neutral_color)
-            embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
-            return embed.add_field(name=ign, value="New Member")
 
     async def rename(self, ctx):
         await ctx.message.delete()
