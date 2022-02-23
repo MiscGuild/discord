@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from func.classes.Func import Func
+from func.classes.Listener import Listener
 from func.classes.String import String
 from func.classes.Union import Union
 
@@ -89,6 +90,9 @@ class Tickets(commands.Cog, name="tickets"):
         """Create a new ticket!"""
         await ctx.send(await Func.new(ctx))
 
+    @commands.Cog.listener()
+    async def on_interaction(self, res):
+        await Listener(obj=res).on_interaction()
 
 def setup(bot):
     bot.add_cog(Tickets(bot))

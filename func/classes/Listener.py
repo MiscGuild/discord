@@ -152,20 +152,19 @@ class Listener:
 
     async def tickets():
         embed = discord.Embed(title="Tickets",
-                    description="""Tickets can be created for any of the following reasons:
-                                > Player Report
-                                > Problems/Queries
-                                > Milestone
-                                > Do-not-kick-list Application
-                                > Staff Application
-                                > GvG Team Application
-                                > Event (When applicable)
-                                > Other
-                                Once you have created a ticket by clicking the button, you will be linked to your ticket\n
-                                The bot will ask you to choose the reason behind the creation of your ticket from a given list. Choose the appropriate reason and then proceed!\n
-                                Once you have created your ticket, staff will respond within 24 hours.""",
-                    color=neutral_color)
-
+                            description="""Tickets can be created for any of the following reasons:
+                                        > Player Report
+                                        > Problems/Queries
+                                        > Milestone
+                                        > Do-not-kick-list Application
+                                        > Staff Application
+                                        > GvG Team Application
+                                        > Event (When applicable)
+                                        > Other
+                                        Once you have created a ticket by clicking the button, you will be linked to your ticket\n
+                                        The bot will ask you to choose the reason behind the creation of your ticket from a given list. Choose the appropriate reason and then proceed!\n
+                                        Once you have created your ticket, staff will respond within 24 hours.""",
+                            color=neutral_color)
         embed.add_field(name="Do-not-kick-list Application",
                         value="You  must have a valid reason for applying and also meet the DNKL requiremnets.\n"
                               "Accepted Reasons:\n"
@@ -175,7 +174,6 @@ class Listener:
                               "> Vacation\n\n"
                               "If your account is banned, it may be temporarily kicked until unbanned.",
                         inline=False)
-
         embed.add_field(name="Player Report",
                         value="When reporting a player, you're expected to explain the situation in maximum detail. Providing the following is considered the bare minimum:\n"
                               "> Username of the accused\n"
@@ -184,26 +182,26 @@ class Listener:
                               "> Proof of offense\n"
                               "If you wish to report a staff member, please DM the acting guild master with your report.",
                         inline=False)
-
         embed.add_field(name="Milestone",
                         value="You'll be prompted to present the milestone you've achieved and proof of its occurence. "
                               "Staff will review your milestone and if accepted, will be include it in the next week's milestone post!",
                         inline=False)
-
         embed.add_field(name="Staff Application",
                         value="After you're done with your application, the staff team will review your it and make a decision to accept or deny it.",
                         inline=False)
-
         embed.set_thumbnail(
             url=f"https://images-ext-1.discordapp.net/external/ziYSZZe7dPyKDYLxA1s2jqpKi-kdCvPFpPaz3zft-wo/%3Fwidth%3D671%26height%3D671/https/media.discordapp.net/attachments/523227151240134664/803843877999607818/misc.png")
 
         image = await get_jpg_file("https://media.discordapp.net/attachments/650248396480970782/873866686049189898/tickets.jpg")
 
         class TicketView(View):
-            @discord.ui.button(label="Create Ticket", style=discord.ButtonStyle.blurple, emoji="✉️")
-
-            async def callback(self, button, interaction: discord.Interaction):
-                ticket = await create_ticket(interaction.user, f"ticket-{interaction.user.display_name}")
-                await interaction.response.send_message(f"Click the following link to go to your ticket! <#{ticket.id}>", ephemeral=True)
+            def __init__(self):
+                super().__init__()
+                self.add_item(Button(label="Create Ticket", custom_id="tickets", style=discord.ButtonStyle.blurple, emoji="✉️"))
 
         return image, embed, TicketView()
+
+    async def on_interaction(self):
+        if self.obj.data["custom_id"] == "tickets":
+            ticket = await create_ticket(self.obj.user, f"ticket-{self.obj.user.name}")
+            await self.obj.response.send_message(f"Click the following link to go to your ticket! <#{ticket.id}>", ephemeral=True)
