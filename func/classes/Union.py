@@ -175,6 +175,7 @@ class Union:
 
             if ign == None:
                 return unknown_ign_embed
+            
             # Filter out people impersonating staff
             if ign in bot.staff_names:
                 return staff_impersonation_embed
@@ -187,46 +188,34 @@ class Union:
                 return discord_not_linked_embed
 
             guild_data = None if "guild" not in player_data else player_data["guild"]
-            guild_name = None if guild_data == None else guild_data["name"]
+            guild_name = "Unkown Guild" if guild_data == None else guild_data["name"]
 
             # User is a member
             if guild_name == guild_handle:
-                # Add member role and delete message
                 await ctx.author.add_roles(bot.member_role, reason="Register")
-                await ctx.message.delete()
-                embed = discord.Embed(title="Registration successful!")
-                embed.add_field(name=ign,
-                                value="Member of " + guild_handle)
-                return embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
 
             # User is in an allied guild
-            if guild_name in allies:
+            elif guild_name in allies:
+                await ctx.author.add_roles(bot.guest, bot.ally, reason="Register")
+
                 # Add guild tag as nick
                 gtag = "" if "tag" not in guild_data else guild_data["tag"]
                 if not ctx.author.nick or gtag not in ctx.author.nick:
                     ign = ign + " " + gtag
-                    await ctx.author.edit(nick=ign)
-
-                    # Add and remove roles and delete message
-                    await ctx.author.remove_roles(bot.new_member_role, reason="Register")
-                    await ctx.author.add_roles(bot.guest, bot.ally, reason="Register")
-                    await ctx.message.delete()
-
-                    embed = discord.Embed(title="Registration successful!")
-                    embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
-                    return embed.add_field(name=ign, value=f"Member of {guild_data}")
 
             # User is a guest
+            else:
+                await ctx.author.add_roles(bot.guest, reason="Register")
+            
+            # Remove new member role, edit nick and delete message
             await ctx.author.remove_roles(bot.new_member_role, reason="Register")
-            await ctx.author.add_roles(bot.awaiting_app, reason="Register")
+            await ctx.author.edit(nick=ign)
             await ctx.message.delete()
 
-            # Create registration ticket
-            await create_ticket(ctx.author, f"registration-ticket-{ctx.author.name}", ticket_categories["registration"])
-
+            # Send success embed
             embed = discord.Embed(title="Registration successful!", color=neutral_color)
             embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
-            return embed.add_field(name=ign, value="New Member")
+            return embed.add_field(name=ign, value=f"Member of {guild_name}")
 
     async def add(self, ctx):
         if ctx.channel.category.name not in ticket_categories.values():
