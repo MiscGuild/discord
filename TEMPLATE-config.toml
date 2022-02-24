@@ -8,8 +8,7 @@ status = ""
 # The ids of all users who will have acces to owner commands
 owner_ids = [
     XXXXXXXXXXXXXXXXXX,
-    XXXXXXXXXXXXXXXXXX,
-    XXXXXXXXXXXXXXXXXX,
+    XXXXXXXXXXXXXXXXXX
 ]
 
 # The ids for your discord server and channel
@@ -25,24 +24,22 @@ partner_channel = XXXXXXXXXXXXXXXXXX
 guild_handle = ""
 
 # Gexp requirements for the guild
-new_member_req = XXXX
-member_req = XXXX
-resident_req = XXXX
-active_req = XXXX
-dnkl_req = XXXX
+new_member_req = 0
+member_req = 0
+resident_req = 0
+active_req = 0
+dnkl_req = 0
 
 # The requirements for joining the GvG team
-gvg_bw_fkdr = XXXX
-gvg_bw_wins = XXXX
-gvg_sw_kdr = XXXX
-gvg_sw_wins = XXXX
-gvg_duels_kills = XXXX
-gvg_duels_wlr = XXXX
+gvg_bw_fkdr = 0
+gvg_bw_wins = 0
+gvg_sw_kdr = 0
+gvg_sw_wins = 0
+gvg_duels_kills = 0
+gvg_duels_wlr = 0
 
 # Names of allied guilds
 allies = [
-    "",
-    "",
     "",
     "",
     ""
@@ -50,12 +47,9 @@ allies = [
 
 # A list of Hypixel API keys for making requests
 api_keys = [
-"",
-"",
-"",
-"",
-"",
-"",
+    "",
+    "",
+    ""
 ]
 
 # The names of discord ticket categories

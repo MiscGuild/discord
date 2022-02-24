@@ -101,19 +101,25 @@ gvg_info_embed = discord.Embed(title="GvG Information",
                                 )
 
 # Errors
+unknown_ign_msg = "Unknown IGN!"
+
+invalid_date_msg = "This date is invalid! This date may not be from before the last week. Enter dates in the form `YYYY/MM/DD`"
+
+missing_permissions_msg = "Your soul lacks the strength to utilize this command!"
+
 invalid_command_embed = discord.Embed(title="Invalid Command!",
                                     description="Use `,help` to view a list of all commands!",
                                     color=error_color)
 
-not_owner_embed = discord.Embed(title="Your soul lacks the strength to utilize this command!",
+not_owner_embed = discord.Embed(title=missing_permissions_msg,
                                 description="You are not the owner of this bot!",
                                 color=error_color)
 
-missing_role_embed = discord.Embed(title="Your soul lacks the strength to utilize this command!",
+missing_role_embed = discord.Embed(title=missing_permissions_msg,
                                 description="You do not have the required roles to access this restricted command!",
                                 color=error_color)
 
-missing_permissions_embed = discord.Embed(title="Your soul lacks the strength to utilize this command!",
+missing_permissions_embed = discord.Embed(title=missing_permissions_msg,
                                     description="You do not have the required permissions to access this restricted command!",
                                     color=error_color)
 
@@ -143,10 +149,6 @@ unknown_ign_embed = discord.Embed(title="Please enter a valid Minecraft username
 discord_not_linked_embed = discord.Embed(title="This account is not linked to your discord account!",
                                         description="Please follow the following steps to link your Hypixel profile with discord:\nGo to 'Your Profile' > Social Media > DISCORD and paste your discord info.",
                                         color=error_color)
-
-unknown_ign_msg = "Unknown IGN!"
-
-invalid_date_msg = "This date is invalid! This date may not be from before the last week. Enter dates in the form `YYYY/MM/DD`"
 
 class ChatColor(Enum):
     RED = "&c"
