@@ -11,7 +11,7 @@ owner_ids = [
     XXXXXXXXXXXXXXXXXX
 ]
 
-# The ids for your discord server and channel
+# The ids for your discord server and channel (Note: dnkl stands for do-not-kick-list)
 guild_id = XXXXXXXXXXXXXXXXXX
 error_channel = XXXXXXXXXXXXXXXXXX
 dnkl_channel = XXXXXXXXXXXXXXXXXX
