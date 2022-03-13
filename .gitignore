@@ -1,5 +1,3 @@
-#Rowdies dont leak anything plz 
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -16,6 +14,7 @@ dnkl.json
 eventparticipants.json
 config.toml
 database.db
+database.db-journal
 
 # PyCharm
 .idea

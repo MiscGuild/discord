@@ -1,20 +1,62 @@
-[bot]
-prefix = ''
+# Discord bot token
 token = ""
-ownerID = 
-status = ''
-error_channel_id = XXXXXXXXXXXXXXXXXX
-dnkl_channel_id = XXXXXXXXXXXXXXXXXX
-ticket_channel_id = XXXXXXXXXXXXXXXXXX
-log_channel_id = XXXXXXXXXXXXXXXXXX
-guild_id = XXXXXXXXXXXXXXXXXX
 
-[hypixel]
-api_keys = [
-"",
-"",
-"",
-"",
-"",
-"",
+# Bot prefix and status
+prefix = ""
+status = ""
+
+# The ids of all users who will have acces to owner commands
+owner_ids = [
+    XXXXXXXXXXXXXXXXXX,
+    XXXXXXXXXXXXXXXXXX
 ]
+
+# The ids for your discord server and channel (Note: dnkl stands for do-not-kick-list)
+guild_id = XXXXXXXXXXXXXXXXXX
+error_channel = XXXXXXXXXXXXXXXXXX
+dnkl_channel = XXXXXXXXXXXXXXXXXX
+ticket_channel = XXXXXXXXXXXXXXXXXX
+log_channel = XXXXXXXXXXXXXXXXXX
+registration_channel = XXXXXXXXXXXXXXXXXX
+partner_channel = XXXXXXXXXXXXXXXXXX
+
+# The name of your Hypixel guild
+guild_handle = ""
+
+# Gexp requirements for the guild
+new_member_req = 0
+member_req = 0
+resident_req = 0
+active_req = 0
+dnkl_req = 0
+
+# The requirements for joining the GvG team
+gvg_bw_fkdr = 0
+gvg_bw_wins = 0
+gvg_sw_kdr = 0
+gvg_sw_wins = 0
+gvg_duels_kills = 0
+gvg_duels_wlr = 0
+
+# Names of allied guilds
+allies = [
+    "",
+    "",
+    ""
+]
+
+# A list of Hypixel API keys for making requests
+api_keys = [
+    "",
+    "",
+    ""
+]
+
+# The names of discord ticket categories
+[ticket_categories]
+generic = ""
+registration = ""
+other = ""
+report = ""
+milestone = ""
+dnkl = ""
