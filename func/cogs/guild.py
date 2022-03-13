@@ -12,7 +12,7 @@ class Guild(commands.Cog, name="guild"):
         self.bot = bot
 
     @commands.command(aliases=["gm", "g"])
-    async def gmember(self, ctx, name: str=None):
+    async def gmember(self, ctx, name: str = None):
         """View the given user's gexp over the past week!"""
         if not name:
             name = await name_grabber(ctx.author)
@@ -33,7 +33,7 @@ class Guild(commands.Cog, name="guild"):
             await ctx.send(embed=res)
 
     @commands.command()
-    async def gtop(self, ctx, day: int=1):
+    async def gtop(self, ctx, day: int = 1):
         """View the daily guild experience leaderboard!"""
         res = await Integer(integer=day).gtop(ctx=ctx)
         if isinstance(res, discord.File):
@@ -55,6 +55,7 @@ class Guild(commands.Cog, name="guild"):
     async def gvg(self, ctx):
         """View information about GvG's and GvG requirements!"""
         await ctx.send(embed=gvg_info_embed)
+
 
 def setup(bot):
     bot.add_cog(Guild(bot))

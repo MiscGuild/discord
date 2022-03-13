@@ -94,5 +94,6 @@ class Tickets(commands.Cog, name="tickets"):
     async def on_interaction(self, res):
         await Listener(obj=res).on_interaction()
 
+
 def setup(bot):
     bot.add_cog(Tickets(bot))

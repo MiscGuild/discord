@@ -44,7 +44,7 @@ class Staff(commands.Cog, name="staff"):
 
     @commands.command()
     @commands.has_role("Staff")
-    async def rolecheck(self, ctx, send_ping: bool=True):
+    async def rolecheck(self, ctx, send_ping: bool = True):
         """Sync the names and roles of everyone in the discord!"""
         await Func.rolecheck(ctx, send_ping)
 

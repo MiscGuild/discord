@@ -10,15 +10,17 @@ from func.utils.consts import (registration_channel_id, active_req, allies, bot_
                                guild_handle, neg_color, neutral_color,
                                pos_color, staff_impersonation_embed,
                                ticket_categories, unknown_ign_embed)
-from func.utils.discord_utils import (create_ticket, check_tag, has_tag_perms, is_linked_discord)
-from func.utils.request_utils import (get_gtag, get_hypixel_player, get_mojang_profile)
+from func.utils.discord_utils import (
+    create_ticket, check_tag, has_tag_perms, is_linked_discord)
+from func.utils.request_utils import (
+    get_gtag, get_hypixel_player, get_mojang_profile)
 
 
 class Union:
     def __init__(self, user: Union[discord.Member, discord.User]):
         self.user = user
 
-    async def mute(self, author, guild_roles, reason: str=None):
+    async def mute(self, author, guild_roles, reason: str = None):
         # Default reason is responsible moderator
         if reason == None:
             reason == f"Responsible moderator: {author}"
@@ -33,7 +35,7 @@ class Union:
                               color=neutral_color)
         return embed
 
-    async def kick(self, author, reason: str=None):
+    async def kick(self, author, reason: str = None):
         # Default reason is responsible moderator
         if not reason:
             reason = f"Responsible moderator: {author}"
@@ -43,7 +45,7 @@ class Union:
                              description=f"{self.user} was kicked by {author}",
                              color=neg_color)
 
-    async def ban(self, guild, author, reason: str=None):
+    async def ban(self, guild, author, reason: str = None):
         # Default reason is responsible moderator
         if not reason:
             reason = f"Responsible moderator: {author}"
@@ -57,7 +59,7 @@ class Union:
         except Forbidden:
             return bot_missing_perms_embed
 
-    async def softban(self, guild, author, reason: str=None):
+    async def softban(self, guild, author, reason: str = None):
         # Default reason is responsible moderator
         if not reason:
             reason = f"Responsible moderator: {author}"
@@ -72,7 +74,7 @@ class Union:
         except Forbidden:
             return bot_missing_perms_embed
 
-    async def unban(self, guild, author, reason: str=None):
+    async def unban(self, guild, author, reason: str = None):
         # Default reason is responsible moderator
         if not reason:
             reason = f"Responsible moderator: {author}"
@@ -86,7 +88,7 @@ class Union:
         except NotFound:
             return err_404_embed
 
-    async def sync(self, ctx, name: str, tag: str=None, is_fs=False):
+    async def sync(self, ctx, name: str, tag: str = None, is_fs=False):
         ign, uuid = await get_mojang_profile(name)
         # Invalid username
         if not ign:
@@ -153,7 +155,8 @@ class Union:
         embed = discord.Embed(title="Your nick, roles, and tag have been successfully changed!",
                               description="If this wasn't the change you anticipated, please create a ticket!",
                               color=neutral_color)
-        embed.set_footer(text=f"• Member of {guild_name}" + "\n• Removed: " + ", ".join([role.name for role in roles_to_remove]) + "\n• Added: " + ", ".join([role.name for role in roles_to_add]))
+        embed.set_footer(text=f"• Member of {guild_name}" + "\n• Removed: " + ", ".join(
+            [role.name for role in roles_to_remove]) + "\n• Added: " + ", ".join([role.name for role in roles_to_add]))
 
         # Set roles and nick
         try:
@@ -170,12 +173,12 @@ class Union:
             # Make sure it is only used in registration channel
             if ctx.channel.id != registration_channel_id:
                 return "This command can only be used in the registration channel!"
-                
+
             ign, uuid = await get_mojang_profile(name)
 
             if ign == None:
                 return unknown_ign_embed
-            
+
             # Filter out people impersonating staff
             if ign in bot.staff_names:
                 return staff_impersonation_embed
@@ -206,14 +209,15 @@ class Union:
             # User is a guest
             else:
                 await ctx.author.add_roles(bot.guest, reason="Register")
-            
+
             # Remove new member role, edit nick and delete message
             await ctx.author.remove_roles(bot.new_member_role, reason="Register")
             await ctx.author.edit(nick=ign)
             await ctx.message.delete()
 
             # Send success embed
-            embed = discord.Embed(title="Registration successful!", color=neutral_color)
+            embed = discord.Embed(
+                title="Registration successful!", color=neutral_color)
             embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
             return embed.add_field(name=ign, value=f"Member of {guild_name}")
 
@@ -224,18 +228,19 @@ class Union:
         # Set perms
         await ctx.channel.set_permissions(self.user, send_messages=True, read_messages=True, add_reactions=True, embed_links=True, attach_files=True, read_message_history=True, external_emojis=True)
         return discord.Embed(title=f"{self.user.name} has been added to the ticket!", color=pos_color)
-       
+
     async def remove(self, ctx):
         if ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
 
         # Set perms
         await ctx.channel.set_permissions(self.user, send_messages=False, read_messages=False,
-                                            add_reactions=False, embed_links=False,
-                                            attach_files=False,
-                                            read_message_history=False, external_emojis=False)
+                                          add_reactions=False, embed_links=False,
+                                          attach_files=False,
+                                          read_message_history=False, external_emojis=False)
         return discord.Embed(title=f"{self.user.name} has been removed from the ticket!", color=pos_color)
 
     async def avatar(self):
-        embed = discord.Embed(title=f"{self.user}'s avatar:", color=neutral_color)
+        embed = discord.Embed(
+            title=f"{self.user}'s avatar:", color=neutral_color)
         return embed.set_image(url=self.user.avatar_url)

@@ -16,7 +16,7 @@ class Listeners(commands.Cog, name="listeners"):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-       await Listener(obj=error).on_command_error(ctx)
+        await Listener(obj=error).on_command_error(ctx)
 
 
 def setup(bot):

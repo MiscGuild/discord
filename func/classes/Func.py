@@ -39,10 +39,12 @@ class Func:
 
             # Loop through all guild members' gexp, adding it to dict
             for member in guild_data["members"]:
-                member_gexp[member["uuid"]] = sum(member["expHistory"].values())
+                member_gexp[member["uuid"]] = sum(
+                    member["expHistory"].values())
 
             # Sort member gexp
-            member_gexp = sorted(member_gexp.items(), key=lambda item: item[1], reverse=True)
+            member_gexp = sorted(member_gexp.items(),
+                                 key=lambda item: item[1], reverse=True)
 
             # Create url
             url = "&f&lWeekly Top&r%5Cn"
@@ -55,7 +57,7 @@ class Func:
                 url += f"&6{i + 1}. {rank} {name} &2{format(user_data[1], ',d')} Guild Experience"
                 # Add new line
                 if i < 9:
-                    url +="%5Cn"
+                    url += "%5Cn"
 
             # Replace characters for URL
             url = url.replace("+", "%2B")
@@ -88,7 +90,7 @@ class Func:
         # Define arrays for guild and ally uuids and names
         guild_uuids = await get_guild_uuids(guild_handle)
         guild_names, ally_names, ally_uuids = [], [], []
-        
+
         for ally in allies:
             await progress_message.edit(content=f"Fetching ally UUIDs - {ally}")
             ally_uuids.extend(await get_guild_uuids(ally))
@@ -113,13 +115,13 @@ class Func:
                     for response in await asyncio.gather(*tasks):
                         dump.append(response)
 
-
         # Loop through discord members, send warning message
         await ctx.send("If you see the bot is stuck on a member, forcesync that user in the event of an error.")
         bot.admin_ids = [member.id for member in bot.admin.members]
         for member in bot.guild.members:
             # Do not check admins and bots
-            if member.id in bot.admin_ids or member.bot: continue
+            if member.id in bot.admin_ids or member.bot:
+                continue
 
             name = await name_grabber(member)
             await progress_message.edit(content=f"Checking {name} - {member}")
@@ -133,18 +135,18 @@ class Func:
                 await member.add_roles(bot.new_member_role)
                 continue
 
-
             # Member of guild
             if name in guild_names:
                 # Edit roles
                 await member.add_roles(bot.member_role)
                 await member.remove_roles(bot.new_member_role, bot.guest, bot.ally)
-            
+
             # Member of allied guild
             elif name in ally_names:
                 # Get player gtag
                 guild = await get_player_guild(uuid)
-                gtag = " " if len(guild["guild"]) < 2 or not guild["tag"] else guild["tag"]
+                gtag = " " if len(
+                    guild["guild"]) < 2 or not guild["tag"] else guild["tag"]
 
                 # Set nick
                 if not member.nick or gtag not in member.nick:
@@ -154,9 +156,9 @@ class Func:
                 await member.add_roles(bot.guest, bot.ally)
                 await member.remove_roles(bot.new_member_role, bot.member_role, bot.active_role)
 
-
         # Send ping to new member role in registration channel
-        if send_ping: await bot.get_channel(registration_channel_id).send(bot.new_member_role.mention, embed=registration_embed)
+        if send_ping:
+            await bot.get_channel(registration_channel_id).send(bot.new_member_role.mention, embed=registration_embed)
 
         await progress_message.edit(content="Rolecheck complete!")
 
@@ -172,12 +174,12 @@ class Func:
 
             # Wait for reply and delete message
             staff_name = await bot.wait_for("message", check=lambda
-                x: x.author == ctx.message.author and x.channel == ctx.channel)
+                                            x: x.author == ctx.message.author and x.channel == ctx.channel)
             await staff_name.delete()
             staff_name = staff_name.content
 
             # Check for cancellation
-            if staff_name.lower() == "cancel": 
+            if staff_name.lower() == "cancel":
                 await progress_message.edit(content="Cancelled")
                 return
 
@@ -185,7 +187,7 @@ class Func:
             await progress_message.edit(content=f"What are your comments about {staff_name}?")
             # Wait for reply and delete message
             staff_comm = await bot.wait_for("message", check=lambda
-                x: x.author == ctx.message.author and x.channel == ctx.channel)
+                                            x: x.author == ctx.message.author and x.channel == ctx.channel)
             await staff_comm.delete()
             staff_comm = staff_comm.content
 
@@ -205,11 +207,11 @@ class Func:
     async def delete(ctx):
         if not ctx.channel.category or ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
-        
+
         # Send deletion warning and gather transcript
         await ctx.send(embed=discord.Embed(title="This ticket will be deleted in 10 seconds!", color=neg_color))
         transcript = await create_transcript(ctx.channel)
-            
+
         # Sleep and delete channel
         await asyncio.sleep(10)
         await discord.TextChannel.delete(ctx.channel)
@@ -218,7 +220,7 @@ class Func:
             # Log outcome
             await log_event(f"{ctx.channel.name} was deleted by {ctx.author}")
             await bot.get_channel(log_channel_id).send(file=transcript)
-    
+
     async def accept(ctx):
         if ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
@@ -236,7 +238,7 @@ class Func:
 
         # Transcript is valid
         return transcript
-    
+
     async def new(ctx):
         # Create ticket
         ticket = await create_ticket(ctx.author, f"ticket-{await name_grabber(ctx.author)}")
@@ -265,7 +267,8 @@ class Func:
         await ctx.send(embed=discord.Embed(title="Questions", description=all_questions, color=neutral_color))
 
         # Define the embed to be sent to the applicant
-        denial_embed = discord.Embed(title="Your staff application has been denied!", description="The reasons have been listed below", color=error_color)
+        denial_embed = discord.Embed(title="Your staff application has been denied!",
+                                     description="The reasons have been listed below", color=error_color)
 
         # Loop for getting question feedback
         while True:
@@ -285,14 +288,15 @@ class Func:
             critique = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
 
             # Update embed and send preview
-            denial_embed.add_field(name=question, value=critique.content, inline=False)
+            denial_embed.add_field(
+                name=question, value=critique.content, inline=False)
             await ctx.send(embed=denial_embed)
 
             # Ask user if they want to critique more questions and wait for reply
             await ctx.send("Would you like to critique more questions? (y/n)")
             while True:
                 more = await bot.wait_for("message",
-                                               check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+                                          check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
                 more = more.content.lower()
 
                 # User does not want to critique more questions
@@ -304,7 +308,7 @@ class Func:
                         return denial_embed.set_footer(text="Transcript creation failed!"), None
 
                     return denial_embed.set_footer(text="You may reapply in 2 weeks.\nFollowing is the transcript so that you can refer to it while reapplying."), transcript
-                
+
                 # Break inner loop and let user answer more questions
                 break
 
@@ -333,7 +337,9 @@ class Func:
                 guild_rank = member["rank"]
                 weekly_exp = sum(member["expHistory"].values())
                 name = await get_name_by_uuid(uuid)
-                name +=  f"[{guild_rank}]\n" + str(datetime.fromtimestamp(int(str(member["joined"])[:-3])))[0:10]
+                name += f"[{guild_rank}]\n" + \
+                    str(datetime.fromtimestamp(
+                        int(str(member["joined"])[:-3])))[0:10]
 
                 # Members who need to be promoted
                 if guild_rank == "Member" and weekly_exp >= active_req:
@@ -345,8 +351,10 @@ class Func:
                 elif weekly_exp < member_req:
                     if guild_rank == "Member":
                         # Filter new members who meet their requirements
-                        days_since_join = (datetime.now() - datetime.fromtimestamp(member["joined"] / 1000.0)).days
-                        if days_since_join <= 7 and weekly_exp > new_member_req * days_since_join: continue
+                        days_since_join = (
+                            datetime.now() - datetime.fromtimestamp(member["joined"] / 1000.0)).days
+                        if days_since_join <= 7 and weekly_exp > new_member_req * days_since_join:
+                            continue
                         inactive[name] = weekly_exp
                     elif guild_rank == "Resident":
                         residents[name] = weekly_exp
@@ -355,21 +363,25 @@ class Func:
             embeds = []
 
             # Loop through dicts, descriptions and colors
-            for _dict, title, color in [[to_promote, "Promote the following users:", pos_color], 
-                                        [to_demote, "Demote the following users:", neg_color],
+            for _dict, title, color in [[to_promote, "Promote the following users:", pos_color],
+                                        [to_demote, "Demote the following users:",
+                                            neg_color],
                                         [residents, "Following are the inactive residents:", 0xe5ba6c],
                                         [inactive, "Following are the users to be kicked:", neg_color]]:
                 # Filter categories with no users
                 if _dict:
                     # Sort values from lowest-highest
-                    _dict = sorted(_dict.items(), key=lambda item: item[1], reverse=True)
+                    _dict = sorted(
+                        _dict.items(), key=lambda item: item[1], reverse=True)
                     length = len(_dict)
 
                     # Create embed, append fields with data
-                    embed = discord.Embed(title=title, description=f"Total: {length}", color=color)
+                    embed = discord.Embed(
+                        title=title, description=f"Total: {length}", color=color)
                     for user in _dict:
-                        embed.add_field(name=f"{user[0]}", value=f"```cs\n{format(user[1], ',d')}```", inline=True)
-                        
+                        embed.add_field(
+                            name=f"{user[0]}", value=f"```cs\n{format(user[1], ',d')}```", inline=True)
+
                         # If the embed is getting too large, append it and create a new one
                         if len(embed.fields) >= 25 and length != 25:
                             embeds.append(embed)
@@ -383,7 +395,7 @@ class Func:
     async def giveawaycreate(ctx):
         # Define progress message for asking questions
         progress_message = await ctx.send("Which channel should the giveaway be hosted in?\n\n`Please respond with a channel shortcut or ID`\n\n**At any time, you can cancel the giveaway by replying with `cancel` to one of the upcoming prompts.**")
-        
+
         while True:
             # Wait for answer and check for cancellation
             destination = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
@@ -394,7 +406,8 @@ class Func:
             # Parse channel ID
             if destination[0] == "<":
                 # Try to get channel ID, returns None if doesn't exist
-                destination = bot.get_channel(int(re.sub(r"[\W_]+", "", destination)))
+                destination = bot.get_channel(
+                    int(re.sub(r"[\W_]+", "", destination)))
             elif destination.isnumeric():
                 # Returns None if doesn't exist
                 destination = bot.get_channel(int(destination))
@@ -406,9 +419,9 @@ class Func:
 
             # Continue with questioning
             break
-        
+
         # Ask for prize
-        await progress_message.edit(content=f"Sweet! The giveaway will be held in <#{destination.id}>. What is the prize going to be?\n\n`Please respond with a small description of the prize.`") 
+        await progress_message.edit(content=f"Sweet! The giveaway will be held in <#{destination.id}>. What is the prize going to be?\n\n`Please respond with a small description of the prize.`")
 
         # Wait for answer and check for cancellation
         prize = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
@@ -440,7 +453,7 @@ class Func:
             break
 
         # Ask for duration
-        await progress_message.edit(content=f"Neat! There will be {number_winners} winner(s). How long should the giveaway last?\n\n`Please enter a duration. Use an 'm' for minutes, 'd' for days, etc.`") 
+        await progress_message.edit(content=f"Neat! There will be {number_winners} winner(s). How long should the giveaway last?\n\n`Please enter a duration. Use an 'm' for minutes, 'd' for days, etc.`")
 
         while True:
             # Wait for answer and check for cancellation
@@ -452,12 +465,14 @@ class Func:
             # Convert letters to seconds
             seconds_per_unit = {"m": 60, "h": 3600, "d": 86400, "w": 604800}
             try:
-                end_date = datetime.utcnow() + timedelta(int(duration[:-1]) * seconds_per_unit[duration[-1]]) 
+                end_date = datetime.utcnow() + \
+                    timedelta(int(duration[:-1]) *
+                              seconds_per_unit[duration[-1]])
                 end_date = end_date.strftime("%Y-%m-%d %H:%M:%S.%f")[:-7]
             except Exception:
                 await ctx.send("Invalid duration! Please try again.", delete_after=3)
                 continue
-        
+
             break
 
         # Ask for gexp requirements
@@ -479,11 +494,12 @@ class Func:
                 else:
                     unit_multiplier = {"k": 1000, "m": 1000000}
                     try:
-                        required_gexp = int(required_gexp[:-1]) * unit_multiplier[required_gexp[-1]]
+                        required_gexp = int(
+                            required_gexp[:-1]) * unit_multiplier[required_gexp[-1]]
                     except Exception:
                         await ctx.send("Invalid gexp requirement! Please try again.", delete_after=3)
                         continue
-                
+
             break
 
         # Ask for role requirements
@@ -494,7 +510,7 @@ class Func:
             required_roles = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
             required_roles = re.sub(r"\s+", "", required_roles.content)
             if required_roles == "cancel":
-                return "Giveaway cancelled!" 
+                return "Giveaway cancelled!"
 
             # Check if user wants role reqs
             if required_roles == "none":
@@ -553,9 +569,12 @@ class Func:
 
         # Create embed
         embed = discord.Embed(title=f"{prize}", color=0x8368ff)
-        embed.set_footer(text=f"{number_winners} Winner(s), Ends at {end_date} UTC/GMT")
-        embed.add_field(name="[-] Information:", value=f"Sponsored by: {sponsors} \nDuration: {duration}", inline=False)
-        embed.add_field(name="[-] Requirements:", value=f"{role_requirement_text} \n{gexp_requirement_text}", inline=False)
+        embed.set_footer(
+            text=f"{number_winners} Winner(s), Ends at {end_date} UTC/GMT")
+        embed.add_field(
+            name="[-] Information:", value=f"Sponsored by: {sponsors} \nDuration: {duration}", inline=False)
+        embed.add_field(
+            name="[-] Requirements:", value=f"{role_requirement_text} \n{gexp_requirement_text}", inline=False)
 
         # Ask for confirmation
         await progress_message.edit(content="This is your last chance to confirm the giveaway, are you sure you want to continue? (y/n)", embed=embed)
@@ -573,23 +592,23 @@ class Func:
         # Enter data into db (Make required roles a str for db)
         required_roles = " ".join([str(role) for role in required_roles])
         await insert_new_giveaway(msg.id, destination.id, prize, number_winners, end_date, required_gexp, all_roles_required, required_roles, sponsors)
-        
+
         # Return confirmation
         return f"Ok! The giveaway has been set up in <#{destination.id}>!"
 
     async def giveawaylist():
         all_giveaways = await select_all("SELECT prize, channel_id, message_id, number_winners, time_of_finish FROM giveaways")
-        
+
         # There have been no recent giveaways
         if not all_giveaways:
             return discord.Embed(title="There have been no giveaways in the last 10 days!",
-                                description="To make a new giveaway, use the command `,giveawaycreate`",
-                                color=neg_color)
+                                 description="To make a new giveaway, use the command `,giveawaycreate`",
+                                 color=neg_color)
         else:
             # Define embed
             embed = discord.Embed(title="Giveaways:",
-                                    description="Listed below are all giveaways from the last 10 days.",
-                                    color=neutral_color)
+                                  description="Listed below are all giveaways from the last 10 days.",
+                                  color=neutral_color)
 
             # Add info to embed
             for giveaway in all_giveaways:

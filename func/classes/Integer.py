@@ -27,7 +27,7 @@ class Integer:
             return "This giveaway has already ended!\n`To re-roll it use ,giveawayreroll`"
         await roll_giveaway(self.integer)
 
-    async def giveawayreroll(self, reroll_number: int=None):
+    async def giveawayreroll(self, reroll_number: int = None):
         # Get giveaway status
         status, = await get_giveaway_status(self.integer)
 
@@ -39,7 +39,7 @@ class Integer:
         if status:
             return "This giveaway hasn't ended yet!\n`To end it, use ,giveawayend`"
         await roll_giveaway(self.integer, reroll_number)
-            
+
     async def gtop(self, ctx):
         # Check no. days requested to prevent errors
         if self.integer > 6:
@@ -57,10 +57,12 @@ class Integer:
             for member in guild_data["members"]:
                 if date == None:
                     date = list(member["expHistory"].keys())[self.integer]
-                member_gexp[member["uuid"]] = list(member["expHistory"].values())[self.integer]
+                member_gexp[member["uuid"]] = list(
+                    member["expHistory"].values())[self.integer]
 
             # Sort member gexp
-            member_gexp = sorted(member_gexp.items(), key=lambda item: item[1], reverse=True)
+            member_gexp = sorted(member_gexp.items(),
+                                 key=lambda item: item[1], reverse=True)
 
             # Get image data
             image_content = f"&f&lDaily Top: {date}&r%5Cn"
@@ -73,8 +75,8 @@ class Integer:
                 image_content += f"&6{i + 1}. {rank} {name} &2{format(user_data[1], ',d')} Guild Experience"
                 # Add new line
                 if i < 9:
-                    image_content +="%5Cn"
-        
+                    image_content += "%5Cn"
+
         # Replace characters for URL
         image_content = image_content.replace("+", "%2B")
         image_content = image_content.replace("&", "%26")

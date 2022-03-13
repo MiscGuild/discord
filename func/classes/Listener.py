@@ -57,13 +57,14 @@ class Listener:
                 else:
                     usage += " <" + key + ">"
             embed = discord.Embed(title=f" arguments",
-                                description=f"Command usage:\n`{usage}`\nFor more help, see `{ctx.prefix}help {ctx.command}`",
-                                color=0xDE3163)
+                                  description=f"Command usage:\n`{usage}`\nFor more help, see `{ctx.prefix}help {ctx.command}`",
+                                  color=0xDE3163)
             await ctx.send(embed=embed)
 
         # All other errors get sent to the error channel
         else:
-            tb = "".join(traceback.format_exception(type(self.obj), self.obj, self.obj.__traceback__))
+            tb = "".join(traceback.format_exception(
+                type(self.obj), self.obj, self.obj.__traceback__))
             if len(tb) <= 1955:
                 await bot.get_channel(error_channel_id).send(f"Ignoring exception in command {ctx.command}:\n```py\n{tb}\n```")
             else:
@@ -75,12 +76,12 @@ class Listener:
     async def reactionroles():
         # Reaction roles
         reaction_roles_embed = discord.Embed(title="To get your desired role, click its respective button!",
-                                            description="🪓 __**SkyBlock**__\nGives you the access to the SkyBlock category!\n\n"
-                                                        "🕹 __**Minigames**__\nAllows you to play some Discord minigames!\n\n"
-                                                        "❓  __**QOTD Ping**__\nThe staff team will mention this role when there's a new question of the day!\n\n"
-                                                        "🎉 __**Giveaways/Events**__\nReact so you don't miss any giveaway or event\n\n"
-                                                        "📖 __**Storytime Pings**__\nGet pinged whenever a storytime happens",
-                                            color=neutral_color)
+                                             description="🪓 __**SkyBlock**__\nGives you the access to the SkyBlock category!\n\n"
+                                             "🕹 __**Minigames**__\nAllows you to play some Discord minigames!\n\n"
+                                             "❓  __**QOTD Ping**__\nThe staff team will mention this role when there's a new question of the day!\n\n"
+                                             "🎉 __**Giveaways/Events**__\nReact so you don't miss any giveaway or event\n\n"
+                                             "📖 __**Storytime Pings**__\nGet pinged whenever a storytime happens",
+                                             color=neutral_color)
 
         class ReactionRoleButton(Button):
             def __init__(self, label: str, emoji: str):
@@ -96,13 +97,16 @@ class Listener:
 
         # Pronouns
         pronouns_embed = discord.Embed(title="Please select your pronouns",
-                                        description="".join([k + v + "\n" for k, v in pronoun_roles.items()]),
-                                        color=neutral_color)
+                                       description="".join(
+                                           [k + v + "\n" for k, v in pronoun_roles.items()]),
+                                       color=neutral_color)
 
         class PronounsSelect(Select):
             def __init__(self):
-                options = [discord.SelectOption(label=k, emoji=v) for k, v in pronoun_roles.items()]
-                super().__init__(placeholder="Select your pronouns (Max 1)", min_values=1, max_values=1, options=options, custom_id="pronouns")
+                options = [discord.SelectOption(
+                    label=k, emoji=v) for k, v in pronoun_roles.items()]
+                super().__init__(placeholder="Select your pronouns (Max 1)",
+                                 min_values=1, max_values=1, options=options, custom_id="pronouns")
 
         pronouns_view = View(timeout=10.0)
         pronouns_view.add_item(PronounsSelect())
@@ -111,7 +115,7 @@ class Listener:
 
     async def tickets():
         embed = discord.Embed(title="Tickets",
-                            description="""Tickets can be created for any of the following reasons:
+                              description="""Tickets can be created for any of the following reasons:
                                         > Player Report
                                         > Problems/Queries
                                         > Milestone
@@ -123,7 +127,7 @@ class Listener:
                                         Once you have created a ticket by clicking the button, you will be linked to your ticket\n
                                         The bot will ask you to choose the reason behind the creation of your ticket from a given list. Choose the appropriate reason and then proceed!\n
                                         Once you have created your ticket, staff will respond within 24 hours.""",
-                            color=neutral_color)
+                              color=neutral_color)
         embed.add_field(name="Do-not-kick-list Application",
                         value="You  must have a valid reason for applying and also meet the DNKL requiremnets.\n"
                               "Accepted Reasons:\n"
@@ -156,7 +160,8 @@ class Listener:
         class TicketView(View):
             def __init__(self):
                 super().__init__()
-                self.add_item(Button(label="Create Ticket", custom_id="tickets", style=discord.ButtonStyle.blurple, emoji="✉️"))
+                self.add_item(Button(label="Create Ticket", custom_id="tickets",
+                              style=discord.ButtonStyle.blurple, emoji="✉️"))
 
         return image, embed, TicketView()
 
@@ -169,19 +174,20 @@ class Listener:
 
         # Reaction roles
         elif self.obj.data["custom_id"] in reaction_roles.keys():
-            role = discord.utils.get(self.obj.guild.roles, name=self.obj.data["custom_id"])
+            role = discord.utils.get(
+                self.obj.guild.roles, name=self.obj.data["custom_id"])
             if role in self.obj.user.roles:
                 await self.obj.user.remove_roles(role)
                 await self.obj.response.send_message(f"Removed {role.name} role from you.", ephemeral=True)
             else:
                 await self.obj.user.add_roles(role)
                 await self.obj.response.send_message(f"Added {role.name} role to you.", ephemeral=True)
-            
+
         # Pronouns
         elif self.obj.data["custom_id"] == "pronouns":
             label = self.obj.data["values"][0] if self.obj.data["values"] else None
             await self.obj.user.remove_roles(*[discord.utils.get(self.obj.guild.roles, name=k) for k in pronoun_roles.keys()])
-            
+
             # User selected none, remove all roles
             if label == None:
                 await self.obj.response.send_message(content=f"Removed all pronoun roles!")

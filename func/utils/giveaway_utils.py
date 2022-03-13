@@ -11,7 +11,8 @@ from func.utils.consts import neutral_color
 from func.utils.db_utils import select_one, select_all, set_giveaway_inactive, connect_db
 from func.utils.request_utils import get_mojang_profile
 
-async def roll_giveaway(message_id: int, reroll_target: int=None):
+
+async def roll_giveaway(message_id: int, reroll_target: int = None):
     # Fetch data
     channel_id, prize, number_winners, time_of_finish, req_gexp, all_roles_required, req_roles, sponsors = await select_one("SELECT channel_id, prize, number_winners, time_of_finish, required_gexp, all_roles_required, required_roles, sponsors FROM giveaways WHERE message_id = (?)", (message_id,))
     req_roles = [int(role) for role in req_roles.split(" ")]
@@ -19,10 +20,11 @@ async def roll_giveaway(message_id: int, reroll_target: int=None):
     # Channel and message vars
     channel: discord.TextChannel = bot.get_channel(channel_id)
     message: discord.Message = await channel.fetch_message(message_id)
-    
+
     # Only fetch 🎉 reaction
     for reaction in message.reactions:
-        if str(reaction.emoji) != "🎉": continue
+        if str(reaction.emoji) != "🎉":
+            continue
 
         # Set vars
         if reroll_target:
@@ -61,19 +63,20 @@ async def roll_giveaway(message_id: int, reroll_target: int=None):
 
                 # Player meets gexp req
                 if weekly_exp and weekly_exp >= req_gexp:
-                    winners.append(winner)  
+                    winners.append(winner)
                 entrants.remove(winner)
                 continue
-            
+
             # By default, that user is a winner
             winners.append(winner)
-        
+
         # Create announcement
         announcement = ",".join([user.mention for user in winners])
         await channel.send(f"🎉 Congratulations {announcement} you won the giveaway for {prize}!\nMake a ticket to claim!")
 
         # Edit embed
-        embed = discord.Embed(title=prize, description=f"Winners: {announcement}\nSponsored by: {sponsors}", color=neutral_color)
+        embed = discord.Embed(
+            title=prize, description=f"Winners: {announcement}\nSponsored by: {sponsors}", color=neutral_color)
         embed.set_footer(text=f"This giveaway ended at  {time_of_finish}")
         return await message.edit(embed=embed)
 
@@ -98,6 +101,7 @@ async def check_giveaways():
         elif not is_active and datetime.utcnow() > time_of_finish + timedelta(days=10):
             await bot.db.execute("DELETE FROM Giveaways WHERE message_id = (?)", (message_id,))
             await bot.db.commit()
+
 
 @check_giveaways.before_loop
 async def before_giveaway_check():

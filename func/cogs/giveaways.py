@@ -23,7 +23,7 @@ class Giveaways(commands.Cog, name="giveaways"):
 
     @commands.command(aliases=["greroll", "reroll"])
     @commands.has_role("Giveaway Creator")
-    async def giveawayreroll(self, ctx, message_ID: int, reroll_number: int=None):
+    async def giveawayreroll(self, ctx, message_ID: int, reroll_number: int = None):
         """Rerolls the giveaway with the given message ID!"""
         res = await Integer(integer=message_ID).giveawayreroll(reroll_number)
         if res != None:
