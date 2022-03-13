@@ -43,13 +43,28 @@ pos_color = 0x00A86B
 neutral_color = 0x8368ff
 error_color = 0xDE3163
 
+# Pronoun roles
+reaction_roles = {
+    "Skyblock": "🪓",
+    "Minigames": "🕹",
+    "QOTD Ping": "❓",
+    "Giveaways/Events": "🎉",
+    "Storytimes": "📖",
+}
+
+pronoun_roles = {
+    "He/Him": "👨",
+    "She/Her": "👩",
+    "They/Them": "🏳️‍🌈",
+    "Other": "❓",
+}
+
 # General embeds
 registration_embed = discord.Embed(title=f"Welcome to the {guild_handle} Discord!",
                     description="Before you can view the server, please register with your Minecraft username.",
-                    color=neutral_color)\
-                        .add_field(name="To register use the following command:",
-                                value=",register `Your Minecraft Name`\n\nExample:\n,register John",
-                                inline=False)
+                    color=neutral_color).add_field(name="To register use the following command:",
+                                                    value=",register `Your Minecraft Name`\n\nExample:\n,register John",
+                                                    inline=False)
 
 staff_impersonation_embed = discord.Embed(title="Staff impersonation is a punishable offense!",
                                         color=neg_color)

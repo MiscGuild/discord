@@ -9,8 +9,9 @@ from discord.ui import Button, Select, View
 from func.utils.consts import (error_channel_id, invalid_command_embed,
                                member_not_found_embed,
                                missing_permissions_embed, missing_role_embed,
-                               neutral_color, not_owner_embed,
-                               registration_channel_id, registration_embed)
+                               neutral_color, not_owner_embed, pronoun_roles,
+                               reaction_roles, registration_channel_id,
+                               registration_embed)
 from func.utils.discord_utils import create_ticket
 from func.utils.request_utils import get_jpg_file
 
@@ -83,67 +84,25 @@ class Listener:
 
         class ReactionRoleButton(Button):
             def __init__(self, label: str, emoji: str):
-                super().__init__(label=label, emoji=emoji)
-
-            async def callback(self, interaction: discord.Interaction):
-                if not isinstance(interaction.user, discord.Member): return
-
-                role = discord.utils.get(interaction.guild.roles, name=self.label)
-                if role in interaction.user.roles:
-                    await interaction.user.remove_roles(role, reason="Pressed Button, removed role")
-                    await interaction.response.send_message(f"Removed {self.label} role from you.", ephemeral=True)
-                else:
-                    await interaction.user.add_roles(role, reason="Pressed Button, added role")
-                    await interaction.response.send_message(f"Added {self.label} role to you.", ephemeral=True)
+                super().__init__(label=label, custom_id=label, emoji=emoji)
 
         class ReactionRolesView(View):
             def __init__(self):
                 super().__init__()
 
-                for name, emoji, in [["Skyblock", "🪓",],
-                                    ["Minigames", "🕹"],
-                                    ["QOTD Ping", "❓"],
-                                    ["Giveaways/Events", "🎉"],
-                                    ["Storytimes", "📖"]]:
-                    self.add_item(ReactionRoleButton(name, emoji))
+                # Add all buttons
+                for k, v, in reaction_roles.items():
+                    self.add_item(ReactionRoleButton(k, v))
 
         # Pronouns
         pronouns_embed = discord.Embed(title="Please select your pronouns",
-                                        description="👨 He/Him"
-                                                    "\n👩 She/Her"
-                                                    "\n🏳‍🌈 They/Them"
-                                                    "\n❓ Other",
+                                        description="".join([k + v + "\n" for k, v in pronoun_roles.items()]),
                                         color=neutral_color)
 
         class PronounsSelect(Select):
             def __init__(self):
-                super().__init__(placeholder="Select your pronouns (Max 1)", min_values=1, max_values=1, options=[
-                    discord.SelectOption(label="He/Him", emoji="👨"),
-                    discord.SelectOption(label="She/Her", emoji="👩"),
-                    discord.SelectOption(label="They/Them", emoji="🏳️‍🌈"),
-                    discord.SelectOption(label="Other", emoji="❓"),
-                ])
-
-            async def callback(self, interaction: discord.Interaction):
-                if not isinstance(interaction.user, discord.Member): return
-                label = list(interaction.data.values())[0][0] if interaction.data.values() else None
-                
-                # User selected none, remove all roles
-                if label == None:
-                    await interaction.user.remove_roles(*[discord.utils.get(interaction.guild.roles, name=item.label) for item in self.options])
-                    await interaction.respond(content=f"Removed all pronoun roles!")
-                else:
-                    # Fetch role
-                    role = discord.utils.get(interaction.guild.roles, name=label)
-                    # Remove single role if user already has it
-                    if role in interaction.user.roles:
-                        await interaction.user.remove_roles(role)
-                        await interaction.respond(content=f"Removed {label}")
-                    # Add the clicked role and remove all others
-                    else:
-                        await interaction.user.remove_roles(*[discord.utils.get(interaction.guild.roles, name=item.label) for item in self.options])
-                        await interaction.user.add_roles(role)
-                        await interaction.respond(content=f"Added {label}")
+                options = [discord.SelectOption(label=k, emoji=v) for k, v in pronoun_roles.items()]
+                super().__init__(placeholder="Select your pronouns (Max 1)", min_values=1, max_values=1, options=options, custom_id="pronouns")
 
         pronouns_view = View(timeout=10.0)
         pronouns_view.add_item(PronounsSelect())
@@ -202,6 +161,37 @@ class Listener:
         return image, embed, TicketView()
 
     async def on_interaction(self):
+        self.obj: discord.Interaction
+        # Ticket creation
         if self.obj.data["custom_id"] == "tickets":
             ticket = await create_ticket(self.obj.user, f"ticket-{self.obj.user.name}")
             await self.obj.response.send_message(f"Click the following link to go to your ticket! <#{ticket.id}>", ephemeral=True)
+
+        # Reaction roles
+        elif self.obj.data["custom_id"] in reaction_roles.keys():
+            role = discord.utils.get(self.obj.guild.roles, name=self.obj.data["custom_id"])
+            if role in self.obj.user.roles:
+                await self.obj.user.remove_roles(role)
+                await self.obj.response.send_message(f"Removed {role.name} role from you.", ephemeral=True)
+            else:
+                await self.obj.user.add_roles(role)
+                await self.obj.response.send_message(f"Added {role.name} role to you.", ephemeral=True)
+            
+        # Pronouns
+        elif self.obj.data["custom_id"] == "pronouns":
+            label = self.obj.data["values"][0] if self.obj.data["values"] else None
+            await self.obj.user.remove_roles(*[discord.utils.get(self.obj.guild.roles, name=k) for k in pronoun_roles.keys()])
+            
+            # User selected none, remove all roles
+            if label == None:
+                await self.obj.response.send_message(content=f"Removed all pronoun roles!")
+            else:
+                # Fetch role
+                role = discord.utils.get(self.obj.guild.roles, name=label)
+                # Remove single role if user already has it
+                if role in self.obj.user.roles:
+                    await self.obj.response.send_message(content=f"Removed {label}", ephemeral=True)
+                # Add the clicked role and remove all others
+                else:
+                    await self.obj.user.add_roles(role)
+                    await self.obj.response.send_message(content=f"Added {label}")
