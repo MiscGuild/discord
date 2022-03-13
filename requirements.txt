@@ -4,7 +4,7 @@ async-timeout==3.0.1
 attrs==21.2.0
 certifi==2021.5.30
 chardet==4.0.0
-DateTime==4.3
+DateTime==4.4
 pycord==0.0.1
 idna==3.2
 multidict==5.1.0
