@@ -18,6 +18,9 @@ async def get_json_response(url: str):
             resp = await resp.json(content_type=None)
             await session.close()
 
+    if resp == None:
+        return None
+
     # Check for invalid API keys
     if "cause" in resp and resp["cause"] == "Invalid API key":
         bot.get_channel(error_channel_id).send(f"WARNING: The API key {re.search(r'(?<=key=)(.*?)(?=&)', url).group(0)} is invalid!")
