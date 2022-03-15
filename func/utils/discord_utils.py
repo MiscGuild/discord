@@ -251,10 +251,10 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                             # Send embed and end loop
                             await ticket.send(embed=embed)
             if option == "Other":
-                await ticket.edit(name=f"other-{ign}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories["dnkl"]))
-                await ticket.send(embed=discord.Embed(title="This ticket has been created for an unkown reason!", 
-                                                                    description="Please specify why you have created this ticket!",
-                                                                    color=neutral_color))
+                await ticket.edit(name=f"other-{ign}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories["OTHER"]))
+                await ticket.send(embed=discord.Embed(title="This ticket has been created for an unkown reason!",
+                                                      description="Please specify why you have created this ticket!",
+                                                      color=neutral_color))
             
 
     # Create view and embed, send to ticket
