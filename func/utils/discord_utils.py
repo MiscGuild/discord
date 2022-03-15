@@ -65,7 +65,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
             # Add milestone, DNKL application, staff application, GvG application if user is a member
             if bot.member_role in user.roles:
                 self.add_option(label="Register a milestone", emoji="🏆")
-                self.add_option(label="Do-not-kick-list application", emoji="🚫")
+                self.add_option(label="Do-not-kick-list application", emoji="<:dnkl:877657298703634483>")
                 self.add_option(label="Staff application", emoji="🤵")
                 self.add_option(label="GvG Team application", emoji="⚔️")
 
