@@ -145,8 +145,7 @@ class Func:
             elif name in ally_names:
                 # Get player gtag
                 guild = await get_player_guild(uuid)
-                gtag = " " if len(
-                    guild["guild"]) < 2 or not guild["tag"] else guild["tag"]
+                gtag = " " if len(guild["guild"]) < 2 or not guild["tag"] else guild["tag"]
 
                 # Set nick
                 if not member.nick or gtag not in member.nick:
