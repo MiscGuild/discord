@@ -6,7 +6,7 @@ certifi==2021.10.8
 chardet==4.0.0
 charset-normalizer==2.0.12
 chat-exporter==1.6.2
-DateTime==4.3
+DateTime==4.4
 emoji==1.7.0
 grapheme==0.6.0
 idna==3.2
