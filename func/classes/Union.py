@@ -243,4 +243,4 @@ class Union:
     async def avatar(self):
         embed = discord.Embed(
             title=f"{self.user}'s avatar:", color=neutral_color)
-        return embed.set_image(url=self.user.avatar_url)
+        return embed.set_image(url=self.user.avatar)

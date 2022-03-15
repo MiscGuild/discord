@@ -15,8 +15,10 @@ class General(commands.Cog, name="general"):
         await ctx.send(await String(string=command).source())
 
     @commands.command()
-    async def avatar(self, ctx, user: discord.User):
+    async def avatar(self, ctx, user: discord.Member = None):
         """See the avatar of a given user!"""
+        if user is None:
+            user = ctx.author
         await ctx.send(embed=await Union(user=user).avatar())
 
 
