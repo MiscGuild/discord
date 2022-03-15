@@ -11,7 +11,7 @@ from discord.ext import commands, tasks
 from discord.ui import Select, View
 from func.utils.db_utils import select_one, insert_new_dnkl, update_dnkl
 from func.utils.consts import (config, dnkl_req, gvg_requirements, neg_color,
-                               neutral_color, dnkl_channel_id, invalid_date_msg, staff_application_questions,
+                               neutral_color, dnkl_channel_id, log_channel_id, invalid_date_msg, staff_application_questions,
                                ticket_categories, unknown_ign_embed, months)
 from func.utils.minecraft_utils import get_player_gexp
 from func.utils.request_utils import get_hypixel_player, get_mojang_profile
@@ -270,7 +270,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
 
 async def log_event(title: str, description: str=None):
     embed = discord.Embed(title=title, description=description, color=neutral_color)
-    await bot.log_channel.send(embed=embed)
+    await bot.get_channel(log_channel_id).send(embed=embed)
 
 async def has_tag_perms(user: discord.User):
     return any(role in user.roles for role in bot.tag_allowed_roles)
