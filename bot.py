@@ -22,8 +22,8 @@ after_cache_ready.start()
 
 # Load extensions
 for extension in ["func.cogs.general", "func.cogs.giveaways", "func.cogs.guild", "func.cogs.hypixel",
-                    "func.cogs.listeners", "func.cogs.menus", "func.cogs.moderation", "func.cogs.staff",
-                    "func.cogs.tickets"]:
+                  "func.cogs.listeners", "func.cogs.menus", "func.cogs.moderation", "func.cogs.staff",
+                  "func.cogs.tickets"]:
     try:
         bot.load_extension(extension)
         print(f"Loaded {extension}")
