@@ -70,7 +70,7 @@ class String:
 
         # Get guild data
         gname = guild["name"]
-        gtag = gname if not guild["tag"] else guild["tag"]
+        gtag = gname if not "tag" in guild else guild["tag"]
 
         # Find player in req
         for member in guild["members"]:
