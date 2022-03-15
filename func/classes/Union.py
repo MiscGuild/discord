@@ -102,7 +102,7 @@ class Union:
         player_data = await get_hypixel_player(ign)
 
         # Account is not linked to discord
-        if not await is_linked_discord(player_data, self.user):
+        if not await is_linked_discord(player_data, self.user) and is_fs is False:
             return discord_not_linked_embed
 
         # Initialize vars for storing changes
@@ -118,7 +118,7 @@ class Union:
         if tag and can_tag:
             tag_check_success, tag_check_reason = await check_tag(tag)
             if tag_check_success:
-                new_nick += f"[{tag}]"
+                new_nick += f" [{tag}]"
             else:
                 return tag_check_reason
 
