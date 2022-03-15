@@ -320,6 +320,8 @@ class Func:
 
             # Retrieve DNKL users so they can be filtered out
             dnkl_uuids = await select_all("SELECT uuid FROM dnkl")
+            for tuple in dnkl_uuids:
+                dnkl_uuids[dnkl_uuids.index(tuple)] = tuple[0]
 
             # Define dicts for each category of users
             to_promote, to_demote, inactive, residents = {}, {}, {}, {}
