@@ -152,9 +152,10 @@ class Union:
             roles_to_remove.extend([bot.member_role])
 
         # Create embed
-        embed = discord.Embed(title="Your nick, roles, and tag have been successfully changed!",
+        embed = discord.Embed(title=f"{ign}'s nick, roles, and tag have been successfully changed!",
                               description="If this wasn't the change you anticipated, please create a ticket!",
                               color=neutral_color)
+        embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
         embed.set_footer(text=f"• Member of {guild_name}" + "\n• Removed: " + ", ".join(
             [role.name for role in roles_to_remove]) + "\n• Added: " + ", ".join([role.name for role in roles_to_add]))
 
