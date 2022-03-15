@@ -28,7 +28,7 @@ for extension in ["func.cogs.general", "func.cogs.giveaways", "func.cogs.guild",
         bot.load_extension(extension)
         print(f"Loaded {extension}")
     except Exception as e:
-        print(f"WARNING: Failed to load extention {extension}", file=sys.stderr)
+        print(f"WARNING: Failed to load extension {extension}", file=sys.stderr)
         print(e)
 
 # Run bot
