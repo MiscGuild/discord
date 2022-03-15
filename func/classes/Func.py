@@ -328,17 +328,20 @@ class Func:
             for member in guild_data["members"]:
                 uuid = member["uuid"]
 
-                # Remove dnkl users from list
-                if uuid in dnkl_uuids:
-                    continue
-
                 # Gather data
                 guild_rank = member["rank"]
+                if uuid in dnkl_uuids:
+                    guild_rank = "DNKL"
                 weekly_exp = sum(member["expHistory"].values())
                 name = await get_name_by_uuid(uuid)
-                name += f"[{guild_rank}]\n" + \
-                    str(datetime.fromtimestamp(
-                        int(str(member["joined"])[:-3])))[0:10]
+                name += f" [{guild_rank}]\n" + \
+                        str(datetime.fromtimestamp(
+                            int(str(member["joined"])[:-3])))[0:10]
+                guild_rank = member["rank"]
+                # Remove dnkl users from list
+
+
+
 
                 # Members who need to be promoted
                 if guild_rank == "Member" and weekly_exp >= active_req:
