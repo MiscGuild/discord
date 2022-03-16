@@ -1,5 +1,3 @@
-# The following file contains: get_player_gexp, get_graph_color_by_rank
-
 import math
 import re
 

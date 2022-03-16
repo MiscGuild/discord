@@ -1,5 +1,3 @@
-# The following file includes: name_grabber, log_event, has_tag_perms, check_tag, get_giveaway_status, roll_giveaway
-
 from datetime import datetime, timedelta
 from io import BytesIO
 

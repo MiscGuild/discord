@@ -1,5 +1,3 @@
-# This file contains all db-related functions for inserting, updating, deleting rows etc
-
 from typing import Tuple
 
 import aiosqlite

@@ -1,4 +1,4 @@
-# The following file contains: on_member_join, on_error, on_command_error, reactionroles, tickets
+# The following file contains: on_member_join, on_error, on_command_error, reactionroles, tickets, on_interaction
 
 import traceback
 
