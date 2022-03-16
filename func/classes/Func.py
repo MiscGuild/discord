@@ -513,11 +513,11 @@ class Func:
             # Wait for answer and check for cancellation
             required_roles = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
             required_roles = re.sub(r"\s+", "", required_roles.content)
-            if required_roles == "cancel":
+            if required_roles.lower() == "cancel":
                 return "Giveaway cancelled!"
 
             # Check if user wants role reqs
-            if required_roles == "none":
+            if required_roles.lower() == "none":
                 required_roles = []
                 break
 
