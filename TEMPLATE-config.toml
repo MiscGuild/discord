@@ -55,7 +55,6 @@ api_keys = [
 # The names of discord ticket categories
 [ticket_categories]
 generic = ""
-registration = ""
 other = ""
 report = ""
 milestone = ""
