@@ -9,7 +9,7 @@ chat-exporter==2.1
 DateTime==4.4
 emoji==1.7.0
 grapheme==0.6.0
-idna==3.2
+idna==3.3
 multidict==6.0.2
 py-cord==2.0.0b5
 pytz==2021.3
