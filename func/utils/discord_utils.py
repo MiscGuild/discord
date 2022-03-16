@@ -6,13 +6,14 @@ from io import BytesIO
 import chat_exporter
 import discord
 from __main__ import bot
-
 from discord.ext import commands, tasks
 from discord.ui import Select, View
-from func.utils.db_utils import select_one, insert_new_dnkl, update_dnkl
-from func.utils.consts import (config, dnkl_req, gvg_requirements, neg_color,
-                               neutral_color, dnkl_channel_id, log_channel_id, invalid_date_msg, staff_application_questions,
-                               ticket_categories, unknown_ign_embed, months)
+from func.utils.consts import (config, dnkl_channel_id, dnkl_req,
+                               gvg_requirements, invalid_date_msg,
+                               log_channel_id, months, neg_color,
+                               neutral_color, staff_application_questions,
+                               ticket_categories, unknown_ign_embed)
+from func.utils.db_utils import insert_new_dnkl, select_one, update_dnkl
 from func.utils.minecraft_utils import get_player_gexp
 from func.utils.request_utils import get_hypixel_player, get_mojang_profile
 
@@ -369,9 +370,6 @@ async def after_cache_ready():
 
     from func.utils.discord_utils import name_grabber
     bot.staff_names = [await name_grabber(member) for member in bot.staff.members]
-
-    # Initialise chat_exporter
-    chat_exporter.init_exporter(bot)
 
     # Set help command
     class HelpCommand(commands.MinimalHelpCommand):
