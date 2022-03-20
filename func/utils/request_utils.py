@@ -51,13 +51,12 @@ async def get_hypixel_player(name: str):
 
 async def get_name_by_uuid(uuid: str):
     resp = await get_json_response(f"https://api.mojang.com/user/profiles/{uuid}/names")
-
     # If player and request is valid
     if resp and "error" not in resp:
         return resp[-1]["name"]
     
     # Player does not exist
-    return None
+    return resp['error']
 
 def session_get_name_by_uuid(session, uuid):
     with session.get(f"https://sessionserver.mojang.com/session/minecraft/profile/{uuid}") as resp:
@@ -65,7 +64,6 @@ def session_get_name_by_uuid(session, uuid):
 
         if resp.status_code != 200:
             return None
-
         return data["name"]
 
 async def get_player_guild(uuid):
