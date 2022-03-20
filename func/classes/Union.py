@@ -192,7 +192,7 @@ class Union:
                 return discord_not_linked_embed
 
             guild_data = None if "guild" not in player_data else player_data["guild"]
-            guild_name = "Unkown Guild" if guild_data == None else guild_data["name"]
+            guild_name = "Unknown Guild" if guild_data is None else guild_data["name"]
 
             # User is a member
             if guild_name == guild_handle:
