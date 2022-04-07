@@ -112,7 +112,7 @@ class Func:
         for _set in [[guild_uuids, guild_names], [ally_uuids, ally_names]]:
             draw, dump = _set
             async with aiohttp.ClientSession():
-                tasks = await gather_with_concurrency(5,
+                tasks = await gather_with_concurrency(3,
                                                       *[
                                                           get_name_by_uuid(uuid) for uuid in draw
                                                       ])    # Gathering with a max concurrency of 5
