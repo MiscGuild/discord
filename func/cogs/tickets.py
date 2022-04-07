@@ -82,7 +82,7 @@ class Tickets(commands.Cog, name="tickets"):
         # Get result and send file if it is returned
         embed, file = await Func.deny(ctx, channel)
         await channel.send(embed=embed)
-        if file != None:
+        if file:
             return await channel.send(file=file)
 
     @commands.command()

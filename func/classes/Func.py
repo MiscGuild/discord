@@ -132,7 +132,7 @@ class Func:
             # Get player data
             name, uuid = await get_mojang_profile(name)
             # Player does not exist
-            if name is None:
+            if not name:
                 # Edit roles and continue loop
                 await member.remove_roles(bot.member_role, bot.ally)
                 await member.add_roles(bot.new_member_role)

@@ -39,7 +39,7 @@ async def get_color_by_gexp(rank: str, weekly_gexp: int):
         return 0xff6464, "rgba(255, 100, 100,0.3)", "rgba(255, 100, 100,0.3)"
 
 async def get_hypixel_player_rank(player_data: dict):
-    if player_data == None:
+    if not player_data:
         return None, None
 
     if "prefix" in player_data and player_data["prefix"] in ["§d[PIG§b+++§d]", "§c[SLOTH]", "§c[OWNER]"]:
