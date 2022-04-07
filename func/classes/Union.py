@@ -13,7 +13,7 @@ from func.utils.consts import (registration_channel_id, active_req, allies, bot_
 from func.utils.discord_utils import (
     create_ticket, check_tag, has_tag_perms, is_linked_discord)
 from func.utils.request_utils import (
-    get_gtag, get_hypixel_player, get_mojang_profile)
+    get_gtag, get_hypixel_player, get_mojang_profile, get_player_guild)
 
 
 class Union:
@@ -22,8 +22,8 @@ class Union:
 
     async def mute(self, author, guild_roles, reason: str = None):
         # Default reason is responsible moderator
-        if reason == None:
-            reason == f"Responsible moderator: {author}"
+        if not reason:
+            reason = f"Responsible moderator: {author}"
 
         await self.user.add_roles(discord.utils.get(guild_roles, name="Muted"))
         return discord.Embed(title="Muted!", description=f"{self.user} was muted by {author}!", color=neg_color)
@@ -177,22 +177,22 @@ class Union:
 
             ign, uuid = await get_mojang_profile(name)
 
-            if ign == None:
+            if not ign:
                 return unknown_ign_embed
 
             # Filter out people impersonating staff
             if ign in bot.staff_names:
                 return staff_impersonation_embed
 
-            # Fetch player data
+            # Fetch player & guild data
             player_data = await get_hypixel_player(ign)
+            guild_data = await get_player_guild(uuid)
 
             # Account is not linked to discord
             if not await is_linked_discord(player_data, self.user):
                 return discord_not_linked_embed
 
-            guild_data = None if "guild" not in player_data else player_data["guild"]
-            guild_name = "Unknown Guild" if not guild_data else guild_data["name"]
+            guild_name = "an Unknown Guild" if not guild_data else guild_data["name"]
 
             # User is a member
             if guild_name == guild_handle:

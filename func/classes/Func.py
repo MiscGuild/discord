@@ -133,7 +133,7 @@ class Func:
             # Player does not exist
             if not name:
                 # Edit roles and continue loop
-                await member.remove_roles(bot.member_role, bot.ally)
+                await member.remove_roles(bot.member_role, bot.ally, bot.guest)
                 await member.add_roles(bot.new_member_role)
                 continue
 
