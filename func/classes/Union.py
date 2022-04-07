@@ -98,8 +98,9 @@ class Union:
         elif ign in bot.staff_names and bot.staff not in self.user.roles:
             return staff_impersonation_embed
 
-        # Fetch player data
+        # Fetch player & guild data
         player_data = await get_hypixel_player(ign)
+        guild_data = await get_player_guild(uuid)
 
         # Account is not linked to discord
         if not await is_linked_discord(player_data, self.user) and is_fs is False:
@@ -110,7 +111,6 @@ class Union:
         roles_to_remove = []
         new_nick = ign
 
-        guild_data = None if "guild" not in player_data else player_data["guild"]
         guild_name = "no guild" if not guild_data else guild_data["name"]
         can_tag = await has_tag_perms(self.user)
 
