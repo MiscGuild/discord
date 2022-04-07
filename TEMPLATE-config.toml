@@ -18,6 +18,7 @@ dnkl_channel = XXXXXXXXXXXXXXXXXX
 ticket_channel = XXXXXXXXXXXXXXXXXX
 log_channel = XXXXXXXXXXXXXXXXXX
 registration_channel = XXXXXXXXXXXXXXXXXX
+staff_announcements = XXXXXXXXXXXXXXXXXX
 partner_channel = XXXXXXXXXXXXXXXXXX
 
 # The name of your Hypixel guild

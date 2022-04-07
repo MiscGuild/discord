@@ -106,7 +106,7 @@ class Listener:
                 options = [discord.SelectOption(
                     label=k, emoji=v) for k, v in pronoun_roles.items()]
                 super().__init__(placeholder="Select your pronouns (Max 1)",
-                                 min_values=1, max_values=1, options=options, custom_id="pronouns")
+                                 min_values=0, max_values=1, options=options, custom_id="pronouns")
 
         pronouns_view = View(timeout=10.0)
         pronouns_view.add_item(PronounsSelect())
@@ -200,4 +200,4 @@ class Listener:
                 # Add the clicked role and remove all others
                 else:
                     await self.obj.user.add_roles(role)
-                    await self.obj.response.send_message(content=f"Added {label}")
+                    await self.obj.response.send_message(content=f"Added {label}", ephemeral=True)
