@@ -19,7 +19,7 @@ async def get_json_response(url: str):
             resp = await resp.json(content_type=None)
             await session.close()
 
-    if resp == None:
+    if not resp:
         return None
 
     # Check for invalid API keys
@@ -99,7 +99,7 @@ async def get_guild_by_name(name):
 
 async def get_guild_uuids(guild_name: str):
     resp = await get_guild_by_name(guild_name)
-    if resp == None:
+    if not resp:
         return None
     return [member["uuid"] for member in resp["members"]]
 
