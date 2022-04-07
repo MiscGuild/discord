@@ -117,7 +117,6 @@ class Func:
                                                           get_name_by_uuid(uuid) for uuid in draw
                                                       ])    # Gathering with a max concurrency of 5
             dump.extend(tasks)
-        print(ally_names)
         # Loop through discord members
         await ctx.send("If you see the bot is stuck on a member along with an error message, forcesync member the bot is stuck on.")
         bot.admin_ids = [member.id for member in bot.admin.members]
@@ -145,7 +144,7 @@ class Func:
                 await member.remove_roles(bot.new_member_role, bot.guest, bot.ally)
 
 
-            # Member of allied guild
+            # Member of an ally guild
             elif name in ally_names:
                 # Get player gtag
                 position = ally_uuids.index(uuid)
