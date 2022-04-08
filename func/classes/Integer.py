@@ -69,7 +69,7 @@ class Integer:
             for i in range(10):
                 user_data = member_gexp[i]
                 name = await get_name_by_uuid(user_data[0])
-                rank, _ = await get_hypixel_player_rank(await get_hypixel_player(name))
+                rank, _ = await get_hypixel_player_rank(await get_hypixel_player(uuid=user_data[0]))
 
                 # Add new entry to image content
                 image_content += f"&6{i + 1}. {rank} {name} &2{format(user_data[1], ',d')} Guild Experience"

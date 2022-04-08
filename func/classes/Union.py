@@ -99,7 +99,7 @@ class Union:
             return staff_impersonation_embed
 
         # Fetch player & guild data
-        player_data = await get_hypixel_player(ign)
+        player_data = await get_hypixel_player(uuid=uuid)
         guild_data = await get_player_guild(uuid)
 
         # Account is not linked to discord
@@ -185,7 +185,7 @@ class Union:
                 return staff_impersonation_embed
 
             # Fetch player & guild data
-            player_data = await get_hypixel_player(ign)
+            player_data = await get_hypixel_player(uuid=uuid)
             guild_data = await get_player_guild(uuid)
 
             # Account is not linked to discord

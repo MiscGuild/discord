@@ -18,7 +18,7 @@ class Giveaways(commands.Cog, name="giveaways"):
     async def giveawayend(self, ctx, message_ID: int):
         """Ends the giveaway with the given message ID!"""
         res = await Integer(integer=message_ID).giveawayend()
-        if res != None:
+        if res:
             await ctx.send(res)
 
     @commands.command(aliases=["greroll", "reroll"])
@@ -26,7 +26,7 @@ class Giveaways(commands.Cog, name="giveaways"):
     async def giveawayreroll(self, ctx, message_ID: int, reroll_number: int = None):
         """Rerolls the giveaway with the given message ID!"""
         res = await Integer(integer=message_ID).giveawayreroll(reroll_number)
-        if res != None:
+        if res:
             await ctx.send(res)
 
     @commands.command(aliases=["glist"])

@@ -148,7 +148,7 @@ class String:
                 return embed.set_image(url=chart.get_url())
 
     async def info(self):
-        player_data = await get_hypixel_player(self.string)
+        player_data = await get_hypixel_player(name=self.string)
         # Player doesn't exist
         if not player_data:
             return unknown_ign_embed
