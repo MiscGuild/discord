@@ -42,9 +42,12 @@ async def get_mojang_profile(name: str):
     return None, None
 
 
-async def get_hypixel_player(name: str):
+async def get_hypixel_player(name: str = None, uuid: str = None):
     api_key = await get_hyapi_key()
-    resp = await get_json_response(f"https://api.hypixel.net/player?key={api_key}&name={name}")
+    if name:
+        resp = await get_json_response(f"https://api.hypixel.net/player?key={api_key}&name={name}")
+    else:
+        resp = await get_json_response(f"https://api.hypixel.net/player?key={api_key}&uuid={uuid}")
 
     # Player doesn't exist
     if "player" not in resp or not resp["player"]:
