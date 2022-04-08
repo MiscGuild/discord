@@ -19,7 +19,7 @@ class Integer:
         status, = await get_giveaway_status(self.integer)
 
         # Giveaway does not exist
-        if status == None:
+        if not status:
             return "This giveaway doesn't seem to exist!\n`Either it never existed, or its data was deleted after 10 days of disuse.`"
 
         # Giveaway exists
@@ -32,7 +32,7 @@ class Integer:
         status, = await get_giveaway_status(self.integer)
 
         # Giveaway does not exist
-        if status == None:
+        if not status:
             return "This giveaway doesn't seem to exist!\n`Either it never existed, or its data was deleted after 10 days of disuse.`"
 
         # Giveaway exists
@@ -48,14 +48,14 @@ class Integer:
         await ctx.message.delete()
         async with ctx.channel.typing():
             guild_data = await get_guild_by_name(guild_handle)
-            if guild_data == None:
+            if not guild_data:
                 return invalid_guild_embed
 
             member_gexp = {}
             date = None
             # Loop through all members to find top 10
             for member in guild_data["members"]:
-                if date == None:
+                if not date:
                     date = list(member["expHistory"].keys())[self.integer]
                 member_gexp[member["uuid"]] = list(
                     member["expHistory"].values())[self.integer]
