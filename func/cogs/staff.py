@@ -33,7 +33,7 @@ class Staff(commands.Cog, name="staff"):
         """Send a progress update and review for staff members!"""
         res = await Func.staffreview(ctx)
         # Result may be empty
-        if res != None:
+        if res:
             await bot.staff_announcements.send(embed=res)
 
     @commands.command()

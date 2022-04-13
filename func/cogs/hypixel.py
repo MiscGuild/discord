@@ -22,7 +22,7 @@ class Hypixel(commands.Cog, name="hypixel"):
     @commands.command()
     async def info(self, ctx, name: str = None):
         """View Hyipxel stats of the given user!"""
-        if name == None:
+        if not name:
             name = await name_grabber(ctx.author)
         await ctx.send(embed=await String(string=name).info())
 
@@ -50,7 +50,7 @@ class Hypixel(commands.Cog, name="hypixel"):
     @commands.command(aliases=["dnklchk"])
     async def dnklcheck(self, ctx, name: str = None):
         """Check whether you are eligible for the do-not-kick-list!"""
-        if name == None:
+        if not name:
             name = await name_grabber(ctx.author)
 
         res = await String(string=name).dnklcheck()

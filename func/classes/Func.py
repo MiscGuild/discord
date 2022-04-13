@@ -2,11 +2,10 @@
 
 import asyncio
 import re
-from concurrent.futures import ThreadPoolExecutor
+import aiohttp
 from datetime import datetime, timedelta
 
 import discord
-import requests
 from __main__ import bot
 from func.utils.consts import (accepted_staff_application_embed, active_req,
                                allies, error_color, guild_handle,
@@ -22,8 +21,7 @@ from func.utils.minecraft_utils import get_hypixel_player_rank
 from func.utils.request_utils import (get_guild_by_name, get_guild_uuids,
                                       get_hypixel_player, get_jpg_file,
                                       get_mojang_profile, get_name_by_uuid,
-                                      get_player_guild,
-                                      session_get_name_by_uuid)
+                                      get_player_guild)
 
 
 class Func:
@@ -32,7 +30,7 @@ class Func:
             # Get guild data
             guild_data = await get_guild_by_name(guild_handle)
 
-            if guild_data == None:
+            if not guild_data:
                 return invalid_guild_embed
 
             member_gexp = {}
@@ -51,7 +49,7 @@ class Func:
             for i in range(10):
                 user_data = member_gexp[i]
                 name = await get_name_by_uuid(user_data[0])
-                rank, _ = await get_hypixel_player_rank(await get_hypixel_player(name))
+                rank, _ = await get_hypixel_player_rank(await get_hypixel_player(uuid=user_data[0]))
 
                 # Add new entry to image content
                 url += f"&6{i + 1}. {rank} {name} &2{format(user_data[1], ',d')} Guild Experience"
@@ -89,34 +87,38 @@ class Func:
 
         # Define arrays for guild and ally uuids and names
         guild_uuids = await get_guild_uuids(guild_handle)
-        guild_names, ally_names, ally_uuids = [], [], []
+        guild_names, ally_names, ally_uuids, ally_divisions = [], [], [], []
 
+        # Appending UUIDs of members of all ally guilds into one array
         for ally in allies:
             await progress_message.edit(content=f"Fetching ally UUIDs - {ally}")
             ally_uuids.extend(await get_guild_uuids(ally))
+            req = await get_player_guild(ally_uuids[-1])
+            gtag = " " if not req["tag"] or not req else req["tag"]
+            ally_divisions.append([len(ally_uuids), gtag])  # Ally divisions marks the separation point of one guild from another in the ally_uuids array along with the guild's gtag
 
-        # Get guild and ally names
+        # Limiting the maximum concurrency
+        async def gather_with_concurrency(n, *tasks):
+            semaphore = asyncio.Semaphore(n)
+
+            async def sem_task(task):
+                async with semaphore:
+                    return await task
+
+            return await asyncio.gather(*(sem_task(task) for task in tasks))
+
+        # Get guild and ally names from their respective UUIDs
         await progress_message.edit(content="Retrieving names...")
         for _set in [[guild_uuids, guild_names], [ally_uuids, ally_names]]:
             draw, dump = _set
-            with ThreadPoolExecutor(max_workers=10) as executor:
-                with requests.Session() as session:
-                    # Set session params before calling fetch
-                    loop = asyncio.get_event_loop()
-                    tasks = [
-                        # Pass multiple args to fetch
-                        loop.run_in_executor(
-                            executor,
-                            session_get_name_by_uuid,
-                            *(session, uuid)
-                        )
-                        for uuid in draw
-                    ]
-                    for response in await asyncio.gather(*tasks):
-                        dump.append(response)
-
-        # Loop through discord members, send warning message
-        await ctx.send("If you see the bot is stuck on a member, forcesync that user in the event of an error.")
+            async with aiohttp.ClientSession():
+                tasks = await gather_with_concurrency(3,
+                                                      *[
+                                                          get_name_by_uuid(uuid) for uuid in draw
+                                                      ])    # Gathering with a max concurrency of 5
+            dump.extend(tasks)
+        # Loop through discord members
+        await ctx.send("If you see the bot is stuck on a member along with an error message, forcesync member the bot is stuck on.")
         bot.admin_ids = [member.id for member in bot.admin.members]
         for member in bot.guild.members:
             # Do not check admins and bots
@@ -129,9 +131,9 @@ class Func:
             # Get player data
             name, uuid = await get_mojang_profile(name)
             # Player does not exist
-            if name == None:
+            if not name:
                 # Edit roles and continue loop
-                await member.remove_roles(bot.member_role, bot.ally)
+                await member.remove_roles(bot.member_role, bot.ally, bot.guest)
                 await member.add_roles(bot.new_member_role)
                 continue
 
@@ -141,15 +143,23 @@ class Func:
                 await member.add_roles(bot.member_role)
                 await member.remove_roles(bot.new_member_role, bot.guest, bot.ally)
 
-            # Member of allied guild
+
+            # Member of an ally guild
             elif name in ally_names:
                 # Get player gtag
-                guild = await get_player_guild(uuid)
-                gtag = " " if len(guild["guild"]) < 2 or not guild["tag"] else guild["tag"]
+                position = ally_uuids.index(uuid)
+                last_value = 0
+                for guild_division in ally_divisions:
+                    if last_value > 0:
+                        if last_value < position < guild_division[0]:
+                            gtag = guild_division[1]
+                    elif position < guild_division[0]:
+                        gtag = guild_division[1]
+                    last_value = guild_division[0]
 
                 # Set nick
                 if not member.nick or gtag not in member.nick:
-                    await member.edit(nick=name + gtag)
+                    await member.edit(nick=name + f' [{gtag}]')
 
                 # Edit roles
                 await member.add_roles(bot.guest, bot.ally)

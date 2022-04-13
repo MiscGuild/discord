@@ -24,7 +24,7 @@ class Tickets(commands.Cog, name="tickets"):
     async def delete(self, ctx):
         """Delete a ticket!"""
         res = await Func.delete(ctx)
-        if res != None:
+        if res:
             await ctx.send(res)
 
     @commands.command()
@@ -82,7 +82,7 @@ class Tickets(commands.Cog, name="tickets"):
         # Get result and send file if it is returned
         embed, file = await Func.deny(ctx, channel)
         await channel.send(embed=embed)
-        if file != None:
+        if file:
             return await channel.send(file=file)
 
     @commands.command()
