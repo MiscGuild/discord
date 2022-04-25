@@ -11,7 +11,7 @@ emoji==1.7.0
 grapheme==0.6.0
 idna==3.3
 multidict==6.0.2
-py-cord==2.0.0b5
+py-cord==2.0.0b7
 pytz==2022.1
 quickchart.io==1.0.1
 requests==2.27.1
