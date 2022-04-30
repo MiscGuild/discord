@@ -259,7 +259,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
     # Create view and embed, send to ticket
     view = View()
     view.add_item(TicketTypeSelect())
-    embed = discord.Embed(title="What did you make this ticket?",
+    embed = discord.Embed(title="Why did you make this ticket?",
                         description="Please select your reason from the dropdown given below!",
                         color=neutral_color)
     await ticket.send(embed=embed, view=view)
