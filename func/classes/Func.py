@@ -225,7 +225,7 @@ class Func:
         await asyncio.sleep(10)
         await discord.TextChannel.delete(ctx.channel)
 
-        if transcript != None:
+        if transcript:
             # Log outcome
             await log_event(f"{ctx.channel.name} was deleted by {ctx.author}")
             await bot.get_channel(log_channel_id).send(file=transcript)
@@ -325,7 +325,7 @@ class Func:
         with ctx.channel.typing():
             # Fetch guid data
             guild_data = await get_guild_by_name(guild_handle)
-            if guild_data == None:
+            if not guild_data:
                 return invalid_guild_embed
 
             # Retrieve DNKL users so they can be filtered out
