@@ -23,8 +23,8 @@ class Guild(commands.Cog, name="guild"):
         if isinstance(res, str):
             await ctx.send(res)
 
-    @commands.command()
-    async def weeklylb(self, ctx):
+    @commands.command(aliases=['gtop', 'weeklylb'])
+    async def weekly_gexp_lb(self, ctx):
         """View the weekly gexp leaderboard!"""
         res = await Func.weeklylb(ctx)
         if isinstance(res, discord.File):

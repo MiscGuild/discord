@@ -45,26 +45,26 @@ class Func:
                                  key=lambda item: item[1], reverse=True)
 
             # Create url
-            url = "&f&lWeekly Top&r%5Cn"
+            text = "&f&lWeekly Top&r%5Cn"
             for i in range(10):
                 user_data = member_gexp[i]
                 name = await get_name_by_uuid(user_data[0])
                 rank, _ = await get_hypixel_player_rank(await get_hypixel_player(uuid=user_data[0]))
 
                 # Add new entry to image content
-                url += f"&6{i + 1}. {rank} {name} &2{format(user_data[1], ',d')} Guild Experience"
+                text += f"&6{i + 1}. {rank} {name} &2{format(user_data[1], ',d')} Guild Experience"
                 # Add new line
                 if i < 9:
-                    url += "%5Cn"
+                    text += "%5Cn"
 
             # Replace characters for URL
-            url = url.replace("+", "%2B")
-            url = url.replace("&", "%26")
-            url = url.replace(" ", "%20")
-            url = url.replace(",", "%2C")
+            text = text.replace("+", "%2B")
+            text = text.replace("&", "%26")
+            text = text.replace(" ", "%20")
+            text = text.replace(",", "%2C")
 
             # Return image
-            return await get_jpg_file(f"https://chat.miscguild.xyz/render.png?m=custom&d={url}&t=1")
+            return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
 
     async def dnkllist(ctx):
         # Fetch all rows

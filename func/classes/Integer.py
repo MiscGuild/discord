@@ -84,7 +84,7 @@ class Integer:
         image_content = image_content.replace(",", "%2C")
 
         # Return image
-        return await get_jpg_file(f"https://chat.miscguild.xyz/render.png?m=custom&d={image_content}&t=1")
+        return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={image_content}&t=1")
 
     async def purge(self, ctx, reason):
         await ctx.message.delete()

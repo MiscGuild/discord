@@ -60,7 +60,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
             # Add default options
             self.add_option(label="Report a player", emoji="🗒️")
             self.add_option(label="Query/Problem", emoji="🤔")
-            
+
             # Add milestone, DNKL application, staff application, GvG application if user is a member
             if bot.member_role in user.roles:
                 self.add_option(label="Register a milestone", emoji="🏆")
@@ -117,7 +117,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     @discord.ui.button(label="Approve", style=discord.ButtonStyle.green, emoji="✅")
                     async def approve_callback(self, _: discord.ui.Button, interaction: discord.Interaction):
                         if bot.staff not in interaction.user.roles: return
-                        msg = await bot.get_channel(dnkl_channel_id).send(embed=embed) 
+                        msg = await bot.get_channel(dnkl_channel_id).send(embed=embed)
 
                         # Check if user is already on DNKL
                         current_message = await select_one("SELECT message_id FROM dnkl WHERE uuid = (?)", (uuid,))
@@ -176,7 +176,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                 answers = {}
                 for number, question in staff_application_questions.items():
                     # Ask question and wait for answer
-                    await ticket.send(embed=discord.Embed(title=f"{number}. {question}", description="You must answer in one message.", color=neutral_color)) 
+                    await ticket.send(embed=discord.Embed(title=f"{number}. {question}", description="You must answer in one message.", color=neutral_color))
                     answer = await bot.wait_for("message", check=lambda x: x.channel == ticket and x.author == interaction.user)
 
                     # Place answer into array with question number
@@ -190,13 +190,13 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                 review_embed.set_footer(text="If you made a mistake, please notify a staff member.")
                 for number, answer in answers.items():
                     review_embed.add_field(name=f"{number}. {staff_application_questions[number]}", value=answer, inline=False)
-                
+
                 # Send embed
                 await ticket.send(embed=review_embed)
             if option == "GvG Team application":
                 # Edit channel name and category
                 await ticket.edit(name=f"gvg-application-{ign}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories["generic"]))
-                
+
                 # Fetch player data
                 player_data = await get_hypixel_player(ign)
                 if player_data == None:
@@ -216,7 +216,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                 eligibility["bedwars"] = False if bw_wins < gvg_requirements["bw_wins"] and bw_fkdr < gvg_requirements["bw_fkdr"] else True
                 eligibility["skywars"] = False if sw_wins < gvg_requirements["sw_wins"] and sw_kdr < gvg_requirements["sw_kdr"] else True
                 eligibility["duels"] = False if duels_wlr < gvg_requirements["duels_wlr"] and duels_kills < gvg_requirements["duels_kills"] else True
-                
+
                 # Polyvalent eligibility
                 if all(eligibility.values()):
                     embed = discord.Embed(title="You are eligible for the polyvalent team!", color=neutral_color)
@@ -239,7 +239,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                 else:
                     # loop through all GvG gamemodes
                     for mode, req1_name, req1, req2_name, req2 in [["bedwars", "Wins", bw_wins, "FKDR", bw_fkdr], ["skywars", "Wins", sw_wins, "KDR", sw_kdr],
-                                                                    ["duels", "WLR", duels_wlr, "Kills", duels_kills]]: 
+                                                                    ["duels", "WLR", duels_wlr, "Kills", duels_kills]]:
                         # If user is eligible for that gamemode, create embed
                         if eligibility[mode]:
                             embed = discord.Embed(title=f"You are eiligible for the {mode.capitalize()} team!", color=neutral_color)
@@ -254,7 +254,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                 await ticket.send(embed=discord.Embed(title="This ticket has been created for an unkown reason!",
                                                       description="Please specify why you have created this ticket!",
                                                       color=neutral_color))
-            
+
 
     # Create view and embed, send to ticket
     view = View()
@@ -315,7 +315,7 @@ async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, au
         if valid_date:
             break
         await channel.send(invalid_date_msg)
-        
+
 
     # Recursively ask for end date
     while True:
