@@ -105,7 +105,7 @@ class String:
                 for i in range(0, 7):
                     date = week_dict.get(i, "None")
                     gexp_history_text = gexp_history_text + \
-                        f"**▸** {date} **{format(gexp_vals[i], ',d')}**\n"
+                                        f"**▸** {date} **{format(gexp_vals[i], ',d')}**\n"
 
                 # Get graph color
                 color, graph_color, graph_border = await get_color_by_gexp(rank, weekly_gexp)

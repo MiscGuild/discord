@@ -11,8 +11,8 @@ class Guild(commands.Cog, name="guild"):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=["gm", "g"])
-    async def gmember(self, ctx, name: str = None):
+    @commands.command(aliases=["gm", "g", "gmember", "gexp"])
+    async def member_gexp(self, ctx, name: str = None):
         """View the given user's gexp over the past week!"""
         if not name:
             name = await name_grabber(ctx.author)
