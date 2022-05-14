@@ -353,7 +353,7 @@ async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, au
     while True:
         await channel.send("**What is the start date?** (YYYY/MM/DD)")
         start_date = await bot.wait_for("message", check=lambda x: x.channel == channel and x.author == author)
-        valid_date, sd, sm, sy = await is_valid_date(start_date.content)
+        valid_date, start_day, start_month, start_year = await is_valid_date(start_date.content)
         if valid_date:
             break
         await channel.send(invalid_date_msg)
@@ -362,26 +362,26 @@ async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, au
     while True:
         await channel.send("**What is the end date?** (YYYY/MM/DD)")
         end_date = await bot.wait_for("message", check=lambda x: x.channel == channel and x.author == author)
-        valid_date, ed, em, ey = await is_valid_date(end_date.content)
+        valid_date, end_day, end_month, end_year = await is_valid_date(end_date.content)
         if valid_date:
             break
         await channel.send(invalid_date_msg)
 
     # Ask for reason
-    await channel.send("**What is the reason for their inactivity?**")
+    await channel.send(f"**What is the reason for {ign}'s inactivity?**")
     reason = await bot.wait_for("message", check=lambda x: x.channel == channel and x.author == author)
     reason = reason.content
 
     # Get worded months (1 = January)
-    sm = months[sm]
-    em = months[em]
+    start_month = months[start_month]
+    end_month = months[end_month]
 
     # Create and return embed
     embed = discord.Embed(title=ign, url=f'https://plancke.io/hypixel/player/stats/{ign}', color=neutral_color)
     embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
     embed.add_field(name="IGN:", value=f"{ign}", inline=False)
-    embed.add_field(name="Start:", value=f"{sd} {sm} {sy}", inline=False)
-    embed.add_field(name="End:", value=f"{ed} {em} {ey}", inline=False)
+    embed.add_field(name="Start:", value=f"{start_day} {start_month} {start_year}", inline=False)
+    embed.add_field(name="End:", value=f"{end_day} {end_month} {end_year}", inline=False)
     embed.add_field(name="Reason", value=f"{reason}", inline=False)
 
     return embed
