@@ -32,7 +32,7 @@ class Giveaways(commands.Cog, name="giveaways"):
     @commands.command(aliases=["glist"])
     async def giveawaylist(self, ctx):
         """View all giveaway from the last 10 days!"""
-        await ctx.send(embed=await Func.giveawaylist())
+        await ctx.send(embed=await Func.giveawaylist(ctx))
 
 
 def setup(bot):

@@ -610,7 +610,7 @@ class Func:
         # Return confirmation
         return f"Ok! The giveaway has been set up in <#{destination.id}>!"
 
-    async def giveawaylist():
+    async def giveawaylist(ctx):
         all_giveaways = await select_all("SELECT prize, channel_id, message_id, number_winners, time_of_finish FROM giveaways")
 
         # There have been no recent giveaways
