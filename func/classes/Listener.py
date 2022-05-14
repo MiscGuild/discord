@@ -73,7 +73,7 @@ class Listener:
                 print("The below exception could not be sent to the error channel:")
                 print(tb)
 
-    async def reactionroles():
+    async def reactionroles(ctx):
         # Reaction roles
         reaction_roles_embed = discord.Embed(title="To get your desired role, click its respective button!",
                                              description="🪓 __**SkyBlock**__\nGives you the access to the SkyBlock category!\n\n"
@@ -113,7 +113,7 @@ class Listener:
 
         return [reaction_roles_embed, ReactionRolesView()], [pronouns_embed, pronouns_view]
 
-    async def tickets():
+    async def tickets(ctx):
         embed = discord.Embed(title="Tickets",
                               description="""Tickets can be created for any of the following reasons:
                                         > Player Report
@@ -189,7 +189,7 @@ class Listener:
             await self.obj.user.remove_roles(*[discord.utils.get(self.obj.guild.roles, name=k) for k in pronoun_roles.keys()])
 
             # User selected none, remove all roles
-            if label == None:
+            if not label:
                 await self.obj.response.send_message(content=f"Removed all pronoun roles!")
             else:
                 # Fetch role

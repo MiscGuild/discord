@@ -66,7 +66,7 @@ class Func:
             # Return image
             return await get_jpg_file(f"https://chat.miscguild.xyz/render.png?m=custom&d={url}&t=1")
 
-    async def dnkllist():
+    async def dnkllist(ctx):
         # Fetch all rows
         rows = await select_all("SELECT * FROM dnkl")
 
