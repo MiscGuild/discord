@@ -23,7 +23,7 @@ class Guild(commands.Cog, name="guild"):
         if isinstance(res, str):
             await ctx.send(res)
 
-    @commands.command(aliases=['gtop', 'weeklylb'])
+    @commands.command(aliases=['weeklylb'])
     async def weekly_gexp_lb(self, ctx):
         """View the weekly gexp leaderboard!"""
         res = await Func.weeklylb(ctx)

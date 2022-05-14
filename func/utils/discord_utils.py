@@ -5,7 +5,7 @@ import chat_exporter
 import discord
 from __main__ import bot
 from discord.ext import commands, tasks
-from discord.ui import Select, View
+import discord.ui
 from func.utils.consts import (config, dnkl_channel_id, dnkl_req,
                                gvg_requirements, invalid_date_msg,
                                log_channel_id, months, neg_color,
@@ -21,39 +21,43 @@ async def name_grabber(author: discord.User) -> str:
         return author.name
     return author.nick.split()[0]
 
+
 async def is_linked_discord(player_data: dict, user: discord.User) -> bool:
     if "socialMedia" not in player_data or "DISCORD" not in player_data["socialMedia"]["links"]:
         return False
     return player_data["socialMedia"]["links"]["DISCORD"] == str(user)
 
-async def create_ticket(user: discord.Member, ticket_name: str, category_name: str=ticket_categories["generic"]):
+
+async def create_ticket(user: discord.Member, ticket_name: str, category_name: str = ticket_categories["generic"]):
     # Create ticket
-    ticket: discord.TextChannel = await bot.guild.create_text_channel(ticket_name, category=discord.utils.get(bot.guild.categories, name=category_name))
+    ticket: discord.TextChannel = await bot.guild.create_text_channel(ticket_name,
+                                                                      category=discord.utils.get(bot.guild.categories,
+                                                                                                 name=category_name))
 
     # Set perms
     await ticket.set_permissions(bot.guild.get_role(bot.guild.id), send_messages=False,
-                                            read_messages=False)
+                                 read_messages=False)
     await ticket.set_permissions(bot.staff, send_messages=True, read_messages=True,
-                                            add_reactions=True, embed_links=True,
-                                            attach_files=True,
-                                            read_message_history=True, external_emojis=True)
+                                 add_reactions=True, embed_links=True,
+                                 attach_files=True,
+                                 read_message_history=True, external_emojis=True)
     await ticket.set_permissions(bot.helper, send_messages=True,
-                                            read_messages=True,
-                                            add_reactions=True, embed_links=True,
-                                            attach_files=True,
-                                            read_message_history=True, external_emojis=True)
+                                 read_messages=True,
+                                 add_reactions=True, embed_links=True,
+                                 attach_files=True,
+                                 read_message_history=True, external_emojis=True)
     await ticket.set_permissions(user, send_messages=True, read_messages=True,
-                                            add_reactions=True, embed_links=True,
-                                            attach_files=True,
-                                            read_message_history=True, external_emojis=True)
+                                 add_reactions=True, embed_links=True,
+                                 attach_files=True,
+                                 read_message_history=True, external_emojis=True)
     await ticket.set_permissions(bot.new_member_role, send_messages=False,
-                                            read_messages=False,
-                                            add_reactions=True, embed_links=True,
-                                            attach_files=True,
-                                            read_message_history=True, external_emojis=True)
+                                 read_messages=False,
+                                 add_reactions=True, embed_links=True,
+                                 attach_files=True,
+                                 read_message_history=True, external_emojis=True)
 
     # Send the dropdown for ticket creation
-    class TicketTypeSelect(Select):
+    class TicketTypeSelect(discord.ui.Select):
         def __init__(self):
             super().__init__()
 
@@ -64,7 +68,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
             # Add milestone, DNKL application, staff application, GvG application if user is a member
             if bot.member_role in user.roles:
                 self.add_option(label="Register a milestone", emoji="🏆")
-                self.add_option(label="Do-not-kick-list application", emoji="<:dnkl:877657298703634483>")
+                self.add_option(label="I am going to be inactive", emoji="<:dnkl:877657298703634483>")
                 self.add_option(label="Staff application", emoji="🤵")
                 self.add_option(label="GvG Team application", emoji="⚔️")
 
@@ -80,132 +84,158 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
 
             # Logic for handling ticket types
             if option == "Report a player":
-                await ticket.edit(name=f"report-{ign}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories["report"]))
+                await ticket.edit(name=f"report-{ign}", category=discord.utils.get(interaction.guild.categories,
+                                                                                   name=ticket_categories["report"]))
                 await ticket.send(embed=discord.Embed(title=f"{ign} wishes to file a player report!",
-                                                description="You are expected to provide maximum detail about the offense.\n"
-                                                            "> Username of the accused\n> Time of offense\n> Explanation of offense\n> Proof of offense\n"
-                                                            "If you wish to report a staff member, please DM the guild master or an admin.",
-                                                color=neutral_color))
+                                                      description="You are expected to provide maximum detail about the offense.\n"
+                                                                  "> Username of the accused\n> Time of offense\n> Explanation of offense\n> Proof of offense\n"
+                                                                  "If you wish to report a staff member, please DM the guild master or an admin.",
+                                                      color=neutral_color))
             if option == "Query/Problem":
-                await ticket.edit(name=f"general-{ign}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories["generic"]))
+                await ticket.edit(name=f"general-{ign}", category=discord.utils.get(interaction.guild.categories,
+                                                                                    name=ticket_categories["generic"]))
                 await ticket.send(embed=discord.Embed(title=f"{ign} has a query/problem!",
-                                        description="Please elaborate on your problem/query so that the staff team can help you out!",
-                                        color=neutral_color))
+                                                      description="Please elaborate on your problem/query so that the staff team can help you out!",
+                                                      color=neutral_color))
             if option == "Register a milestone":
-                await ticket.edit(name=f"milestone-{ign}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories["milestone"]))
+                await ticket.edit(name=f"milestone-{ign}", category=discord.utils.get(interaction.guild.categories,
+                                                                                      name=ticket_categories[
+                                                                                          "milestone"]))
                 await ticket.send(embed=discord.Embed(title=f"{ign} would like to register a milestone!",
-                                                description="Please provide a small description and proof of your milestone!\nIf your milestone is approved, it'll be included in next week's milestone post!",
-                                                color=neutral_color))
-            if option == "Do-not-kick-list application":
+                                                      description="Please provide a small description and proof of your milestone!\nIf your milestone is approved, it'll be included in next week's milestone post!",
+                                                      color=neutral_color))
+            if option == "I am going to be inactive":
                 # Edit channel name and category
-                await ticket.edit(name=f"dnkl-{ign}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories["dnkl"]))
+                await ticket.edit(name=f"dnkl-{ign}", category=discord.utils.get(interaction.guild.categories,
+                                                                                 name=ticket_categories["dnkl"]))
 
                 # Notify user if they don't meet gexp req, however ask questions anyway
                 _, weekly_gexp = await get_player_gexp(uuid)
-                if weekly_gexp == None:
+                if not weekly_gexp:
                     return await ticket.send(embed=unknown_ign_embed)
                 if weekly_gexp < dnkl_req:
                     await ticket.send(embed=discord.Embed(title="You do not meet the do-not-kick-list requirements!",
-                                                                        description="Even though you do not meet the requirements, your application may still be accepted.",
-                                                                        color=neg_color))
+                                                          description="Even though you do not meet the requirements, your application may still be accepted.",
+                                                          color=neg_color))
+                class Dnkl_Buttons(discord.ui.Button):
+                    def __init__(self, button : list):
+                        """
+                        3 buttons for 3 dnkl actions. `custom_id` is needed for persistent views.
+                        """
+                        super().__init__(label=button[0], custom_id=button[1], style=button[2])
 
-                # DNKL application view
-                class DnklApplicationView(View):
-                    def __init__(self):
-                        super().__init__()
+                    async def callback(self, interaction: discord.Interaction):
+                        #if bot.staff not in interaction.user.roles and ticket.id != interaction.channel_id: return
+                        if interaction.custom_id == "DNKL_Approve":
+                            msg = await bot.get_channel(dnkl_channel_id).send(embed=embed)
 
-                    @discord.ui.button(label="Approve", style=discord.ButtonStyle.green, emoji="✅")
-                    async def approve_callback(self, _: discord.ui.Button, interaction: discord.Interaction):
-                        if bot.staff not in interaction.user.roles: return
-                        msg = await bot.get_channel(dnkl_channel_id).send(embed=embed)
+                            # Check if user is already on DNKL
+                            current_message = await select_one("SELECT message_id FROM dnkl WHERE uuid = (?)", (uuid,))
+                            # User is not currently on DNKL
+                            if not current_message:
+                                await insert_new_dnkl(msg.id, uuid, ign)
+                                return await ticket.send("This user has been added to the do-not-kick-list!")
 
-                        # Check if user is already on DNKL
-                        current_message = await select_one("SELECT message_id FROM dnkl WHERE uuid = (?)", (uuid,))
-                        # User is not currently on DNKL
-                        if not current_message:
-                            await insert_new_dnkl(msg.id, uuid, ign)
-                            return await ticket.send("This user has been added to the do-not-kick-list!")
+                            # User is already on DNKl
+                            # Try to delete current message
+                            try:
+                                current_message = await bot.get_channel(dnkl_channel_id).fetch_message(current_message)
+                                await current_message.delete()
+                            except Exception:
+                                pass
 
-                        # User is already on DNKl
-                        # Try to delete current message
-                        try:
-                            current_message = await bot.get_channel(dnkl_channel_id).fetch_message(current_message)
-                            await current_message.delete()
-                        except Exception:
-                            pass
+                            await update_dnkl(msg.id, uuid)
+                            await ticket.send(
+                                "Since this user was already on the do-not-kick-list, their entry has been updated.")
 
-                        await update_dnkl(msg.id, uuid)
-                        await ticket.send("Since this user was already on the do-not-kick-list, their entry has been updated.")
+                        elif interaction.custom_id == "DNKL_Deny":
+                            await ticket.send(
+                                embed=discord.Embed(title="Your do-not-kick-list application has been denied!",
+                                                    color=neg_color))
 
-                    @discord.ui.button(label="Deny", style=discord.ButtonStyle.red, emoji="❌")
-                    async def deny_callback(self, _: discord.ui.Button, interaction: discord.Interaction):
-                        if bot.staff in interaction.user.roles:
-                            await ticket.send(embed=discord.Embed(title="Your do-not-kick-list application has been denied!",
-                                                                                color=neg_color))
+                        elif interaction.custom_id == "DNKL_Error":
+                            await ticket.send(embed=discord.Embed(
+                                title="Your application has been accepted, however there was an error!",
+                                description="Please await staff assistance!",
+                                color=neutral_color))
 
-                    @discord.ui.button(label="Error", emoji="📔")
-                    async def error_callback(self, _: discord.ui.Button, interaction: discord.Interaction):
-                        if bot.staff in interaction.user.roles:
-                            await ticket.send(embed=discord.Embed(title="Your application has been accepted, however there was an error!",
-                                                                                description="Please await staff assistance!",
-                                                                                color=neutral_color))
+                view = discord.ui.View(timeout=None)
+                buttons = [["Approve", "DNKL_Approve", discord.enums.ButtonStyle.green],
+                           ["Deny", "DNKL_Deny", discord.enums.ButtonStyle.red],
+                           ["Error", "DNKL_Error", discord.enums.ButtonStyle.gray]]
+                # Loop through the list of roles and add a new button to the view for each role.
+                for button in buttons:
+                    # Get the role from the guild by ID.
+                    view.add_item(Dnkl_Buttons(button))
 
-                # Ask DNKL application questions and send preview embed
                 embed = await dnkl_application(ign, uuid, ticket, interaction.user)
-                await ticket.send("Staff, what do you wish to do with this application?", embed=embed, view=DnklApplicationView())
+                await ticket.send("Staff, what do you wish to do with this application?", embed=embed, view=view)
+
+
             if option == "Staff application":
                 # Edit category and send info embed with requirements
-                await ticket.edit(name=f"staff-application-{ign}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories["generic"]))
+                await ticket.edit(name=f"staff-application-{ign}",
+                                  category=discord.utils.get(interaction.guild.categories,
+                                                             name=ticket_categories["generic"]))
                 await ticket.send(embed=discord.Embed(title=f"{ign} wishes to apply for staff!",
-                                        description="Please respond to the bot's prompts appropriately!",
-                                        color=neutral_color).add_field(
-                                        name="Do you meet the following requirements? (y/n)",
-                                        value="• You must be older than 13 years.\n• You must have sufficient knowledge of the bots in this Discord."
-                                                "\n• You must be active both on Hypixel and in the guild Discord.\n• You must have a good reputation amongst guild members.",
-                                        inline=False))
+                                                      description="Please respond to the bot's prompts appropriately!",
+                                                      color=neutral_color).add_field(
+                    name="Do you meet the following requirements? (y/n)",
+                    value="• You must be older than 13 years.\n• You must have sufficient knowledge of the bots in this Discord."
+                          "\n• You must be active both on Hypixel and in the guild Discord.\n• You must have a good reputation amongst guild members.",
+                    inline=False))
 
-                meets_requirements = await bot.wait_for("message", check=lambda x: x.channel == ticket and x.author == interaction.user)
+                meets_requirements = await bot.wait_for("message", check=lambda
+                    x: x.channel == ticket and x.author == interaction.user)
 
                 # If user doesn't meet requirements, deny application
                 if meets_requirements.content not in ["y", "yes"]:
                     return await ticket.send(embed=discord.Embed(title="Your staff application has been denied!",
-                                                                        description="Since you do not meet the requirements, your staff application has been denied.",
-                                                                        color=neg_color))
+                                                                 description="Since you do not meet the requirements, your staff application has been denied.",
+                                                                 color=neg_color))
 
                 # Loop for all questions to gather info
                 answers = {}
                 for number, question in staff_application_questions.items():
                     # Ask question and wait for answer
-                    await ticket.send(embed=discord.Embed(title=f"{number}. {question}", description="You must answer in one message.", color=neutral_color))
-                    answer = await bot.wait_for("message", check=lambda x: x.channel == ticket and x.author == interaction.user)
+                    await ticket.send(embed=discord.Embed(title=f"{number}. {question}",
+                                                          description="You must answer in one message.",
+                                                          color=neutral_color))
+                    answer = await bot.wait_for("message",
+                                                check=lambda x: x.channel == ticket and x.author == interaction.user)
 
                     # Place answer into array with question number
                     answers[number] = answer.content
 
                 # Send completion message
-                await ticket.send("Your staff application has been completed! Please wait while your answers are compiled.")
+                await ticket.send(
+                    "Your staff application has been completed! Please wait while your answers are compiled.")
 
                 # Create overview embed
                 review_embed = discord.Embed(title=f"{ign}'s Staff Application", color=neutral_color)
                 review_embed.set_footer(text="If you made a mistake, please notify a staff member.")
                 for number, answer in answers.items():
-                    review_embed.add_field(name=f"{number}. {staff_application_questions[number]}", value=answer, inline=False)
+                    review_embed.add_field(name=f"{number}. {staff_application_questions[number]}", value=answer,
+                                           inline=False)
 
                 # Send embed
                 await ticket.send(embed=review_embed)
             if option == "GvG Team application":
                 # Edit channel name and category
-                await ticket.edit(name=f"gvg-application-{ign}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories["generic"]))
+                await ticket.edit(name=f"gvg-application-{ign}",
+                                  category=discord.utils.get(interaction.guild.categories,
+                                                             name=ticket_categories["generic"]))
 
                 # Fetch player data
                 player_data = await get_hypixel_player(ign)
-                if player_data == None:
+                if not player_data:
                     return await ticket.send(unknown_ign_embed)
                 player_data = player_data["stats"]
 
                 # Set vars for each stat
                 bw_wins = player_data["Bedwars"]["wins_bedwars"]
-                bw_fkdr = round(player_data["Bedwars"]["final_kills_bedwars"] / player_data["Bedwars"]["final_deaths_bedwars"], 2)
+                bw_fkdr = round(
+                    player_data["Bedwars"]["final_kills_bedwars"] / player_data["Bedwars"]["final_deaths_bedwars"], 2)
                 sw_wins = player_data["SkyWars"]["wins"]
                 sw_kdr = round(player_data["SkyWars"]["kills"] / player_data["SkyWars"]["deaths"], 2)
                 duels_wlr = round(player_data["Duels"]["wins"] / player_data["Duels"]["losses"], 2)
@@ -213,9 +243,12 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
 
                 # Define dict for eligibility and set each gamemode boolean
                 eligibility = {}
-                eligibility["bedwars"] = False if bw_wins < gvg_requirements["bw_wins"] and bw_fkdr < gvg_requirements["bw_fkdr"] else True
-                eligibility["skywars"] = False if sw_wins < gvg_requirements["sw_wins"] and sw_kdr < gvg_requirements["sw_kdr"] else True
-                eligibility["duels"] = False if duels_wlr < gvg_requirements["duels_wlr"] and duels_kills < gvg_requirements["duels_kills"] else True
+                eligibility["bedwars"] = False if bw_wins < gvg_requirements["bw_wins"] and bw_fkdr < gvg_requirements[
+                    "bw_fkdr"] else True
+                eligibility["skywars"] = False if sw_wins < gvg_requirements["sw_wins"] and sw_kdr < gvg_requirements[
+                    "sw_kdr"] else True
+                eligibility["duels"] = False if duels_wlr < gvg_requirements["duels_wlr"] and duels_kills < \
+                                                gvg_requirements["duels_kills"] else True
 
                 # Polyvalent eligibility
                 if all(eligibility.values()):
@@ -231,18 +264,21 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
 
                 # User is not eligible for any team
                 elif not all(eligibility.values()):
-                    await ticket.send(embed=discord.Embed(title="You are ineligible for the GvG Team as you do not meet the requirements!",
-                                                                        description="Please await staff assistance for further information!",
-                                                                        color=neg_color))
+                    await ticket.send(embed=discord.Embed(
+                        title="You are ineligible for the GvG Team as you do not meet the requirements!",
+                        description="Please await staff assistance for further information!",
+                        color=neg_color))
 
                 # User is eligible for at least one gamemode
                 else:
                     # loop through all GvG gamemodes
-                    for mode, req1_name, req1, req2_name, req2 in [["bedwars", "Wins", bw_wins, "FKDR", bw_fkdr], ["skywars", "Wins", sw_wins, "KDR", sw_kdr],
-                                                                    ["duels", "WLR", duels_wlr, "Kills", duels_kills]]:
+                    for mode, req1_name, req1, req2_name, req2 in [["bedwars", "Wins", bw_wins, "FKDR", bw_fkdr],
+                                                                   ["skywars", "Wins", sw_wins, "KDR", sw_kdr],
+                                                                   ["duels", "WLR", duels_wlr, "Kills", duels_kills]]:
                         # If user is eligible for that gamemode, create embed
                         if eligibility[mode]:
-                            embed = discord.Embed(title=f"You are eiligible for the {mode.capitalize()} team!", color=neutral_color)
+                            embed = discord.Embed(title=f"You are eiligible for the {mode.capitalize()} team!",
+                                                  color=neutral_color)
                             embed.set_footer(text="Please await staff assistance for further information!")
                             embed.add_field(title=req1_name, value=f"`{req1}`")
                             embed.add_field(title=req2_name, value=f"`{req2}`")
@@ -250,29 +286,32 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                             # Send embed and end loop
                             await ticket.send(embed=embed)
             if option == "Other":
-                await ticket.edit(name=f"other-{ign}", category=discord.utils.get(interaction.guild.categories, name=ticket_categories["OTHER"]))
+                await ticket.edit(name=f"other-{ign}", category=discord.utils.get(interaction.guild.categories,
+                                                                                  name=ticket_categories["OTHER"]))
                 await ticket.send(embed=discord.Embed(title="This ticket has been created for an unkown reason!",
                                                       description="Please specify why you have created this ticket!",
                                                       color=neutral_color))
 
-
     # Create view and embed, send to ticket
-    view = View()
+    view = discord.ui.View()
     view.add_item(TicketTypeSelect())
     embed = discord.Embed(title="Why did you make this ticket?",
-                        description="Please select your reason from the dropdown given below!",
-                        color=neutral_color)
+                          description="Please select your reason from the dropdown given below!",
+                          color=neutral_color)
     await ticket.send(embed=embed, view=view)
 
     # Return ticket for use
     return ticket
 
-async def log_event(title: str, description: str=None):
+
+async def log_event(title: str, description: str = None):
     embed = discord.Embed(title=title, description=description, color=neutral_color)
     await bot.get_channel(log_channel_id).send(embed=embed)
 
+
 async def has_tag_perms(user: discord.User):
     return any(role in user.roles for role in bot.tag_allowed_roles)
+
 
 async def check_tag(tag: str):
     tag = tag.lower()
@@ -288,6 +327,7 @@ async def check_tag(tag: str):
     # Tag is okay to use
     return True, None
 
+
 async def is_valid_date(date: str):
     # Return False if parsing fails
     try:
@@ -299,12 +339,14 @@ async def is_valid_date(date: str):
     except ValueError:
         return False, None, None, None
 
+
 async def create_transcript(channel: discord.TextChannel):
     transcript = await chat_exporter.export(channel)
     if not transcript: return None
 
     # Create and return file
     return discord.File(BytesIO(transcript.encode()), filename=f"transcript-{channel.name}.html")
+
 
 async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, author: discord.User):
     # Recursively ask for start date
@@ -315,7 +357,6 @@ async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, au
         if valid_date:
             break
         await channel.send(invalid_date_msg)
-
 
     # Recursively ask for end date
     while True:
@@ -344,6 +385,7 @@ async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, au
     embed.add_field(name="Reason", value=f"{reason}", inline=False)
 
     return embed
+
 
 @tasks.loop(count=1)
 async def after_cache_ready():
@@ -388,6 +430,7 @@ async def after_cache_ready():
             await channel.send(embed=embed)
 
     bot.help_command = HelpCommand(command_attrs={"hidden": True})
+
 
 @after_cache_ready.before_loop
 async def before_cache_loop():
