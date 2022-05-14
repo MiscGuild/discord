@@ -17,7 +17,7 @@ class Menus(commands.Cog, command_attrs=dict(hidden=True), name="menus"):
     @commands.is_owner()
     async def tickets(self, ctx):
         """Send a ticket help embed!"""
-        image, embed, view = await Listener.tickets()
+        image, embed, view = await Listener.tickets(ctx)
         await ctx.send(file=image, embed=embed, view=view)
 
 
