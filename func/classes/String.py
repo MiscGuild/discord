@@ -6,18 +6,13 @@ from datetime import datetime
 
 import discord
 from __main__ import bot
-from func.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed,
-                               neg_color, pos_color, ticket_categories,
-                               unknown_ign_embed)
-from func.utils.db_utils import (delete_dnkl, insert_new_dnkl, select_one,
-                                 update_dnkl)
+from func.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed, neg_color, pos_color, ticket_categories,
+                               unknown_ign_embed, months, neutral_color, qotd_channel_id)
+from func.utils.db_utils import (delete_dnkl, insert_new_dnkl, select_one, update_dnkl)
 from func.utils.discord_utils import dnkl_application
-from func.utils.minecraft_utils import (calculate_network_level,
-                                        get_color_by_gexp,
-                                        get_hypixel_player_rank,
+from func.utils.minecraft_utils import (calculate_network_level, get_color_by_gexp, get_hypixel_player_rank,
                                         get_player_gexp)
-from func.utils.request_utils import (get_hypixel_player, get_mojang_profile,
-                                      get_player_guild)
+from func.utils.request_utils import (get_hypixel_player, get_mojang_profile, get_player_guild)
 from quickchart import QuickChart
 
 
@@ -84,19 +79,11 @@ class String:
                     await ctx.message.delete()
                     return f"__**{name}**__\n**Guild Experience -** `{format(weekly_gexp, ',d')}`"
 
-                week_dict = {
-                    0: "Today:",
-                    1: "Yesterday:",
-                    2: "Two days ago:",
-                    3: "Three days ago:",
-                    4: "Four days ago:",
-                    5: "Five days ago:",
-                    6: "Six days ago:"
-                }
+                week_dict = {0: "Today:", 1: "Yesterday:", 2: "Two days ago:", 3: "Three days ago:",
+                    4: "Four days ago:", 5: "Five days ago:", 6: "Six days ago:"}
 
                 # Fetch remaining data
-                join_date = str(datetime.fromtimestamp(
-                    int(str(member["joined"])[:-3])))[0:10]
+                join_date = str(datetime.fromtimestamp(int(str(member["joined"])[:-3])))[0:10]
                 rank = member["rank"]
                 quest_participation = member["questParticipation"] if "questParticipation" in member else 0
                 dates = [k for k, _ in gexp_history.items()]
@@ -104,24 +91,19 @@ class String:
                 gexp_history_text = ""
                 for i in range(0, 7):
                     date = week_dict.get(i, "None")
-                    gexp_history_text = gexp_history_text + \
-                                        f"**▸** {date} **{format(gexp_vals[i], ',d')}**\n"
+                    gexp_history_text = gexp_history_text + f"**▸** {date} **{format(gexp_vals[i], ',d')}**\n"
 
                 # Get graph color
                 color, graph_color, graph_border = await get_color_by_gexp(rank, weekly_gexp)
 
                 # Create embed
-                embed = discord.Embed(
-                    title=name, url=f"https://plancke.io/hypixel/player/stats/{name}", color=color)
-                embed.set_author(
-                    name=f"{gname} [{gtag}]", url=f"https://plancke.io/hypixel/guild/player/{name}")
-                embed.set_thumbnail(
-                    url=f"https://minotar.net/helm/{uuid}/512.png")
-                embed.add_field(name="General Information:",
-                                value=f"`✚` **Rank**: `{rank}`\n"
-                                      f"`✚` **Joined**: `{join_date}`\n"
-                                      f"`✚` **Quests Completed**: `{quest_participation}`\n"
-                                      f"`✚` **Overall Guild Experience**: `{format(weekly_gexp, ',d')}`\n\n{gexp_history_text}",
+                embed = discord.Embed(title=name, url=f"https://plancke.io/hypixel/player/stats/{name}", color=color)
+                embed.set_author(name=f"{gname} [{gtag}]", url=f"https://plancke.io/hypixel/guild/player/{name}")
+                embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
+                embed.add_field(name="General Information:", value=f"`✚` **Rank**: `{rank}`\n"
+                                                                   f"`✚` **Joined**: `{join_date}`\n"
+                                                                   f"`✚` **Quests Completed**: `{quest_participation}`\n"
+                                                                   f"`✚` **Overall Guild Experience**: `{format(weekly_gexp, ',d')}`\n\n{gexp_history_text}",
                                 inline=False)
 
                 # Create chart
@@ -131,20 +113,9 @@ class String:
                 chart.width = 1000
                 chart.height = 500
                 chart.background_color = "transparent"
-                chart.config = {
-                    "type": "line",
-                    "data": {
-                        "labels": dates,
-                        "datasets": [{
-                            "label": "Experience",
-                            "data": gexp_vals,
-                            "lineTension": 0.4,
-                            "backgroundColor": graph_color,
-                            "borderColor": graph_border,
-                            "pointRadius": 0,
-                        }]
-                    }
-                }
+                chart.config = {"type": "line", "data": {"labels": dates, "datasets": [
+                    {"label": "Experience", "data": gexp_vals, "lineTension": 0.4, "backgroundColor": graph_color,
+                        "borderColor": graph_border, "pointRadius": 0, }]}}
                 return embed.set_image(url=chart.get_url())
 
     async def info(self):
@@ -163,27 +134,21 @@ class String:
         completed_challenges = "0" if "general_challenger" not in player_data[
             "achievements"] else f"{int(player_data['achievements']['general_challenger']):,d}"
         completed_quests = "-" if "quests" not in player_data else f"{len(player_data['quests']):,d}"
-        first_login = datetime.fromtimestamp(
-            int(str(player_data["firstLogin"])[:-3]))
+        first_login = datetime.fromtimestamp(int(str(player_data["firstLogin"])[:-3]))
         last_login = "Unkown" if "lastLogin" not in player_data else datetime.fromtimestamp(
             int(str(player_data["lastLogin"])[:-3]))
         guild = await get_player_guild(uuid)
         gtag = "" if not guild or "tag" not in guild else f"[{guild['tag']}]"
 
-        embed = discord.Embed(title=f"{rank} {ign} {gtag}",
-                              url=f'https://plancke.io/hypixel/player/stats/{ign}',
+        embed = discord.Embed(title=f"{rank} {ign} {gtag}", url=f'https://plancke.io/hypixel/player/stats/{ign}',
                               color=0x8368ff)
         embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
         embed.add_field(name="Network Level:", value=f"`{nwl}`", inline=True)
         embed.add_field(name="Karma:", value=f"`{karma}`", inline=True)
-        embed.add_field(name="Achievement Points:",
-                        value=f"`{achievement_points}`", inline=False)
-        embed.add_field(name="Challenges Finished:",
-                        value=f"`{completed_challenges}`", inline=True)
-        embed.add_field(name="Quests Completed:",
-                        value=f"`{completed_quests}`", inline=True)
-        embed.add_field(name="First • Last login",
-                        value=f"`{first_login} • {last_login}`", inline=False)
+        embed.add_field(name="Achievement Points:", value=f"`{achievement_points}`", inline=False)
+        embed.add_field(name="Challenges Finished:", value=f"`{completed_challenges}`", inline=True)
+        embed.add_field(name="Quests Completed:", value=f"`{completed_quests}`", inline=True)
+        embed.add_field(name="First • Last login", value=f"`{first_login} • {last_login}`", inline=False)
         return embed.set_image(url=f"https://gen.plancke.io/exp/{ign}.png")
 
     async def dnkladd(self, ctx):
@@ -245,8 +210,7 @@ class String:
         if weeklygexp > dnkl_req:
             embed = discord.Embed(title=self.string, color=pos_color)
             embed.add_field(name="This player is eligible to apply for the do-not-kick-list.",
-                            value=f"They have {weeklygexp}/{dnkl_req} weekly guild experience.",
-                            inline=True)
+                            value=f"They have {weeklygexp}/{dnkl_req} weekly guild experience.", inline=True)
 
         # Player is not eligible
         else:
@@ -268,3 +232,14 @@ class String:
         # Channel is a ticket
         channel_name = self.string.replace(" ", "-")
         await ctx.channel.edit(name=channel_name)
+
+    async def qotd(self, ctx):
+        # 15th May 2022 was the 473rd QOTD day. It is used as a reference point to calculate the day number.
+        day_number = 473 + (datetime.utcnow() - datetime.strptime("2022/05/15", "%Y/%m/%d")).days
+        embed = discord.Embed(
+            title=f"Day {day_number}: {datetime.utcnow().day} {months[datetime.utcnow().month]} {datetime.utcnow().year}",
+            description=self.string, color=neutral_color)
+        embed.set_footer(text="Put your answers in #qotd-answer")
+
+        await bot.get_channel(qotd_channel_id).send("<@&923978802818871356>", embed=embed)
+        await ctx.send(f"**The QOTD has been sent to <#{qotd_channel_id}>!**")

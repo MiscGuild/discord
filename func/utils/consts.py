@@ -31,6 +31,7 @@ log_channel_id = config["log_channel"]
 registration_channel_id = config["registration_channel"]
 staff_announcements_id = config["staff_announcements_channel"]
 partner_channel_id = config["partner_channel"]
+qotd_channel_id = config["qotd_channel"]
 
 # Other variables
 guild_handle = config["guild_handle"]
