@@ -174,8 +174,6 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
 
                 embed = await dnkl_application(ign, uuid, ticket, interaction.user)
                 await ticket.send("Staff, what do you wish to do with this application?", embed=embed, view=view)
-
-
             if option == "Staff application":
                 # Edit category and send info embed with requirements
                 await ticket.edit(name=f"staff-application-{ign}",
@@ -284,15 +282,15 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                             embed = discord.Embed(title=f"You are eiligible for the {mode.capitalize()} team!",
                                                   color=neutral_color)
                             embed.set_footer(text="Please await staff assistance for further information!")
-                            embed.add_field(title=req1_name, value=f"`{req1}`")
-                            embed.add_field(title=req2_name, value=f"`{req2}`")
+                            embed.add_field(name=req1_name, value=f"`{req1}`")
+                            embed.add_field(name=req2_name, value=f"`{req2}`")
 
                             # Send embed and end loop
                             await ticket.send(embed=embed)
             if option == "Other":
                 await ticket.edit(name=f"other-{ign}", category=discord.utils.get(interaction.guild.categories,
-                                                                                  name=ticket_categories["OTHER"]))
-                await ticket.send(embed=discord.Embed(title="This ticket has been created for an unkown reason!",
+                                                                                  name=ticket_categories["other"]))
+                await ticket.send(embed=discord.Embed(title="This ticket has been created for an unknown reason!",
                                                       description="Please specify why you have created this ticket!",
                                                       color=neutral_color))
 
