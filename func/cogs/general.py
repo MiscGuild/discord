@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 from func.classes.String import String
 from func.classes.Union import Union
-from datetime import datetime, date
 
 
 class General(commands.Cog, name="general"):
@@ -21,7 +20,7 @@ class General(commands.Cog, name="general"):
         await ctx.send(embed=await Union(user=user or ctx.author).avatar())
 
     @commands.command()
-    @commands.has_role("QOTD Manager")
+    @commands.has_any_role("QOTD Manager", "Staff")
     async def qotd(self, ctx):
         """Used by QOTD Managers to register a QOTD"""
         await ctx.send("**What is the question of the day?**")
