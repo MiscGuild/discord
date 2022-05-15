@@ -115,8 +115,12 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     return await ticket.send(embed=unknown_ign_embed)
                 if weekly_gexp < dnkl_req:
                     await ticket.send(embed=discord.Embed(title="You do not meet the do-not-kick-list requirements!",
-                                                          description="Even though you do not meet the requirements, your application may still be accepted.",
+                                                          description=f"Even though you do not meet the requirements, your application may still be accepted.\nYou have {format(weekly_gexp, ',d')} weekly guild experience!",
                                                           color=neg_color))
+                else:
+                    await ticket.send(embed=discord.Embed(title="You meet the do-not-kick-list requirements!",
+                                                          description=f"You have {format(weekly_gexp, ',d')} weekly guild experience!",
+                                                          color=neutral_color))
                 class Dnkl_Buttons(discord.ui.Button):
                     def __init__(self, button : list):
                         """
