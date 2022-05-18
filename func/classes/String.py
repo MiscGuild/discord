@@ -7,7 +7,7 @@ from datetime import datetime
 import discord
 from __main__ import bot
 from func.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed, neg_color, pos_color, ticket_categories,
-                               unknown_ign_embed, months, neutral_color, qotd_channel_id)
+                               unknown_ign_embed, months, neutral_color, qotd_channel_id, qotd_ans_channel_id)
 from func.utils.db_utils import (delete_dnkl, insert_new_dnkl, select_one, update_dnkl)
 from func.utils.discord_utils import dnkl_application
 from func.utils.minecraft_utils import (calculate_network_level, get_color_by_gexp, get_hypixel_player_rank,
@@ -80,7 +80,7 @@ class String:
                     return f"__**{name}**__\n**Guild Experience -** `{format(weekly_gexp, ',d')}`"
 
                 week_dict = {0: "Today:", 1: "Yesterday:", 2: "Two days ago:", 3: "Three days ago:",
-                    4: "Four days ago:", 5: "Five days ago:", 6: "Six days ago:"}
+                             4: "Four days ago:", 5: "Five days ago:", 6: "Six days ago:"}
 
                 # Fetch remaining data
                 join_date = str(datetime.fromtimestamp(int(str(member["joined"])[:-3])))[0:10]
@@ -115,7 +115,7 @@ class String:
                 chart.background_color = "transparent"
                 chart.config = {"type": "line", "data": {"labels": dates, "datasets": [
                     {"label": "Experience", "data": gexp_vals, "lineTension": 0.4, "backgroundColor": graph_color,
-                        "borderColor": graph_border, "pointRadius": 0, }]}}
+                     "borderColor": graph_border, "pointRadius": 0, }]}}
                 return embed.set_image(url=chart.get_url())
 
     async def info(self):
@@ -243,3 +243,5 @@ class String:
 
         await bot.get_channel(qotd_channel_id).send("<@&923978802818871356>", embed=embed)
         await ctx.send(f"**The QOTD has been sent to <#{qotd_channel_id}>!**")
+        await bot.get_channel(qotd_ans_channel_id).send(
+            "https://media.discordapp.net/attachments/495114793288728586/535784155527774208/Rainbow.gif")
