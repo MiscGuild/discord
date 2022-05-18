@@ -19,7 +19,7 @@ class Hypixel(commands.Cog, name="hypixel"):
         elif isinstance(res, str):
             await ctx.send(res)
 
-    @commands.command()
+    @commands.command(aliases=['i'])
     async def info(self, ctx, name: str = None):
         """View Hyipxel stats of the given user!"""
         if not name:
