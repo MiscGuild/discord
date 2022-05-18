@@ -180,7 +180,8 @@ class String:
         return "Since this user was already on the do-not-kick-list, their entry has been updated."
 
     async def dnklremove(self):
-        row = await select_one("SELECT * FROM dnkl WHERE username = (?)", (self.string,))
+        ign, uuid = await get_mojang_profile(self.string)
+        row = await select_one("SELECT * FROM dnkl WHERE username = (?)", (ign,))
 
         if not row:
             return "This player is not on the do-not-kick-list!"
