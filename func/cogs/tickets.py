@@ -7,6 +7,10 @@ from func.classes.Union import Union
 
 
 class Tickets(commands.Cog, name="tickets"):
+    """
+    Everything to do with tickets.
+    """
+
     def __init__(self, bot):
         self.bot = bot
 

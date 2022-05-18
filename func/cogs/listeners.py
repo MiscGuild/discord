@@ -3,6 +3,9 @@ from func.classes.Listener import Listener
 
 
 class Listeners(commands.Cog, name="listeners"):
+    """
+    Hidden cog.
+    """
     def __init__(self, bot):
         self.bot = bot
 

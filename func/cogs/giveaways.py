@@ -4,6 +4,9 @@ from func.classes.Integer import Integer
 
 
 class Giveaways(commands.Cog, name="giveaways"):
+    """
+    Everything to do with giveaway creation, deletion and updation!
+    """
     def __init__(self, bot):
         self.bot = bot
 

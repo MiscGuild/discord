@@ -413,25 +413,6 @@ async def after_cache_ready():
     from func.utils.discord_utils import name_grabber
     bot.staff_names = [await name_grabber(member) for member in bot.staff.members]
 
-    # Set help command
-    class HelpCommand(commands.MinimalHelpCommand):
-        async def send_pages(self):
-            destination = self.get_destination()
-            for page in self.paginator.pages:
-                embed = discord.Embed(description=page, color=neutral_color)
-                await destination.send(embed=embed)
-
-        async def send_command_help(self, command):
-            embed = discord.Embed(title=self.get_command_signature(command), color=neutral_color)
-            embed.add_field(name="Help", value=command.help)
-            alias = command.aliases
-            if alias:
-                embed.add_field(name="Aliases", value=", ".join(alias), inline=False)
-
-            channel = self.get_destination()
-            await channel.send(embed=embed)
-
-    bot.help_command = HelpCommand(command_attrs={"hidden": True})
 
 
 @after_cache_ready.before_loop

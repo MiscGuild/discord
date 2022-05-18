@@ -5,6 +5,10 @@ from func.classes.Union import Union
 
 
 class Moderation(commands.Cog, name="moderation"):
+    """
+    Everything to do with discord Moderation
+    """
+
     def __init__(self, bot):
         self.bot = bot
 

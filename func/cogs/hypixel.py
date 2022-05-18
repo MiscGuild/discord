@@ -7,6 +7,9 @@ from func.utils.discord_utils import name_grabber
 
 
 class Hypixel(commands.Cog, name="hypixel"):
+    """
+    All non-guild related Hypixel commands.
+    """
     def __init__(self, bot):
         self.bot = bot
 

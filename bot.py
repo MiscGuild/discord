@@ -18,13 +18,14 @@ bot = commands.Bot(command_prefix=commands.when_mentioned_or(config["prefix"]), 
 
 # Load all bot vars once cache is ready
 from func.utils.discord_utils import after_cache_ready
+bot.remove_command('help')
 
 after_cache_ready.start()
 
 # Load extensions
 for extension in ["func.cogs.general", "func.cogs.giveaways", "func.cogs.guild", "func.cogs.hypixel",
                   "func.cogs.listeners", "func.cogs.menus", "func.cogs.moderation", "func.cogs.staff",
-                  "func.cogs.tickets"]:
+                  "func.cogs.tickets","func.cogs.help"]:
     try:
         bot.load_extension(extension)
         print(f"Loaded {extension}")

@@ -8,6 +8,9 @@ from func.utils.discord_utils import name_grabber
 
 
 class Guild(commands.Cog, name="guild"):
+    """
+    Everything to do with guild. All the commands related to guilds come under this module.
+    """
     def __init__(self, bot):
         self.bot = bot
 
