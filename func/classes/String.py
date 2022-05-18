@@ -135,7 +135,7 @@ class String:
             "achievements"] else f"{int(player_data['achievements']['general_challenger']):,d}"
         completed_quests = "-" if "quests" not in player_data else f"{len(player_data['quests']):,d}"
         first_login = datetime.fromtimestamp(int(str(player_data["firstLogin"])[:-3]))
-        last_login = "Unkown" if "lastLogin" not in player_data else datetime.fromtimestamp(
+        last_login = "Unknown" if "lastLogin" not in player_data else datetime.fromtimestamp(
             int(str(player_data["lastLogin"])[:-3]))
         guild = await get_player_guild(uuid)
         gtag = "" if not guild or "tag" not in guild else f"[{guild['tag']}]"
