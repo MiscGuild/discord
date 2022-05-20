@@ -546,7 +546,7 @@ class Func:
                 role_ids = []
                 for name in required_roles:
                     role = discord.utils.get(ctx.guild.roles, name=name)
-                    if role == None:
+                    if not role:
                         await ctx.send(f"Invalid role: {name}. Please try again.", delete_after=5)
                         return False
                     role_ids.append(role.id)
