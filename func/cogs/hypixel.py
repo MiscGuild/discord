@@ -31,7 +31,7 @@ class Hypixel(commands.Cog, name="hypixel"):
 
     @commands.command()
     @commands.has_permissions(manage_messages=True)
-    async def dnkladd(self, ctx, name: str):
+    async def DNKL_Add(self, ctx, name: str):
         """Add a user to the do-not-kick-list!"""
         res = await String(string=name).dnkladd(ctx)
         if isinstance(res, str):
@@ -41,17 +41,17 @@ class Hypixel(commands.Cog, name="hypixel"):
 
     @commands.command(aliases=["dnklrmv"])
     @commands.has_permissions(manage_messages=True)
-    async def dnklremove(self, ctx, name: str):
+    async def DNKL_Remove(self, ctx, name: str):
         """Remove a player from the do-not-kick-list"""
         await ctx.send(await String(string=name).dnklremove())
 
     @commands.command()
-    async def dnkllist(self, ctx):
+    async def DNKL_List(self, ctx):
         """View all users on the do-not-kick-list!"""
         await ctx.send(embed=await Func.dnkllist(ctx))
 
     @commands.command(aliases=["dnklchk"])
-    async def dnklcheck(self, ctx, name: str = None):
+    async def DNKL_Check(self, ctx, name: str = None):
         """Check whether you are eligible for the do-not-kick-list!"""
         if not name:
             name = await name_grabber(ctx.author)
