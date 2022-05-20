@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from discord.errors import Forbidden
-from func.utils.consts import config
+from func.utils.consts import config, neutral_color
 
 """This custom help command is a perfect replacement for the default one on any Discord Bot written in Discord.py!
 However, you must put "bot.remove_command('help')" in your bot, and the command must be in a cog for it to work.
@@ -62,7 +62,7 @@ class Help(commands.Cog):
 
             # starting to build embed
             emb = discord.Embed(title='Commands and modules', color=discord.Color.blue(),
-                                description=f'Use `{prefix}help <module>` to gain more information about that module '
+                                description=f'Use `{prefix}help <module/command>` to gain more information about that module '
                                             f':smiley:\n')
 
             # iterating trough cogs, gathering descriptions
@@ -75,7 +75,7 @@ class Help(commands.Cog):
                     if valid:
                         break
                 if valid:
-                    cogs_desc += f'`{cog}` {self.bot.cogs[cog].__doc__}\n'
+                    cogs_desc += f'`{cog.capitalize()}` {self.bot.cogs[cog].__doc__}\n'
 
             # adding 'list' of cogs to embed
             emb.add_field(name='Modules', value=cogs_desc, inline=False)
@@ -96,6 +96,21 @@ class Help(commands.Cog):
         # block called when one cog-name is given
         # trying to find matching cog and it's commands
         elif len(input) == 1:
+            if input[0] not in self.bot.cogs:
+                command = self.bot.get_command(input[0])
+                for key, value in command.clean_params.items():
+                    syntax = f"{prefix}{command.name}"
+                    if not value.default:
+                        syntax += " [" + key + "]"
+                    else:
+                        syntax += " <" + key + ">"
+                embed = discord.Embed(title=f"Help", color=neutral_color)
+                embed.add_field(name=f"`{syntax}`", value=command.help)
+                aliases = command.aliases
+                if aliases:
+                    embed.add_field(name="Aliases", value=", ".join(aliases), inline=False)
+                await ctx.send(embed=embed)
+                return
 
             # iterating trough cogs
             for cog in self.bot.cogs:
@@ -103,14 +118,20 @@ class Help(commands.Cog):
                 if cog.lower() == input[0].lower():
 
                     # making title - getting description from doc-string below class
-                    emb = discord.Embed(title=f'{cog} - Commands', description=self.bot.cogs[cog].__doc__,
+                    emb = discord.Embed(title=f'{cog.capitalize()} - Commands', description=self.bot.cogs[cog].__doc__,
                                         color=discord.Color.green())
 
                     # getting commands from cog
                     for command in self.bot.get_cog(cog).get_commands():
                         # if cog is not hidden
                         if not command.hidden:
-                            emb.add_field(name=f"`{prefix}{command.name}`", value=command.help, inline=False)
+                            for key, value in command.clean_params.items():
+                                syntax = f"{prefix}{command.name}"
+                                if not value.default:
+                                    syntax += " [" + key + "]"
+                                else:
+                                    syntax += " <" + key + ">"
+                            emb.add_field(name=f"`{syntax}`", value=command.help, inline=False)
                     # found cog - breaking loop
                     break
 
@@ -122,15 +143,15 @@ class Help(commands.Cog):
                     if "Hidden" not in self.bot.cogs[cog].__doc__:
                         cogs_desc += f'`{cog.capitalize()}` {self.bot.cogs[cog].__doc__}\n'
                 emb = discord.Embed(title="What's that?!",
-                                    description=f"I've never heard from a module called `{input[0]}` before :scream:",
+                                    description=f"I've never heard of a module/command called `{input[0]}` before :scream:",
                                     color=discord.Color.orange())
                 emb.add_field(name="Here is a list of all the fields and their descriptions", value=cogs_desc)
-                emb.set_footer(text="Use ,help <module> to gain more information about that module")
+                emb.set_footer(text="Use ,help <module/command> to gain more information about that module/command")
 
         # too many cogs requested - only one at a time allowed
         elif len(input) > 1:
             emb = discord.Embed(title="That's too much.",
-                                description="Please request only one module at once :sweat_smile:",
+                                description="Please request only one module or one command at once :sweat_smile:",
                                 color=discord.Color.orange())
 
         # sending reply embed using our own function defined above
