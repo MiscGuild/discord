@@ -56,7 +56,7 @@ class Listener:
                     usage += " [" + key + "]"
                 else:
                     usage += " <" + key + ">"
-            embed = discord.Embed(title=f" arguments",
+            embed = discord.Embed(title=f"Invalid Syntax",
                                   description=f"Command usage:\n`{usage}`\nFor more help, see `{ctx.prefix}help {ctx.command}`",
                                   color=0xDE3163)
             await ctx.send(embed=embed)
