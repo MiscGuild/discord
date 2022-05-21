@@ -140,7 +140,7 @@ unknown_ign_msg = "Unknown IGN!"
 
 invalid_date_msg = "This date is invalid! You have entered a date that has already passed!\n Enter dates in the form `YYYY/MM/DD`"
 
-missing_permissions_msg = "Your soul lacks the strength to utilize this command!"
+missing_permissions_msg = "Your soul lacks the strength to utilize this feature!"
 
 invalid_command_embed = discord.Embed(title="Invalid Command!",
                                     description="Use `,help` to view a list of all commands!",
