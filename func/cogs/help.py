@@ -98,8 +98,8 @@ class Help(commands.Cog):
         elif len(input) == 1:
             if input[0] not in self.bot.cogs:
                 command = self.bot.get_command(input[0])
+                syntax = f"{prefix}{command.name}"
                 for key, value in command.clean_params.items():
-                    syntax = f"{prefix}{command.name}"
                     if not value.default:
                         syntax += " [" + key + "]"
                     else:
