@@ -23,7 +23,8 @@ async def name_grabber(author: discord.User) -> str:
 
 
 async def is_linked_discord(player_data: dict, user: discord.User) -> bool:
-    if ("socialMedia" not in player_data) or ("links" not in player_data["socialMedia"]) or ("DISCORD" not in player_data["socialMedia"]["links"]):
+    if ("socialMedia" not in player_data) or ("links" not in player_data["socialMedia"]) or (
+            "DISCORD" not in player_data["socialMedia"]["links"]):
         return False
     return player_data["socialMedia"]["links"]["DISCORD"] == str(user)
 
@@ -98,9 +99,10 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                                       description="Please elaborate on your problem/query so that the staff team can help you out!",
                                                       color=neutral_color))
             if option == "Register a milestone":
-                await ticket.edit(name=f"milestone-{ign}", category=discord.utils.get(interaction.guild.categories,
-                                                                                      name=ticket_categories[
-                                                                                          "milestone"]))
+                await ticket.edit(name=f"milestone-{ign}", topic=f"{interaction.user.id}|",
+                                  category=discord.utils.get(interaction.guild.categories,
+                                                             name=ticket_categories[
+                                                                 "milestone"]))
                 await ticket.send(embed=discord.Embed(title=f"{ign} would like to register a milestone!",
                                                       description="Please provide a small description and proof of your milestone!\nIf your milestone is approved, it'll be included in next week's milestone post!",
                                                       color=neutral_color))
@@ -121,15 +123,16 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     await ticket.send(embed=discord.Embed(title="You meet the do-not-kick-list requirements!",
                                                           description=f"You have {format(weekly_gexp, ',d')} weekly guild experience!",
                                                           color=neutral_color))
+
                 class Dnkl_Buttons(discord.ui.Button):
-                    def __init__(self, button : list):
+                    def __init__(self, button: list):
                         """
                         3 buttons for 3 dnkl actions. `custom_id` is needed for persistent views.
                         """
                         super().__init__(label=button[0], custom_id=button[1], style=button[2])
 
                     async def callback(self, interaction: discord.Interaction):
-                        #if bot.staff not in interaction.user.roles and ticket.id != interaction.channel_id: return
+                        # if bot.staff not in interaction.user.roles and ticket.id != interaction.channel_id: return
                         if interaction.custom_id == "DNKL_Approve":
                             msg = await bot.get_channel(dnkl_channel_id).send(embed=embed)
 
@@ -412,7 +415,6 @@ async def after_cache_ready():
 
     from func.utils.discord_utils import name_grabber
     bot.staff_names = [await name_grabber(member) for member in bot.staff.members]
-
 
 
 @after_cache_ready.before_loop
