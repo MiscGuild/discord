@@ -68,6 +68,7 @@ milestone_emojis = {
     "Bedwars": "<:BedWars64:823036962150547477>",
     "Skywars": "<:Skywars:823036980526972948>",
     "Duels": "<:Duels:823036885089255434>",
+    "Skyblock": "<:sb:732824932177805405>",
     "Build Battle": "<:buildbattle:828113746978406481>",
     "Arcade": "<:arcade:825723888477929472>",
     "Turbo Kart Racers": "<:TurboKartRacers64:846306861950304267>",
