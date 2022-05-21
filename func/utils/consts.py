@@ -33,11 +33,13 @@ staff_announcements_id = config["staff_announcements_channel"]
 partner_channel_id = config["partner_channel"]
 qotd_channel_id = config["qotd_channel"]
 qotd_ans_channel_id = config["qotd_ans_channel"]
+milestones_channel = config["milestones_channel"]
 
 # Other variables
 guild_handle = config["guild_handle"]
 ticket_categories = config["ticket_categories"]
 allies = config["allies"]
+milestones_category = config['milestones_category']
 
 # Colors
 neg_color = 0xff3333
@@ -59,6 +61,21 @@ pronoun_roles = {
     "She/Her": "👩",
     "They/Them": "🏳️‍🌈",
     "Other": "❓",
+}
+
+milestone_emojis = {
+    "Hypixel": "<:hypixel:823036946984730662>",
+    "Bedwars": "<:BedWars64:823036962150547477>",
+    "Skywars": "<:Skywars:823036980526972948>",
+    "Duels": "<:Duels:823036885089255434>",
+    "Build Battle": "<:buildbattle:828113746978406481>",
+    "Arcade": "<:arcade:825723888477929472>",
+    "Turbo Kart Racers": "<:TurboKartRacers64:846306861950304267>",
+    "Pit": "<:pit:851361342744690728>",
+    "Murder Mystery": "<:MurderMystery64:823036899974447105>",
+    "Miscellaneous": "<:Misc:540990817872117780>",
+    "Discord": "<:discord:977349801412788266>",
+    "Other": "❓"
 }
 
 # General embeds
