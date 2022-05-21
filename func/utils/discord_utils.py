@@ -8,7 +8,7 @@ from discord.ext import commands, tasks
 import discord.ui
 from func.utils.consts import (config, dnkl_channel_id, dnkl_req,
                                gvg_requirements, invalid_date_msg,
-                               log_channel_id, months, neg_color,
+                               log_channel_id, months, missing_permissions_embed, neg_color,
                                neutral_color, staff_application_questions,
                                ticket_categories, unknown_ign_embed)
 from func.utils.db_utils import insert_new_dnkl, select_one, update_dnkl
@@ -132,8 +132,11 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                         super().__init__(label=button[0], custom_id=button[1], style=button[2])
 
                     async def callback(self, interaction: discord.Interaction):
+                        if bot.staff not in interaction.user.roles:
+                            await ticket.send(embed=missing_permissions_embed)
+                            return
                         # if bot.staff not in interaction.user.roles and ticket.id != interaction.channel_id: return
-                        if interaction.custom_id == "DNKL_Approve":
+                        elif interaction.custom_id == "DNKL_Approve":
                             msg = await bot.get_channel(dnkl_channel_id).send(embed=embed)
 
                             # Check if user is already on DNKL
@@ -177,6 +180,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
 
                 embed = await dnkl_application(ign, uuid, ticket, interaction.user)
                 await ticket.send("Staff, what do you wish to do with this application?", embed=embed, view=view)
+
             if option == "Staff application":
                 # Edit category and send info embed with requirements
                 await ticket.edit(name=f"staff-application-{ign}",
