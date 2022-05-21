@@ -6,12 +6,14 @@ import aiohttp
 from datetime import datetime, timedelta
 
 import discord
+import discord.ui
+
 from __main__ import bot
 from func.utils.consts import (accepted_staff_application_embed, active_req,
                                allies, error_color, guild_handle,
-                               invalid_guild_embed, log_channel_id, member_req,
-                               neg_color, neutral_color, new_member_req,
-                               pos_color, registration_channel_id,
+                               invalid_guild_embed, log_channel_id, member_req, milestones_category,
+                               milestones_channel, milestone_emojis, neg_color, neutral_color,
+                               new_member_req, pos_color, registration_channel_id,
                                registration_embed, staff_application_questions,
                                ticket_categories)
 from func.utils.db_utils import insert_new_giveaway, select_all
@@ -71,7 +73,8 @@ class Func:
         rows = await select_all("SELECT * FROM dnkl")
 
         if not rows:
-            return discord.Embed(title="No entries!", description="There are no users on the do-not-kick-list!", color=neg_color)
+            return discord.Embed(title="No entries!", description="There are no users on the do-not-kick-list!",
+                                 color=neg_color)
 
         # Create embed
         content = ""
@@ -79,7 +82,8 @@ class Func:
             _, _, username = _set
             content += f"{username}\n"
 
-        return discord.Embed(title="The people on the do-not-kick-list are as follows:", description=content, color=neutral_color).set_footer(text=f"Total: {len(content.split())}")
+        return discord.Embed(title="The people on the do-not-kick-list are as follows:", description=content,
+                             color=neutral_color).set_footer(text=f"Total: {len(content.split())}")
 
     async def rolecheck(ctx, send_ping: bool):
         # Define a message for sending progress updates
@@ -95,7 +99,8 @@ class Func:
             ally_uuids.extend(await get_guild_uuids(ally))
             req = await get_player_guild(ally_uuids[-1])
             gtag = " " if not req["tag"] or not req else req["tag"]
-            ally_divisions.append([len(ally_uuids), gtag])  # Ally divisions marks the separation point of one guild from another in the ally_uuids array along with the guild's gtag
+            ally_divisions.append([len(ally_uuids),
+                                   gtag])  # Ally divisions marks the separation point of one guild from another in the ally_uuids array along with the guild's gtag
 
         # Limiting the maximum concurrency
         async def gather_with_concurrency(n, *tasks):
@@ -115,10 +120,11 @@ class Func:
                 tasks = await gather_with_concurrency(3,
                                                       *[
                                                           get_name_by_uuid(uuid) for uuid in draw
-                                                      ])    # Gathering with a max concurrency of 5
+                                                      ])  # Gathering with a max concurrency of 5
             dump.extend(tasks)
         # Loop through discord members
-        await ctx.send("If you see the bot is stuck on a member along with an error message, forcesync member the bot is stuck on.")
+        await ctx.send(
+            "If you see the bot is stuck on a member along with an error message, forcesync member the bot is stuck on.")
         bot.admin_ids = [member.id for member in bot.admin.members]
         for member in bot.guild.members:
             # Do not check admins and bots
@@ -179,11 +185,12 @@ class Func:
         # Indefinite loop for collecting info
         while True:
             # Ask for name
-            await progress_message.edit(content="What is the name of the staff member? (say 'cancel' to void this command)")
+            await progress_message.edit(
+                content="What is the name of the staff member? (say 'cancel' to void this command)")
 
             # Wait for reply and delete message
             staff_name = await bot.wait_for("message", check=lambda
-                                            x: x.author == ctx.message.author and x.channel == ctx.channel)
+                x: x.author == ctx.message.author and x.channel == ctx.channel)
             await staff_name.delete()
             staff_name = staff_name.content
 
@@ -196,7 +203,7 @@ class Func:
             await progress_message.edit(content=f"What are your comments about {staff_name}?")
             # Wait for reply and delete message
             staff_comm = await bot.wait_for("message", check=lambda
-                                            x: x.author == ctx.message.author and x.channel == ctx.channel)
+                x: x.author == ctx.message.author and x.channel == ctx.channel)
             await staff_comm.delete()
             staff_comm = staff_comm.content
 
@@ -282,8 +289,10 @@ class Func:
         # Loop for getting question feedback
         while True:
             while True:
-                await ctx.send("What is the question number of the reply that you would like to critique?\nIf you would like to critique something in general, reply with `0`")
-                question = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+                await ctx.send(
+                    "What is the question number of the reply that you would like to critique?\nIf you would like to critique something in general, reply with `0`")
+                question = await bot.wait_for("message",
+                                              check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
 
                 # Try-except for checking if the given number is valid
                 try:
@@ -294,7 +303,8 @@ class Func:
                     await ctx.send("Please respond with a valid question number.")
 
             await ctx.send(f"`{question}`\n**What was the issue that you found with their reply?**")
-            critique = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+            critique = await bot.wait_for("message",
+                                          check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
 
             # Update embed and send preview
             denial_embed.add_field(
@@ -316,7 +326,8 @@ class Func:
                     if not transcript:
                         return denial_embed.set_footer(text="Transcript creation failed!"), None
 
-                    return denial_embed.set_footer(text="You may reapply in 2 weeks.\nFollowing is the transcript so that you can refer to it while reapplying."), transcript
+                    return denial_embed.set_footer(
+                        text="You may reapply in 2 weeks.\nFollowing is the transcript so that you can refer to it while reapplying."), transcript
 
                 # Break inner loop and let user answer more questions
                 break
@@ -352,9 +363,6 @@ class Func:
                 guild_rank = member["rank"]
                 # Remove dnkl users from list
 
-
-
-
                 # Members who need to be promoted
                 if guild_rank == "Member" and weekly_exp >= active_req:
                     to_promote[name] = weekly_exp
@@ -366,7 +374,7 @@ class Func:
                     if guild_rank == "Member":
                         # Filter new members who meet their requirements
                         days_since_join = (
-                            datetime.now() - datetime.fromtimestamp(member["joined"] / 1000.0)).days
+                                datetime.now() - datetime.fromtimestamp(member["joined"] / 1000.0)).days
                         if days_since_join <= 7 and weekly_exp > new_member_req * days_since_join:
                             continue
                         inactive[name] = weekly_exp
@@ -379,7 +387,7 @@ class Func:
             # Loop through dicts, descriptions and colors
             for _dict, title, color in [[to_promote, "Promote the following users:", pos_color],
                                         [to_demote, "Demote the following users:",
-                                            neg_color],
+                                         neg_color],
                                         [residents, "Following are the inactive residents:", 0xe5ba6c],
                                         [inactive, "Following are the users to be kicked:", neg_color]]:
                 # Filter categories with no users
@@ -408,11 +416,13 @@ class Func:
 
     async def giveawaycreate(ctx):
         # Define progress message for asking questions
-        progress_message = await ctx.send("Which channel should the giveaway be hosted in?\n\n`Please respond with a channel shortcut or ID`\n\n**At any time, you can cancel the giveaway by replying with `cancel` to one of the upcoming prompts.**")
+        progress_message = await ctx.send(
+            "Which channel should the giveaway be hosted in?\n\n`Please respond with a channel shortcut or ID`\n\n**At any time, you can cancel the giveaway by replying with `cancel` to one of the upcoming prompts.**")
 
         while True:
             # Wait for answer and check for cancellation
-            destination = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+            destination = await bot.wait_for("message",
+                                             check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
             destination = destination.content.lower()
             if destination == "cancel":
                 return "Giveaway cancelled!"
@@ -435,7 +445,8 @@ class Func:
             break
 
         # Ask for prize
-        await progress_message.edit(content=f"Sweet! The giveaway will be held in <#{destination.id}>. What is the prize going to be?\n\n`Please respond with a small description of the prize.`")
+        await progress_message.edit(
+            content=f"Sweet! The giveaway will be held in <#{destination.id}>. What is the prize going to be?\n\n`Please respond with a small description of the prize.`")
 
         # Wait for answer and check for cancellation
         prize = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
@@ -444,11 +455,13 @@ class Func:
             return "Giveaway cancelled!"
 
         # Ask for no. winners
-        await progress_message.edit(content=f"Ok great! The prize is set to be {prize}. How many winners should the giveaway have?\n\n`Please respond with a number from 1-20.`")
+        await progress_message.edit(
+            content=f"Ok great! The prize is set to be {prize}. How many winners should the giveaway have?\n\n`Please respond with a number from 1-20.`")
 
         while True:
             # Wait for answer and check for cancellation
-            number_winners = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+            number_winners = await bot.wait_for("message",
+                                                check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
             number_winners = number_winners.content
             if number_winners == "cancel":
                 return "Giveaway cancelled!"
@@ -467,11 +480,13 @@ class Func:
             break
 
         # Ask for duration
-        await progress_message.edit(content=f"Neat! There will be {number_winners} winner(s). How long should the giveaway last?\n\n`Please enter a duration. Use an 'm' for minutes, 'd' for days, etc.`")
+        await progress_message.edit(
+            content=f"Neat! There will be {number_winners} winner(s). How long should the giveaway last?\n\n`Please enter a duration. Use an 'm' for minutes, 'd' for days, etc.`")
 
         while True:
             # Wait for answer and check for cancellation
-            duration = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+            duration = await bot.wait_for("message",
+                                          check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
             duration = duration.content.lower()
             if duration == "cancel":
                 return "Giveaway cancelled!"
@@ -480,8 +495,8 @@ class Func:
             seconds_per_unit = {"m": 60, "h": 3600, "d": 86400, "w": 604800}
             try:
                 end_date = datetime.utcnow() + \
-                    timedelta(int(duration[:-1]) *
-                              seconds_per_unit[duration[-1]])
+                           timedelta(int(duration[:-1]) *
+                                     seconds_per_unit[duration[-1]])
                 end_date = end_date.strftime("%Y-%m-%d %H:%M:%S.%f")[:-7]
             except Exception:
                 await ctx.send("Invalid duration! Please try again.", delete_after=3)
@@ -490,11 +505,13 @@ class Func:
             break
 
         # Ask for gexp requirements
-        await progress_message.edit(content=f"Awesome! The giveaway will last for {duration}. Should there be a weekly gexp requirement?\n\n`If you don't want a gexp requirement, reply with 0.`\n`Otherwise, enter a required amount of weekly gexp. Use 'k' for thousands, or 'm' for millions.`")
+        await progress_message.edit(
+            content=f"Awesome! The giveaway will last for {duration}. Should there be a weekly gexp requirement?\n\n`If you don't want a gexp requirement, reply with 0.`\n`Otherwise, enter a required amount of weekly gexp. Use 'k' for thousands, or 'm' for millions.`")
 
         while True:
             # Wait for answer and check for cancellation
-            required_gexp = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+            required_gexp = await bot.wait_for("message",
+                                               check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
             required_gexp = required_gexp.content.lower()
             if required_gexp == "cancel":
                 return "Giveaway cancelled!"
@@ -517,11 +534,13 @@ class Func:
             break
 
         # Ask for role requirements
-        await progress_message.edit(content=f"Ok, there will be a gexp requirement of {format(required_gexp, ',d')}. Should there be any role requirements for the giveaway?\n\n`Please enter role names or role IDs.`\n`If you don't want any role requirements, reply with 'none'`.\n`If entrants only need ONE of the required roles, use ',' between roles.`\n`If entrants must have ALL required roles, use '&'.`")
+        await progress_message.edit(
+            content=f"Ok, there will be a gexp requirement of {format(required_gexp, ',d')}. Should there be any role requirements for the giveaway?\n\n`Please enter role names or role IDs.`\n`If you don't want any role requirements, reply with 'none'`.\n`If entrants only need ONE of the required roles, use ',' between roles.`\n`If entrants must have ALL required roles, use '&'.`")
 
         while True:
             # Wait for answer and check for cancellation
-            required_roles = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+            required_roles = await bot.wait_for("message",
+                                                check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
             required_roles = re.sub(r"\s+", "", required_roles.content)
             if required_roles.lower() == "cancel":
                 return "Giveaway cancelled!"
@@ -563,7 +582,8 @@ class Func:
             break
 
         # Ask for sponsor(s)
-        await progress_message.edit(content=f"Excellent! There will be {len(required_roles)} required role(s). Finally, who has sponsored this giveaway?\n\n`Please ping the sponsor(s) of this giveaway.`")
+        await progress_message.edit(
+            content=f"Excellent! There will be {len(required_roles)} required role(s). Finally, who has sponsored this giveaway?\n\n`Please ping the sponsor(s) of this giveaway.`")
         # Wait for answer and check for cancellation
         sponsors = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
         sponsors = sponsors.content
@@ -591,27 +611,34 @@ class Func:
             name="[-] Requirements:", value=f"{role_requirement_text} \n{gexp_requirement_text}", inline=False)
 
         # Ask for confirmation
-        await progress_message.edit(content="This is your last chance to confirm the giveaway, are you sure you want to continue? (y/n)", embed=embed)
+        await progress_message.edit(
+            content="This is your last chance to confirm the giveaway, are you sure you want to continue? (y/n)",
+            embed=embed)
 
         # Wait for answer and check confirmation
-        confirmation = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+        confirmation = await bot.wait_for("message",
+                                          check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
         confirmation = confirmation.content.lower()
         if confirmation not in ["y", "yes"]:
             return "Giveaway cancelled!"
 
         # Send the giveaway in destination channel and add 🎉 reaction
-        msg = await destination.send(f"{bot.giveaways_events.mention} React with 🎉 to enter! If you win this giveaway, make a ticket to claim it!", embed=embed)
+        msg = await destination.send(
+            f"{bot.giveaways_events.mention} React with 🎉 to enter! If you win this giveaway, make a ticket to claim it!",
+            embed=embed)
         await msg.add_reaction("\U0001F389")
 
         # Enter data into db (Make required roles a str for db)
         required_roles = " ".join([str(role) for role in required_roles])
-        await insert_new_giveaway(msg.id, destination.id, prize, number_winners, end_date, required_gexp, all_roles_required, required_roles, sponsors)
+        await insert_new_giveaway(msg.id, destination.id, prize, number_winners, end_date, required_gexp,
+                                  all_roles_required, required_roles, sponsors)
 
         # Return confirmation
         return f"Ok! The giveaway has been set up in <#{destination.id}>!"
 
     async def giveawaylist(ctx):
-        all_giveaways = await select_all("SELECT prize, channel_id, message_id, number_winners, time_of_finish FROM giveaways")
+        all_giveaways = await select_all(
+            "SELECT prize, channel_id, message_id, number_winners, time_of_finish FROM giveaways")
 
         # There have been no recent giveaways
         if not all_giveaways:
@@ -631,3 +658,112 @@ class Func:
                                 value=f"Channel: <#{channel_id}> \nMessage ID: {message_id} \nNumber Of Winners: {number_winners} \nEnds At: {finish}")
 
             return embed
+
+    async def add_milestone(ctx, name):
+        if not name:
+            member = bot.guild.get_member(int(ctx.channel.topic.split("|")[0]))
+            name = await name_grabber(member)
+
+        class MilestoneTypeSelect(discord.ui.Select):
+            def __init__(self):
+                super().__init__()
+                for key, value in milestone_emojis.items():
+                    self.add_option(label=key, emoji=f"{value}")
+
+            # Override default callback
+            async def callback(self, interaction: discord.Interaction):
+                # Set option var and delete Select so it cannot be used twice
+                option = list(interaction.data.values())[0][0]
+                option_emoji = milestone_emojis.get(option)
+                channel = ctx.channel
+
+                await interaction.response.send_message(f"**Milestone Category:** {option}"
+                                                        f"\n**What is {name}'s milestone?**\n"
+                                                        f"{option_emoji}{name}.... (Complete the sentence)")
+                milestone = await bot.wait_for("message",
+                                               check=lambda
+                                                   x: x.channel == channel and x.author == interaction.user)
+                milestone_message = f"{option_emoji} {member.mention} {milestone.content}|"
+                channel_description = channel.topic + milestone_message
+                await ctx.send(
+                    "Please give the bot up to 10 minutes to add the milestone. Once it has done it, you'll receive a completion message.")
+                await channel.edit(topic=str(channel_description))
+                embed = discord.Embed(title="Milestone Registered!",
+                                      description=milestone_message[:-1], color=neutral_color)
+
+                await ctx.send(embed=embed)
+
+        # Create view and embed, send to ticket
+        view = discord.ui.View()
+        view.add_item(MilestoneTypeSelect())
+        embed = discord.Embed(title=f"Under what category does {name}'s milestone fall?",
+                              description="Please select your reason from the dropdown given below!",
+                              color=neutral_color)
+        await ctx.send(embed=embed, view=view)
+
+    async def update_milestone(ctx, name):
+        if not name:
+            member = bot.guild.get_member(int(ctx.channel.topic.split("|")[0]))
+            name = await name_grabber(member)
+
+        channel_description_list = ctx.channel.topic.split(
+            "|")  # Has a list in the format ["MEMBER ID","MILESTONE 1", "MILESTONE 2"....}
+        all_milestones = ctx.channel.topic.split('|')[
+                         1:-1]  # Omits the Member ID from channel_description_list and also an empty string from the end
+
+        class MilestoneTypeSelect(discord.ui.Select):
+            def __init__(self):
+                super().__init__()
+                index = 1
+                for milestone in all_milestones:
+                    category = [k for k, v in milestone_emojis.items() if v == milestone.split(" ")[0]][0]
+                    self.add_option(label=f"{name} {milestone.split(' ', 2)[2]}",
+                                    value=f"{index} {category} {milestone.split(' ', 2)[2]}",
+                                    emoji=milestone.split(" ")[0])
+                    index += 1
+
+            # Override default callback
+            async def callback(self, interaction: discord.Interaction):
+                # Set option var
+                option = list(interaction.data.values())[0][0].split(' ', 2)
+                index = int(option[0])
+                category = option[1]
+                old_milestone = option[2]
+                emoji = milestone_emojis[category]
+
+                await interaction.response.send_message(
+                    f"**Milestone Category:** {category}\n"
+                    f"**Old Milestone:** {old_milestone}"
+                    f"\n**What is {name}'s milestone?**\n"
+                    f"{emoji}{name}.... (Complete the sentence)")
+                milestone = await bot.wait_for("message",
+                                               check=lambda
+                                                   x: x.channel == ctx.channel and x.author == interaction.user)
+                new_milestone_message = f"{emoji} {member.mention} {milestone.content}"
+                channel_description_list[index] = new_milestone_message
+
+                await ctx.channel.edit(topic="|".join(channel_description_list))
+                embed = discord.Embed(title="Milestone Registered!",
+                                      description=new_milestone_message, color=neutral_color)
+
+                await ctx.send(embed=embed)
+
+        # Create view and embed, send to ticket
+        view = discord.ui.View()
+        view.add_item(MilestoneTypeSelect())
+        embed = discord.Embed(title=f"Which of the following milestones would you like to update?",
+                              description="Please select your reason from the dropdown given below!",
+                              color=neutral_color)
+        await ctx.send(embed=embed, view=view)
+
+    async def compile_milestones(ctx):
+        day_number = 86 + round((datetime.utcnow() - datetime.strptime("2022/05/15", "%Y/%m/%d")).days / 7)
+
+        milestone_message = f"**Weekly Milestones**\nThis is week __{day_number}__ of weekly milestones\n\n"
+        for channel in bot.guild.text_channels:
+            if channel.category_id == milestones_category:
+                player_milestones = channel.topic.split("|")[1:-1]
+                for milestone in player_milestones:
+                    milestone_message = milestone_message + milestone + "!\n"
+        milestone_message = milestone_message + "\n**Congrats to everyone this week. If you wish to submit a milestone, look over at <#650248396480970782>!**"
+        await bot.get_channel(milestones_channel).send(milestone_message)
