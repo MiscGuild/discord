@@ -659,10 +659,9 @@ class Func:
 
             return embed
 
-    async def add_milestone(ctx, name):
-        if not name:
-            member = bot.guild.get_member(int(ctx.channel.topic.split("|")[0]))
-            name = await name_grabber(member)
+    async def add_milestone(ctx):
+        member = bot.guild.get_member(int(ctx.channel.topic.split("|")[0]))
+        name = await name_grabber(member)
 
         class MilestoneTypeSelect(discord.ui.Select):
             def __init__(self):
@@ -701,10 +700,9 @@ class Func:
                               color=neutral_color)
         await ctx.send(embed=embed, view=view)
 
-    async def update_milestone(ctx, name):
-        if not name:
-            member = bot.guild.get_member(int(ctx.channel.topic.split("|")[0]))
-            name = await name_grabber(member)
+    async def update_milestone(ctx):
+        member = bot.guild.get_member(int(ctx.channel.topic.split("|")[0]))
+        name = await name_grabber(member)
 
         channel_description_list = ctx.channel.topic.split(
             "|")  # Has a list in the format ["MEMBER ID","MILESTONE 1", "MILESTONE 2"....}

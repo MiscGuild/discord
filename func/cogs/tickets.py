@@ -94,18 +94,16 @@ class Tickets(commands.Cog, name="tickets"):
         """Create a new ticket!"""
         await ctx.send(await Func.new(ctx))
 
-    async def add_milestone(ctx, name):
-        pass
 
     @commands.command(aliases=['AddMilestone'])
-    async def MilestoneAdd(self, ctx, name: str = None):
+    async def MilestoneAdd(self, ctx):
         """Register a milestone"""
-        await Func.add_milestone(ctx, name)
+        await Func.add_milestone(ctx)
 
     @commands.command(aliases=['UpdateMilestone'])
-    async def MilestoneUpdate(self, ctx, name: str = None):
+    async def MilestoneUpdate(self, ctx):
         """Update a milestone that has already been registered"""
-        await Func.update_milestone(ctx,name)
+        await Func.update_milestone(ctx)
 
     @commands.command(aliases=["CompileMilestones", "mc", "cm", "MilestoneCompile", "CompileMilestone"])
     async def MilestonesCompile(self, ctx):
