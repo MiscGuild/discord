@@ -13,7 +13,7 @@ from func.utils.consts import (accepted_staff_application_embed, active_req,
                                allies, error_color, guild_handle,
                                invalid_guild_embed, log_channel_id, member_req, milestones_category,
                                milestones_channel, milestone_emojis, neg_color, neutral_color,
-                               new_member_req, pos_color, registration_channel_id,
+                               pos_color, registration_channel_id,
                                registration_embed, staff_application_questions,
                                ticket_categories)
 from func.utils.db_utils import insert_new_giveaway, select_all
