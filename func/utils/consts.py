@@ -7,7 +7,6 @@ import toml
 config = toml.load("config.toml")
 
 # Gexp requirements
-new_member_req = config["new_member_req"]
 member_req = config["member_req"]
 resident_req = config["resident_req"]
 active_req = config["active_req"]
@@ -93,21 +92,16 @@ accepted_staff_application_embed = discord.Embed(title="Congratulations, your st
                                                 description="Please view `https://bit.ly/MiscStaffGuide` and the `#staff-faq` channel to help you get started!",
                                                 color=neutral_color)
 
-requirements_embed = discord.Embed(title="Miscellaneous Guild Requirements", description="These requirements are subject to change!", color=neutral_color).add_field(
-                                                name="New Member",
-                                                value=f"•  {format(new_member_req, ',d')} Daily Guild Experience",
-                                                inline=False).add_field(name="Member",
+requirements_embed = discord.Embed(title="Miscellaneous Guild Requirements", description="These requirements are subject to change!", color=neutral_color).add_field(name="Member",
                                                 value=f"•  {format(member_req, ',d')} Weekly Guild Experience",
                                                 inline=False).add_field(name="Resident",
                                                 value=f"•  {format(resident_req, ',d')} Weekly Guild Experience",
-                                                inline=False).add_field(
-                                                name="Active",
+                                                inline=False).add_field(name="Active",
                                                 value=f"•  {format(active_req, ',d')} Weekly Guild Experience",
                                                 inline=False).add_field(name="Do-not-kick-list Eligibility",
                                                 value=f"•  {format(dnkl_req, ',d')} Weekly Guild Experience",
                                                 inline=False).set_footer(
-                                                text="You are considered a New Member for the first 7 days after joining the guild"
-                                                    "\nIf you fail to meet these requirements, you will be kicked!")
+                                                text="If you fail to meet these requirements, you will be kicked!")
 
 resident_embed = discord.Embed(title="How can I get Resident?",
                                 description="To be eligible for Resident, you must be satisfy at least one of the following requirements:", color=neutral_color).add_field(name="Youtuber",
@@ -225,7 +219,7 @@ staff_application_questions = {
     5: "What has brought you to Miscellaneous, and what has kept you here?",
     6: "What is something you could suggest that would improve the guild?",
     7: "You have just started as a helper and a moderator starts arguing with another member. This argument starts to get serious quite quickly. What do you do?",
-    8: "Suppose it's your first week of being a helper and you guild-mute a well-known player. Your guildmates start spamming you calling you a bad moderator and telling you to unmute them. What would you do?",
+    8: "Suppose it's your first week of being a helper and you guild-mute a well-known player. Your guild-mates start spamming you calling you a bad moderator and telling you to unmute them. What would you do?",
     9: "Upon joining a game and you discover that a guild member is in your game and is hacking. What do you do?",
     10: "Have you been staff in any other guild or on any server? If yes, which one?",
     11: "How much time do you have to contribute to the role? (Per day)",
