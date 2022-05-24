@@ -375,7 +375,7 @@ class Func:
                         # Filter new members who meet their requirements
                         days_since_join = (
                                 datetime.now() - datetime.fromtimestamp(member["joined"] / 1000.0)).days
-                        if days_since_join <= 7 and weekly_exp > new_member_req * days_since_join:
+                        if days_since_join <= 7 and weekly_exp > member_req/7 * days_since_join:
                             continue
                         inactive[name] = weekly_exp
                     elif guild_rank == "Resident":
