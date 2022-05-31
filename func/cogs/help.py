@@ -125,8 +125,8 @@ class Help(commands.Cog):
                     for command in self.bot.get_cog(cog).get_commands():
                         # if cog is not hidden
                         if not command.hidden:
+                            syntax = f"{prefix}{command.name}"
                             for key, value in command.clean_params.items():
-                                syntax = f"{prefix}{command.name}"
                                 if not value.default:
                                     syntax += " [" + key + "]"
                                 else:
