@@ -47,6 +47,8 @@ class Listener:
             await ctx.send(embed=missing_role_embed)
         elif isinstance(self.obj, commands.MissingPermissions):
             await ctx.send(embed=missing_permissions_embed)
+        elif isinstance(self.obj, commands.MissingAnyRole):
+            await ctx.send(embed=missing_permissions_embed)
         elif isinstance(self.obj, commands.MemberNotFound):
             await ctx.send(embed=member_not_found_embed)
         elif isinstance(self.obj, commands.MissingRequiredArgument):
