@@ -250,7 +250,7 @@ class Func:
         # Create transcript
         transcript = await create_transcript(ctx.channel)
         if not transcript:
-            return discord.Embed(text="Transcript creation failed!", color=error_color)
+            return discord.Embed(title="Transcript creation failed!", color=error_color)
 
         # Transcript is valid
         return transcript
