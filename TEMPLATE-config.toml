@@ -1,28 +1,34 @@
 # Discord bot token
-token = ""
+token = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 # Bot prefix and status
 prefix = ""
-status = ""
+status = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 # The ids of all users who will have acces to owner commands
 owner_ids = [
-    XXXXXXXXXXXXXXXXXX,
-    XXXXXXXXXXXXXXXXXX
+    12345,
+    12345,
 ]
 
 # The ids for your discord server and channel (Note: dnkl stands for do-not-kick-list)
-guild_id = XXXXXXXXXXXXXXXXXX
-error_channel = XXXXXXXXXXXXXXXXXX
-dnkl_channel = XXXXXXXXXXXXXXXXXX
-ticket_channel = XXXXXXXXXXXXXXXXXX
-log_channel = XXXXXXXXXXXXXXXXXX
-registration_channel = XXXXXXXXXXXXXXXXXX
-staff_announcements_channel = XXXXXXXXXXXXXXXXXX
-partner_channel = XXXXXXXXXXXXXXXXXX
+guild_id = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+error_channel = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+dnkl_channel = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ticket_channel = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+log_channel = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+registration_channel = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+staff_announcements_channel = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+partner_channel = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+qotd_channel = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+qotd_ans_channel = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+milestones_channel = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+milestones_category = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+
 
 # The name of your Hypixel guild
-guild_handle = ""
+guild_handle = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 # Gexp requirements for the guild
 new_member_req = 0
@@ -43,20 +49,24 @@ gvg_duels_wlr = 0
 allies = [
     "",
     "",
-    ""
+    "",
+    "",
+    "",
+    "",
 ]
 
 # A list of Hypixel API keys for making requests
 api_keys = [
-    "",
-    "",
-    ""
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
 ]
 
 # The names of discord ticket categories
 [ticket_categories]
-generic = ""
-other = ""
-report = ""
-milestone = ""
-dnkl = ""
+generic = "ABC"
+other = "DEF"
+report = "GHI"
+milestone = "JKL"
+dnkl = "DNKL"
