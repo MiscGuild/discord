@@ -1,10 +1,12 @@
 # The following file contains: mute, unmute, kick, ban, softban, unban, sync/forcesync, register, add, remove, avatar
 
+import asyncio
+from __main__ import bot
 from typing import Union
 
 import discord
-from __main__ import bot
 from discord.errors import Forbidden, NotFound
+
 from func.utils.consts import (registration_channel_id, active_req, allies, bot_missing_perms_embed,
                                discord_not_linked_embed, err_404_embed,
                                guild_handle, neg_color, neutral_color,
@@ -188,19 +190,18 @@ class Union:
             player_data = await get_hypixel_player(uuid=uuid)
             guild_data = await get_player_guild(uuid)
 
-            # Account is not linked to discord
-            if not await is_linked_discord(player_data, self.user):
-                return discord_not_linked_embed
-
             guild_name = "an Unknown Guild" if not guild_data else guild_data["name"]
+
+            await ctx.author.edit(nick=ign)
 
             # User is a member
             if guild_name == guild_handle:
-                await ctx.author.add_roles(bot.member_role, reason="Register")
+                await ctx.author.add_roles(bot.member_role, reason="Registration - Member")
+
 
             # User is in an allied guild
             elif guild_name in allies:
-                await ctx.author.add_roles(bot.guest, bot.ally, reason="Register")
+                await ctx.author.add_roles(bot.guest, bot.ally, reason="Registration - Ally")
 
                 # Add guild tag as nick
                 gtag = "" if "tag" not in guild_data else guild_data["tag"]
@@ -209,11 +210,56 @@ class Union:
 
             # User is a guest
             else:
-                await ctx.author.add_roles(bot.guest, reason="Register")
+                await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
+                ticket = await create_ticket(ctx.author, f"ticket-{ign}",
+                                             category_name=ticket_categories["registration"])
+                await ticket.purge(limit=1000)
+                await ticket.edit(name=f"join-request-{ign}", topic=f"{ctx.author.id}|",
+                                  category=discord.utils.get(ctx.guild.categories,
+                                                             name=ticket_categories["registration"]))
+
+                class Join_Misc_Buttons(discord.ui.Button):
+                    def __init__(self, button: list):
+                        """
+                        2 buttons for 2 registration actions. `custom_id` is needed for persistent views.
+                        """
+                        super().__init__(label=button[0], custom_id=button[1], style=button[2])
+
+                    async def callback(self, interaction: discord.Interaction):
+                        # if bot.staff not in interaction.user.roles and ticket.id != interaction.channel_id: return
+                        if interaction.custom_id == "Yes":
+                            await ticket.purge(limit=100)
+                            await ticket.send(
+                                embed=discord.Embed(title=f"{ign} wishes to join Miscellaneous!",
+                                                    description=f"Please await staff assistance!\nIn the meanwhile, you may explore the Discord!",
+                                                    color=neutral_color))
+                            await interaction.user.add_roles(bot.guest, reason="Registration - Guest")
+
+                        elif interaction.custom_id == "No":
+                            await ticket.purge(limit=100)
+                            await interaction.user.remove_roles(bot.processing, reason="Registration - Guest")
+                            await interaction.user.add_roles(bot.guest, reason="Registration - Guest")
+                            await ticket.send(
+                                embed=discord.Embed(
+                                    title="You have been given the Guest role!\n**This ticket will be deleted in 10 seconds.** \n\n*If you need assistance with anything else, create a new ticket using* `,new`",
+                                    color=neutral_color))
+                            await asyncio.sleep(10)
+                            await discord.TextChannel.delete(ticket)
+
+                view = discord.ui.View(timeout=None)
+                buttons = [["Yes", "Yes", discord.enums.ButtonStyle.primary],
+                           ["No", "No", discord.enums.ButtonStyle.red]]
+                # Loop through the list of roles and add a new button to the view for each role.
+                for button in buttons:
+                    # Get the role from the guild by ID.
+                    view.add_item(Join_Misc_Buttons(button))
+
+                await ticket.send(
+                    embed=discord.Embed(title="Do you wish to join Miscellaneous in-game?", color=neutral_color),
+                    view=view)
 
             # Remove new member role, edit nick and delete message
             await ctx.author.remove_roles(bot.new_member_role, reason="Register")
-            await ctx.author.edit(nick=ign)
             await ctx.message.delete()
 
             # Send success embed
@@ -227,7 +273,9 @@ class Union:
             return "This command can only be used in tickets!"
 
         # Set perms
-        await ctx.channel.set_permissions(self.user, send_messages=True, read_messages=True, add_reactions=True, embed_links=True, attach_files=True, read_message_history=True, external_emojis=True)
+        await ctx.channel.set_permissions(self.user, send_messages=True, read_messages=True, add_reactions=True,
+                                          embed_links=True, attach_files=True, read_message_history=True,
+                                          external_emojis=True)
         return discord.Embed(title=f"{self.user.name} has been added to the ticket!", color=pos_color)
 
     async def remove(self, ctx):
