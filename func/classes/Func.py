@@ -2,13 +2,13 @@
 
 import asyncio
 import re
-import aiohttp
+from __main__ import bot
 from datetime import datetime, timedelta
 
+import aiohttp
 import discord
 import discord.ui
 
-from __main__ import bot
 from func.utils.consts import (accepted_staff_application_embed, active_req,
                                allies, error_color, guild_handle,
                                invalid_guild_embed, log_channel_id, member_req, milestones_category,
@@ -18,7 +18,7 @@ from func.utils.consts import (accepted_staff_application_embed, active_req,
                                ticket_categories)
 from func.utils.db_utils import insert_new_giveaway, select_all
 from func.utils.discord_utils import (create_ticket, create_transcript,
-                                      log_event, name_grabber)
+                                      log_event, name_grabber, get_ticket_creator)
 from func.utils.minecraft_utils import get_hypixel_player_rank
 from func.utils.request_utils import (get_guild_by_name, get_guild_uuids,
                                       get_hypixel_player, get_jpg_file,
@@ -286,12 +286,11 @@ class Func:
         # Copy real question list and append 0th element for general critiquing
         application_questions = staff_application_questions.copy()
         application_questions[0] = "General critiquing"
-
+        message = await channel.fetch_message(int(channel.topic.split("|")[1]))
+        member = await get_ticket_creator(ctx.channel)
+        await ctx.send(embed=message.embeds[0].set_footer(text=""))
         # Send the list of questions and their associated numbers
         all_questions = ""
-        for key, value in application_questions.items():
-            all_questions += f"**{key})** {value}\n\n"
-        await ctx.send(embed=discord.Embed(title="Questions", description=all_questions, color=neutral_color))
 
         # Define the embed to be sent to the applicant
         denial_embed = discord.Embed(title="Your staff application has been denied!",
@@ -310,10 +309,10 @@ class Func:
                     question = application_questions[int(question.content)]
                     break
                 # Catch KeyError if number is invalid
-                except KeyError:
+                except:
                     await ctx.send("Please respond with a valid question number.")
 
-            await ctx.send(f"`{question}`\n**What was the issue that you found with their reply?**")
+            await ctx.send(f"`{question}`\n**What was the issue that you found with {member.nick}'s reply?**")
             critique = await bot.wait_for("message",
                                           check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
 
@@ -386,7 +385,7 @@ class Func:
                         # Filter new members who meet their requirements
                         days_since_join = (
                                 datetime.now() - datetime.fromtimestamp(member["joined"] / 1000.0)).days
-                        if days_since_join <= 7 and weekly_exp > member_req/7 * days_since_join:
+                        if days_since_join <= 7 and weekly_exp > member_req / 7 * days_since_join:
                             continue
                         inactive[name] = weekly_exp
                     elif guild_rank == "Resident":
@@ -670,7 +669,7 @@ class Func:
             return embed
 
     async def add_milestone(ctx):
-        member = bot.guild.get_member(int(ctx.channel.topic.split("|")[0]))
+        member = await get_ticket_creator(ctx.channel)
         name = await name_grabber(member)
 
         class MilestoneTypeSelect(discord.ui.Select):
@@ -711,7 +710,7 @@ class Func:
         await ctx.send(embed=embed, view=view)
 
     async def update_milestone(ctx):
-        member = bot.guild.get_member(int(ctx.channel.topic.split("|")[0]))
+        member = await get_ticket_creator(ctx.channel)
         name = await name_grabber(member)
 
         channel_description_list = ctx.channel.topic.split(
