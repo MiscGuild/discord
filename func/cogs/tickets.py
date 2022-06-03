@@ -94,7 +94,6 @@ class Tickets(commands.Cog, name="tickets"):
         """Create a new ticket!"""
         await ctx.send(await Func.new(ctx))
 
-
     @commands.command(aliases=['AddMilestone'])
     async def MilestoneAdd(self, ctx):
         """Register a milestone"""

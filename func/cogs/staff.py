@@ -8,7 +8,7 @@ from func.utils.consts import partner_channel_id
 
 class Staff(commands.Cog, name="staff"):
     """
-    Commands for Miscellaneous staff members
+    Commands for Miscellaneous staff members.
     """
 
     def __init__(self, bot):

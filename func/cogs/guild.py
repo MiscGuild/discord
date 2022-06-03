@@ -9,7 +9,7 @@ from func.utils.discord_utils import name_grabber
 
 class Guild(commands.Cog, name="guild"):
     """
-    Everything to do with guild. All the commands related to guilds come under this module.
+    Everything to do with guilds. All the commands related to guilds come under this module.
     """
     def __init__(self, bot):
         self.bot = bot
@@ -56,7 +56,7 @@ class Guild(commands.Cog, name="guild"):
 
     @commands.command()
     async def gvg(self, ctx):
-        """View information about GvG's and GvG requirements!"""
+        """View information about Miscellaneous' GvG team and the requirements!!"""
         await ctx.send(embed=gvg_info_embed)
 
 

@@ -98,19 +98,20 @@ class Help(commands.Cog):
         elif len(input) == 1:
             if input[0] not in self.bot.cogs:
                 command = self.bot.get_command(input[0])
-                syntax = f"{prefix}{command.name}"
-                for key, value in command.clean_params.items():
-                    if not value.default:
-                        syntax += " [" + key + "]"
-                    else:
-                        syntax += " <" + key + ">"
-                embed = discord.Embed(title=f"Help", color=neutral_color)
-                embed.add_field(name=f"`{syntax}`", value=command.help)
-                aliases = command.aliases
-                if aliases:
-                    embed.add_field(name="Aliases", value=", ".join(aliases), inline=False)
-                await ctx.send(embed=embed)
-                return
+                if command:
+                    syntax = f"{prefix}{command.name}"
+                    for key, value in command.clean_params.items():
+                        if not value.default:
+                            syntax += " [" + key + "]"
+                        else:
+                            syntax += " <" + key + ">"
+                    embed = discord.Embed(title=f"Help", color=neutral_color)
+                    embed.add_field(name=f"`{syntax}`", value=command.help)
+                    aliases = command.aliases
+                    if aliases:
+                        embed.add_field(name="Aliases", value=", ".join(aliases), inline=False)
+                    await ctx.send(embed=embed)
+                    return
 
             # iterating trough cogs
             for cog in self.bot.cogs:
