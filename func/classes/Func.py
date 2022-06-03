@@ -9,6 +9,7 @@ import aiohttp
 import discord
 import discord.ui
 
+from func.classes.Union import Union
 from func.utils.consts import (accepted_staff_application_embed, active_req,
                                allies, error_color, guild_handle,
                                invalid_guild_embed, log_channel_id, member_req, milestones_category,
@@ -226,15 +227,8 @@ class Func:
         if ctx.channel.category.name == "REGISTRATION":
             member = await get_ticket_creator(ctx.channel)
             ign, uuid = await get_mojang_profile(member.nick)
-            guild = None
-            try:
-                guild = (await get_player_guild(uuid))['name']
-            except:
-                pass
-            if guild == "Miscellaneous":
-                await member.remove_roles(bot.guest, bot.processing,
-                                          reason="Register - Person Joined Misc - Ticket Deletion")
-                await member.add_roles(bot.member_role, reason="Registration - Member")
+            await Union(user=member).sync(ctx, ign, None, True)
+
         # Send deletion warning and gather transcript
         await ctx.send(embed=discord.Embed(title="This ticket will be deleted in 10 seconds!", color=neg_color))
         transcript = await create_transcript(ctx.channel)

@@ -110,7 +110,7 @@ class Union:
 
         # Initialize vars for storing changes
         roles_to_add = []
-        roles_to_remove = []
+        roles_to_remove = [bot.processing]
         new_nick = ign
 
         guild_name = "no guild" if not guild_data else guild_data["name"]
@@ -147,7 +147,7 @@ class Union:
         # User is a guest
         else:
             # Filter people who have not been approved to join the discord
-            if str(ctx.channel.category.name) == "RTickets" and not is_fs:
+            if not is_fs:
                 return "You cannot use this command in a registration ticket!\nKindly await staff assistance!"
 
             roles_to_add.append(bot.guest)
