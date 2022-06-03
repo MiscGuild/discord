@@ -417,7 +417,7 @@ class Func:
     async def giveawaycreate(ctx):
         # Define progress message for asking questions
         progress_message = await ctx.send(
-            "Which channel should the giveaway be hosted in?\n\n`Please respond with a channel shortcut or ID`\n\n**At any time, you can cancel the giveaway by replying with `cancel` to one of the upcoming prompts.**")
+            "**Which channel should the giveaway be hosted in?**\n\n`Please respond with a channel shortcut or ID`\n\n**At any time, you can cancel the giveaway by replying with `cancel` to one of the upcoming prompts.**")
 
         while True:
             # Wait for answer and check for cancellation
@@ -446,7 +446,7 @@ class Func:
 
         # Ask for prize
         await progress_message.edit(
-            content=f"Sweet! The giveaway will be held in <#{destination.id}>. What is the prize going to be?\n\n`Please respond with a small description of the prize.`")
+            content=f"Sweet! The giveaway will be held in <#{destination.id}>.\n\n**What is the prize going to be?**\n\n`Please respond with a small description of the prize.`")
 
         # Wait for answer and check for cancellation
         prize = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
@@ -456,7 +456,7 @@ class Func:
 
         # Ask for no. winners
         await progress_message.edit(
-            content=f"Ok great! The prize is set to be {prize}. How many winners should the giveaway have?\n\n`Please respond with a number from 1-20.`")
+            content=f"Ok great! The prize is set to be {prize}.\n\n**How many winners should the giveaway have?**\n\n`Please respond with a number from 1-20.`")
 
         while True:
             # Wait for answer and check for cancellation
@@ -481,7 +481,7 @@ class Func:
 
         # Ask for duration
         await progress_message.edit(
-            content=f"Neat! There will be {number_winners} winner(s). How long should the giveaway last?\n\n`Please enter a duration. Use an 'm' for minutes, 'd' for days, etc.`")
+            content=f"Neat! There will be {number_winners} winner(s).\n\n**How long should the giveaway last?**\n\n`Please enter a duration. Use an 'm' for minutes, 'd' for days, etc.`")
 
         while True:
             # Wait for answer and check for cancellation
@@ -495,8 +495,7 @@ class Func:
             seconds_per_unit = {"m": 60, "h": 3600, "d": 86400, "w": 604800}
             try:
                 end_date = datetime.utcnow() + \
-                           timedelta(int(duration[:-1]) *
-                                     seconds_per_unit[duration[-1]])
+                           timedelta(seconds=(int(duration[:-1]) * seconds_per_unit[duration[-1]]))
                 end_date = end_date.strftime("%Y-%m-%d %H:%M:%S.%f")[:-7]
             except Exception:
                 await ctx.send("Invalid duration! Please try again.", delete_after=3)
@@ -506,7 +505,7 @@ class Func:
 
         # Ask for gexp requirements
         await progress_message.edit(
-            content=f"Awesome! The giveaway will last for {duration}. Should there be a weekly gexp requirement?\n\n`If you don't want a gexp requirement, reply with 0.`\n`Otherwise, enter a required amount of weekly gexp. Use 'k' for thousands, or 'm' for millions.`")
+            content=f"Awesome! The giveaway will last for {duration}.\n\n**Should there be a weekly gexp requirement?**\n\n`If you don't want a gexp requirement, reply with 0.`\n`Otherwise, enter a required amount of weekly gexp. Use 'k' for thousands, or 'm' for millions.`")
 
         while True:
             # Wait for answer and check for cancellation
@@ -535,7 +534,7 @@ class Func:
 
         # Ask for role requirements
         await progress_message.edit(
-            content=f"Ok, there will be a gexp requirement of {format(required_gexp, ',d')}. Should there be any role requirements for the giveaway?\n\n`Please enter role names or role IDs.`\n`If you don't want any role requirements, reply with 'none'`.\n`If entrants only need ONE of the required roles, use ',' between roles.`\n`If entrants must have ALL required roles, use '&'.`")
+            content=f"Ok, there will be a gexp requirement of {format(required_gexp, ',d')}.\n\n**Should there be any role requirements for the giveaway?**\n\n`Please enter role names or role IDs.`\n`If you don't want any role requirements, reply with 'none'`.\n`If entrants only need ONE of the required roles, use ',' between roles.`\n`If entrants must have ALL required roles, use '&'.`")
 
         while True:
             # Wait for answer and check for cancellation
@@ -583,7 +582,7 @@ class Func:
 
         # Ask for sponsor(s)
         await progress_message.edit(
-            content=f"Excellent! There will be {len(required_roles)} required role(s). Finally, who has sponsored this giveaway?\n\n`Please ping the sponsor(s) of this giveaway.`")
+            content=f"Excellent! There will be {len(required_roles)} required role(s).\n\n**Finally, who has sponsored this giveaway?**\n\n`Please ping the sponsor(s) of this giveaway.`")
         # Wait for answer and check for cancellation
         sponsors = await bot.wait_for("message", check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
         sponsors = sponsors.content
