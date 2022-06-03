@@ -223,7 +223,18 @@ class Func:
     async def delete(ctx):
         if not ctx.channel.category or ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
-
+        if ctx.channel.category.name == "REGISTRATION":
+            member = await get_ticket_creator(ctx.channel)
+            ign, uuid = await get_mojang_profile(member.nick)
+            guild = None
+            try:
+                guild = (await get_player_guild(uuid))['name']
+            except:
+                pass
+            if guild == "Miscellaneous":
+                await member.remove_roles(bot.guest, bot.processing,
+                                          reason="Register - Person Joined Misc - Ticket Deletion")
+                await member.add_roles(bot.member_role, reason="Registration - Member")
         # Send deletion warning and gather transcript
         await ctx.send(embed=discord.Embed(title="This ticket will be deleted in 10 seconds!", color=neg_color))
         transcript = await create_transcript(ctx.channel)
