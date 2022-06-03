@@ -14,8 +14,8 @@ dnkl_req = config["dnkl_req"]
 
 # GvG team requirements
 gvg_requirements = {
-    "bw_fkdr":  config["gvg_bw_fkdr"],
-    "bw_wins":  config["gvg_bw_wins"],
+    "bw_fkdr": config["gvg_bw_fkdr"],
+    "bw_wins": config["gvg_bw_wins"],
     "sw_kdr": config["gvg_sw_kdr"],
     "sw_wins": config["gvg_sw_wins"],
     "duels_kills": config["gvg_duels_kills"],
@@ -80,54 +80,60 @@ milestone_emojis = {
 
 # General embeds
 registration_embed = discord.Embed(title=f"Welcome to the {guild_handle} Discord!",
-                    description="Before you can view the server, please register with your Minecraft username.",
-                    color=neutral_color).add_field(name="To register use the following command:",
-                                                    value=",register `Your Minecraft Name`\n\nExample:\n,register John",
-                                                    inline=False)
+                                   description="Before you can view the server, please register with your Minecraft username.",
+                                   color=neutral_color).add_field(name="To register use the following command:",
+                                                                  value=",register `Your Minecraft Name`\n\nExample:\n,register John",
+                                                                  inline=False)
 
 staff_impersonation_embed = discord.Embed(title="Staff impersonation is a punishable offense!",
-                                        color=neg_color)
+                                          color=neg_color)
 
 accepted_staff_application_embed = discord.Embed(title="Congratulations, your staff application has been accepted!",
-                                                description="Please view `https://bit.ly/MiscStaffGuide` and the `#staff-faq` channel to help you get started!",
-                                                color=neutral_color)
+                                                 description="Please view `https://bit.ly/MiscStaffGuide` and the `#staff-faq` channel to help you get started!",
+                                                 color=neutral_color)
 
-requirements_embed = discord.Embed(title="Miscellaneous Guild Requirements", description="These requirements are subject to change!", color=neutral_color).add_field(name="Member",
-                                                value=f"•  {format(member_req, ',d')} Weekly Guild Experience",
-                                                inline=False).add_field(name="Resident",
-                                                value=f"•  {format(resident_req, ',d')} Weekly Guild Experience",
-                                                inline=False).add_field(name="Active",
-                                                value=f"•  {format(active_req, ',d')} Weekly Guild Experience",
-                                                inline=False).add_field(name="Do-not-kick-list Eligibility",
-                                                value=f"•  {format(dnkl_req, ',d')} Weekly Guild Experience",
-                                                inline=False).set_footer(
-                                                text="If you fail to meet these requirements, you will be kicked!")
+requirements_embed = discord.Embed(title="Miscellaneous Guild Requirements",
+                                   description="These requirements are subject to change!",
+                                   color=neutral_color).add_field(name="Member",
+                                                                  value=f"•  {format(member_req, ',d')} Weekly Guild Experience",
+                                                                  inline=False).add_field(name="Resident",
+                                                                                          value=f"•  {format(resident_req, ',d')} Weekly Guild Experience",
+                                                                                          inline=False).add_field(
+    name="Active",
+    value=f"•  {format(active_req, ',d')} Weekly Guild Experience",
+    inline=False).add_field(name="Do-not-kick-list Eligibility",
+                            value=f"•  {format(dnkl_req, ',d')} Weekly Guild Experience",
+                            inline=False).set_footer(
+    text="If you fail to meet these requirements, you will be kicked!")
 
 resident_embed = discord.Embed(title="How can I get Resident?",
-                                description="To be eligible for Resident, you must be satisfy at least one of the following requirements:", color=neutral_color).add_field(name="Youtuber",
-                                value="If you're a youtuber with more than 5,000 subscribers, you aren't subject to any guild requirements.",
-                                inline=False).add_field(name="Rich Kid", value="Spend Money on the guild by doing giveaways and or sponsoring events!",
-                                inline=False).add_field(name="Server Booster", value="Boost the guild discord!",
-                                inline=False).add_field(name="GvG Team", value="Be an exceptional GvG player.",
-                                inline=False).set_footer(
-                                text=f"Unless otherwise specified, all residents must get {format(resident_req, ',d')} weekly guild experience.")
+                               description="To be eligible for Resident, you must be satisfy at least one of the following requirements:",
+                               color=neutral_color).add_field(name="Youtuber",
+                                                              value="If you're a youtuber with more than 5,000 subscribers, you aren't subject to any guild requirements.",
+                                                              inline=False).add_field(name="Rich Kid",
+                                                                                      value="Spend Money on the guild by doing giveaways and or sponsoring events!",
+                                                                                      inline=False).add_field(
+    name="Server Booster", value="Boost the guild discord!",
+    inline=False).add_field(name="GvG Team", value="Be an exceptional GvG player.",
+                            inline=False).set_footer(
+    text=f"Unless otherwise specified, all residents must get {format(resident_req, ',d')} weekly guild experience.")
 
-gvg_info_embed = discord.Embed(title="GvG Information", 
-                                description="Following is some general information and the requiurements for the GvG team.",
-                                color=neutral_color).add_field(
-                                    name="Information",
-                                    value="In a GvG (Guild vs Guild), players are organised by guild and play various gamemodes. The guild that wins the most games wins the GvG.",
-                                    inline=False
-                                ).add_field(
-                                    name="Requirements",
-                                    value=f"""Bedwars Wins: `{gvg_requirements["bw_wins"]}`
+gvg_info_embed = discord.Embed(title="GvG Information",
+                               description="Following is some general information and the requirements for the GvG team.",
+                               color=neutral_color).add_field(
+    name="Information",
+    value="In a GvG (Guild vs Guild), players are organised by guild and play various gamemodes. The guild that wins the most games wins the GvG.",
+    inline=False
+).add_field(
+    name="Requirements",
+    value=f"""Bedwars Wins: `{gvg_requirements["bw_wins"]}`
                                             Bedwars FKDR: `{gvg_requirements["bw_fkdr"]}`
                                             Skywars Wins: `{gvg_requirements["sw_wins"]}`
                                             Skywars KDR: `{gvg_requirements["sw_kdr"]}`
                                             Duels WLR: `{gvg_requirements["duels_wlr"]}`
                                             Duels Kills: `{gvg_requirements["duels_kills"]}`""",
-                                    inline=False
-                                )
+    inline=False
+)
 
 # Errors
 unknown_ign_msg = "Unknown IGN!"
@@ -137,34 +143,34 @@ invalid_date_msg = "This date is invalid! You have entered a date that has alrea
 missing_permissions_msg = "Your soul lacks the strength to utilize this feature!"
 
 invalid_command_embed = discord.Embed(title="Invalid Command!",
-                                    description="Use `,help` to view a list of all commands!",
-                                    color=error_color)
+                                      description="Use `,help` to view a list of all commands!",
+                                      color=error_color)
 
 not_owner_embed = discord.Embed(title=missing_permissions_msg,
                                 description="You are not the owner of this bot!",
                                 color=error_color)
 
 missing_role_embed = discord.Embed(title=missing_permissions_msg,
-                                description="You do not have the required roles to access this restricted command!",
-                                color=error_color)
+                                   description="You do not have the required roles to access this restricted command!",
+                                   color=error_color)
 
 missing_permissions_embed = discord.Embed(title=missing_permissions_msg,
-                                    description="You do not have the required permissions to access this restricted command!",
-                                    color=error_color)
+                                          description="You do not have the required permissions to access this restricted command!",
+                                          color=error_color)
 
 member_not_found_embed = discord.Embed(title="Member not found",
-                                    description="This member doesn't seem to exist.\nCheck you have their ID or tag's capitalization and spelling correct!",
-                                    color=error_color)
+                                       description="This member doesn't seem to exist.\nCheck you have their ID or tag's capitalization and spelling correct!",
+                                       color=error_color)
 
 err_404_embed = discord.Embed(title="404 - Not Found",
-                            description="The bot encountered an error 404 while performing this action!",
-                            color=error_color)
+                              description="The bot encountered an error 404 while performing this action!",
+                              color=error_color)
 
 bot_missing_perms_embed = discord.Embed(title="Missing permissions!",
                                         description="Due to the role hierarchy, the bot does not have the permission to do that!",
                                         color=error_color)
 
-guildless_embed = discord.Embed(title="Guildless!", 
+guildless_embed = discord.Embed(title="Guildless!",
                                 description="This player is not in a guild!",
                                 color=error_color)
 
@@ -173,12 +179,14 @@ invalid_guild_embed = discord.Embed(title="Invalid guild!",
                                     color=error_color)
 
 unknown_ign_embed = discord.Embed(title="Please enter a valid Minecraft username!",
-                                color=error_color)
+                                  color=error_color)
 
 discord_not_linked_embed = discord.Embed(title="This account is not linked to your discord account!",
-                                        description="Please follow the following steps to link your Hypixel profile with discord:\nGo to 'Your Profile' > Social Media > DISCORD and paste your discord info.",
-                                        color=error_color)
-discord_not_linked_embed.set_image(url="https://media.discordapp.net/attachments/796061149593731128/953770877395284008/osl_.gif")
+                                         description="Please follow the following steps to link your Hypixel profile with discord:\nGo to 'Your Profile' > Social Media > DISCORD and paste your discord info.",
+                                         color=error_color)
+discord_not_linked_embed.set_image(
+    url="https://media.discordapp.net/attachments/796061149593731128/953770877395284008/osl_.gif")
+
 
 class ChatColor(Enum):
     RED = "&c"
@@ -196,18 +204,19 @@ class ChatColor(Enum):
     BLACK = "&0"
     DARK_BLUE = "&1"
 
+
 months = {
     1: "January",
-    2: "February", 
-    3: "March", 
+    2: "February",
+    3: "March",
     4: "April",
     5: "May",
-    6: "June", 
-    7: "July", 
-    8: "August", 
+    6: "June",
+    7: "July",
+    8: "August",
     9: "September",
-    10: "October", 
-    11: "November", 
+    10: "October",
+    11: "November",
     12: "December"
 }
 
@@ -224,5 +233,5 @@ staff_application_questions = {
     10: "Have you been staff in any other guild or on any server? If yes, which one?",
     11: "How much time do you have to contribute to the role? (Per day)",
     12: "Tell us about a time you made a mistake within the last year. How did you deal with it? What did you learn?",
-    13: "Anything else you would us to know?"
+    13: "Anything else you like would us to know?"
 }

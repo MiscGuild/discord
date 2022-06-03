@@ -1,6 +1,8 @@
-import discord
 from __main__ import bot
+
+import discord
 from discord.ext import commands
+
 from func.classes.Func import Func
 from func.classes.Union import Union
 from func.utils.consts import partner_channel_id
@@ -42,7 +44,7 @@ class Staff(commands.Cog, name="staff"):
 
     @commands.command()
     @commands.has_role("Admin")
-    async def partner(self, ctx,  organization_name: str):
+    async def partner(self, ctx, organization_name: str):
         """Create an embed with information about a partner!"""
         await bot.get_channel(partner_channel_id).send(embed=await Func.partner(ctx, organization_name))
 

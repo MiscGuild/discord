@@ -1,6 +1,7 @@
 import discord
-from discord.ext import commands
 from discord.errors import Forbidden
+from discord.ext import commands
+
 from func.utils.consts import config, neutral_color
 
 """This custom help command is a perfect replacement for the default one on any Discord Bot written in Discord.py!
@@ -56,6 +57,7 @@ class Help(commands.Cog):
                 return await cmd.can_run(ctx)
             except commands.CommandError:
                 return False
+
         # checks if cog parameter was given
         # if not: sending all modules and commands not associated with a cog
         if not input:

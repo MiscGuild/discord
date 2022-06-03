@@ -1,11 +1,12 @@
+from __main__ import bot
 from datetime import datetime, timedelta
 from io import BytesIO
 
 import chat_exporter
 import discord
-from __main__ import bot
-from discord.ext import commands, tasks
 import discord.ui
+from discord.ext import tasks
+
 from func.utils.consts import (config, dnkl_channel_id, dnkl_req,
                                gvg_requirements, invalid_date_msg,
                                log_channel_id, months, missing_permissions_embed, neg_color,
@@ -28,8 +29,10 @@ async def is_linked_discord(player_data: dict, user: discord.User) -> bool:
         return False
     return player_data["socialMedia"]["links"]["DISCORD"] == str(user)
 
+
 async def get_ticket_creator(channel: discord.TextChannel):
     return bot.guild.get_member(int(channel.topic.split("|")[0]))
+
 
 async def create_ticket(user: discord.Member, ticket_name: str, category_name: str = ticket_categories["generic"]):
     # Create ticket
@@ -90,16 +93,18 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
 
                 # Logic for handling ticket types
                 if option == "Report a player":
-                    await ticket.edit(name=f"report-{ign}", topic=f"{interaction.user.id}|", category=discord.utils.get(interaction.guild.categories,
-                                                                                       name=ticket_categories["report"]))
+                    await ticket.edit(name=f"report-{ign}", topic=f"{interaction.user.id}|",
+                                      category=discord.utils.get(interaction.guild.categories,
+                                                                 name=ticket_categories["report"]))
                     await ticket.send(embed=discord.Embed(title=f"{ign} wishes to file a player report!",
                                                           description="You are expected to provide maximum detail about the offense.\n"
                                                                       "> Username of the accused\n> Time of offense\n> Explanation of offense\n> Proof of offense\n"
                                                                       "If you wish to report a staff member, please DM the guild master or an admin.",
                                                           color=neutral_color))
                 if option == "Query/Problem":
-                    await ticket.edit(name=f"general-{ign}", topic=f"{interaction.user.id}|", category=discord.utils.get(interaction.guild.categories,
-                                                                                        name=ticket_categories["generic"]))
+                    await ticket.edit(name=f"general-{ign}", topic=f"{interaction.user.id}|",
+                                      category=discord.utils.get(interaction.guild.categories,
+                                                                 name=ticket_categories["generic"]))
                     await ticket.send(embed=discord.Embed(title=f"{ign} has a query/problem!",
                                                           description="Please elaborate on your problem/query so that the staff team can help you out!",
                                                           color=neutral_color))
@@ -113,17 +118,19 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                                           color=neutral_color))
                 if option == "I am going to be inactive":
                     # Edit channel name and category
-                    await ticket.edit(name=f"dnkl-{ign}", topic=f"{interaction.user.id}|", category=discord.utils.get(interaction.guild.categories,
-                                                                                     name=ticket_categories["dnkl"]))
+                    await ticket.edit(name=f"dnkl-{ign}", topic=f"{interaction.user.id}|",
+                                      category=discord.utils.get(interaction.guild.categories,
+                                                                 name=ticket_categories["dnkl"]))
 
                     # Notify user if they don't meet gexp req, however ask questions anyway
                     _, weekly_gexp = await get_player_gexp(uuid)
                     if not weekly_gexp:
                         return await ticket.send(embed=unknown_ign_embed)
                     if weekly_gexp < dnkl_req:
-                        await ticket.send(embed=discord.Embed(title="You do not meet the do-not-kick-list requirements!",
-                                                              description=f"Even though you do not meet the requirements, your application may still be accepted.\nYou have {format(weekly_gexp, ',d')} weekly guild experience!",
-                                                              color=neg_color))
+                        await ticket.send(
+                            embed=discord.Embed(title="You do not meet the do-not-kick-list requirements!",
+                                                description=f"Even though you do not meet the requirements, your application may still be accepted.\nYou have {format(weekly_gexp, ',d')} weekly guild experience!",
+                                                color=neg_color))
                     else:
                         await ticket.send(embed=discord.Embed(title="You meet the do-not-kick-list requirements!",
                                                               description=f"You have {format(weekly_gexp, ',d')} weekly guild experience!",
@@ -145,7 +152,8 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                 msg = await bot.get_channel(dnkl_channel_id).send(embed=embed)
 
                                 # Check if user is already on DNKL
-                                current_message = await select_one("SELECT message_id FROM dnkl WHERE uuid = (?)", (uuid,))
+                                current_message = await select_one("SELECT message_id FROM dnkl WHERE uuid = (?)",
+                                                                   (uuid,))
                                 # User is not currently on DNKL
                                 if not current_message:
                                     await insert_new_dnkl(msg.id, uuid, ign)
@@ -154,7 +162,8 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                 # User is already on DNKl
                                 # Try to delete current message
                                 try:
-                                    current_message = await bot.get_channel(dnkl_channel_id).fetch_message(current_message)
+                                    current_message = await bot.get_channel(dnkl_channel_id).fetch_message(
+                                        current_message)
                                     await current_message.delete()
                                 except Exception:
                                     pass
@@ -215,7 +224,8 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                                               description="You must answer in one message.",
                                                               color=neutral_color))
                         answer = await bot.wait_for("message",
-                                                    check=lambda x: x.channel == ticket and x.author == interaction.user)
+                                                    check=lambda
+                                                        x: x.channel == ticket and x.author == interaction.user)
 
                         # Place answer into array with question number
                         answers[number] = answer.content
@@ -249,7 +259,8 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     # Set vars for each stat
                     bw_wins = player_data["Bedwars"]["wins_bedwars"]
                     bw_fkdr = round(
-                        player_data["Bedwars"]["final_kills_bedwars"] / player_data["Bedwars"]["final_deaths_bedwars"], 2)
+                        player_data["Bedwars"]["final_kills_bedwars"] / player_data["Bedwars"]["final_deaths_bedwars"],
+                        2)
                     sw_wins = player_data["SkyWars"]["wins"]
                     sw_kdr = round(player_data["SkyWars"]["kills"] / player_data["SkyWars"]["deaths"], 2)
                     duels_wlr = round(player_data["Duels"]["wins"] / player_data["Duels"]["losses"], 2)
@@ -257,10 +268,12 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
 
                     # Define dict for eligibility and set each gamemode boolean
                     eligibility = {}
-                    eligibility["bedwars"] = False if bw_wins < gvg_requirements["bw_wins"] and bw_fkdr < gvg_requirements[
-                        "bw_fkdr"] else True
-                    eligibility["skywars"] = False if sw_wins < gvg_requirements["sw_wins"] and sw_kdr < gvg_requirements[
-                        "sw_kdr"] else True
+                    eligibility["bedwars"] = False if bw_wins < gvg_requirements["bw_wins"] and bw_fkdr < \
+                                                      gvg_requirements[
+                                                          "bw_fkdr"] else True
+                    eligibility["skywars"] = False if sw_wins < gvg_requirements["sw_wins"] and sw_kdr < \
+                                                      gvg_requirements[
+                                                          "sw_kdr"] else True
                     eligibility["duels"] = False if duels_wlr < gvg_requirements["duels_wlr"] and duels_kills < \
                                                     gvg_requirements["duels_kills"] else True
 
@@ -288,7 +301,8 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                         # loop through all GvG gamemodes
                         for mode, req1_name, req1, req2_name, req2 in [["bedwars", "Wins", bw_wins, "FKDR", bw_fkdr],
                                                                        ["skywars", "Wins", sw_wins, "KDR", sw_kdr],
-                                                                       ["duels", "WLR", duels_wlr, "Kills", duels_kills]]:
+                                                                       ["duels", "WLR", duels_wlr, "Kills",
+                                                                        duels_kills]]:
                             # If user is eligible for that gamemode, create embed
                             if eligibility[mode]:
                                 embed = discord.Embed(title=f"You are eiligible for the {mode.capitalize()} team!",
@@ -308,8 +322,9 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                                           description="Please await staff assistance!",
                                                           color=neutral_color))
                 if option == "Other":
-                    await ticket.edit(name=f"other-{ign}", topic=f"{interaction.user.id}|", category=discord.utils.get(interaction.guild.categories,
-                                                                                      name=ticket_categories["other"]))
+                    await ticket.edit(name=f"other-{ign}", topic=f"{interaction.user.id}|",
+                                      category=discord.utils.get(interaction.guild.categories,
+                                                                 name=ticket_categories["other"]))
                     await ticket.send(embed=discord.Embed(title="This ticket has been created for an unknown reason!",
                                                           description="Please specify why you have created this ticket!",
                                                           color=neutral_color))

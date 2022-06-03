@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+
 from func.classes.String import String
 from func.classes.Union import Union
 
@@ -8,6 +9,7 @@ class General(commands.Cog, name="general"):
     """
     Contains all source, avatar, qotd.
     """
+
     def __init__(self, bot):
         self.bot = bot
 

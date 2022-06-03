@@ -1,11 +1,12 @@
 # The following file contains: on_member_join, on_error, on_command_error, reactionroles, tickets, on_interaction
 
 import traceback
+from __main__ import bot
 
 import discord
-from __main__ import bot
 from discord.ext import commands
 from discord.ui import Button, Select, View
+
 from func.utils.consts import (error_channel_id, invalid_command_embed,
                                member_not_found_embed,
                                missing_permissions_embed, missing_role_embed,
@@ -68,7 +69,8 @@ class Listener:
             tb = "".join(traceback.format_exception(
                 type(self.obj), self.obj, self.obj.__traceback__))
             if len(tb) <= 1955:
-                await bot.get_channel(error_channel_id).send(f"Ignoring exception in command {ctx.command}:\n```py\n{tb}\n```")
+                await bot.get_channel(error_channel_id).send(
+                    f"Ignoring exception in command {ctx.command}:\n```py\n{tb}\n```")
             else:
                 await bot.get_channel(error_channel_id).send(
                     f"```An error occurred in command '{ctx.command}' that could not be sent in this channel, check the console for the traceback. \n\n'{self.obj}'```")
@@ -79,10 +81,10 @@ class Listener:
         # Reaction roles
         reaction_roles_embed = discord.Embed(title="To get your desired role, click its respective button!",
                                              description="🪓 __**SkyBlock**__\nGives you the access to the SkyBlock category!\n\n"
-                                             "🕹 __**Minigames**__\nAllows you to play some Discord minigames!\n\n"
-                                             "❓  __**QOTD Ping**__\nThe staff team will mention this role when there's a new question of the day!\n\n"
-                                             "🎉 __**Giveaways/Events**__\nReact so you don't miss any giveaway or event\n\n"
-                                             "📖 __**Storytime Pings**__\nGet pinged whenever a storytime happens",
+                                                         "🕹 __**Minigames**__\nAllows you to play some Discord minigames!\n\n"
+                                                         "❓  __**QOTD Ping**__\nThe staff team will mention this role when there's a new question of the day!\n\n"
+                                                         "🎉 __**Giveaways/Events**__\nReact so you don't miss any giveaway or event\n\n"
+                                                         "📖 __**Storytime Pings**__\nGet pinged whenever a storytime happens",
                                              color=neutral_color)
 
         class ReactionRoleButton(Button):
@@ -157,13 +159,14 @@ class Listener:
         embed.set_thumbnail(
             url=f"https://images-ext-1.discordapp.net/external/ziYSZZe7dPyKDYLxA1s2jqpKi-kdCvPFpPaz3zft-wo/%3Fwidth%3D671%26height%3D671/https/media.discordapp.net/attachments/523227151240134664/803843877999607818/misc.png")
 
-        image = await get_jpg_file("https://media.discordapp.net/attachments/650248396480970782/873866686049189898/tickets.jpg")
+        image = await get_jpg_file(
+            "https://media.discordapp.net/attachments/650248396480970782/873866686049189898/tickets.jpg")
 
         class TicketView(View):
             def __init__(self):
                 super().__init__()
                 self.add_item(Button(label="Create Ticket", custom_id="tickets",
-                              style=discord.ButtonStyle.blurple, emoji="✉️"))
+                                     style=discord.ButtonStyle.blurple, emoji="✉️"))
 
         return image, embed, TicketView()
 
@@ -172,7 +175,8 @@ class Listener:
         # Ticket creation
         if self.obj.data["custom_id"] == "tickets":
             ticket = await create_ticket(self.obj.user, f"ticket-{self.obj.user.name}")
-            await self.obj.response.send_message(f"Click the following link to go to your ticket! <#{ticket.id}>", ephemeral=True)
+            await self.obj.response.send_message(f"Click the following link to go to your ticket! <#{ticket.id}>",
+                                                 ephemeral=True)
 
         # Reaction roles
         elif self.obj.data["custom_id"] in reaction_roles.keys():
@@ -188,7 +192,8 @@ class Listener:
         # Pronouns
         elif self.obj.data["custom_id"] == "pronouns":
             label = self.obj.data["values"][0] if self.obj.data["values"] else None
-            await self.obj.user.remove_roles(*[discord.utils.get(self.obj.guild.roles, name=k) for k in pronoun_roles.keys()])
+            await self.obj.user.remove_roles(
+                *[discord.utils.get(self.obj.guild.roles, name=k) for k in pronoun_roles.keys()])
 
             # User selected none, remove all roles
             if not label:

@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+
 from func.classes.Func import Func
 from func.classes.String import String
 from func.classes.Union import Union
@@ -10,6 +11,7 @@ class Hypixel(commands.Cog, name="hypixel"):
     """
     All non-guild related Hypixel commands.
     """
+
     def __init__(self, bot):
         self.bot = bot
 

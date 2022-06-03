@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+
 from func.classes.Func import Func
 from func.classes.Integer import Integer
 from func.classes.String import String
@@ -11,6 +12,7 @@ class Guild(commands.Cog, name="guild"):
     """
     Everything to do with guilds. All the commands related to guilds come under this module.
     """
+
     def __init__(self, bot):
         self.bot = bot
 
