@@ -222,15 +222,18 @@ class Func:
             return embed
 
     async def delete(ctx):
+        embed = discord.Embed(title="This ticket will be deleted in 10 seconds!", color=neg_color)
         if not ctx.channel.category or ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
         if ctx.channel.category.name == ticket_categories["registrees"]:
             member = await get_ticket_creator(ctx.channel)
             ign, uuid = await get_mojang_profile(member.nick)
             await Union(user=member).sync(ctx, ign, None, True)
+            embed.set_footer(text=f"{ign}'s roles have been updated automatically!")
+
 
         # Send deletion warning and gather transcript
-        await ctx.send(embed=discord.Embed(title="This ticket will be deleted in 10 seconds!", color=neg_color))
+        await ctx.send(embed=embed)
         transcript = await create_transcript(ctx.channel)
 
         # Sleep and delete channel

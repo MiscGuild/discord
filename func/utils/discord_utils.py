@@ -61,7 +61,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                  add_reactions=True, embed_links=True,
                                  attach_files=True,
                                  read_message_history=True, external_emojis=True)
-    if category_name != ticket_categories["registration"]:
+    if category_name != ticket_categories["registrees"]:
         # Send the dropdown for ticket creation
         class TicketTypeSelect(discord.ui.Select):
             def __init__(self):
