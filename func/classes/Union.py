@@ -212,11 +212,11 @@ class Union:
             else:
                 await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
                 ticket = await create_ticket(ctx.author, f"ticket-{ign}",
-                                             category_name=ticket_categories["registration"])
+                                             category_name=ticket_categories["registrees"])
                 await ticket.purge(limit=1000)
                 await ticket.edit(name=f"join-request-{ign}", topic=f"{ctx.author.id}|",
                                   category=discord.utils.get(ctx.guild.categories,
-                                                             name=ticket_categories["registration"]))
+                                                             name=ticket_categories["registrees"]))
 
                 class Join_Misc_Buttons(discord.ui.Button):
                     def __init__(self, button: list):

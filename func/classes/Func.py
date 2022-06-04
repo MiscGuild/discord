@@ -224,7 +224,7 @@ class Func:
     async def delete(ctx):
         if not ctx.channel.category or ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
-        if ctx.channel.category.name == "REGISTRATION":
+        if ctx.channel.category.name == ticket_categories["registrees"]:
             member = await get_ticket_creator(ctx.channel)
             ign, uuid = await get_mojang_profile(member.nick)
             await Union(user=member).sync(ctx, ign, None, True)
