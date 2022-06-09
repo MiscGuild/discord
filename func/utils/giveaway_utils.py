@@ -17,7 +17,8 @@ async def roll_giveaway(message_id: int, reroll_target: int = None):
     channel_id, prize, number_winners, time_of_finish, req_gexp, all_roles_required, req_roles, sponsors = await select_one(
         "SELECT channel_id, prize, number_winners, time_of_finish, required_gexp, all_roles_required, required_roles, sponsors FROM giveaways WHERE message_id = (?)",
         (message_id,))
-    req_roles = [int(role) for role in req_roles.split(" ")]
+
+    req_roles = None if not req_roles else [int(role) for role in req_roles.split(" ")]
 
     # Channel and message vars
     channel: discord.TextChannel = bot.get_channel(channel_id)
@@ -34,7 +35,7 @@ async def roll_giveaway(message_id: int, reroll_target: int = None):
         # Get all users, remove bot's own reaction
         entrants = await reaction.users().flatten()
         del entrants[0]
-        winners: list[discord.User] = []
+        winners: list[discord.Member] = []
 
         # Pick winners
         while len(winners) < number_winners:
@@ -55,7 +56,7 @@ async def roll_giveaway(message_id: int, reroll_target: int = None):
             winner = random.choice(entrants)
 
             # Remove entrant if they do not meet role reqs
-            if len(req_roles):
+            if req_roles:
                 if not all_roles_required and not any(
                         role.id in req_roles for role in winner.roles) or all_roles_required and not all(
                         role.id in req_roles for role in winner.roles):
@@ -85,6 +86,7 @@ async def roll_giveaway(message_id: int, reroll_target: int = None):
         embed = discord.Embed(
             title=prize, description=f"Winners: {announcement}\nSponsored by: {sponsors}", color=neutral_color)
         embed.set_footer(text=f"This giveaway ended at  {time_of_finish}")
+        await set_giveaway_inactive(message_id)
         return await message.edit(embed=embed)
 
     # Message does not have 🎉 reaction

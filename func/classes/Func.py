@@ -498,11 +498,8 @@ class Func:
             if duration == "cancel":
                 return "Giveaway cancelled!"
 
-            # Convert letters to seconds
-            seconds_per_unit = {"m": 60, "h": 3600, "d": 86400, "w": 604800}
             try:
-                end_date = datetime.utcnow() + \
-                           timedelta(seconds=(int(duration[:-1]) * seconds_per_unit[duration[-1]]))
+                end_date = datetime.utcnow() + timedelta(datetime.strptime(str(duration[:-1]), f"%{duration[:-2:-1]}").second)
                 end_date = end_date.strftime("%Y-%m-%d %H:%M:%S.%f")[:-7]
             except Exception:
                 await ctx.send("Invalid duration! Please try again.", delete_after=3)
@@ -541,7 +538,7 @@ class Func:
 
         # Ask for role requirements
         await progress_message.edit(
-            content=f"Ok, there will be a gexp requirement of {format(required_gexp, ',d')}.\n\n**Should there be any role requirements for the giveaway?**\n\n`Please enter role names or role IDs.`\n`If you don't want any role requirements, reply with 'none'`.\n`If entrants only need ONE of the required roles, use ',' between roles.`\n`If entrants must have ALL required roles, use '&'.`")
+            content=f"Ok, there will be a gexp requirement of {format(required_gexp, ',d')}.\n\n**Should there be any role requirements for the giveaway?**\n\n`Please enter role names or role IDs.`\n`If you don't want any role requirements, reply with 'None'`.\n`If entrants only need ONE of the required roles, use ',' between roles.`\n`If entrants must have ALL required roles, use '&'.`")
 
         while True:
             # Wait for answer and check for cancellation
@@ -554,6 +551,7 @@ class Func:
             # Check if user wants role reqs
             if required_roles.lower() == "none":
                 required_roles = []
+                all_roles_required = False
                 break
 
             # Convert string to list of all required roles, set requirement type
