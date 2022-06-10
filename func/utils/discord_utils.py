@@ -12,7 +12,6 @@ from func.utils.consts import (config, dnkl_channel_id, dnkl_req,
                                log_channel_id, months, missing_permissions_embed, neg_color,
                                neutral_color, staff_application_questions,
                                ticket_categories, unknown_ign_embed)
-from func.classes.Union import Union
 from func.utils.db_utils import insert_new_dnkl, select_one, update_dnkl
 from func.utils.minecraft_utils import get_player_gexp
 from func.utils.request_utils import get_hypixel_player, get_mojang_profile
@@ -37,7 +36,6 @@ async def get_ticket_creator(channel: discord.TextChannel):
 
 async def create_ticket(user: discord.Member, ticket_name: str, category_name: str = ticket_categories["generic"]):
     # Create ticket
-    await Union(user=user).sync(None, user.nick, None, True)
     ticket: discord.TextChannel = await bot.guild.create_text_channel(ticket_name,
                                                                       category=discord.utils.get(bot.guild.categories,
                                                                                                  name=category_name))

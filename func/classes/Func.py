@@ -265,6 +265,7 @@ class Func:
 
     async def new(ctx):
         # Create ticket
+        await Union(user=ctx.author).sync(None, await name_grabber(ctx.author), None, True)
         ticket = await create_ticket(ctx.author, f"ticket-{await name_grabber(ctx.author)}")
 
         # Return message with link to ticket
