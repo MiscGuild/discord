@@ -284,10 +284,8 @@ class Func:
         application_questions = staff_application_questions.copy()
         application_questions[0] = "General critiquing"
         message = await channel.fetch_message(int(channel.topic.split("|")[1]))
-        member = await get_ticket_creator(ctx.channel)
+        member = await get_ticket_creator(channel)
         await ctx.send(embed=message.embeds[0].set_footer(text=""))
-        # Send the list of questions and their associated numbers
-        all_questions = ""
 
         # Define the embed to be sent to the applicant
         denial_embed = discord.Embed(title="Your staff application has been denied!",
@@ -300,7 +298,6 @@ class Func:
                     "What is the question number of the reply that you would like to critique?\nIf you would like to critique something in general, reply with `0`")
                 question = await bot.wait_for("message",
                                               check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
-
                 # Try-except for checking if the given number is valid
                 try:
                     question = application_questions[int(question.content)]
