@@ -90,7 +90,7 @@ class Func:
         # Define a message for sending progress updates
         progress_message = await ctx.send("Processing prerequisites...")
 
-        # Define arrays for guild and ally uuids and names
+        # Define arrays for guild and all   y uuids and names
         guild_uuids = await get_guild_uuids(guild_handle)
         guild_names, ally_names, ally_uuids, ally_divisions = [], [], [], []
 
@@ -118,7 +118,7 @@ class Func:
         for _set in [[guild_uuids, guild_names], [ally_uuids, ally_names]]:
             draw, dump = _set
             async with aiohttp.ClientSession():
-                tasks = await gather_with_concurrency(3,
+                tasks = await gather_with_concurrency(2,
                                                       *[
                                                           get_name_by_uuid(uuid) for uuid in draw
                                                       ])  # Gathering with a max concurrency of 5
@@ -135,24 +135,23 @@ class Func:
             name = await name_grabber(member)
             await progress_message.edit(content=f"Checking {name} - {member}")
 
+            # Member of guild
+            if name in guild_names:
+                # Edit roles
+                await member.add_roles(bot.member_role)
+                await member.remove_roles(bot.new_member_role, bot.guest, bot.ally)
+                continue
+
             # Get player data
             name, uuid = await get_mojang_profile(name)
-            # Player does not exist
             if not name:
                 # Edit roles and continue loop
                 await member.remove_roles(bot.member_role, bot.ally, bot.guest)
                 await member.add_roles(bot.new_member_role)
                 continue
 
-            # Member of guild
-            if name in guild_names:
-                # Edit roles
-                await member.add_roles(bot.member_role)
-                await member.remove_roles(bot.new_member_role, bot.guest, bot.ally)
-
-
             # Member of an ally guild
-            elif name in ally_names:
+            if name in ally_names:
                 # Get player gtag
                 position = ally_uuids.index(uuid)
                 last_value = 0

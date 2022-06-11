@@ -59,12 +59,16 @@ async def get_hypixel_player(name: str = None, uuid: str = None):
 
 
 async def get_name_by_uuid(uuid: str):
-    resp = await get_json_response(f"https://sessionserver.mojang.com/session/minecraft/profile/{uuid}")
-    if not resp:
-        return None
+    i = 0
+    while i < 5:
+        i += 1
+        resp = await get_json_response(f"https://sessionserver.mojang.com/session/minecraft/profile/{uuid}")
+        # Player does not exist
+        if not resp:
+            continue
 
-    # Player does not exist
-    return resp["name"]
+        return resp["name"]
+    return None
 
 
 def session_get_name_by_uuid(session, uuid):
