@@ -227,9 +227,10 @@ class Func:
             return "This command can only be used in tickets!"
         if ctx.channel.category.name == ticket_categories["registrees"]:
             member = await get_ticket_creator(ctx.channel)
-            ign, uuid = await get_mojang_profile(member.nick)
-            await Union(user=member).sync(ctx, ign, None, True)
-            embed.set_footer(text=f"{ign}'s roles have been updated automatically!")
+            if member:
+                ign, uuid = await get_mojang_profile(await name_grabber(member))
+                await Union(user=member).sync(ctx, ign, None, True)
+                embed.set_footer(text=f"{ign}'s roles have been updated automatically!")
 
 
         # Send deletion warning and gather transcript
