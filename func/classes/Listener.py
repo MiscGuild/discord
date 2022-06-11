@@ -13,7 +13,6 @@ from func.utils.consts import (error_channel_id, invalid_command_embed,
                                neutral_color, not_owner_embed, pronoun_roles,
                                reaction_roles, registration_channel_id,
                                registration_embed)
-from func.classes.Union import Union
 from func.utils.discord_utils import create_ticket
 from func.utils.request_utils import get_jpg_file
 
@@ -175,7 +174,6 @@ class Listener:
         self.obj: discord.Interaction
         # Ticket creation
         if self.obj.data["custom_id"] == "tickets":
-            await Union(user=self.obj.user).sync(None, self.obj.user.nick, None, True)
             ticket = await create_ticket(self.obj.user, f"ticket-{self.obj.user.name}")
             await self.obj.response.send_message(f"Click the following link to go to your ticket! <#{ticket.id}>",
                                                  ephemeral=True)
