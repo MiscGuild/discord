@@ -96,10 +96,6 @@ class Union:
         if not ign:
             return unknown_ign_embed
 
-        # User trying to sync with staff name
-        elif ign in bot.staff_names and bot.staff not in self.user.roles:
-            return staff_impersonation_embed
-
         # Fetch player & guild data
         player_data = await get_hypixel_player(uuid=uuid)
         guild_data = await get_player_guild(uuid)
