@@ -151,7 +151,7 @@ class Union:
                 return "You cannot use this command in a registration ticket!\nKindly await staff assistance!"
 
             roles_to_add.append(bot.guest)
-            roles_to_remove.extend([bot.member_role])
+            roles_to_remove.extend([bot.member_role, bot.new_member_role])
 
         # Create embed
         embed = discord.Embed(title=f"{ign}'s nick, roles, and tag have been successfully changed!",
@@ -187,10 +187,9 @@ class Union:
                 return staff_impersonation_embed
 
             # Fetch player & guild data
-            player_data = await get_hypixel_player(uuid=uuid)
             guild_data = await get_player_guild(uuid)
 
-            guild_name = "an Unknown Guild" if not guild_data else guild_data["name"]
+            guild_name = "Guildless" if not guild_data else guild_data["name"]
 
             await ctx.author.edit(nick=ign)
 
@@ -242,7 +241,7 @@ class Union:
                             await ticket.send(
                                 embed=discord.Embed(
                                     title="You have been given the Guest role!\n**This ticket will be deleted in 10 seconds.** \n\n*If you need assistance with anything else, create a new ticket using* `,new`",
-                                    color=neutral_color))
+                                    color=neg_color))
                             await asyncio.sleep(10)
                             await discord.TextChannel.delete(ticket)
 
