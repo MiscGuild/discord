@@ -316,10 +316,13 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     # Edit category and send info embed with requirements
                     await ticket.edit(name=f"join-request-{ign}", topic=f"{interaction.user.id}|",
                                       category=discord.utils.get(interaction.guild.categories,
-                                                                 name=ticket_categories["registration"]))
-                    await ticket.send(embed=discord.Embed(title=f"{ign} wishes to join Miscellaneous in-game!",
-                                                          description="Please await staff assistance!",
-                                                          color=neutral_color))
+                                                                 name=ticket_categories["registrees"]))
+                    await ticket.purge(limit=100)
+                    await ticket.send(
+                        embed=discord.Embed(title=f"{ign} wishes to join Miscellaneous!",
+                                            description=f"Please await staff assistance!\nIn the meanwhile, you may explore the Discord!",
+                                            color=neutral_color))
+                    await interaction.user.add_roles(bot.guest, reason="Registration - Guest")
                 if option == "Other":
                     await ticket.edit(name=f"other-{ign}", topic=f"{interaction.user.id}|",
                                       category=discord.utils.get(interaction.guild.categories,
