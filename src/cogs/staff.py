@@ -1,11 +1,9 @@
-from __main__ import bot
-
 import discord
+from __main__ import bot
 from discord.ext import commands
-
-from func.classes.Func import Func
-from func.classes.Union import Union
-from func.utils.consts import partner_channel_id
+from src.func.Func import Func
+from src.func.Union import Union
+from src.utils.consts import partner_channel_id
 
 
 class Staff(commands.Cog, name="staff"):

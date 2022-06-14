@@ -1,6 +1,5 @@
 from discord.ext import commands
-
-from func.classes.Listener import Listener
+from src.func.Listener import Listener
 
 
 class Menus(commands.Cog, command_attrs=dict(hidden=True), name="menus"):

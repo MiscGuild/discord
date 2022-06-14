@@ -1,11 +1,10 @@
 import discord
 from discord.ext import commands
-
-from func.classes.Func import Func
-from func.classes.Integer import Integer
-from func.classes.String import String
-from func.utils.consts import requirements_embed, resident_embed, gvg_info_embed
-from func.utils.discord_utils import name_grabber
+from src.func.Func import Func
+from src.func.Integer import Integer
+from src.func.String import String
+from src.utils.consts import gvg_info_embed, requirements_embed, resident_embed
+from src.utils.discord_utils import name_grabber
 
 
 class Guild(commands.Cog, name="guild"):

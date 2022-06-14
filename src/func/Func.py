@@ -2,29 +2,30 @@
 
 import asyncio
 import re
-from __main__ import bot
 from datetime import datetime, timedelta
 
 import aiohttp
 import discord
 import discord.ui
-
-from func.classes.Union import Union
-from func.utils.consts import (accepted_staff_application_embed, active_req,
-                               allies, error_color, guild_handle,
-                               invalid_guild_embed, log_channel_id, member_req, milestones_category,
-                               milestones_channel, milestone_emojis, neg_color, neutral_color,
-                               pos_color, registration_channel_id,
-                               registration_embed, staff_application_questions,
-                               ticket_categories)
-from func.utils.db_utils import insert_new_giveaway, select_all
-from func.utils.discord_utils import (create_ticket, create_transcript,
-                                      log_event, name_grabber, get_ticket_creator)
-from func.utils.minecraft_utils import get_hypixel_player_rank
-from func.utils.request_utils import (get_guild_by_name, get_guild_uuids,
-                                      get_hypixel_player, get_jpg_file,
-                                      get_mojang_profile, get_name_by_uuid,
-                                      get_player_guild)
+from __main__ import bot
+from src.func.Union import Union
+from src.utils.consts import (accepted_staff_application_embed, active_req,
+                              allies, error_color, guild_handle,
+                              invalid_guild_embed, log_channel_id, member_req,
+                              milestone_emojis, milestones_category,
+                              milestones_channel, neg_color, neutral_color,
+                              pos_color, registration_channel_id,
+                              registration_embed, staff_application_questions,
+                              ticket_categories)
+from src.utils.db_utils import insert_new_giveaway, select_all
+from src.utils.discord_utils import (create_ticket, create_transcript,
+                                     get_ticket_creator, log_event,
+                                     name_grabber)
+from src.utils.minecraft_utils import get_hypixel_player_rank
+from src.utils.request_utils import (get_guild_by_name, get_guild_uuids,
+                                     get_hypixel_player, get_jpg_file,
+                                     get_mojang_profile, get_name_by_uuid,
+                                     get_player_guild)
 
 
 class Func:

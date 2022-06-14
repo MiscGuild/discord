@@ -1,21 +1,21 @@
 # The following file contains: mute, unmute, kick, ban, softban, unban, sync/forcesync, register, add, remove, avatar
 
 import asyncio
-from __main__ import bot
 from typing import Union
 
 import discord
+from __main__ import bot
 from discord.errors import Forbidden, NotFound
-
-from func.utils.consts import (registration_channel_id, active_req, allies, bot_missing_perms_embed,
-                               discord_not_linked_embed, err_404_embed,
-                               guild_handle, neg_color, neutral_color,
-                               pos_color, staff_impersonation_embed,
-                               ticket_categories, unknown_ign_embed)
-from func.utils.discord_utils import (
-    create_ticket, check_tag, has_tag_perms, is_linked_discord)
-from func.utils.request_utils import (
-    get_gtag, get_hypixel_player, get_mojang_profile, get_player_guild)
+from src.utils.consts import (active_req, allies, bot_missing_perms_embed,
+                              discord_not_linked_embed, err_404_embed,
+                              guild_handle, neg_color, neutral_color,
+                              pos_color, registration_channel_id,
+                              staff_impersonation_embed, ticket_categories,
+                              unknown_ign_embed)
+from src.utils.discord_utils import (check_tag, create_ticket, has_tag_perms,
+                                     is_linked_discord)
+from src.utils.request_utils import (get_gtag, get_hypixel_player,
+                                     get_mojang_profile, get_player_guild)
 
 
 class Union:

@@ -1,8 +1,8 @@
 import math
 import re
 
-from func.utils.consts import ChatColor, active_req, member_req, resident_req
-from func.utils.request_utils import get_player_guild
+from src.utils.consts import ChatColor, active_req, member_req, resident_req
+from src.utils.request_utils import get_player_guild
 
 
 async def get_player_gexp(uuid: str):

@@ -1,20 +1,20 @@
-from __main__ import bot
 from datetime import datetime, timedelta
 from io import BytesIO
 
 import chat_exporter
 import discord
 import discord.ui
+from __main__ import bot
 from discord.ext import tasks
-
-from func.utils.consts import (config, dnkl_channel_id, dnkl_req,
-                               gvg_requirements, invalid_date_msg,
-                               log_channel_id, months, missing_permissions_embed, neg_color,
-                               neutral_color, staff_application_questions,
-                               ticket_categories, unknown_ign_embed)
-from func.utils.db_utils import insert_new_dnkl, select_one, update_dnkl
-from func.utils.minecraft_utils import get_player_gexp
-from func.utils.request_utils import get_hypixel_player, get_mojang_profile
+from src.utils.consts import (config, dnkl_channel_id, dnkl_req,
+                              gvg_requirements, invalid_date_msg,
+                              log_channel_id, missing_permissions_embed,
+                              months, neg_color, neutral_color,
+                              staff_application_questions, ticket_categories,
+                              unknown_ign_embed)
+from src.utils.db_utils import insert_new_dnkl, select_one, update_dnkl
+from src.utils.minecraft_utils import get_player_gexp
+from src.utils.request_utils import get_hypixel_player, get_mojang_profile
 
 
 async def name_grabber(author: discord.User) -> str:
@@ -448,7 +448,7 @@ async def after_cache_ready():
     bot.giveaways_events = discord.utils.get(bot.guild.roles, name="Giveaways/Events")
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster, bot.rich_kid)
 
-    from func.utils.discord_utils import name_grabber
+    from src.utils.discord_utils import name_grabber
     bot.staff_names = [await name_grabber(member) for member in bot.staff.members]
 
 

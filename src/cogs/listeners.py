@@ -1,6 +1,5 @@
 from discord.ext import commands
-
-from func.classes.Listener import Listener
+from src.func.Listener import Listener
 
 
 class Listeners(commands.Cog, name="listeners"):

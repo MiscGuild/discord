@@ -1,8 +1,7 @@
 import discord
 from discord.errors import Forbidden
 from discord.ext import commands
-
-from func.utils.consts import config, neutral_color
+from src.utils.consts import config, neutral_color
 
 """This custom help command is a perfect replacement for the default one on any Discord Bot written in Discord.py!
 However, you must put "bot.remove_command('help')" in your bot, and the command must be in a cog for it to work.

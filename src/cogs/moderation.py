@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
 
-from func.classes.Integer import Integer
-from func.classes.Union import Union
+from src.func.Integer import Integer
+from src.func.Union import Union
 
 
 class Moderation(commands.Cog, name="moderation"):

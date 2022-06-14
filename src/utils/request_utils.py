@@ -1,12 +1,11 @@
 import random
 import re
-from __main__ import bot
 from io import BytesIO
 
 import aiohttp
 import discord
-
-from func.utils.consts import config, error_channel_id
+from __main__ import bot
+from src.utils.consts import config, error_channel_id
 
 
 async def get_hyapi_key():

@@ -1,8 +1,7 @@
 import discord
 from discord.ext import commands
-
-from func.classes.String import String
-from func.classes.Union import Union
+from src.func.String import String
+from src.func.Union import Union
 
 
 class General(commands.Cog, name="general"):

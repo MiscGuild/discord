@@ -2,19 +2,24 @@
 
 import inspect
 import os
-from __main__ import bot
 from datetime import datetime
 
 import discord
+from __main__ import bot
 from quickchart import QuickChart
-
-from func.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed, neg_color, pos_color, ticket_categories,
-                               unknown_ign_embed, months, neutral_color, qotd_channel_id, qotd_ans_channel_id)
-from func.utils.db_utils import (delete_dnkl, insert_new_dnkl, select_one, update_dnkl)
-from func.utils.discord_utils import dnkl_application
-from func.utils.minecraft_utils import (calculate_network_level, get_color_by_gexp, get_hypixel_player_rank,
-                                        get_player_gexp)
-from func.utils.request_utils import (get_hypixel_player, get_mojang_profile, get_player_guild)
+from src.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed,
+                              months, neg_color, neutral_color, pos_color,
+                              qotd_ans_channel_id, qotd_channel_id,
+                              ticket_categories, unknown_ign_embed)
+from src.utils.db_utils import (delete_dnkl, insert_new_dnkl, select_one,
+                                update_dnkl)
+from src.utils.discord_utils import dnkl_application
+from src.utils.minecraft_utils import (calculate_network_level,
+                                       get_color_by_gexp,
+                                       get_hypixel_player_rank,
+                                       get_player_gexp)
+from src.utils.request_utils import (get_hypixel_player, get_mojang_profile,
+                                     get_player_guild)
 
 
 class String:

@@ -1,20 +1,19 @@
 # The following file contains: on_member_join, on_error, on_command_error, reactionroles, tickets, on_interaction
 
 import traceback
-from __main__ import bot
 
 import discord
+from __main__ import bot
 from discord.ext import commands
 from discord.ui import Button, Select, View
-
-from func.utils.consts import (error_channel_id, invalid_command_embed,
-                               member_not_found_embed,
-                               missing_permissions_embed, missing_role_embed,
-                               neutral_color, not_owner_embed, pronoun_roles,
-                               reaction_roles, registration_channel_id,
-                               registration_embed)
-from func.utils.discord_utils import create_ticket
-from func.utils.request_utils import get_jpg_file
+from src.utils.consts import (error_channel_id, invalid_command_embed,
+                              member_not_found_embed,
+                              missing_permissions_embed, missing_role_embed,
+                              neutral_color, not_owner_embed, pronoun_roles,
+                              reaction_roles, registration_channel_id,
+                              registration_embed)
+from src.utils.discord_utils import create_ticket
+from src.utils.request_utils import get_jpg_file
 
 
 class Listener:

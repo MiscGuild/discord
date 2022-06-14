@@ -1,10 +1,9 @@
 import discord
 from discord.ext import commands
-
-from func.classes.Func import Func
-from func.classes.String import String
-from func.classes.Union import Union
-from func.utils.discord_utils import name_grabber
+from src.func.Func import Func
+from src.func.String import String
+from src.func.Union import Union
+from src.utils.discord_utils import name_grabber
 
 
 class Hypixel(commands.Cog, name="hypixel"):

@@ -1,14 +1,13 @@
 # The following file contains: giveawayend, giveawayreroll, gtop, purge
 
 import discord
-
-from func.utils.consts import error_color, guild_handle, invalid_guild_embed
-from func.utils.db_utils import get_giveaway_status
-from func.utils.discord_utils import log_event, name_grabber
-from func.utils.giveaway_utils import roll_giveaway
-from func.utils.minecraft_utils import get_hypixel_player_rank
-from func.utils.request_utils import (get_guild_by_name, get_hypixel_player,
-                                      get_jpg_file, get_name_by_uuid)
+from src.utils.consts import error_color, guild_handle, invalid_guild_embed
+from src.utils.db_utils import get_giveaway_status
+from src.utils.discord_utils import log_event, name_grabber
+from src.utils.giveaway_utils import roll_giveaway
+from src.utils.minecraft_utils import get_hypixel_player_rank
+from src.utils.request_utils import (get_guild_by_name, get_hypixel_player,
+                                     get_jpg_file, get_name_by_uuid)
 
 
 class Integer:

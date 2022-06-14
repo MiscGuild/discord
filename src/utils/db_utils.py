@@ -1,7 +1,7 @@
-from __main__ import bot
 from typing import Tuple
 
 import aiosqlite
+from __main__ import bot
 
 
 async def connect_db():

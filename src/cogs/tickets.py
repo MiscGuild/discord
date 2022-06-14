@@ -1,10 +1,9 @@
 import discord
 from discord.ext import commands
-
-from func.classes.Func import Func
-from func.classes.Listener import Listener
-from func.classes.String import String
-from func.classes.Union import Union
+from src.func.Func import Func
+from src.func.Listener import Listener
+from src.func.String import String
+from src.func.Union import Union
 
 
 class Tickets(commands.Cog, name="tickets"):

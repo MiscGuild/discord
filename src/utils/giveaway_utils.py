@@ -1,15 +1,15 @@
 import random
-from __main__ import bot
 from datetime import datetime, timedelta
 
 import discord
+from __main__ import bot
 from discord.ext import tasks
-
-from func.utils.consts import neutral_color
-from func.utils.db_utils import select_one, select_all, set_giveaway_inactive, connect_db
-from func.utils.discord_utils import name_grabber
-from func.utils.minecraft_utils import get_player_gexp
-from func.utils.request_utils import get_mojang_profile
+from src.utils.consts import neutral_color
+from src.utils.db_utils import (connect_db, select_all, select_one,
+                                set_giveaway_inactive)
+from src.utils.discord_utils import name_grabber
+from src.utils.minecraft_utils import get_player_gexp
+from src.utils.request_utils import get_mojang_profile
 
 
 async def roll_giveaway(message_id: int, reroll_target: int = None):

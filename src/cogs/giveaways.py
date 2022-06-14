@@ -1,6 +1,6 @@
 from discord.ext import commands
-from func.classes.Func import Func
-from func.classes.Integer import Integer
+from src.func.Func import Func
+from src.func.Integer import Integer
 
 
 class Giveaways(commands.Cog, name="giveaways"):
