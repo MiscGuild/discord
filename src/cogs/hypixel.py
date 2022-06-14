@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from src.func.Func import Func
+from func.General import Func
 from src.func.String import String
 from src.func.Union import Union
 from src.utils.discord_utils import name_grabber

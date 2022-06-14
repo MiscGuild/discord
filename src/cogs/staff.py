@@ -1,7 +1,7 @@
 import discord
 from __main__ import bot
 from discord.ext import commands
-from src.func.Func import Func
+from func.General import Func
 from src.func.Union import Union
 from src.utils.consts import partner_channel_id
 

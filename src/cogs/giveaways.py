@@ -1,5 +1,5 @@
 from discord.ext import commands
-from src.func.Func import Func
+from func.General import Func
 from src.func.Integer import Integer
 
 
