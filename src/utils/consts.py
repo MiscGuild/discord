@@ -38,7 +38,6 @@ milestones_channel = config["milestones_channel"]
 guild_handle = config["guild_handle"]
 ticket_categories = config["ticket_categories"]
 allies = config["allies"]
-milestones_category = config['milestones_category']
 
 # Colors
 neg_color = 0xff3333

@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from func.General import General
+from src.func.General import General
 from src.func.Integer import Integer
 from src.func.String import String
 from src.utils.consts import gvg_info_embed, requirements_embed, resident_embed

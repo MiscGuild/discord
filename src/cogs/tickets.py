@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from func.General import General
+from src.func.General import General
 from src.func.Listener import Listener
 from src.func.String import String
 from src.func.Union import Union
