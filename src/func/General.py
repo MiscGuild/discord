@@ -27,7 +27,7 @@ from src.utils.request_utils import (get_guild_by_name, get_guild_uuids,
                                      get_player_guild)
 
 
-class Func:
+class General:
     async def weeklylb(ctx):
         async with ctx.channel.typing():
             # Get guild data

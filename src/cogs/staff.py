@@ -1,7 +1,7 @@
 import discord
 from __main__ import bot
 from discord.ext import commands
-from func.General import Func
+from func.General import General
 from src.func.Union import Union
 from src.utils.consts import partner_channel_id
 
@@ -18,7 +18,7 @@ class Staff(commands.Cog, name="staff"):
     @commands.has_role("Staff")
     async def inactive(self, ctx):
         """View all inactive users in the guild!"""
-        for embed in await Func.inactive(ctx):
+        for embed in await General.inactive(ctx):
             await ctx.send(embed=embed)
 
     @commands.command(aliases=["fs"])
@@ -35,7 +35,7 @@ class Staff(commands.Cog, name="staff"):
     @commands.has_role("Admin")
     async def staffreview(self, ctx):
         """Send a progress update and review for staff members!"""
-        res = await Func.staffreview(ctx)
+        res = await General.staffreview(ctx)
         # Result may be empty
         if res:
             await bot.staff_announcements.send(embed=res)
@@ -44,13 +44,13 @@ class Staff(commands.Cog, name="staff"):
     @commands.has_role("Admin")
     async def partner(self, ctx, organization_name: str):
         """Create an embed with information about a partner!"""
-        await bot.get_channel(partner_channel_id).send(embed=await Func.partner(ctx, organization_name))
+        await bot.get_channel(partner_channel_id).send(embed=await General.partner(ctx, organization_name))
 
     @commands.command()
     @commands.has_role("Staff")
     async def rolecheck(self, ctx, send_ping: bool = True):
         """Sync the names and roles of everyone in the discord!"""
-        await Func.rolecheck(ctx, send_ping)
+        await General.rolecheck(ctx, send_ping)
 
 
 def setup(bot):

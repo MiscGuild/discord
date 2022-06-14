@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from func.General import Func
+from func.General import General
 from src.func.String import String
 from src.func.Union import Union
 from src.utils.discord_utils import name_grabber
@@ -49,7 +49,7 @@ class Hypixel(commands.Cog, name="hypixel"):
     @commands.command()
     async def DNKL_List(self, ctx):
         """View all users on the do-not-kick-list!"""
-        await ctx.send(embed=await Func.dnkllist(ctx))
+        await ctx.send(embed=await General.dnkllist(ctx))
 
     @commands.command(aliases=["dnklchk"])
     async def DNKL_Check(self, ctx, name: str = None):

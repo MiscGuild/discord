@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from func.General import Func
+from func.General import General
 from src.func.Integer import Integer
 from src.func.String import String
 from src.utils.consts import gvg_info_embed, requirements_embed, resident_embed
@@ -30,7 +30,7 @@ class Guild(commands.Cog, name="guild"):
     @commands.command(aliases=['weeklylb'])
     async def weekly_gexp_lb(self, ctx):
         """View the weekly gexp leaderboard!"""
-        res = await Func.weeklylb(ctx)
+        res = await General.weeklylb(ctx)
         if isinstance(res, discord.File):
             await ctx.send(file=res)
         if isinstance(res, discord.Embed):

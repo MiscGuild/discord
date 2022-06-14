@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from func.General import Func
+from func.General import General
 from src.func.Listener import Listener
 from src.func.String import String
 from src.func.Union import Union
@@ -27,7 +27,7 @@ class Tickets(commands.Cog, name="tickets"):
     @commands.has_role("Staff")
     async def delete(self, ctx):
         """Delete a ticket!"""
-        res = await Func.delete(ctx)
+        res = await General.delete(ctx)
         if res:
             await ctx.send(res)
 
@@ -61,7 +61,7 @@ class Tickets(commands.Cog, name="tickets"):
     @commands.has_role("Staff")
     async def transcript(self, ctx):
         """Create a transcript for a ticket!"""
-        res = await Func.transcript(ctx)
+        res = await General.transcript(ctx)
         if isinstance(res, discord.Embed):
             await ctx.send(embed=res)
         elif isinstance(res, discord.File):
@@ -73,7 +73,7 @@ class Tickets(commands.Cog, name="tickets"):
     @commands.has_role("Admin")
     async def accept(self, ctx):
         """Accept a staff application!"""
-        res = await Func.accept(ctx)
+        res = await General.accept(ctx)
         if isinstance(res, str):
             await ctx.send(res)
         if isinstance(res, discord.Embed):
@@ -84,7 +84,7 @@ class Tickets(commands.Cog, name="tickets"):
     async def deny(self, ctx, channel: discord.TextChannel):
         """Deny a staff application!"""
         # Get result and send file if it is returned
-        embed, file = await Func.deny(ctx, channel)
+        embed, file = await General.deny(ctx, channel)
         await channel.send(embed=embed)
         if file:
             return await channel.send(file=file)
@@ -92,22 +92,22 @@ class Tickets(commands.Cog, name="tickets"):
     @commands.command()
     async def new(self, ctx):
         """Create a new ticket!"""
-        await ctx.send(await Func.new(ctx))
+        await ctx.send(await General.new(ctx))
 
     @commands.command(aliases=['AddMilestone'])
     async def MilestoneAdd(self, ctx):
         """Register a milestone"""
-        await Func.add_milestone(ctx)
+        await General.add_milestone(ctx)
 
     @commands.command(aliases=['UpdateMilestone'])
     async def MilestoneUpdate(self, ctx):
         """Update a milestone that has already been registered"""
-        await Func.update_milestone(ctx)
+        await General.update_milestone(ctx)
 
     @commands.command(aliases=["CompileMilestones", "mc", "cm", "MilestoneCompile", "CompileMilestone"])
     async def MilestonesCompile(self, ctx):
         """Compiles all milestones into one message and sends it to the milestones channel"""
-        await Func.compile_milestones(ctx)
+        await General.compile_milestones(ctx)
 
     @commands.Cog.listener()
     async def on_interaction(self, res):
