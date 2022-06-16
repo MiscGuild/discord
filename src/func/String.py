@@ -28,7 +28,7 @@ class String:
 
     # Command from https://github.com/Rapptz/RoboDanny
     async def source(self):
-        source_url = "https://github.com/MiscGuild/MiscBot"
+        source_url = "https://github.com/MiscGuild/discord"
         branch = "main"
 
         if not self.string:
