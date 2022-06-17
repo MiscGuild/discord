@@ -25,14 +25,14 @@ class Hypixel(commands.Cog, name="hypixel"):
 
     @commands.command(aliases=['i'])
     async def info(self, ctx, name: str = None):
-        """View Hyipxel stats of the given user!"""
+        """View Hypixel stats of the given user!"""
         if not name:
             name = await name_grabber(ctx.author)
         await ctx.send(embed=await String(string=name).info())
 
-    @commands.command()
+    @commands.command(aliases=['dnkladd'])
     @commands.has_permissions(manage_messages=True)
-    async def DNKL_Add(self, ctx, name: str):
+    async def Dnkl_Add(self, ctx, name: str):
         """Add a user to the do-not-kick-list!"""
         res = await String(string=name).dnkladd(ctx)
         if isinstance(res, str):
@@ -40,18 +40,18 @@ class Hypixel(commands.Cog, name="hypixel"):
         elif isinstance(res, discord.Embed):
             await ctx.send(embed=res)
 
-    @commands.command(aliases=["dnklrmv"])
+    @commands.command(aliases=['dnklrmv'])
     @commands.has_permissions(manage_messages=True)
     async def DNKL_Remove(self, ctx, name: str):
         """Remove a player from the do-not-kick-list"""
         await ctx.send(await String(string=name).dnklremove())
 
-    @commands.command()
+    @commands.command(aliases=['dnkllist'])
     async def DNKL_List(self, ctx):
         """View all users on the do-not-kick-list!"""
         await ctx.send(embed=await General.dnkllist(ctx))
 
-    @commands.command(aliases=["dnklchk"])
+    @commands.command(aliases=['dnklchk'])
     async def DNKL_Check(self, ctx, name: str = None):
         """Check whether you are eligible for the do-not-kick-list!"""
         if not name:

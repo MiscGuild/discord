@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+
 from src.func.General import General
 from src.func.Integer import Integer
 from src.func.String import String
@@ -27,7 +28,7 @@ class Guild(commands.Cog, name="guild"):
         if isinstance(res, str):
             await ctx.send(res)
 
-    @commands.command(aliases=['weeklylb'])
+    @commands.command(aliases=['weeklylb', 'wlb'])
     async def weekly_gexp_lb(self, ctx):
         """View the weekly gexp leaderboard!"""
         res = await General.weeklylb(ctx)
@@ -36,7 +37,7 @@ class Guild(commands.Cog, name="guild"):
         if isinstance(res, discord.Embed):
             await ctx.send(embed=res)
 
-    @commands.command()
+    @commands.command(aliases=['dailylb', 'dlb'])
     async def gtop(self, ctx, day: int = 1):
         """View the daily guild experience leaderboard!"""
         res = await Integer(integer=day).gtop(ctx=ctx)

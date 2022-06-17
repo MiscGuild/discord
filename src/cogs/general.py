@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+
 from src.func.String import String
 from src.func.Union import Union
 
@@ -13,7 +14,7 @@ class General(commands.Cog, name="general"):
         self.bot = bot
 
     # Command from https://github.com/Rapptz/RoboDanny
-    @commands.command()
+    @commands.command(aliases=['src'])
     async def source(self, ctx, *, command: str = None):
         """View the source code for a command!"""
         await ctx.send(await String(string=command).source())
