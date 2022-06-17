@@ -349,7 +349,7 @@ class General:
                 dnkl_uuids[dnkl_uuids.index(tuple)] = tuple[0]
 
             # Define dicts for each category of users
-            to_promote, to_demote, inactive, residents = {}, {}, {}, {}
+            to_promote, to_demote, inactive, residents, skipped_users = {}, {}, {}, {}, []
 
             # Loop through all guild members with a session to fetch names
             for member in guild_data["members"]:
@@ -361,6 +361,9 @@ class General:
                     guild_rank = "DNKL"
                 weekly_exp = sum(member["expHistory"].values())
                 name = await get_name_by_uuid(uuid)
+                if not name:
+                    skipped_users.append(uuid)
+                    continue
                 name += f" [{guild_rank}]\n" + \
                         str(datetime.fromtimestamp(
                             int(str(member["joined"])[:-3])))[0:10]
@@ -412,7 +415,8 @@ class General:
                         if len(embed.fields) >= 25 and length != 25:
                             embeds.append(embed)
                             embed = discord.Embed(color=color)
-
+                            if skipped_users:
+                                embed.set_footer(text=f"Omitted {len(skipped_users)} user(s) to avoid an error!\nUUID(s):\n{str(*skipped_users)}")
                     # Append embed to array
                     embeds.append(embed)
 
