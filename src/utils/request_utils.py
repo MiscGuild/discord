@@ -67,7 +67,12 @@ async def get_name_by_uuid(uuid: str):
             continue
 
         return resp["name"]
-    return None
+    api_key = await get_hyapi_key()
+    #If the Mojang API fails to return a name, the bot checks using the hypixel API
+    resp = await get_json_response(f"https://api.hypixel.net/player?key={api_key}&uuid={uuid}")
+    if "player" not in resp:
+        return None
+    return resp['player']['displayname']
 
 
 def session_get_name_by_uuid(session, uuid):
