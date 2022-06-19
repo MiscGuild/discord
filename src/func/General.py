@@ -2,12 +2,13 @@
 
 import asyncio
 import re
+from __main__ import bot
 from datetime import datetime, timedelta
 
 import aiohttp
 import discord
 import discord.ui
-from __main__ import bot
+
 from src.func.Union import Union
 from src.utils.consts import (accepted_staff_application_embed, active_req,
                               allies, error_color, guild_handle,
@@ -90,7 +91,8 @@ class General:
         # Define a message for sending progress updates
         progress_message = await ctx.send("Processing prerequisites...")
 
-        # Define arrays for guild and all   y uuids and names
+        # Define arrays for guild and ally uuids and names
+        guild_members = (await get_guild_by_name(guild_handle))['members']
         guild_uuids = await get_guild_uuids(guild_handle)
         guild_names, ally_names, ally_uuids, ally_divisions = [], [], [], []
 
@@ -124,8 +126,8 @@ class General:
                                                       ])  # Gathering with a max concurrency of 5
             dump.extend(tasks)
         # Loop through discord members
-        await ctx.send(
-            "If you see the bot is stuck on a member along with an error message, forcesync member the bot is stuck on.")
+        await ctx.send("If you see the bot is stuck on a member along with an error message, "
+                       "forcesync member the bot is stuck on.")
         bot.admin_ids = [member.id for member in bot.admin.members]
         for member in bot.guild.members:
             # Do not check admins and bots
@@ -134,9 +136,17 @@ class General:
 
             name = await name_grabber(member)
             await progress_message.edit(content=f"Checking {name} - {member}")
-
             # Member of guild
             if name in guild_names:
+                # Checks if the member meets the requirements for the active rank
+                for guild_member in guild_members:
+                    if guild_uuids[guild_names.index(name)] == guild_member['uuid']:  # Finds the users uuid from their name using the list and finds their corresponding hypixel data
+                        weekly_exp = sum(guild_member["expHistory"].values())
+                        if weekly_exp >= active_req:  # If the member meets the active requirements
+                            await member.add_roles(bot.active_role)
+                        elif weekly_exp < active_req and bot.active_role in member.roles:  # If the member doesn't meet active requirements but has the active role
+                            await member.remove_roles(bot.active_role)
+
                 # Edit roles
                 await member.add_roles(bot.member_role)
                 await member.remove_roles(bot.new_member_role, bot.guest, bot.ally)
@@ -230,7 +240,6 @@ class General:
                 ign, uuid = await get_mojang_profile(await name_grabber(member))
                 await Union(user=member).sync(ctx, ign, None, True)
                 embed.set_footer(text=f"{ign}'s roles have been updated automatically!")
-
 
         # Send deletion warning and gather transcript
         await ctx.send(embed=embed)
@@ -416,7 +425,8 @@ class General:
                             embeds.append(embed)
                             embed = discord.Embed(color=color)
                             if skipped_users:
-                                embed.set_footer(text=f"Omitted {len(skipped_users)} user(s) to avoid an error!\nUUID(s):\n{str(*skipped_users)}")
+                                embed.set_footer(
+                                    text=f"Omitted {len(skipped_users)} user(s) to avoid an error!\nUUID(s):\n{str(*skipped_users)}")
                     # Append embed to array
                     embeds.append(embed)
 
@@ -500,7 +510,8 @@ class General:
                 return "Giveaway cancelled!"
 
             try:
-                end_date = datetime.utcnow() + timedelta(datetime.strptime(str(duration[:-1]), f"%{duration[:-2:-1]}").second)
+                end_date = datetime.utcnow() + timedelta(
+                    datetime.strptime(str(duration[:-1]), f"%{duration[:-2:-1]}").second)
                 end_date = end_date.strftime("%Y-%m-%d %H:%M:%S.%f")[:-7]
             except Exception:
                 await ctx.send("Invalid duration! Please try again.", delete_after=3)
