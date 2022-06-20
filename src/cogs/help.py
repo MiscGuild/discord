@@ -134,6 +134,7 @@ class Help(commands.Cog):
                                 else:
                                     syntax += " <" + key + ">"
                             emb.add_field(name=f"`{syntax}`", value=command.help, inline=False)
+                    emb.set_footer(text="\n\n[] represent compulsory fields\n<> represent optional fields\nDo not type the brackets!")
                     # found cog - breaking loop
                     break
 
