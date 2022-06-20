@@ -187,8 +187,6 @@ class Union:
 
             guild_name = "Guildless" if not guild_data else guild_data["name"]
 
-            await ctx.author.edit(nick=ign)
-
             # User is a member
             if guild_name == guild_handle:
                 await ctx.author.add_roles(bot.member_role, reason="Registration - Member")
@@ -201,7 +199,7 @@ class Union:
                 # Add guild tag as nick
                 gtag = "" if "tag" not in guild_data else guild_data["tag"]
                 if not ctx.author.nick or gtag not in ctx.author.nick:
-                    ign = ign + " " + gtag
+                    ign = ign + " " + f"[{gtag}]"
 
             # User is a guest
             else:
@@ -255,6 +253,7 @@ class Union:
 
             # Remove new member role, edit nick and delete message
             await ctx.author.remove_roles(bot.new_member_role, reason="Register")
+            await ctx.author.edit(nick=ign)
             await ctx.message.delete()
 
             # Send success embed
