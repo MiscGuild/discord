@@ -180,6 +180,13 @@ class General:
                 # Edit roles
                 await member.add_roles(bot.guest, bot.ally)
                 await member.remove_roles(bot.new_member_role, bot.member_role, bot.active_role)
+                continue
+
+            # Guests
+            else:
+                await member.add_roles(bot.guest)
+                await member.remove_roles(bot.new_member_role, bot.member_role, bot.active_role, bot.ally)
+                continue
 
         # Send ping to new member role in registration channel
         if send_ping:
