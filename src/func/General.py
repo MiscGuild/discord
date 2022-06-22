@@ -50,15 +50,17 @@ class General:
 
             # Create url
             text = "&f&lWeekly Top&r%5Cn"
-            for i in range(10):
-                user_data = member_gexp[i]
+            count = 0
+            for i in member_gexp[:10]:
+                count += 1
+                user_data = i
                 name = await get_name_by_uuid(user_data[0])
                 rank, _ = await get_hypixel_player_rank(await get_hypixel_player(uuid=user_data[0]))
 
                 # Add new entry to image content
-                text += f"&6{i + 1}. {rank} {name} &2{format(user_data[1], ',d')} Guild Experience"
+                text += f"&6{count}. {rank} {name} &2{format(user_data[1], ',d')} Guild Experience"
                 # Add new line
-                if i < 9:
+                if count < 10:
                     text += "%5Cn"
 
             # Replace characters for URL
