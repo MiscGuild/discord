@@ -142,7 +142,8 @@ class General:
             if name in guild_names:
                 # Checks if the member meets the requirements for the active rank
                 for guild_member in guild_members:
-                    if guild_uuids[guild_names.index(name)] == guild_member['uuid']:  # Finds the users uuid from their name using the list and finds their corresponding hypixel data
+                    if guild_uuids[guild_names.index(name)] == guild_member[
+                        'uuid']:  # Finds the users uuid from their name using the list and finds their corresponding hypixel data
                         weekly_exp = sum(guild_member["expHistory"].values())
                         if weekly_exp >= active_req:  # If the member meets the active requirements
                             await member.add_roles(bot.active_role)
@@ -289,7 +290,7 @@ class General:
         return f"Click the following link to go to your ticket! <#{ticket.id}>"
 
     async def partner(ctx, organization_name: str):
-        await ctx.send("In one message, please provide a brief description of the guild/organization being patnered.")
+        await ctx.send("In one message, please provide a brief description of the guild/organization being partnered.")
 
         # Wait for description
         description = await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)
@@ -456,11 +457,11 @@ class General:
 
             # Parse channel ID
             if destination[0] == "<":
-                # Try to get channel ID, returns None if doesn't exist
+                # Try to get channel ID, returns None if it doesn't exist
                 destination = bot.get_channel(
                     int(re.sub(r"[\W_]+", "", destination)))
             elif destination.isnumeric():
-                # Returns None if doesn't exist
+                # Returns None if it doesn't exist
                 destination = bot.get_channel(int(destination))
 
             # If destination is invalid, ask again
@@ -696,7 +697,7 @@ class General:
 
             # Override default callback
             async def callback(self, interaction: discord.Interaction):
-                # Set option var and delete Select so it cannot be used twice
+                # Set option var and delete Select, so it cannot be used twice
                 option = list(interaction.data.values())[0][0]
                 option_emoji = milestone_emojis.get(option)
                 channel = ctx.channel
