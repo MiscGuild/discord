@@ -14,7 +14,7 @@ from src.utils.consts import (config, dnkl_channel_id, dnkl_req,
                               unknown_ign_embed)
 from src.utils.db_utils import insert_new_dnkl, select_one, update_dnkl
 from src.utils.minecraft_utils import get_player_gexp
-from src.utils.request_utils import get_hypixel_player, get_mojang_profile
+from src.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild, get_guild_level
 
 
 async def name_grabber(author: discord.User) -> str:
@@ -68,13 +68,14 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
 
                 if bot.guest in user.roles:
                     self.add_option(label="I want to join Miscellaneous", emoji="<:Misc:540990817872117780>")
+                    self.add_option(label="I want to organize a GvG", emoji="⚔️")
 
                 # Add milestone, DNKL application, staff application, GvG application if user is a member
                 if bot.member_role in user.roles:
                     self.add_option(label="Register a milestone", emoji="🏆")
                     self.add_option(label="I am going to be inactive", emoji="<:dnkl:877657298703634483>")
-                    self.add_option(label="Staff application", emoji="🤵")
-                    self.add_option(label="GvG Team application", emoji="⚔️")
+                    self.add_option(label="I want to join the staff team", emoji="🤵")
+                    self.add_option(label="I want to join the GvG team", emoji="⚔️")
 
                 # Add default options
                 self.add_option(label="Report a player", emoji="🗒️")
@@ -193,7 +194,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
 
                     embed = await dnkl_application(ign, uuid, ticket, interaction.user)
                     await ticket.send("Staff, what do you wish to do with this application?", embed=embed, view=view)
-                if option == "Staff application":
+                if option == "I want to join the staff team":
                     # Edit category and send info embed with requirements
                     await ticket.edit(name=f"staff-application-{ign}",
                                       category=discord.utils.get(interaction.guild.categories,
@@ -243,7 +244,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     # Send embed
                     message = await ticket.send(embed=review_embed)
                     await ticket.edit(topic=f"{interaction.user.id}|{message.id}")
-                if option == "GvG Team application":
+                if option == "I want to join the GvG team":
                     # Edit channel name and category
                     await ticket.edit(name=f"gvg-application-{ign}", topic=f"{interaction.user.id}|",
                                       category=discord.utils.get(interaction.guild.categories,
@@ -323,6 +324,30 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                             description=f"Please await staff assistance!\nIn the meanwhile, you may explore the Discord!",
                                             color=neutral_color))
                     await interaction.user.add_roles(bot.guest, reason="Registration - Guest")
+                if option == "I want to organize a GvG":
+                    await ticket.edit(name=f"gvg-request-{ign}", topic=f"{interaction.user.id}|",
+                                      category=discord.utils.get(interaction.guild.categories,
+                                                                 name=ticket_categories["other"]))
+                    await ticket.purge(limit=100)
+                    guild = await get_player_guild(uuid)
+                    if not guild:
+                        embed = discord.Embed(title="Error! Guild not found!", color=neg_color)
+                        embed.add_field(name="If you wish to GvG us, please list the following", value="Guild Name\nGuild Level\n"
+                                                                                                       "Preferred gamemode(s) for the GvG"
+                                                                                                       "\nAny special rules"
+                                                                                                       "\nNumber of Players\nTime & Timezone")
+                        await ticket.send(embed=embed)
+                        return
+                    embed = discord.Embed(title=f"{ign} wishes to organize a GvG with Miscellaneous on behalf of {guild['name']}",
+                                          description=f"Guild Level: {await get_guild_level(guild['exp'])}",
+                                          color=neutral_color)
+                    embed.add_field(name=f"If you wish to GvG us, please list the following",value="Preferred gamemode(s) for the GvG"
+                                                                                                    "\nAny special rules"
+                                                                                                    "\nNumber of Players\nTime & Timezone")
+                    embed.set_footer(text="Once you have done so, please await staff assistance!")
+                    await ticket.send(embed=embed)
+                    return
+
                 if option == "Other":
                     await ticket.edit(name=f"other-{ign}", topic=f"{interaction.user.id}|",
                                       category=discord.utils.get(interaction.guild.categories,
