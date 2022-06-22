@@ -1,7 +1,8 @@
 # The following file contains: giveawayend, giveawayreroll, gtop, purge
 
 import discord
-from src.utils.consts import error_color, guild_handle, invalid_guild_embed
+
+from src.utils.consts import error_color, invalid_guild_embed, guild_handle
 from src.utils.db_utils import get_giveaway_status
 from src.utils.discord_utils import log_event, name_grabber
 from src.utils.giveaway_utils import roll_giveaway
@@ -67,15 +68,17 @@ class Integer:
 
             # Get image data
             image_content = f"&f&lDaily Top: {date}&r%5Cn"
-            for i in range(10):
-                user_data = member_gexp[i]
+            count = 0
+            for i in member_gexp[:10]:
+                count += 1
+                user_data = i
                 name = await get_name_by_uuid(user_data[0])
                 rank, _ = await get_hypixel_player_rank(await get_hypixel_player(uuid=user_data[0]))
 
                 # Add new entry to image content
-                image_content += f"&6{i + 1}. {rank} {name} &2{format(user_data[1], ',d')} Guild Experience"
+                image_content += f"&6{count}. {rank} {name} &2{format(user_data[1], ',d')} Guild Experience"
                 # Add new line
-                if i < 9:
+                if count < 10:
                     image_content += "%5Cn"
 
         # Replace characters for URL
