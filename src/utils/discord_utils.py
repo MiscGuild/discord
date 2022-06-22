@@ -327,7 +327,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                 if option == "I want to organize a GvG":
                     await ticket.edit(name=f"gvg-request-{ign}", topic=f"{interaction.user.id}|",
                                       category=discord.utils.get(interaction.guild.categories,
-                                                                 name=ticket_categories["other"]))
+                                                                 name=ticket_categories["generic"]))
                     await ticket.purge(limit=100)
                     guild = await get_player_guild(uuid)
                     if not guild:
@@ -351,7 +351,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                 if option == "Other":
                     await ticket.edit(name=f"other-{ign}", topic=f"{interaction.user.id}|",
                                       category=discord.utils.get(interaction.guild.categories,
-                                                                 name=ticket_categories["other"]))
+                                                                 name=ticket_categories["generic"]))
                     await ticket.send(embed=discord.Embed(title="This ticket has been created for an unknown reason!",
                                                           description="Please specify why you have created this ticket!",
                                                           color=neutral_color))
