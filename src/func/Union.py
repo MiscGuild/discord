@@ -123,7 +123,7 @@ class Union:
         # Users is a member
         if guild_name == guild_handle:
             roles_to_add.append(bot.member_role)
-            roles_to_remove.extend([bot.guest])
+            roles_to_remove.extend([bot.guest, bot.ally])
 
             # Add active role if eligible
             for member in guild_data["members"]:
@@ -147,7 +147,7 @@ class Union:
                 return "You cannot use this command in a registration ticket!\nKindly await staff assistance!"
 
             roles_to_add.append(bot.guest)
-            roles_to_remove.extend([bot.member_role, bot.new_member_role])
+            roles_to_remove.extend([bot.member_role, bot.new_member_role, bot.ally])
 
         # Create embed
         embed = discord.Embed(title=f"{ign}'s nick, roles, and tag have been successfully changed!",
