@@ -37,6 +37,10 @@ async def get_mojang_profile(name: str):
     # If player and request is valid
     if resp and "error" not in resp:
         return resp["name"], resp["id"]
+    api_key = await get_hyapi_key()
+    resp = await get_json_response(f"https://api.hypixel.net/player?key={api_key}&name={name}")
+    if resp and 'player' in resp and resp['player']:
+        return resp['player']['displayname'], resp['player']['uuid']
 
     # Player does not exist
     return None, None
