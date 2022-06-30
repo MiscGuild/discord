@@ -133,10 +133,7 @@ class Union:
 
         # User is an ally
         elif guild_name in allies:
-            gtag = await get_gtag(guild_name)
-
-            # Account for if user has nick perms
-            new_nick = ign + " " + gtag
+            new_nick += f" [{await get_gtag(guild_name)}]"
             roles_to_remove.extend([bot.new_member_role, bot.member_role])
             roles_to_add.extend([bot.guest, bot.ally])
 
