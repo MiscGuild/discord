@@ -120,7 +120,7 @@ class Union:
             else:
                 return tag_check_reason
 
-        # Users is a member
+        # User is a member
         if guild_name == guild_handle:
             roles_to_add.append(bot.member_role)
             roles_to_remove.extend([bot.guest, bot.ally])
@@ -133,7 +133,8 @@ class Union:
 
         # User is an ally
         elif guild_name in allies:
-            new_nick += f" [{await get_gtag(guild_name)}]"
+            if not can_tag:
+                new_nick += f" [{await get_gtag(guild_name)}]"
             roles_to_remove.extend([bot.new_member_role, bot.member_role])
             roles_to_add.extend([bot.guest, bot.ally])
 
