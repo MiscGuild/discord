@@ -122,6 +122,7 @@ class String:
                 chart.config = {"type": "line", "data": {"labels": dates, "datasets": [
                     {"label": "Experience", "data": gexp_vals, "lineTension": 0.4, "backgroundColor": graph_color,
                      "borderColor": graph_border, "pointRadius": 0, }]}}
+                embed.set_footer(text='RIP Techno <3')
                 return embed.set_image(url=chart.get_url())
 
     async def info(self):
