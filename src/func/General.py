@@ -291,12 +291,14 @@ class General:
 
     async def partner(ctx, organization_name: str):
         await ctx.send("In one message, please provide a brief description of the guild/organization being partnered.")
-
         # Wait for description
-        description = await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)
-        description = description.content
+        description = (await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)).content
 
-        return discord.Embed(title=organization_name, description=description, color=neutral_color)
+        await ctx.send("Please provide the logo of the organization/guild. (Please provide the URL)")
+        # Wait for Logo
+        logo = (await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)).content
+
+        return discord.Embed(title=organization_name, description=description, color=neutral_color).set_thumbnail(url=logo)
 
     async def deny(ctx, channel: discord.TextChannel):
         # Copy real question list and append 0th element for general critiquing
