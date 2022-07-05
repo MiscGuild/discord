@@ -176,6 +176,8 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                 await ticket.send(
                                     embed=discord.Embed(title="Your do-not-kick-list application has been denied!",
                                                         color=neg_color))
+                                                        description=f"You have {format(weekly_gexp, ',d')} of the required {format(dnkl_req, ',d')}",
+                                                        color=neg_color).set_footer(text="If don't you think you can meet the requirements, you may rejoin the guild once your inactivity period has finished."))
 
                             elif interaction.custom_id == "DNKL_Error":
                                 await ticket.send(embed=discord.Embed(
