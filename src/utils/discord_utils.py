@@ -6,13 +6,14 @@ import discord
 import discord.ui
 from __main__ import bot
 from discord.ext import tasks
+from src.func.String import String
 from src.utils.consts import (config, dnkl_channel_id, dnkl_req,
                               gvg_requirements, invalid_date_msg,
                               log_channel_id, missing_permissions_embed,
                               months, neg_color, neutral_color,
                               staff_application_questions, ticket_categories,
                               unknown_ign_embed)
-from src.utils.db_utils import insert_new_dnkl, select_one, update_dnkl
+from src.utils.db_utils import insert_new_dnkl, select_one, update_dnkl, delete_dnkl
 from src.utils.minecraft_utils import get_player_gexp
 from src.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild, get_guild_level
 
@@ -175,9 +176,9 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                             elif interaction.custom_id == "DNKL_Deny":
                                 await ticket.send(
                                     embed=discord.Embed(title="Your do-not-kick-list application has been denied!",
-                                                        color=neg_color))
                                                         description=f"You have {format(weekly_gexp, ',d')} of the required {format(dnkl_req, ',d')}",
                                                         color=neg_color).set_footer(text="If don't you think you can meet the requirements, you may rejoin the guild once your inactivity period has finished."))
+                                await String(string=ign).dnklremove()
 
                             elif interaction.custom_id == "DNKL_Error":
                                 await ticket.send(embed=discord.Embed(
@@ -349,7 +350,6 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     embed.set_footer(text="Once you have done so, please await staff assistance!")
                     await ticket.send(embed=embed)
                     return
-
                 if option == "Other":
                     await ticket.edit(name=f"other-{ign}", topic=f"{interaction.user.id}|",
                                       category=discord.utils.get(interaction.guild.categories,
