@@ -89,7 +89,7 @@ class String:
                              4: "Four days ago:", 5: "Five days ago:", 6: "Six days ago:"}
 
                 # Fetch remaining data
-                join_date = str(datetime.fromtimestamp(int(str(member["joined"])[:-3])))[0:10]
+                join_date = str(datetime.fromtimestamp(int(str(member["joined"])[:-3])))[:10]
                 rank = member["rank"]
                 quest_participation = member["questParticipation"] if "questParticipation" in member else 0
                 dates = [k for k, _ in gexp_history.items()]
@@ -122,7 +122,6 @@ class String:
                 chart.config = {"type": "line", "data": {"labels": dates, "datasets": [
                     {"label": "Experience", "data": gexp_vals, "lineTension": 0.4, "backgroundColor": graph_color,
                      "borderColor": graph_border, "pointRadius": 0, }]}}
-                embed.set_footer(text='RIP Techno <3')
                 return embed.set_image(url=chart.get_url())
 
     async def info(self):
