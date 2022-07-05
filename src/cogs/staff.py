@@ -1,9 +1,11 @@
-import discord
 from __main__ import bot
+
+import discord
 from discord.ext import commands
+
 from src.func.General import General
 from src.func.Union import Union
-from src.utils.consts import partner_channel_id
+from src.utils.consts import partner_channel_id, information_embed
 
 
 class Staff(commands.Cog, name="staff"):
@@ -45,6 +47,11 @@ class Staff(commands.Cog, name="staff"):
     async def partner(self, ctx, organization_name: str):
         """Create an embed with information about a partner!"""
         await bot.get_channel(partner_channel_id).send(embed=await General.partner(ctx, organization_name))
+
+    @commands.command()
+    @commands.has_role("Admin")
+    async def information(self, ctx):
+        await ctx.send(embed=information_embed)
 
     @commands.command()
     @commands.has_role("Staff")

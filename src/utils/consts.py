@@ -42,7 +42,7 @@ allies = config["allies"]
 # Colors
 neg_color = 0xff3333
 pos_color = 0x00A86B
-neutral_color = 0xFF55FF #8368ff
+neutral_color = 0x8368ff
 error_color = 0xDE3163
 
 # Pronoun roles
@@ -93,17 +93,49 @@ accepted_staff_application_embed = discord.Embed(title="Congratulations, your st
 
 requirements_embed = discord.Embed(title="Miscellaneous Guild Requirements",
                                    description="These requirements are subject to change!",
-                                   color=neutral_color).add_field(name="Member",
-                                                                  value=f"•  {format(member_req, ',d')} Weekly Guild Experience",
-                                                                  inline=False).add_field(name="Resident",
-                                                                                          value=f"•  {format(resident_req, ',d')} Weekly Guild Experience",
-                                                                                          inline=False).add_field(
+                                   color=neutral_color).add_field(
     name="Active",
     value=f"•  {format(active_req, ',d')} Weekly Guild Experience",
-    inline=False).add_field(name="Do-not-kick-list Eligibility",
-                            value=f"•  {format(dnkl_req, ',d')} Weekly Guild Experience",
-                            inline=False).set_footer(
+    inline=False).add_field(name="Member",
+                            value=f"•  {format(member_req, ',d')} Weekly Guild Experience",
+                            inline=False).add_field(name="Resident",
+                                                    value=f"•  {format(resident_req, ',d')} Weekly Guild Experience",
+                                                    inline=False).add_field(name="Do-not-kick-list Eligibility",
+                                                                            value=f"•  {format(dnkl_req, ',d')} Weekly Guild Experience",
+                                                                            inline=False).set_footer(
     text="If you fail to meet these requirements, you will be kicked!")
+
+information_embed = discord.Embed(title="Miscellaneous", url="https://plancke.io/hypixel/guild/name/Miscellaneous",
+                                  description="Miscellaneous is an all games Hypixel guild. "
+                                              "Our primary goal is to be a guild that is friendly to everyone. "
+                                              "All of our guild requirements are well thought out. "
+                                              "Miscellaneous strives to be a good community while maintaining its position on the guild leaderboards. "
+                                              "We are a 2014 guild which makes us one of the OG hypixel guilds. "
+                                              "We, the miscellaneous staff team will do anything to protect the legacy of this spectacle of a guild.",
+                                  color=neutral_color).add_field(name="Partners",
+                                                                 value="XL - https://discord.gg/XvqCvYn\n"
+                                                                       "Lucid - https://discord.gg/DDTMad2pYR\n"
+                                                                       "OUT - https://discord.gg/td75grErXq\n"
+                                                                       "Betrayed - https://discord.gg/kcJkAr2tW2\n"
+                                                                       "Blight - https://discord.gg/dgTWpgy\n"
+                                                                       "Cubelify - https://cubelify.com/ / https://discord.gg/cubelify",
+                                                                 inline=False).add_field(
+    name="Useful Resources",
+    value="Guild Thread: http://bit.ly/MiscThread\n"
+          "Discord: https://discord.gg/bHFWukp",
+    inline=False).add_field(name="Requirements",
+                            value="__**Active**__\n"
+                                 f"➤ {format(active_req, ',d')} Weekly Guild Experience\n"
+                                 "__**Member**__\n"
+                                 f"➤ {format(member_req, ',d')} Weekly Guild Experience\n"
+                                 f"__**Resident**__\n"
+                                 f"➤ {format(resident_req, ',d')} Weekly Guild Experience\n",
+                            inline=False).set_thumbnail(url="https://images-ext-2.discordapp.net/external/c1AaQE93xCcn0mQDOLY1-d14TTEVIOg78IRhqaAnk1I/https/images-ext-1.discordapp.net/external/rey4uPv9eHzVTkM9_GVWvWiK1jyrtBy_sUQjBaE5qbE/"
+                                                            "https/images-ext-2.discordapp.net/external/oTPK3H5eQJWBw_syuTTVUJ3yP7YkvvXTb0JbMX0cdJQ/https/"
+                                                            "images-ext-1.discordapp.net/external/ziYSZZe7dPyKDYLxA1s2jqpKi-kdCvPFpPaz3zft-wo/"
+                                                            "%2525253Fwidth%2525253D671%25252526height%2525253D671/https/media.discordapp.net/"
+                                                            "attachments/523227151240134664/803843877999607818/misc.png").set_footer(text="If you have any queries, kindly make a ticket!")
+
 
 resident_embed = discord.Embed(title="How can I get Resident?",
                                description="To be eligible for Resident, you must be satisfy at least one of the following requirements:",
