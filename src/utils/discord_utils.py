@@ -6,7 +6,6 @@ import discord
 import discord.ui
 from __main__ import bot
 from discord.ext import tasks
-from src.func.String import String
 from src.utils.consts import (config, dnkl_channel_id, dnkl_req,
                               gvg_requirements, invalid_date_msg,
                               log_channel_id, missing_permissions_embed,
@@ -178,7 +177,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                     embed=discord.Embed(title="Your do-not-kick-list application has been denied!",
                                                         description=f"You have {format(weekly_gexp, ',d')} of the required {format(dnkl_req, ',d')}",
                                                         color=neg_color).set_footer(text="If don't you think you can meet the requirements, you may rejoin the guild once your inactivity period has finished."))
-                                await String(string=ign).dnklremove()
+                                await delete_dnkl(ign)
 
                             elif interaction.custom_id == "DNKL_Error":
                                 await ticket.send(embed=discord.Embed(

@@ -110,7 +110,7 @@ information_embed = discord.Embed(title="Miscellaneous", url="https://plancke.io
                                               "Our primary goal is to be a guild that is friendly to everyone. "
                                               "All of our guild requirements are well thought out. "
                                               "Miscellaneous strives to be a good community while maintaining its position on the guild leaderboards. "
-                                              "We are a 2014 guild which makes us one of the OG hypixel guilds. "
+                                              "We were founded in 2014 by Fantastic_Doge making us one of the oldest guilds on the Hypixel Network. "
                                               "We, the miscellaneous staff team will do anything to protect the legacy of this spectacle of a guild.",
                                   color=neutral_color).add_field(name="Partners",
                                                                  value="XL - https://discord.gg/XvqCvYn\n"
