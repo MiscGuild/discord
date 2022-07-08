@@ -511,24 +511,28 @@ class General:
 
         # Ask for duration
         await progress_message.edit(
-            content=f"Neat! There will be {number_winners} winner(s).\n\n**How long should the giveaway last?**\n\n`Please enter a duration. Use an 'm' for minutes, 'd' for days, etc.`")
+            content=f"Neat! There will be {number_winners} winner(s).\n\n**How long should the giveaway last?**\n\n`Please enter a duration. Use a 's' for seconds, 'm' for minutes and 'd' for days`")
 
         while True:
             # Wait for answer and check for cancellation
             duration = await bot.wait_for("message",
                                           check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
             duration = duration.content.lower()
+            # Convert the duration to seconds
+            if duration[:-2:-1] == "s":
+                duration = int(duration[:-1])
+            elif duration[:-2:-1] == "m":
+                duration = int(duration[:-1])*60
+            elif duration[:-2:-1] == "d":
+                duration = int(duration[:-1])*86400
             if duration == "cancel":
                 return "Giveaway cancelled!"
-
             try:
-                end_date = datetime.utcnow() + timedelta(
-                    datetime.strptime(str(duration[:-1]), f"%{duration[:-2:-1]}").second)
+                end_date = datetime.utcnow() + timedelta(seconds=duration)
                 end_date = end_date.strftime("%Y-%m-%d %H:%M:%S.%f")[:-7]
             except Exception:
                 await ctx.send("Invalid duration! Please try again.", delete_after=3)
                 continue
-
             break
 
         # Ask for gexp requirements
