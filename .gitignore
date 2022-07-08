@@ -143,3 +143,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+Google API.json
+sheets.googleapis.com-python.json

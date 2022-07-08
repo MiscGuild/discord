@@ -207,3 +207,13 @@ class Listener:
                 else:
                     await self.obj.user.add_roles(role)
                     await self.obj.response.send_message(content=f"Added {label}", ephemeral=True)
+
+    async def on_message(self):
+        if self.obj.channel.name == "event-registrees":
+            import pygsheets
+            gc = pygsheets.authorize(client_secret='Google API.json')
+
+            sh = gc.open_by_key('1qB4Lm8fGXzm7CqyrK5PsE_Jbk43_Z9lMH9HqTfrN-aI')[0]
+
+            sh.append_table([self.obj.content], start="A2", dimension="COLUMNS", overwrite=False)
+            await self.obj.add_reaction(emoji="✅")

@@ -1,15 +1,17 @@
+from __main__ import bot
 from datetime import datetime, timedelta
 from io import BytesIO
 
 import chat_exporter
 import discord
 import discord.ui
-from __main__ import bot
+import asyncio
 from discord.ext import tasks
+
 from src.utils.consts import (config, dnkl_channel_id, dnkl_req,
                               gvg_requirements, invalid_date_msg,
                               log_channel_id, missing_permissions_embed,
-                              months, neg_color, neutral_color,
+                              months, neg_color, neutral_color, pos_color,
                               staff_application_questions, ticket_categories,
                               unknown_ign_embed)
 from src.utils.db_utils import insert_new_dnkl, select_one, update_dnkl, delete_dnkl
@@ -72,6 +74,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
 
                 # Add milestone, DNKL application, staff application, GvG application if user is a member
                 if bot.member_role in user.roles:
+                    self.add_option(label="GEXP Tourney Registration", emoji="⭐")
                     self.add_option(label="Register a milestone", emoji="🏆")
                     self.add_option(label="I am going to be inactive", emoji="<:dnkl:877657298703634483>")
                     self.add_option(label="I want to join the staff team", emoji="🤵")
@@ -176,7 +179,8 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                 await ticket.send(
                                     embed=discord.Embed(title="Your do-not-kick-list application has been denied!",
                                                         description=f"You have {format(weekly_gexp, ',d')} of the required {format(dnkl_req, ',d')}",
-                                                        color=neg_color).set_footer(text="If don't you think you can meet the requirements, you may rejoin the guild once your inactivity period has finished."))
+                                                        color=neg_color).set_footer(
+                                        text="If don't you think you can meet the requirements, you may rejoin the guild once your inactivity period has finished."))
                                 await delete_dnkl(ign)
 
                             elif interaction.custom_id == "DNKL_Error":
@@ -334,18 +338,21 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     guild = await get_player_guild(uuid)
                     if not guild:
                         embed = discord.Embed(title="Error! Guild not found!", color=neg_color)
-                        embed.add_field(name="If you wish to GvG us, please list the following", value="Guild Name\nGuild Level\n"
-                                                                                                       "Preferred gamemode(s) for the GvG"
-                                                                                                       "\nAny special rules"
-                                                                                                       "\nNumber of Players\nTime & Timezone")
+                        embed.add_field(name="If you wish to GvG us, please list the following",
+                                        value="Guild Name\nGuild Level\n"
+                                              "Preferred gamemode(s) for the GvG"
+                                              "\nAny special rules"
+                                              "\nNumber of Players\nTime & Timezone")
                         await ticket.send(embed=embed)
                         return
-                    embed = discord.Embed(title=f"{ign} wishes to organize a GvG with Miscellaneous on behalf of {guild['name']}",
-                                          description=f"Guild Level: {await get_guild_level(guild['exp'])}",
-                                          color=neutral_color)
-                    embed.add_field(name=f"If you wish to GvG us, please list the following",value="Preferred gamemode(s) for the GvG"
-                                                                                                    "\nAny special rules"
-                                                                                                    "\nNumber of Players\nTime & Timezone")
+                    embed = discord.Embed(
+                        title=f"{ign} wishes to organize a GvG with Miscellaneous on behalf of {guild['name']}",
+                        description=f"Guild Level: {await get_guild_level(guild['exp'])}",
+                        color=neutral_color)
+                    embed.add_field(name=f"If you wish to GvG us, please list the following",
+                                    value="Preferred gamemode(s) for the GvG"
+                                          "\nAny special rules"
+                                          "\nNumber of Players\nTime & Timezone")
                     embed.set_footer(text="Once you have done so, please await staff assistance!")
                     await ticket.send(embed=embed)
                     return
@@ -356,6 +363,23 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     await ticket.send(embed=discord.Embed(title="This ticket has been created for an unknown reason!",
                                                           description="Please specify why you have created this ticket!",
                                                           color=neutral_color))
+
+                if option == "GEXP Tourney Registration":
+                    await ticket.edit(name=f"Event-{ign}", topic=f"{interaction.user.id}|",
+                                      category=discord.utils.get(interaction.guild.categories,
+                                                                 name=ticket_categories["event"]))
+                    import pygsheets
+                    gc = pygsheets.authorize(client_secret='Google API.json')
+
+                    sh = gc.open_by_key('1qB4Lm8fGXzm7CqyrK5PsE_Jbk43_Z9lMH9HqTfrN-aI')[0]
+
+                    sh.append_table([ign], start="A2", dimension="COLUMNS", overwrite=False)
+                    await ticket.send(embed=discord.Embed(title="Registration successful!",
+                                                          description="You will now be a part of the GEXP Tournament that will take place from 22nd July to 29th July!",
+                                                          color=pos_color).set_thumbnail(
+                        url=f"https://minotar.net/helm/{uuid}/512.png").set_footer(text="This ticket will be deleted in 15 seconds!"))
+                    await asyncio.sleep(15)
+                    await discord.TextChannel.delete(ticket)
 
         # Create view and embed, send to ticket
         view = discord.ui.View()
