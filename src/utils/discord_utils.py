@@ -373,6 +373,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     import pygsheets
                     gc = pygsheets.authorize(client_secret='Google API.json')
                     sh = gc.open_by_key('1qB4Lm8fGXzm7CqyrK5PsE_Jbk43_Z9lMH9HqTfrN-aI')[0]
+                    name = ign
                     if bot.ally in user.roles:
                         guild = await get_player_guild(uuid)
                         name = ign + " " + f"[{guild['tag']}]"
