@@ -141,7 +141,7 @@ class Union:
         # User is a guest
         else:
             # Filter people who have not been approved to join the discord
-            if not is_fs:
+            if ctx.channel.id == registration_channel_id and not is_fs:
                 return "You cannot use this command in a registration ticket!\nKindly await staff assistance!"
 
             roles_to_add.append(bot.guest)

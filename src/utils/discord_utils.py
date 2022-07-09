@@ -501,8 +501,9 @@ async def after_cache_ready():
     bot.ally = discord.utils.get(bot.guild.roles, name="Ally")
     bot.server_booster = discord.utils.get(bot.guild.roles, name="Server Booster")
     bot.rich_kid = discord.utils.get(bot.guild.roles, name="Rich Kid")
+    bot.gvg = discord.utils.get(bot.guild.roles, name="GvG Team")
     bot.giveaways_events = discord.utils.get(bot.guild.roles, name="Giveaways/Events")
-    bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster, bot.rich_kid)
+    bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster, bot.rich_kid, bot.gvg)
 
     from src.utils.discord_utils import name_grabber
     bot.staff_names = [await name_grabber(member) for member in bot.staff.members]
