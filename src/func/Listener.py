@@ -7,7 +7,7 @@ from __main__ import bot
 from discord.ext import commands
 from discord.ui import Button, Select, View
 from src.utils.consts import (error_channel_id, invalid_command_embed,
-                              member_not_found_embed,
+                              member_not_found_embed, allies,
                               missing_permissions_embed, missing_role_embed,
                               neutral_color, not_owner_embed, pronoun_roles,
                               reaction_roles, registration_channel_id,
@@ -219,8 +219,8 @@ class Listener:
                 await self.obj.add_reaction(emoji='❌')
                 await self.obj.add_reaction(emoji='1️⃣')
                 return
-            guild = None if not await get_player_guild(uuid) else (await get_player_guild(uuid))['name']
-            if not guild or guild != 'Miscellaneous':
+            guild = None if not await get_player_guild(uuid) else await get_player_guild(uuid)
+            if not guild or (guild['name'] != 'Miscellaneous' and guild['name'] not in allies):
                 await self.obj.add_reaction(emoji='❌')
                 await self.obj.add_reaction(emoji='2️⃣')
                 return
@@ -229,6 +229,9 @@ class Listener:
                 await self.obj.add_reaction(emoji='❌')
                 await self.obj.add_reaction(emoji='3️⃣')
                 return
+
+            if guild['name'] in allies:
+                self.obj.content = ign + " " + f"[{guild['tag']}]"
 
             sh.append_table([self.obj.content], start="A2", dimension="COLUMNS", overwrite=False)
             await self.obj.add_reaction(emoji="✅")
