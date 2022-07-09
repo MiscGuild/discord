@@ -410,7 +410,7 @@ async def has_tag_perms(user: discord.User):
 
 async def check_tag(tag: str):
     tag = tag.lower()
-    with open("func/utils/badwords.txt", "r") as f:
+    with open(r"src/utils/badwords.txt", "r") as f:
         badwords = f.read()
 
     if tag in badwords.split("\n"):
