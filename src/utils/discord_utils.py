@@ -370,9 +370,15 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                                                  name=ticket_categories["event"]))
                     import pygsheets
                     gc = pygsheets.authorize(client_secret='Google API.json')
-
                     sh = gc.open_by_key('1qB4Lm8fGXzm7CqyrK5PsE_Jbk43_Z9lMH9HqTfrN-aI')[0]
 
+                    if sh.find(ign):  # Checks if the person already exists
+                        await ticket.send(embed=discord.Embed(title="You have already registered for the event!",
+                                                              description="You may not register for the event more than once!",
+                                                              color=neg_color).set_footer(text="This ticket will be deleted in 15 seconds!"))
+                        await asyncio.sleep(15)
+                        await discord.TextChannel.delete(ticket)
+                        return
                     sh.append_table([ign], start="A2", dimension="COLUMNS", overwrite=False)
                     await ticket.send(embed=discord.Embed(title="Registration successful!",
                                                           description="You will now be a part of the GEXP Tournament that will take place from 22nd July to 29th July!",

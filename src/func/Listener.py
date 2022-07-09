@@ -13,7 +13,8 @@ from src.utils.consts import (error_channel_id, invalid_command_embed,
                               reaction_roles, registration_channel_id,
                               registration_embed)
 from src.utils.discord_utils import create_ticket
-from src.utils.request_utils import get_jpg_file
+from src.utils.request_utils import get_jpg_file, get_player_guild, get_mojang_profile
+
 
 
 class Listener:
@@ -212,8 +213,22 @@ class Listener:
         if self.obj.channel.name == "event-registrees":
             import pygsheets
             gc = pygsheets.authorize(client_secret='Google API.json')
-
             sh = gc.open_by_key('1qB4Lm8fGXzm7CqyrK5PsE_Jbk43_Z9lMH9HqTfrN-aI')[0]
+            ign, uuid = await get_mojang_profile(self.obj.content)
+            if not ign:
+                await self.obj.add_reaction(emoji='❌')
+                await self.obj.add_reaction(emoji='1️⃣')
+                return
+            guild = None if not await get_player_guild(uuid) else (await get_player_guild(uuid))['name']
+            if not guild or guild != 'Miscellaneous':
+                await self.obj.add_reaction(emoji='❌')
+                await self.obj.add_reaction(emoji='2️⃣')
+                return
+
+            if sh.find(self.obj.content):   # Checks if the person already exists
+                await self.obj.add_reaction(emoji='❌')
+                await self.obj.add_reaction(emoji='3️⃣')
+                return
 
             sh.append_table([self.obj.content], start="A2", dimension="COLUMNS", overwrite=False)
             await self.obj.add_reaction(emoji="✅")
