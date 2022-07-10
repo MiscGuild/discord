@@ -118,6 +118,7 @@ information_embed = discord.Embed(title="Miscellaneous", url="https://plancke.io
                                                                        "OUT - https://discord.gg/td75grErXq\n"
                                                                        "Betrayed - https://discord.gg/kcJkAr2tW2\n"
                                                                        "Blight - https://discord.gg/dgTWpgy\n"
+                                                                       "The Happy Pixels - https://discord.gg/JVTqPr9t\n"
                                                                        "Cubelify - https://cubelify.com/ / https://discord.gg/cubelify",
                                                                  inline=False).add_field(
     name="Useful Resources",
