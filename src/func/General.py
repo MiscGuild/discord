@@ -790,10 +790,16 @@ class General:
         day_number = 86 + round((datetime.utcnow() - datetime.strptime("2022/05/15", "%Y/%m/%d")).days / 7)
 
         milestone_message = f"**Weekly Milestones**\nThis is week __{day_number}__ of weekly milestones\n\n"
+        count = 0
         for channel in bot.guild.text_channels:
             if channel.category.name == ticket_categories["milestone"]:
                 player_milestones = channel.topic.split("|")[1:-1]
                 for milestone in player_milestones:
+                    count += 1
                     milestone_message = milestone_message + milestone + "!\n"
+                    if count >= 20:
+                        await bot.get_channel(milestones_channel).send(milestone_message)
+                        milestone_message = ""
+                        count = 0
         milestone_message = milestone_message + "\n**Congrats to everyone this week. If you wish to submit a milestone, look over at <#650248396480970782>!**"
         await bot.get_channel(milestones_channel).send(milestone_message)
