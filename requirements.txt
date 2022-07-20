@@ -7,7 +7,7 @@ chardet==5.0.0
 charset-normalizer==2.1.0
 chat-exporter==2.2.1
 DateTime==4.5
-emoji==1.7.0
+emoji==2.0.0
 grapheme==0.6.0
 idna==3.3
 multidict==6.0.2
