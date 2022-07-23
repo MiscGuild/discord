@@ -14,7 +14,7 @@ from src.utils.consts import (accepted_staff_application_embed, active_req,
                               allies, error_color, guild_handle,
                               invalid_guild_embed, log_channel_id, member_req,
                               milestone_emojis, milestones_channel, neg_color,
-                              neutral_color, pos_color,
+                              neutral_color, pos_color, ticket_deleted_embed,
                               registration_channel_id, registration_embed,
                               staff_application_questions, ticket_categories)
 from src.utils.db_utils import insert_new_giveaway, select_all
@@ -262,6 +262,7 @@ class General:
         if transcript:
             # Log outcome
             await log_event(f"{ctx.channel.name} was deleted by {ctx.author}")
+            await (await bot.fetch_user(ctx.channel.topic.split("|")[0])).send(embed=ticket_deleted_embed, file=transcript)
             await bot.get_channel(log_channel_id).send(file=transcript)
 
     async def accept(ctx):
