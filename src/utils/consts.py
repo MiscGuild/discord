@@ -84,6 +84,11 @@ registration_embed = discord.Embed(title=f"Welcome to the {guild_handle} Discord
                                                                   value=",register `Your Minecraft Name`\n\nExample:\n,register John",
                                                                   inline=False)
 
+ticket_deleted_embed = discord.Embed(title="Your ticket was deleted!",
+                                     description="The file above is the transcript",
+                                     color=neutral_color).set_footer(
+    text="If your issue was not resolved, please make a new ticket!")
+
 staff_impersonation_embed = discord.Embed(title="Staff impersonation is a punishable offense!",
                                           color=neg_color)
 
@@ -126,17 +131,18 @@ information_embed = discord.Embed(title="Miscellaneous", url="https://plancke.io
           "Discord: https://discord.gg/bHFWukp",
     inline=False).add_field(name="Requirements",
                             value="__**Active**__\n"
-                                 f"➤ {format(active_req, ',d')} Weekly Guild Experience\n"
-                                 "__**Member**__\n"
-                                 f"➤ {format(member_req, ',d')} Weekly Guild Experience\n"
-                                 f"__**Resident**__\n"
-                                 f"➤ {format(resident_req, ',d')} Weekly Guild Experience\n",
-                            inline=False).set_thumbnail(url="https://images-ext-2.discordapp.net/external/c1AaQE93xCcn0mQDOLY1-d14TTEVIOg78IRhqaAnk1I/https/images-ext-1.discordapp.net/external/rey4uPv9eHzVTkM9_GVWvWiK1jyrtBy_sUQjBaE5qbE/"
-                                                            "https/images-ext-2.discordapp.net/external/oTPK3H5eQJWBw_syuTTVUJ3yP7YkvvXTb0JbMX0cdJQ/https/"
-                                                            "images-ext-1.discordapp.net/external/ziYSZZe7dPyKDYLxA1s2jqpKi-kdCvPFpPaz3zft-wo/"
-                                                            "%2525253Fwidth%2525253D671%25252526height%2525253D671/https/media.discordapp.net/"
-                                                            "attachments/523227151240134664/803843877999607818/misc.png").set_footer(text="If you have any queries, kindly make a ticket!")
-
+                                  f"➤ {format(active_req, ',d')} Weekly Guild Experience\n"
+                                  "__**Member**__\n"
+                                  f"➤ {format(member_req, ',d')} Weekly Guild Experience\n"
+                                  f"__**Resident**__\n"
+                                  f"➤ {format(resident_req, ',d')} Weekly Guild Experience\n",
+                            inline=False).set_thumbnail(
+    url="https://images-ext-2.discordapp.net/external/c1AaQE93xCcn0mQDOLY1-d14TTEVIOg78IRhqaAnk1I/https/images-ext-1.discordapp.net/external/rey4uPv9eHzVTkM9_GVWvWiK1jyrtBy_sUQjBaE5qbE/"
+        "https/images-ext-2.discordapp.net/external/oTPK3H5eQJWBw_syuTTVUJ3yP7YkvvXTb0JbMX0cdJQ/https/"
+        "images-ext-1.discordapp.net/external/ziYSZZe7dPyKDYLxA1s2jqpKi-kdCvPFpPaz3zft-wo/"
+        "%2525253Fwidth%2525253D671%25252526height%2525253D671/https/media.discordapp.net/"
+        "attachments/523227151240134664/803843877999607818/misc.png").set_footer(
+    text="If you have any queries, kindly make a ticket!")
 
 resident_embed = discord.Embed(title="How can I get Resident?",
                                description="To be eligible for Resident, you must be satisfy at least one of the following requirements:",
