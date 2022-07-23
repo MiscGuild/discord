@@ -802,6 +802,7 @@ class General:
                         await bot.get_channel(milestones_channel).send(milestone_message)
                         milestone_message = ""
                         count = 0
+                await discord.TextChannel.delete(channel)
         milestone_message = milestone_message + "\n**Congrats to everyone this week. If you wish to submit a milestone, look over at <#650248396480970782>!**"
         await bot.get_channel(milestones_channel).send(milestone_message)
 
