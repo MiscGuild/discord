@@ -59,6 +59,12 @@ class Staff(commands.Cog, name="staff"):
         """Sync the names and roles of everyone in the discord!"""
         await General.rolecheck(ctx, send_ping)
 
+    @commands.command(aliases=['ug','updateevent','ue'])
+    @commands.has_role("Staff")
+    async def updategexp(self, ctx):
+        '''Command to update the gexps of people on the spreadsheet during the guild event'''
+        await General.updategexp(ctx)
+
 
 def setup(bot):
     bot.add_cog(Staff(bot))

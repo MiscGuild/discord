@@ -803,3 +803,41 @@ class General:
                         count = 0
         milestone_message = milestone_message + "\n**Congrats to everyone this week. If you wish to submit a milestone, look over at <#650248396480970782>!**"
         await bot.get_channel(milestones_channel).send(milestone_message)
+
+    async def updategexp(ctx):
+        progress_message = await ctx.send("Authorizing connection...")
+
+        import pygsheets
+        gc = pygsheets.authorize(client_secret='Google API.json')
+        wk = gc.open_by_key('1qB4Lm8fGXzm7CqyrK5PsE_Jbk43_Z9lMH9HqTfrN-aI')[0]
+        await progress_message.edit(content=f"Fetching all records")
+        records = wk.get_all_values(include_tailing_empty_rows=False, include_tailing_empty=False)
+        participants = [x for x in wk.get_col(1)[1:] if x != ""]  # Gets rid of the empty trailing strings and ignores the column header
+
+        cell_no = 2
+        dates = {'2022-07-22':['DAY 1','B'],
+                 '2022-07-23':['DAY 2','C'],
+                 '2022-07-24':['DAY 3','D'],
+                 '2022-07-25':['DAY 4','E'],
+                 '2022-07-26':['DAY 5','F'],
+                 '2022-07-27':['DAY 6','G'],
+                 '2022-07-28':['DAY 7','H']}
+        guild = await get_guild_by_name(guild_handle)
+
+        for name in participants:
+            await progress_message.edit(content=f"Updating {name}")
+            name, uuid = await get_mojang_profile(name)
+            if not name:
+                cell_no += 1
+                continue
+            # Find player in guild
+            for member in guild["members"]:
+                if member["uuid"] == uuid:
+                    # Get player data
+                    gexp_history = member["expHistory"]
+                    for k,v in dates.items():
+                        try:
+                            wk.update_value(f'{v[1]}{cell_no}', gexp_history[k])
+                        except:
+                            pass
+            cell_no += 1
