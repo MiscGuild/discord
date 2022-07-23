@@ -160,7 +160,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                 # User is not currently on DNKL
                                 if not current_message:
                                     await insert_new_dnkl(msg.id, uuid, ign)
-                                    return await ticket.send("This user has been added to the do-not-kick-list!")
+                                    return await ticket.send("**This user has been added to the do-not-kick-list!**")
 
                                 # User is already on DNKl
                                 # Try to delete current message
@@ -173,7 +173,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
 
                                 await update_dnkl(msg.id, uuid)
                                 await ticket.send(
-                                    "Since this user was already on the do-not-kick-list, their entry has been updated.")
+                                    "**Since this user was already on the do-not-kick-list, their entry has been updated.**")
 
                             elif interaction.custom_id == "DNKL_Deny":
                                 await ticket.send(
@@ -182,6 +182,8 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                                         color=neg_color).set_footer(
                                         text="If don't you think you can meet the requirements, you may rejoin the guild once your inactivity period has finished."))
                                 await delete_dnkl(ign)
+                                await interaction.response.send_message("If you wish to reverse your decision, add them to the DNKL using `,dnkladd`", ephemeral=True)
+                                await interaction.followup
 
                             elif interaction.custom_id == "DNKL_Error":
                                 await ticket.send(embed=discord.Embed(
