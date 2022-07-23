@@ -242,8 +242,8 @@ class General:
 
     async def delete(ctx):
         embed = discord.Embed(title="This ticket will be deleted in 10 seconds!", color=neg_color)
-        if not ctx.channel.category or ctx.channel.category.name not in ticket_categories.values():
-            return "This command can only be used in tickets!"
+        if ("MILESTONES" == ctx.channel.category.name) or not ctx.channel.category or ctx.channel.category.name not in ticket_categories.values():
+            return "This command cannot be used here"
         if ctx.channel.category.name == ticket_categories["registrees"]:
             member = await get_ticket_creator(ctx.channel)
             if member:
