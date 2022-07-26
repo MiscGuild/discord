@@ -1,6 +1,6 @@
 import discord
 from discord.errors import Forbidden
-from discord.ext import commands
+from discord.ext import commands, bridge
 from src.utils.consts import config, neutral_color
 
 """This custom help command is a perfect replacement for the default one on any Discord Bot written in Discord.py!
@@ -24,12 +24,12 @@ async def send_embed(ctx, embed):
     If this all fails: https://youtu.be/dQw4w9WgXcQ
     """
     try:
-        await ctx.send(embed=embed)
+        await ctx.respond(embed=embed)
     except Forbidden:
         try:
-            await ctx.send("Hey, seems like I can't send embeds. Please check my permissions :)")
+            await ctx.respond("Hey, seems like I can't send embeds. Please check my permissions :)")
         except Forbidden:
-            await ctx.author.send(
+            await ctx.author.respond(
                 f"Hey, seems like I can't send any message in {ctx.channel.name} on {ctx.guild.name}\n"
                 f"May you inform the server team about this issue? :slight_smile: ", embed=embed)
 
@@ -42,9 +42,9 @@ class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @bridge.bridge_command()
     # @commands.bot_has_permissions(add_reactions=True,embed_links=True)
-    async def help(self, ctx, *input):
+    async def help(self, ctx, input=None):
         """Shows all modules of the Miscellaneous bot"""
 
         # !SET THOSE VARIABLES TO MAKE THE COG FUNCTIONAL!
@@ -111,7 +111,7 @@ class Help(commands.Cog):
                     aliases = command.aliases
                     if aliases:
                         embed.add_field(name="Aliases", value=", ".join(aliases), inline=False)
-                    await ctx.send(embed=embed)
+                    await ctx.respond(embed=embed)
                     return
 
             # iterating trough cogs
