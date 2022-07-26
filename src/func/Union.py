@@ -252,7 +252,6 @@ class Union:
             # Remove new member role, edit nick and delete message
             await ctx.author.remove_roles(bot.new_member_role, reason="Register")
             await ctx.author.edit(nick=ign)
-            await ctx.message.delete()
 
             # Send success embed
             embed = discord.Embed(
