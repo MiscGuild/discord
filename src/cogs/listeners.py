@@ -1,4 +1,4 @@
-from discord.ext import commands
+from discord.ext import commands, bridge
 from src.func.Listener import Listener
 
 
@@ -26,6 +26,9 @@ class Listeners(commands.Cog, name="listeners"):
     async def on_message(self, message):
         await Listener(obj=message).on_message()
 
+    @commands.Cog.listener()
+    async def on_application_command_error(self, ctx, error):
+        await Listener(obj=error).on_application_command_error(ctx)
 
 def setup(bot):
     bot.add_cog(Listeners(bot))
