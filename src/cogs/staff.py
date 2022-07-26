@@ -1,7 +1,7 @@
 from __main__ import bot
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, bridge
 
 from src.func.General import General
 from src.func.Union import Union
@@ -16,42 +16,43 @@ class Staff(commands.Cog, name="staff"):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @bridge.bridge_command()
     @commands.has_role("Staff")
     async def inactive(self, ctx):
         """View all inactive users in the guild!"""
+        await ctx.defer()
         for embed in await General.inactive(ctx):
-            await ctx.send(embed=embed)
+            await ctx.respond(embed=embed)
 
-    @commands.command(aliases=["fs"])
+    @bridge.bridge_command(aliases=["fs"])
     @commands.has_role("Staff")
     async def forcesync(self, ctx, member: discord.Member, name: str):
         """Update a user's discord nick, tag and roles for them!"""
         res = await Union(user=member).sync(ctx, name, None, True)
         if isinstance(res, discord.Embed):
-            await ctx.send(embed=res)
+            await ctx.respond(embed=res)
         elif isinstance(res, str):
-            await ctx.send(res)
+            await ctx.respond(res)
 
-    @commands.command()
+    @bridge.bridge_command()
     @commands.has_role("Admin")
     async def staffreview(self, ctx):
         """Send a progress update and review for staff members!"""
         res = await General.staffreview(ctx)
         # Result may be empty
         if res:
-            await bot.staff_announcements.send(embed=res)
+            await bot.staff_announcements.respond(embed=res)
 
-    @commands.command()
+    @bridge.bridge_command()
     @commands.has_role("Admin")
     async def partner(self, ctx, organization_name: str):
         """Create an embed with information about a partner!"""
-        await bot.get_channel(partner_channel_id).send(embed=await General.partner(ctx, organization_name))
+        await bot.get_channel(partner_channel_id).respond(embed=await General.partner(ctx, organization_name))
 
-    @commands.command()
+    @bridge.bridge_command()
     @commands.has_role("Admin")
     async def information(self, ctx):
-        await ctx.send(embed=information_embed)
+        await ctx.respond(embed=information_embed)
 
     @commands.command()
     @commands.has_role("Staff")
@@ -59,7 +60,7 @@ class Staff(commands.Cog, name="staff"):
         """Sync the names and roles of everyone in the discord!"""
         await General.rolecheck(ctx, send_ping)
 
-    @commands.command(aliases=['ug','updateevent','ue'])
+    @commands.command(aliases=['ug', 'updateevent', 'ue'])
     @commands.has_role("Staff")
     async def updategexp(self, ctx):
         '''Command to update the gexps of people on the spreadsheet during the guild event'''
