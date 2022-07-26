@@ -122,6 +122,80 @@ class Listener:
                 print("The below exception could not be sent to the error channel:")
                 print(tb)
 
+
+    async def on_message(self):
+        if isinstance(self.obj, AttributeError):
+            pass
+        if self.obj.channel.name == "event-registrees":
+            import pygsheets
+            gc = pygsheets.authorize(client_secret='Google API.json')
+            sh = gc.open_by_key('1qB4Lm8fGXzm7CqyrK5PsE_Jbk43_Z9lMH9HqTfrN-aI')[0]
+            ign, uuid = await get_mojang_profile(self.obj.content)
+            if not ign:
+                await self.obj.add_reaction(emoji='❌')
+                await self.obj.add_reaction(emoji='1️⃣')
+                return
+            guild = None if not await get_player_guild(uuid) else await get_player_guild(uuid)
+            if not guild or (guild['name'] != 'Miscellaneous' and guild['name'] not in allies):
+                await self.obj.add_reaction(emoji='❌')
+                await self.obj.add_reaction(emoji='2️⃣')
+                return
+
+            if sh.find(self.obj.content):   # Checks if the person already exists
+                await self.obj.add_reaction(emoji='❌')
+                await self.obj.add_reaction(emoji='3️⃣')
+                return
+
+            if guild['name'] in allies:
+                self.obj.content = ign + " " + f"[{guild['tag']}]"
+
+            sh.append_table([self.obj.content], start="A2", dimension="COLUMNS", overwrite=False)
+            await self.obj.add_reaction(emoji="✅")
+        else:
+            pass
+
+
+    async def on_interaction(self):
+        self.obj: discord.Interaction
+        # Ticket creation
+        if "custom_id" not in self.obj.data:
+            pass
+        elif self.obj.data["custom_id"] == "tickets":
+            ticket = await create_ticket(self.obj.user, f"ticket-{self.obj.user.name}")
+            await self.obj.response.send_message(f"Click the following link to go to your ticket! <#{ticket.id}>",
+                                                 ephemeral=True)
+
+        # Reaction roles
+        elif self.obj.data["custom_id"] in reaction_roles.keys():
+            role = discord.utils.get(
+                self.obj.guild.roles, name=self.obj.data["custom_id"])
+            if role in self.obj.user.roles:
+                await self.obj.user.remove_roles(role)
+                await self.obj.response.send_message(f"Removed {role.name} role from you.", ephemeral=True)
+            else:
+                await self.obj.user.add_roles(role)
+                await self.obj.response.send_message(f"Added {role.name} role to you.", ephemeral=True)
+
+        # Pronouns
+        elif self.obj.data["custom_id"] == "pronouns":
+            label = self.obj.data["values"][0] if self.obj.data["values"] else None
+            await self.obj.user.remove_roles(
+                *[discord.utils.get(self.obj.guild.roles, name=k) for k in pronoun_roles.keys()])
+
+            # User selected none, remove all roles
+            if not label:
+                await self.obj.response.send_message(content=f"Removed all pronoun roles!")
+            else:
+                # Fetch role
+                role = discord.utils.get(self.obj.guild.roles, name=label)
+                # Remove single role if user already has it
+                if role in self.obj.user.roles:
+                    await self.obj.response.send_message(content=f"Removed {label}", ephemeral=True)
+                # Add the clicked role and remove all others
+                else:
+                    await self.obj.user.add_roles(role)
+                    await self.obj.response.send_message(content=f"Added {label}", ephemeral=True)
+
     async def reactionroles(ctx):
         # Reaction roles
         reaction_roles_embed = discord.Embed(title="To get your desired role, click its respective button!",
@@ -215,68 +289,3 @@ class Listener:
 
         return image, embed, TicketView()
 
-    async def on_interaction(self):
-        self.obj: discord.Interaction
-        # Ticket creation
-        if self.obj.data["custom_id"] == "tickets":
-            ticket = await create_ticket(self.obj.user, f"ticket-{self.obj.user.name}")
-            await self.obj.response.send_message(f"Click the following link to go to your ticket! <#{ticket.id}>",
-                                                 ephemeral=True)
-
-        # Reaction roles
-        elif self.obj.data["custom_id"] in reaction_roles.keys():
-            role = discord.utils.get(
-                self.obj.guild.roles, name=self.obj.data["custom_id"])
-            if role in self.obj.user.roles:
-                await self.obj.user.remove_roles(role)
-                await self.obj.response.send_message(f"Removed {role.name} role from you.", ephemeral=True)
-            else:
-                await self.obj.user.add_roles(role)
-                await self.obj.response.send_message(f"Added {role.name} role to you.", ephemeral=True)
-
-        # Pronouns
-        elif self.obj.data["custom_id"] == "pronouns":
-            label = self.obj.data["values"][0] if self.obj.data["values"] else None
-            await self.obj.user.remove_roles(
-                *[discord.utils.get(self.obj.guild.roles, name=k) for k in pronoun_roles.keys()])
-
-            # User selected none, remove all roles
-            if not label:
-                await self.obj.response.send_message(content=f"Removed all pronoun roles!")
-            else:
-                # Fetch role
-                role = discord.utils.get(self.obj.guild.roles, name=label)
-                # Remove single role if user already has it
-                if role in self.obj.user.roles:
-                    await self.obj.response.send_message(content=f"Removed {label}", ephemeral=True)
-                # Add the clicked role and remove all others
-                else:
-                    await self.obj.user.add_roles(role)
-                    await self.obj.response.send_message(content=f"Added {label}", ephemeral=True)
-
-    async def on_message(self):
-        if self.obj.channel.name == "event-registrees":
-            import pygsheets
-            gc = pygsheets.authorize(client_secret='Google API.json')
-            sh = gc.open_by_key('1qB4Lm8fGXzm7CqyrK5PsE_Jbk43_Z9lMH9HqTfrN-aI')[0]
-            ign, uuid = await get_mojang_profile(self.obj.content)
-            if not ign:
-                await self.obj.add_reaction(emoji='❌')
-                await self.obj.add_reaction(emoji='1️⃣')
-                return
-            guild = None if not await get_player_guild(uuid) else await get_player_guild(uuid)
-            if not guild or (guild['name'] != 'Miscellaneous' and guild['name'] not in allies):
-                await self.obj.add_reaction(emoji='❌')
-                await self.obj.add_reaction(emoji='2️⃣')
-                return
-
-            if sh.find(self.obj.content):   # Checks if the person already exists
-                await self.obj.add_reaction(emoji='❌')
-                await self.obj.add_reaction(emoji='3️⃣')
-                return
-
-            if guild['name'] in allies:
-                self.obj.content = ign + " " + f"[{guild['tag']}]"
-
-            sh.append_table([self.obj.content], start="A2", dimension="COLUMNS", overwrite=False)
-            await self.obj.add_reaction(emoji="✅")
