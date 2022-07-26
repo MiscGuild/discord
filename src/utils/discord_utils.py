@@ -204,7 +204,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     await ticket.send("Staff, what do you wish to do with this application?", embed=embed, view=view)
                 if option == "I want to join the staff team":
                     # Edit category and send info embed with requirements
-                    await ticket.edit(name=f"staff-application-{ign}",
+                    await ticket.edit(name=f"staff-application-{ign}", topic=f"{interaction.user.id}|",
                                       category=discord.utils.get(interaction.guild.categories,
                                                                  name=ticket_categories["generic"]))
                     await ticket.send(embed=discord.Embed(title=f"{ign} wishes to apply for staff!",
@@ -445,6 +445,7 @@ async def is_valid_date(date: str):
 async def create_transcript(channel: discord.TextChannel, limit: int = None):
     transcript = await chat_exporter.export(channel, limit=limit)
     if not transcript:
+        return None
 
     # Create and return file
     return discord.File(BytesIO(transcript.encode()), filename=f"transcript-{channel.name}.html")
