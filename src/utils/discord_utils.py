@@ -442,9 +442,9 @@ async def is_valid_date(date: str):
         return False, None, None, None
 
 
-async def create_transcript(channel: discord.TextChannel):
-    transcript = await chat_exporter.export(channel)
-    if not transcript: return None
+async def create_transcript(channel: discord.TextChannel, limit: int = None):
+    transcript = await chat_exporter.export(channel, limit=limit)
+    if not transcript:
 
     # Create and return file
     return discord.File(BytesIO(transcript.encode()), filename=f"transcript-{channel.name}.html")
