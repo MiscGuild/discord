@@ -234,9 +234,11 @@ class String:
         if ctx.channel.category.name not in ticket_categories.values():
             return await ctx.send("This command can only be used in tickets!")
 
+        old_name = ctx.channel.name
         # Channel is a ticket
         channel_name = self.string.replace(" ", "-")
         await ctx.channel.edit(name=channel_name)
+        return discord.Embed(title=f"The channel name was changed from {old_name} to {channel_name}", color=neutral_color)
 
     async def qotd(self, ctx):
         # 15th May 2022 was the 473rd QOTD day. It is used as a reference point to calculate the day number.
