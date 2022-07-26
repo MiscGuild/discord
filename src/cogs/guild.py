@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, bridge
 
 from src.func.General import General
 from src.func.Integer import Integer
@@ -16,50 +16,52 @@ class Guild(commands.Cog, name="guild"):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=["gm", "g", "gmember", "gexp"])
-    async def member_gexp(self, ctx, name: str = None):
+    @bridge.bridge_command(aliases=["gm", "g", "gexp"])
+    async def gmember(self, ctx, name: str = None):
         """View the given user's gexp over the past week!"""
         if not name:
             name = await name_grabber(ctx.author)
 
         res = await String(string=name).gmember(ctx)
         if isinstance(res, discord.Embed):
-            await ctx.send(embed=res)
+            await ctx.respond(embed=res)
         if isinstance(res, str):
-            await ctx.send(res)
+            await ctx.respond(res)
 
-    @commands.command(aliases=['weeklylb', 'wlb'])
+    @bridge.bridge_command(aliases=['weeklylb', 'wlb'])
     async def weekly_gexp_lb(self, ctx):
         """View the weekly gexp leaderboard!"""
+        await ctx.defer()
         res = await General.weeklylb(ctx)
         if isinstance(res, discord.File):
-            await ctx.send(file=res)
+            await ctx.respond(file=res)
         if isinstance(res, discord.Embed):
-            await ctx.send(embed=res)
+            await ctx.respond(embed=res)
 
-    @commands.command(aliases=['dailylb', 'dlb'])
+    @bridge.bridge_command(aliases=['dailylb', 'dlb'])
     async def gtop(self, ctx, day: int = 1):
         """View the daily guild experience leaderboard!"""
+        await ctx.defer()
         res = await Integer(integer=day).gtop(ctx=ctx)
         if isinstance(res, discord.File):
-            await ctx.send(file=res)
+            await ctx.respond(file=res)
         elif isinstance(res, discord.Embed):
-            await ctx.send(embed=res)
+            await ctx.respond(embed=res)
 
-    @commands.command(aliases=["req", "reqs"])
+    @bridge.bridge_command(aliases=["req", "reqs"])
     async def requirements(self, ctx):
         """View the guild gexp requirements!"""
-        await ctx.send(embed=requirements_embed)
+        await ctx.respond(embed=requirements_embed)
 
-    @commands.command(aliases=["res"])
+    @bridge.bridge_command(aliases=["res"])
     async def resident(self, ctx):
         """See the different ways of obtaining the resident rank!"""
-        await ctx.send(embed=resident_embed)
+        await ctx.respond(embed=resident_embed)
 
-    @commands.command()
+    @bridge.bridge_command()
     async def gvg(self, ctx):
         """View information about Miscellaneous' GvG team and the requirements!!"""
-        await ctx.send(embed=gvg_info_embed)
+        await ctx.respond(embed=gvg_info_embed)
 
 
 def setup(bot):
