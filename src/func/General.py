@@ -798,7 +798,7 @@ class General:
                 for milestone in player_milestones:
                     count += 1
                     milestone_message = milestone_message + milestone + "!\n"
-                    if count >= 20:
+                    if count >= 15:
                         await bot.get_channel(milestones_channel).send(milestone_message)
                         milestone_message = ""
                         count = 0
