@@ -82,7 +82,6 @@ class String:
 
                 # Send shortened version for non-command channels
                 if "commands" not in ctx.channel.name:
-                    await ctx.message.delete()
                     return f"__**{name}**__\n**Guild Experience -** `{format(weekly_gexp, ',d')}`"
 
                 week_dict = {0: "Today:", 1: "Yesterday:", 2: "Two days ago:", 3: "Three days ago:",
@@ -231,7 +230,6 @@ class String:
         return embed
 
     async def rename(self, ctx):
-        await ctx.message.delete()
         # Channel is not a ticket
         if ctx.channel.category.name not in ticket_categories.values():
             return await ctx.send("This command can only be used in tickets!")
