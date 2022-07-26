@@ -4,7 +4,7 @@ import traceback
 
 import discord
 from __main__ import bot
-from discord.ext import commands
+from discord.ext import commands, bridge
 from discord.ui import Button, Select, View
 from src.utils.consts import (error_channel_id, invalid_command_embed,
                               member_not_found_embed, allies,
@@ -43,15 +43,15 @@ class Listener:
 
         # Catch a series of common errors
         if isinstance(self.obj, commands.NotOwner):
-            await ctx.send(embed=not_owner_embed)
+            await ctx.respond(embed=not_owner_embed)
         elif isinstance(self.obj, commands.MissingRole):
-            await ctx.send(embed=missing_role_embed)
+            await ctx.respond(embed=missing_role_embed)
         elif isinstance(self.obj, commands.MissingPermissions):
-            await ctx.send(embed=missing_permissions_embed)
-        elif isinstance(self.obj, commands.MissingAnyRole):
-            await ctx.send(embed=missing_permissions_embed)
+            await ctx.respond(embed=missing_permissions_embed)
+        elif isinstance(self.obj, discord.ext.commands.MissingAnyRole):
+            await ctx.respond(embed=missing_permissions_embed)
         elif isinstance(self.obj, commands.MemberNotFound):
-            await ctx.send(embed=member_not_found_embed)
+            await ctx.respond(embed=member_not_found_embed)
         elif isinstance(self.obj, commands.MissingRequiredArgument):
             usage = f"{ctx.prefix}{ctx.command.name}"
             for key, value in ctx.command.clean_params.items():
@@ -71,6 +71,51 @@ class Listener:
             if len(tb) <= 1955:
                 await bot.get_channel(error_channel_id).send(
                     f"Ignoring exception in command {ctx.command}:\n```py\n{tb}\n```")
+
+            else:
+                await bot.get_channel(error_channel_id).send(
+                    f"```An error occurred in command '{ctx.command}' that could not be sent in this channel, check the console for the traceback. \n\n'{self.obj}'```")
+                print("The below exception could not be sent to the error channel:")
+                print(tb)
+
+    async def on_application_command_error(self, ctx: discord.ApplicationContext):
+        if ctx.command.has_error_handler() or ctx.cog.has_error_handler():
+            return
+
+        # Checks for the original exception raised and send to CommandInvokeError
+        self.obj = getattr(self.obj, "original", self.obj)
+
+        # Catch a series of common application errors
+        if isinstance(self.obj, commands.NotOwner):
+            await ctx.respond(embed=not_owner_embed)
+        elif isinstance(self.obj, commands.MissingRole):
+            await ctx.respond(embed=missing_role_embed)
+        elif isinstance(self.obj, commands.MissingPermissions):
+            await ctx.respond(embed=missing_permissions_embed)
+        elif isinstance(self.obj, discord.ext.commands.MissingAnyRole):
+            await ctx.respond(embed=missing_permissions_embed)
+        elif isinstance(self.obj, commands.MemberNotFound):
+            await ctx.respond(embed=member_not_found_embed)
+        elif isinstance(self.obj, commands.MissingRequiredArgument):
+            usage = f"{ctx.prefix}{ctx.command.name}"
+            for key, value in ctx.command.clean_params.items():
+                if not value.default:
+                    usage += " [" + key + "]"
+                else:
+                    usage += " <" + key + ">"
+            embed = discord.Embed(title=f"Invalid Syntax",
+                                  description=f"Command usage:\n`{usage}`\nFor more help, see `{ctx.prefix}help {ctx.command}`",
+                                  color=0xDE3163)
+            await ctx.send(embed=embed)
+
+        # All other errors get sent to the error channel
+        else:
+            tb = "".join(traceback.format_exception(
+                type(self.obj), self.obj, self.obj.__traceback__))
+            if len(tb) <= 1955:
+                await bot.get_channel(error_channel_id).send(
+                    f"Ignoring exception in command {ctx.command}:\n```py\n{tb}\n```")
+
             else:
                 await bot.get_channel(error_channel_id).send(
                     f"```An error occurred in command '{ctx.command}' that could not be sent in this channel, check the console for the traceback. \n\n'{self.obj}'```")
