@@ -1,7 +1,7 @@
 import sys
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, bridge
 
 from src.utils.consts import config
 
@@ -13,7 +13,7 @@ intents = discord.Intents.default()
 intents.reactions = True
 intents.members = True
 intents.message_content = True
-bot = commands.Bot(command_prefix=commands.when_mentioned_or(config["prefix"]), intents=intents,
+bot = bridge.Bot(command_prefix=config["prefix"], intents=intents,
                    status=discord.Status.idle, activity=discord.Game(config["status"]), case_insensitive=True)
 
 # Load all bot vars once cache is ready
