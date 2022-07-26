@@ -252,7 +252,7 @@ class General:
                 embed.set_footer(text=f"{ign}'s roles have been updated automatically!")
 
         # Send deletion warning and gather transcript
-        await ctx.send(embed=embed)
+        await ctx.respond(embed=embed)
         transcript = await create_transcript(ctx.channel)
 
         # Sleep and delete channel
@@ -262,7 +262,6 @@ class General:
         if transcript:
             # Log outcome
             await log_event(f"{ctx.channel.name} was deleted by {ctx.author}")
-            await (await bot.fetch_user(ctx.channel.topic.split("|")[0])).send(embed=ticket_deleted_embed, file=transcript)
             await (await bot.fetch_user(ctx.channel.topic.split("|")[0])).send(embed=ticket_deleted_embed.set_footer(text=ctx.channel.name), file=transcript)
             await bot.get_channel(log_channel_id).send(file=transcript)
 
@@ -732,7 +731,7 @@ class General:
         embed = discord.Embed(title=f"Under what category does {name}'s milestone fall?",
                               description="Please select your reason from the dropdown given below!",
                               color=neutral_color)
-        await ctx.send(embed=embed, view=view)
+        return embed, view
 
     async def update_milestone(ctx):
         member = await get_ticket_creator(ctx.channel)
@@ -786,7 +785,7 @@ class General:
         embed = discord.Embed(title=f"Which of the following milestones would you like to update?",
                               description="Please select your reason from the dropdown given below!",
                               color=neutral_color)
-        await ctx.send(embed=embed, view=view)
+        return embed, view
 
     async def compile_milestones(ctx):
         day_number = 86 + round((datetime.utcnow() - datetime.strptime("2022/05/15", "%Y/%m/%d")).days / 7)
@@ -806,6 +805,8 @@ class General:
                 await discord.TextChannel.delete(channel)
         milestone_message = milestone_message + "\n**Congrats to everyone this week. If you wish to submit a milestone, look over at <#650248396480970782>!**"
         await bot.get_channel(milestones_channel).send(milestone_message)
+        return f"{count} milestones have been compiled and sent in {bot.get_channel(milestones_channel)}"
+
 
     async def updategexp(ctx):
         progress_message = await ctx.send("Authorizing connection...")
