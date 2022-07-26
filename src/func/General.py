@@ -263,6 +263,7 @@ class General:
             # Log outcome
             await log_event(f"{ctx.channel.name} was deleted by {ctx.author}")
             await (await bot.fetch_user(ctx.channel.topic.split("|")[0])).send(embed=ticket_deleted_embed, file=transcript)
+            await (await bot.fetch_user(ctx.channel.topic.split("|")[0])).send(embed=ticket_deleted_embed.set_footer(text=ctx.channel.name), file=transcript)
             await bot.get_channel(log_channel_id).send(file=transcript)
 
     async def accept(ctx):
