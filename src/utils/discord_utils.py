@@ -488,6 +488,15 @@ async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, au
 
     return embed
 
+async def get_rank_role(rank):
+    ranks = {
+        "[MVP++]": bot.mvpplusplus,
+        "[MVP+]": bot.mvpplus,
+        "[MVP]": bot.mvp,
+        "[VIP+]": bot.vipplus,
+        "[VIP]": bot.vip,
+    }
+    return ranks.get(rank)
 
 @tasks.loop(count=1)
 async def after_cache_ready():
@@ -511,6 +520,13 @@ async def after_cache_ready():
     bot.gvg = discord.utils.get(bot.guild.roles, name="GvG Team")
     bot.giveaways_events = discord.utils.get(bot.guild.roles, name="Giveaways/Events")
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff, bot.server_booster, bot.rich_kid, bot.gvg)
+
+    bot.mvpplusplus = discord.utils.get(bot.guild.roles, name="MVP++")
+    bot.mvpplus = discord.utils.get(bot.guild.roles, name="MVP+")
+    bot.mvp = discord.utils.get(bot.guild.roles, name="MVP")
+    bot.vipplus = discord.utils.get(bot.guild.roles, name="VIP+")
+    bot.vip = discord.utils.get(bot.guild.roles, name="VIP")
+
 
     from src.utils.discord_utils import name_grabber
     bot.staff_names = [await name_grabber(member) for member in bot.staff.members]
