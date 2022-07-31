@@ -190,11 +190,6 @@ async def get_rank(uuid):
                 return 'VIP+'
             elif rank == 'VIP':
                 return '[VIP]'
-            elif rank == 'ADMIN':
-                return '[ADMIN]'
-            elif rank == 'MODERATOR':
-                return '[MOD]'
-            elif rank == 'HELPER':
-                return '[HELPER]'
+
     else:
         return None
