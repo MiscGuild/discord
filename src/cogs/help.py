@@ -44,13 +44,12 @@ class Help(commands.Cog):
 
     @bridge.bridge_command()
     # @commands.bot_has_permissions(add_reactions=True,embed_links=True)
-    async def help(self, ctx, input=None):
+    async def help(self, ctx, module=None):
         """Shows all modules of the Miscellaneous bot"""
 
         # !SET THOSE VARIABLES TO MAKE THE COG FUNCTIONAL!
         prefix = config['prefix']
         version = 1.0
-
         async def predicate(cmd):
             try:
                 return await cmd.can_run(ctx)
@@ -59,7 +58,7 @@ class Help(commands.Cog):
 
         # checks if cog parameter was given
         # if not: sending all modules and commands not associated with a cog
-        if not input:
+        if not module:
 
             # starting to build embed
             emb = discord.Embed(title='Commands and modules', color=discord.Color.blue(),
@@ -96,9 +95,9 @@ class Help(commands.Cog):
 
         # block called when one cog-name is given
         # trying to find matching cog and it's commands
-        elif len(input) == 1:
-            if input[0] not in self.bot.cogs:
-                command = self.bot.get_command(input[0])
+        elif len(module.split()) == 1:
+            if module not in self.bot.cogs:
+                command = self.bot.get_command(module)
                 if command:
                     syntax = f"{prefix}{command.name}"
                     for key, value in command.clean_params.items():
@@ -117,14 +116,13 @@ class Help(commands.Cog):
             # iterating trough cogs
             for cog in self.bot.cogs:
                 # check if cog is the matching one
-                if cog.lower() == input[0].lower():
-
+                if cog.lower() == module.lower():
                     # making title - getting description from doc-string below class
                     emb = discord.Embed(title=f'{cog.capitalize()} - Commands', description=self.bot.cogs[cog].__doc__,
                                         color=discord.Color.green())
 
                     # getting commands from cog
-                    for command in self.bot.get_cog(cog).get_commands():
+                    for command in self.bot.get_cog(cog).get_commands()[::2]:   # Ignores all the duplicate commands returned by bridge slash commands
                         # if cog is not hidden
                         if not command.hidden:
                             syntax = f"{prefix}{command.name}"
@@ -134,6 +132,7 @@ class Help(commands.Cog):
                                 else:
                                     syntax += " <" + key + ">"
                             emb.add_field(name=f"`{syntax}`", value=command.help, inline=False)
+
                     emb.set_footer(text="\n\n[] represent compulsory fields\n<> represent optional fields\nDo not type the brackets!")
                     # found cog - breaking loop
                     break
@@ -146,13 +145,13 @@ class Help(commands.Cog):
                     if "Hidden" not in self.bot.cogs[cog].__doc__:
                         cogs_desc += f'`{cog.capitalize()}` {self.bot.cogs[cog].__doc__}\n'
                 emb = discord.Embed(title="What's that?!",
-                                    description=f"I've never heard of a module/command called `{input[0]}` before :scream:",
+                                    description=f"I've never heard of a module/command called `{module}` before :scream:",
                                     color=discord.Color.orange())
                 emb.add_field(name="Here is a list of all the fields and their descriptions", value=cogs_desc)
                 emb.set_footer(text="Use ,help <module/command> to gain more information about that module/command")
 
         # too many cogs requested - only one at a time allowed
-        elif len(input) > 1:
+        elif len(module.split()) > 1:
             emb = discord.Embed(title="That's too much.",
                                 description="Please request only one module or one command at once :sweat_smile:",
                                 color=discord.Color.orange())
