@@ -168,6 +168,7 @@ async def get_guild_level(exp):
         # and subtract the required amount of XP to level up,
         # from the total amount of XP that the guild had.
 
+
 async def get_rank(uuid):
     player = await get_hypixel_player(uuid=uuid)
     if player is None:

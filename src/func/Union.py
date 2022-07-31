@@ -13,9 +13,9 @@ from src.utils.consts import (active_req, allies, bot_missing_perms_embed,
                               staff_impersonation_embed, ticket_categories,
                               unknown_ign_embed)
 from src.utils.discord_utils import (check_tag, create_ticket, has_tag_perms,
-                                     is_linked_discord)
+                                     is_linked_discord, get_rank_role)
 from src.utils.request_utils import (get_gtag, get_hypixel_player,
-                                     get_mojang_profile, get_player_guild)
+                                     get_mojang_profile, get_player_guild, get_rank)
 
 
 class Union:
@@ -91,23 +91,29 @@ class Union:
             return err_404_embed
 
     async def sync(self, ctx, name: str, tag: str = None, is_fs=False):
+        await ctx.defer()
         ign, uuid = await get_mojang_profile(name)
         # Invalid username
         if not ign:
             return unknown_ign_embed
 
-        # Fetch player & guild data
-        player_data = await get_hypixel_player(uuid=uuid)
-        guild_data = await get_player_guild(uuid)
-
-        # Account is not linked to discord
-        if not await is_linked_discord(player_data, self.user) and is_fs is False:
-            return discord_not_linked_embed
-
         # Initialize vars for storing changes
         roles_to_add = []
         roles_to_remove = [bot.processing]
         new_nick = ign
+
+        # Fetch player & guild data
+        player_data = await get_hypixel_player(uuid=uuid)
+        guild_data = await get_player_guild(uuid)
+        rank = await get_rank(uuid)
+        rank_role = await get_rank_role(rank)
+
+        if rank_role:   # Checks if the player has a rank
+            roles_to_add.append(rank_role)
+
+        # Account is not linked to discord
+        if not await is_linked_discord(player_data, self.user) and is_fs is False:
+            return discord_not_linked_embed
 
         guild_name = "no guild" if not guild_data else guild_data["name"]
         can_tag = await has_tag_perms(self.user)
@@ -160,7 +166,7 @@ class Union:
             await self.user.add_roles(*roles_to_add, reason="Sync")
             await self.user.remove_roles(*roles_to_remove, reason="Sync")
             await self.user.edit(nick=new_nick)
-        except Forbidden:
+        except:
             return bot_missing_perms_embed
 
         return embed
