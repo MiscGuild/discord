@@ -140,9 +140,6 @@ async def get_jpg_file(url: str):
     return discord.File(resp, "image.jpg")
 
 
-
-
-
 async def get_guild_level(exp):
     EXP_NEEDED = [100000, 150000, 250000, 500000, 750000, 1000000, 1250000, 1500000, 2000000, 2500000, 2500000, 2500000,
                   2500000, 2500000, 3000000]
@@ -170,3 +167,33 @@ async def get_guild_level(exp):
         # Otherwise, increase their level by one,
         # and subtract the required amount of XP to level up,
         # from the total amount of XP that the guild had.
+
+async def get_rank(uuid):
+    player = await get_hypixel_player(uuid=uuid)
+    if player is None:
+        return None
+    if "newPackageRank" in player:
+            rank = (player["newPackageRank"])
+            if rank == 'MVP_PLUS':
+                if "monthlyPackageRank" in player:
+                    mvp_plus_plus = (player["monthlyPackageRank"])
+                    if mvp_plus_plus == "NONE":
+                        return '[MVP+]'
+                    else:
+                        return"[MVP++]"
+                else:
+                    return"[MVP+]"
+            elif rank == 'MVP':
+                return '[MVP]'
+            elif rank == 'VIP_PLUS':
+                return 'VIP+'
+            elif rank == 'VIP':
+                return '[VIP]'
+            elif rank == 'ADMIN':
+                return '[ADMIN]'
+            elif rank == 'MODERATOR':
+                return '[MOD]'
+            elif rank == 'HELPER':
+                return '[HELPER]'
+    else:
+        return None
