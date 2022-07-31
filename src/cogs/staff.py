@@ -5,7 +5,7 @@ from discord.ext import commands, bridge
 
 from src.func.General import General
 from src.func.Union import Union
-from src.utils.consts import partner_channel_id, information_embed
+from src.utils.consts import partner_channel_id, information_embed, neutral_color
 
 
 class Staff(commands.Cog, name="staff"):
@@ -47,7 +47,9 @@ class Staff(commands.Cog, name="staff"):
     @commands.has_role("Admin")
     async def partner(self, ctx, organization_name: str):
         """Create an embed with information about a partner!"""
-        await bot.get_channel(partner_channel_id).respond(embed=await General.partner(ctx, organization_name))
+        await bot.get_channel(partner_channel_id).send(embed=await General.partner(ctx, organization_name))
+        await ctx.respond(embed=discord.Embed(title=f"Miscellaneous has officially partnered with {organization_name}", color=neutral_color).set_footer(text="The partner embed has been sent to the partners channel!"))
+
 
     @bridge.bridge_command()
     @commands.has_role("Admin")

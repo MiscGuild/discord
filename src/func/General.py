@@ -304,7 +304,7 @@ class General:
             return discord.Embed(title=organization_name, description=description, color=neutral_color).set_thumbnail(url=logo)
         return discord.Embed(title=organization_name, description=description, color=neutral_color)
 
-    
+
     async def deny(ctx, channel: discord.TextChannel):
         # Copy real question list and append 0th element for general critiquing
         application_questions = staff_application_questions.copy()
