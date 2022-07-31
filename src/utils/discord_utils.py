@@ -26,7 +26,7 @@ async def name_grabber(author: discord.User) -> str:
 
 
 async def is_linked_discord(player_data: dict, user: discord.User) -> bool:
-    if ("socialMedia" not in player_data) or ("links" not in player_data["socialMedia"]) or (
+    if (not player_data) or ("socialMedia" not in player_data) or (not player_data["socialMedia"]) or (not player_data["socialMedia"]["links"]) or ("links" not in player_data["socialMedia"]) or (
             "DISCORD" not in player_data["socialMedia"]["links"]):
         return False
     return player_data["socialMedia"]["links"]["DISCORD"] == str(user)
