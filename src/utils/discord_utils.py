@@ -71,6 +71,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                 if bot.guest in user.roles:
                     self.add_option(label="I want to join Miscellaneous", emoji="<:Misc:540990817872117780>")
                     self.add_option(label="I want to organize a GvG", emoji="⚔️")
+                    self.add_option(label="My guild wishes to ally Miscellaneous", emoji="🤝")
 
                 # Add milestone, DNKL application, staff application, GvG application if user is a member
                 if bot.member_role in user.roles:
@@ -354,6 +355,32 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                     value="Preferred gamemode(s) for the GvG"
                                           "\nAny special rules"
                                           "\nNumber of Players\nTime & Timezone")
+                    embed.set_footer(text="Once you have done so, please await staff assistance!")
+                    await ticket.send(embed=embed)
+                    return
+                if option == "My guild wishes to ally Miscellaneous":
+                    await ticket.edit(name=f"alliance-request-{ign}", topic=f"{interaction.user.id}|",
+                                      category=discord.utils.get(interaction.guild.categories,
+                                                                 name=ticket_categories["generic"]))
+                    await ticket.purge(limit=100)
+                    guild = await get_player_guild(uuid)
+                    if not guild:
+                        embed = discord.Embed(title="Error! Guild not found!", color=neg_color)
+                        embed.add_field(name=f"If you wish to form an alliance with us, please provide the following",
+                                        value="Guild Name\n"
+                                              "Guild Level\n"
+                                              "Guild Logo\n"
+                                              "Guild Advertisement Message\n")
+                        embed.set_footer(text="Once you have done so, please await staff assistance!")
+                        await ticket.send(embed=embed)
+                        return
+                    embed = discord.Embed(
+                        title=f"{ign} wishes to ally with Miscellaneous on behalf of {guild['name']}",
+                        description=f"Guild Level: {await get_guild_level(guild['exp'])}",
+                        color=neutral_color)
+                    embed.add_field(name=f"If you wish to form an alliance with us, please provide the following",
+                                    value="Guild Logo\n"
+                                          "Guild Advertisement Message\n")
                     embed.set_footer(text="Once you have done so, please await staff assistance!")
                     await ticket.send(embed=embed)
                     return
