@@ -297,12 +297,14 @@ class General:
         # Wait for description
         description = (await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)).content
 
-        await ctx.send("Please provide the logo of the organization/guild. (Please provide the URL)")
+        await ctx.send("Please provide the logo of the organization/guild. (Please provide the URL. If they don't have a logo, type `None`)")
         # Wait for Logo
-        logo = (await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)).content
+        logo = (await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)).content if (await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)).content.lower() != "none" else None
+        if logo:
+            return discord.Embed(title=organization_name, description=description, color=neutral_color).set_thumbnail(url=logo)
+        return discord.Embed(title=organization_name, description=description, color=neutral_color)
 
-        return discord.Embed(title=organization_name, description=description, color=neutral_color).set_thumbnail(url=logo)
-
+    
     async def deny(ctx, channel: discord.TextChannel):
         # Copy real question list and append 0th element for general critiquing
         application_questions = staff_application_questions.copy()
