@@ -107,6 +107,7 @@ class General:
             ally_divisions.append([len(ally_uuids),
                                    gtag])  # Ally divisions marks the separation point of one guild from another in the ally_uuids array along with the guild's gtag
 
+        print(ally_uuids, ally_divisions)
         # Limiting the maximum concurrency
         async def gather_with_concurrency(n, *tasks):
             semaphore = asyncio.Semaphore(n)
@@ -142,8 +143,7 @@ class General:
             if name in guild_names:
                 # Checks if the member meets the requirements for the active rank
                 for guild_member in guild_members:
-                    if guild_uuids[guild_names.index(name)] == guild_member[
-                        'uuid']:  # Finds the users uuid from their name using the list and finds their corresponding hypixel data
+                    if guild_uuids[guild_names.index(name)] == guild_member['uuid']:  # Finds the users uuid from their name using the list and finds their corresponding hypixel data
                         weekly_exp = sum(guild_member["expHistory"].values())
                         if weekly_exp >= active_req:  # If the member meets the active requirements
                             await member.add_roles(bot.active_role)
@@ -167,11 +167,13 @@ class General:
             if name in ally_names:
                 # Get player gtag
                 position = ally_uuids.index(uuid)
-                last_value = 0
+                last_value = 1
                 for guild_division in ally_divisions:
-                    if last_value > 0:
+                    if last_value > 1:
                         if last_value < position < guild_division[0]:
                             gtag = guild_division[1]
+                            print(name, gtag)
+
                     elif position < guild_division[0]:
                         gtag = guild_division[1]
                     last_value = guild_division[0]
