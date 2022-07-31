@@ -520,7 +520,7 @@ class General:
             # Wait for answer and check for cancellation
             duration = await bot.wait_for("message",
                                           check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
-            duration = duration.content.lower()
+            duration_visual = duration = duration.content.lower()
             # Convert the duration to seconds
             if duration[:-2:-1] == "s":
                 duration = int(duration[:-1])
@@ -540,7 +540,7 @@ class General:
 
         # Ask for gexp requirements
         await progress_message.edit(
-            content=f"Awesome! The giveaway will last for {duration}.\n\n**Should there be a weekly gexp requirement?**\n\n`If you don't want a gexp requirement, reply with 0.`\n`Otherwise, enter a required amount of weekly gexp. Use 'k' for thousands, or 'm' for millions.`")
+            content=f"Awesome! The giveaway will last for {duration_visual}.\n\n**Should there be a weekly gexp requirement?**\n\n`If you don't want a gexp requirement, reply with 0.`\n`Otherwise, enter a required amount of weekly gexp. Use 'k' for thousands, or 'm' for millions.`")
 
         while True:
             # Wait for answer and check for cancellation
@@ -641,7 +641,7 @@ class General:
         embed.set_footer(
             text=f"{number_winners} Winner(s), Ends at {end_date} UTC/GMT")
         embed.add_field(
-            name="[-] Information:", value=f"Sponsored by: {sponsors} \nDuration: {duration}", inline=False)
+            name="[-] Information:", value=f"Sponsored by: {sponsors} \nDuration: {duration_visual}", inline=False)
         embed.add_field(
             name="[-] Requirements:", value=f"{role_requirement_text} \n{gexp_requirement_text}", inline=False)
 
