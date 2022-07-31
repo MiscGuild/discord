@@ -123,38 +123,6 @@ class Listener:
                 print(tb)
 
 
-    async def on_message(self):
-        if isinstance(self.obj, AttributeError):
-            pass
-        if self.obj.channel.name == "event-registrees":
-            import pygsheets
-            gc = pygsheets.authorize(client_secret='Google API.json')
-            sh = gc.open_by_key('1qB4Lm8fGXzm7CqyrK5PsE_Jbk43_Z9lMH9HqTfrN-aI')[0]
-            ign, uuid = await get_mojang_profile(self.obj.content)
-            if not ign:
-                await self.obj.add_reaction(emoji='❌')
-                await self.obj.add_reaction(emoji='1️⃣')
-                return
-            guild = None if not await get_player_guild(uuid) else await get_player_guild(uuid)
-            if not guild or (guild['name'] != 'Miscellaneous' and guild['name'] not in allies):
-                await self.obj.add_reaction(emoji='❌')
-                await self.obj.add_reaction(emoji='2️⃣')
-                return
-
-            if sh.find(self.obj.content):   # Checks if the person already exists
-                await self.obj.add_reaction(emoji='❌')
-                await self.obj.add_reaction(emoji='3️⃣')
-                return
-
-            if guild['name'] in allies:
-                self.obj.content = ign + " " + f"[{guild['tag']}]"
-
-            sh.append_table([self.obj.content], start="A2", dimension="COLUMNS", overwrite=False)
-            await self.obj.add_reaction(emoji="✅")
-        else:
-            pass
-
-
     async def on_interaction(self):
         self.obj: discord.Interaction
         # Ticket creation
