@@ -123,15 +123,13 @@ class Help(commands.Cog):
 
                     # getting commands from cog
                     for command in self.bot.get_cog(cog).get_commands()[::2]:   # Ignores all the duplicate commands returned by bridge slash commands
-                        # if cog is not hidden
-                        if not command.hidden:
-                            syntax = f"{prefix}{command.name}"
-                            for key, value in command.clean_params.items():
-                                if not value.default:
-                                    syntax += " [" + key + "]"
-                                else:
-                                    syntax += " <" + key + ">"
-                            emb.add_field(name=f"`{syntax}`", value=command.help, inline=False)
+                        syntax = f"{prefix}{command.name}"
+                        for key, value in command.clean_params.items():
+                            if not value.default:
+                                syntax += " [" + key + "]"
+                            else:
+                                syntax += " <" + key + ">"
+                        emb.add_field(name=f"`{syntax}`", value=command.help, inline=False)
 
                     emb.set_footer(text="\n\n[] represent compulsory fields\n<> represent optional fields\nDo not type the brackets!")
                     # found cog - breaking loop
