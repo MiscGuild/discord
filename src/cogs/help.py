@@ -70,8 +70,7 @@ class Help(commands.Cog):
             for cog in self.bot.cogs:
                 valid = False
                 for command in self.bot.get_cog(cog).get_commands():
-                    if not command.hidden:
-                        valid = await predicate(command)
+                    valid = await predicate(command)
                     if valid:
                         break
                 if valid:
@@ -84,8 +83,8 @@ class Help(commands.Cog):
             commands_desc = ''
             for command in self.bot.walk_commands():
                 # if cog not in a cog
-                # listing command if cog name is None and command isn't hidden
-                if not command.cog_name and not command.hidden:
+                # listing command if cog name is None
+                if not command.cog_name:
                     commands_desc += f'{command.name} - {command.help}\n'
 
             # adding those commands to embed
