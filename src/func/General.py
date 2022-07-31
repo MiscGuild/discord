@@ -107,7 +107,6 @@ class General:
             ally_divisions.append([len(ally_uuids),
                                    gtag])  # Ally divisions marks the separation point of one guild from another in the ally_uuids array along with the guild's gtag
 
-        print(ally_uuids, ally_divisions)
         # Limiting the maximum concurrency
         async def gather_with_concurrency(n, *tasks):
             semaphore = asyncio.Semaphore(n)
@@ -172,7 +171,6 @@ class General:
                     if last_value > 1:
                         if last_value < position < guild_division[0]:
                             gtag = guild_division[1]
-                            print(name, gtag)
 
                     elif position < guild_division[0]:
                         gtag = guild_division[1]
