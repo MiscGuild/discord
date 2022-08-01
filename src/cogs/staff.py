@@ -34,14 +34,6 @@ class Staff(commands.Cog, name="staff"):
         elif isinstance(res, str):
             await ctx.respond(res)
 
-    @bridge.bridge_command()
-    @commands.has_role("Admin")
-    async def staffreview(self, ctx):
-        """Send a progress update and review for staff members!"""
-        res = await General.staffreview(ctx)
-        # Result may be empty
-        if res:
-            await bot.staff_announcements.respond(embed=res)
 
     @bridge.bridge_command()
     @commands.has_role("Admin")
