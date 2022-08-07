@@ -13,7 +13,7 @@ from src.utils.consts import (config, dnkl_channel_id, dnkl_req,
                               log_channel_id, missing_permissions_embed,
                               months, neg_color, neutral_color, pos_color,
                               staff_application_questions, ticket_categories,
-                              unknown_ign_embed)
+                              unknown_ign_embed, guild_handle)
 from src.utils.db_utils import insert_new_dnkl, select_one, update_dnkl, delete_dnkl
 from src.utils.minecraft_utils import get_player_gexp
 from src.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild, get_guild_level
@@ -69,9 +69,9 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                 super().__init__()
 
                 if bot.guest in user.roles:
-                    self.add_option(label="I want to join Miscellaneous", emoji="<:Misc:540990817872117780>")
-                    self.add_option(label="I want to organize a GvG", emoji="⚔️")
-                    self.add_option(label="My guild wishes to ally Miscellaneous", emoji="🤝")
+                    self.add_option(label=f"I want to join {guild_handle}", emoji="<:Misc:540990817872117780>")
+                    self.add_option(label=f"I want to organize a GvG with {guild_handle}", emoji="⚔️")
+                    self.add_option(label=f"My guild wishes to ally {guild_handle}", emoji="🤝")
 
                 # Add milestone, DNKL application, staff application, GvG application if user is a member
                 if bot.member_role in user.roles:

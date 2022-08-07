@@ -205,7 +205,7 @@ err_404_embed = discord.Embed(title="404 - Not Found",
                               color=error_color)
 
 bot_missing_perms_embed = discord.Embed(title="Missing permissions!",
-                                        description="Due to the role hierarchy, the bot does not have the permission to do that!",
+                                        description="Due to the role hierarchy, I do not have the permission to do that!",
                                         color=error_color)
 
 guildless_embed = discord.Embed(title="Guildless!",
