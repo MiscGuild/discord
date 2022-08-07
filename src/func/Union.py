@@ -52,43 +52,34 @@ class Union:
         if not reason:
             reason = f"Responsible moderator: {author}"
 
-        # Catch MissingPermissions error
-        try:
-            await guild.ban(self.user, reason=reason)
-            return discord.Embed(title="Banned!",
-                                 description=f"{self.user} was banned by {author}",
-                                 color=neg_color)
-        except Forbidden:
-            return bot_missing_perms_embed
+        await guild.ban(self.user, reason=reason)
+        return discord.Embed(title="Banned!",
+                             description=f"{self.user} was banned by {author}",
+                             color=neg_color)
+
 
     async def softban(self, guild, author, reason: str = None):
         # Default reason is responsible moderator
         if not reason:
             reason = f"Responsible moderator: {author}"
 
-        # Catch MissingPermissions error
-        try:
-            await guild.ban(self.user, reason=reason)
-            await guild.unban(self.user, reason=reason)
-            return discord.Embed(title="Softbanned!",
-                                 description=f"{self.user} was softbanned by {author}",
-                                 color=neg_color)
-        except Forbidden:
-            return bot_missing_perms_embed
+        await guild.ban(self.user, reason=reason)
+        await guild.unban(self.user, reason=reason)
+        return discord.Embed(title="Softbanned!",
+                             description=f"{self.user} was softbanned by {author}",
+                             color=neg_color)
+
 
     async def unban(self, guild, author, reason: str = None):
         # Default reason is responsible moderator
         if not reason:
             reason = f"Responsible moderator: {author}"
 
-        # Catch Unknown Ban error
-        try:
-            await guild.unban(self.user, reason=reason)
-            return discord.Embed(title="Unbanned!",
-                                 description=f"{self.user} was unbanned by {author}",
-                                 color=neg_color)
-        except NotFound:
-            return err_404_embed
+        await guild.unban(self.user, reason=reason)
+        return discord.Embed(title="Unbanned!",
+                             description=f"{self.user} was unbanned by {author}",
+                             color=neg_color)
+
 
     async def sync(self, ctx, name: str, tag: str = None, is_fs=False):
         await ctx.defer()
@@ -162,12 +153,9 @@ class Union:
             [role.name for role in roles_to_remove]) + "\n• Added: " + ", ".join([role.name for role in roles_to_add]))
 
         # Set roles and nick
-        try:
-            await self.user.add_roles(*roles_to_add, reason="Sync")
-            await self.user.remove_roles(*roles_to_remove, reason="Sync")
-            await self.user.edit(nick=new_nick)
-        except:
-            return bot_missing_perms_embed
+        await self.user.add_roles(*roles_to_add, reason="Sync")
+        await self.user.remove_roles(*roles_to_remove, reason="Sync")
+        await self.user.edit(nick=new_nick)
 
         return embed
 
