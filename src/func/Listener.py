@@ -11,7 +11,7 @@ from src.utils.consts import (error_channel_id, invalid_command_embed,
                               missing_permissions_embed, missing_role_embed,
                               neutral_color, not_owner_embed, pronoun_roles,
                               reaction_roles, registration_channel_id,
-                              registration_embed)
+                              registration_embed, err_404_embed, bot_missing_perms_embed)
 from src.utils.discord_utils import create_ticket
 from src.utils.request_utils import get_jpg_file, get_player_guild, get_mojang_profile
 
@@ -52,6 +52,10 @@ class Listener:
             await ctx.respond(embed=missing_permissions_embed)
         elif isinstance(self.obj, commands.MemberNotFound):
             await ctx.respond(embed=member_not_found_embed)
+        elif isinstance(self.obj, discord.errors.Forbidden):
+            await ctx.respond(embed=bot_missing_perms_embed)
+        elif isinstance(self.obj, discord.errors.NotFound):
+            await ctx.respond(embed=err_404_embed)
         elif isinstance(self.obj, commands.MissingRequiredArgument):
             usage = f"{ctx.prefix}{ctx.command.name}"
             for key, value in ctx.command.clean_params.items():
@@ -96,6 +100,10 @@ class Listener:
             await ctx.respond(embed=missing_permissions_embed)
         elif isinstance(self.obj, commands.MemberNotFound):
             await ctx.respond(embed=member_not_found_embed)
+        elif isinstance(self.obj, discord.errors.Forbidden):
+            await ctx.respond(embed=bot_missing_perms_embed)
+        elif isinstance(self.obj, discord.errors.NotFound):
+            await ctx.respond(embed=err_404_embed)
         elif isinstance(self.obj, commands.MissingRequiredArgument):
             usage = f"{ctx.prefix}{ctx.command.name}"
             for key, value in ctx.command.clean_params.items():
