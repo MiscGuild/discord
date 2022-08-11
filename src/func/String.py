@@ -251,4 +251,4 @@ class String:
         await bot.get_channel(qotd_channel_id).send("<@&923978802818871356>", embed=embed)
         await ctx.send(f"**The QOTD has been sent to <#{qotd_channel_id}>!**")
         await bot.get_channel(qotd_ans_channel_id).send(
-            "https://media.discordapp.net/attachments/495114793288728586/535784155527774208/Rainbow.gif")
+            "https://images-ext-2.discordapp.net/external/ld0YImTBVJf7lGZafYVswSXzCbTuA4kXywe0AAekf_I/https/media.tenor.com/1o77CxmUESEAAAPo/rainbow-color.mp4")
