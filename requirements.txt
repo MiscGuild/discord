@@ -12,7 +12,7 @@ grapheme==0.6.0
 idna==3.3
 multidict==6.0.2
 py-cord==2.0.0
-pytz==2022.1
+pytz==2022.2
 quickchart.io==1.0.1
 requests==2.28.1
 toml==0.10.2
