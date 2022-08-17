@@ -1,11 +1,10 @@
 import random
-from datetime import datetime, timedelta
+from __main__ import bot
 
 import discord
-from __main__ import bot
-from discord.ext import tasks
+
 from src.utils.consts import neutral_color
-from src.utils.db_utils import (connect_db, select_all, select_one,
+from src.utils.db_utils import (select_one,
                                 set_giveaway_inactive)
 from src.utils.discord_utils import name_grabber
 from src.utils.minecraft_utils import get_player_gexp
@@ -59,7 +58,7 @@ async def roll_giveaway(message_id: int, reroll_target: int = None):
             if req_roles:
                 if not all_roles_required and not any(
                         role.id in req_roles for role in winner.roles) or all_roles_required and not all(
-                        role.id in req_roles for role in winner.roles):
+                    role.id in req_roles for role in winner.roles):
                     entrants.remove(winner)
                     continue
 
@@ -92,4 +91,3 @@ async def roll_giveaway(message_id: int, reroll_target: int = None):
     # Message does not have 🎉 reaction
     await set_giveaway_inactive(message_id)
     return await channel.send(f"Yikes! The giveaway for {prize} doesn't seem to have the 🎉 reaction :(")
-

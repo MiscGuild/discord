@@ -49,5 +49,3 @@ async def send_gexp_lb():
 @send_gexp_lb.before_loop
 async def before_gexp_lb():
     await bot.wait_until_ready()
-
-

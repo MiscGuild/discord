@@ -5,14 +5,12 @@ from io import BytesIO
 import chat_exporter
 import discord
 import discord.ui
-import asyncio
 from discord.ext import tasks
 
 from src.utils.consts import (config, dnkl_channel_id, dnkl_req,
                               gvg_requirements, invalid_date_msg,
                               log_channel_id, missing_permissions_embed,
-                              months, neg_color, neutral_color, pos_color,
-                              staff_application_questions, ticket_categories,
+                              months, neg_color, neutral_color, staff_application_questions, ticket_categories,
                               unknown_ign_embed, guild_handle)
 from src.utils.db_utils import insert_new_dnkl, select_one, update_dnkl, delete_dnkl
 from src.utils.minecraft_utils import get_player_gexp
@@ -26,7 +24,8 @@ async def name_grabber(author: discord.User) -> str:
 
 
 async def is_linked_discord(player_data: dict, user: discord.User) -> bool:
-    if (not player_data) or ("socialMedia" not in player_data) or (not player_data["socialMedia"]) or (not player_data["socialMedia"]["links"]) or ("links" not in player_data["socialMedia"]) or (
+    if (not player_data) or ("socialMedia" not in player_data) or (not player_data["socialMedia"]) or (
+            not player_data["socialMedia"]["links"]) or ("links" not in player_data["socialMedia"]) or (
             "DISCORD" not in player_data["socialMedia"]["links"]):
         return False
     return player_data["socialMedia"]["links"]["DISCORD"] == str(user)
@@ -182,7 +181,9 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                                         color=neg_color).set_footer(
                                         text="If don't you think you can meet the requirements, you may rejoin the guild once your inactivity period has finished."))
                                 await delete_dnkl(ign)
-                                await interaction.response.send_message("If you wish to reverse your decision, add them to the DNKL using `,dnkladd`", ephemeral=True)
+                                await interaction.response.send_message(
+                                    "If you wish to reverse your decision, add them to the DNKL using `,dnkladd`",
+                                    ephemeral=True)
                                 await interaction.followup
 
                             elif interaction.custom_id == "DNKL_Error":
@@ -392,7 +393,6 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                                           description="Please specify why you have created this ticket!",
                                                           color=neutral_color))
 
-
         # Create view and embed, send to ticket
         view = discord.ui.View()
         view.add_item(TicketTypeSelect())
@@ -488,6 +488,7 @@ async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, au
 
     return embed
 
+
 async def get_rank_role(rank):
     ranks = {
         "[MVP++]": bot.mvpplusplus,
@@ -497,6 +498,7 @@ async def get_rank_role(rank):
         "[VIP]": bot.vip,
     }
     return ranks.get(rank)
+
 
 @tasks.loop(count=1)
 async def after_cache_ready():
@@ -527,9 +529,12 @@ async def after_cache_ready():
     bot.vipplus = discord.utils.get(bot.guild.roles, name="VIP+")
     bot.vip = discord.utils.get(bot.guild.roles, name="VIP")
 
-
     from src.utils.discord_utils import name_grabber
     bot.staff_names = [await name_grabber(member) for member in bot.staff.members]
+
+    from src.utils.loop_utils import check_giveaways, send_gexp_lb
+    check_giveaways.start()
+    send_gexp_lb.start()
 
 
 @after_cache_ready.before_loop
