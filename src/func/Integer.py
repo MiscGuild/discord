@@ -48,38 +48,37 @@ class Integer:
             return discord.Embed(title="Invalid timestamp!", description="You cannot request data this old!",
                                  color=error_color)
 
-        async with ctx.channel.typing():
-            guild_data = await get_guild_by_name(guild_handle)
-            if not guild_data:
-                return invalid_guild_embed
+        guild_data = await get_guild_by_name(guild_handle)
+        if not guild_data:
+            return invalid_guild_embed
 
-            member_gexp = {}
-            date = None
-            # Loop through all members to find top 10
-            for member in guild_data["members"]:
-                if not date:
-                    date = list(member["expHistory"].keys())[self.integer]
-                member_gexp[member["uuid"]] = list(
-                    member["expHistory"].values())[self.integer]
+        member_gexp = {}
+        date = None
+        # Loop through all members to find top 10
+        for member in guild_data["members"]:
+            if not date:
+                date = list(member["expHistory"].keys())[self.integer]
+            member_gexp[member["uuid"]] = list(
+                member["expHistory"].values())[self.integer]
 
-            # Sort member gexp
-            member_gexp = sorted(member_gexp.items(),
-                                 key=lambda item: item[1], reverse=True)
+        # Sort member gexp
+        member_gexp = sorted(member_gexp.items(),
+                             key=lambda item: item[1], reverse=True)
 
-            # Get image data
-            image_content = f"&f&lDaily Top: {date}&r%5Cn"
-            count = 0
-            for i in member_gexp[:10]:
-                count += 1
-                user_data = i
-                name = await get_name_by_uuid(user_data[0])
-                rank, _ = await get_hypixel_player_rank(await get_hypixel_player(uuid=user_data[0]))
+        # Get image data
+        image_content = f"&f&lDaily Top: {date}&r%5Cn"
+        count = 0
+        for i in member_gexp[:10]:
+            count += 1
+            user_data = i
+            name = await get_name_by_uuid(user_data[0])
+            rank, _ = await get_hypixel_player_rank(await get_hypixel_player(uuid=user_data[0]))
 
-                # Add new entry to image content
-                image_content += f"&6{count}. {rank} {name} &2{format(user_data[1], ',d')} Guild Experience"
-                # Add new line
-                if count < 10:
-                    image_content += "%5Cn"
+            # Add new entry to image content
+            image_content += f"&6{count}. {rank} {name} &2{format(user_data[1], ',d')} Guild Experience"
+            # Add new line
+            if count < 10:
+                image_content += "%5Cn"
 
         # Replace characters for URL
         image_content = image_content.replace("+", "%2B")

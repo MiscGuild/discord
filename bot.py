@@ -1,7 +1,7 @@
 import sys
 
 import discord
-from discord.ext import commands, bridge
+from discord.ext import bridge
 
 from src.utils.consts import config
 
@@ -14,7 +14,7 @@ intents.reactions = True
 intents.members = True
 intents.message_content = True
 bot = bridge.Bot(command_prefix=config["prefix"], intents=intents,
-                   status=discord.Status.idle, activity=discord.Game(config["status"]), case_insensitive=True)
+                 status=discord.Status.idle, activity=discord.Game(config["status"]), case_insensitive=True)
 
 # Load all bot vars once cache is ready
 from src.utils.discord_utils import after_cache_ready
@@ -22,7 +22,6 @@ from src.utils.discord_utils import after_cache_ready
 bot.remove_command("help")
 
 after_cache_ready.start()
-
 # Load extensions
 for extension in ["src.cogs.general", "src.cogs.giveaways", "src.cogs.guild", "src.cogs.hypixel",
                   "src.cogs.listeners", "src.cogs.menus", "src.cogs.moderation", "src.cogs.staff",

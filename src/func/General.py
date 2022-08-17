@@ -30,47 +30,46 @@ from src.utils.request_utils import (get_guild_by_name, get_guild_uuids,
 
 class General:
     async def weeklylb(ctx):
-        async with ctx.channel.typing():
-            # Get guild data
-            guild_data = await get_guild_by_name(guild_handle)
+        # Get guild data
+        guild_data = await get_guild_by_name(guild_handle)
 
-            if not guild_data:
-                return invalid_guild_embed
+        if not guild_data:
+            return invalid_guild_embed
 
-            member_gexp = {}
+        member_gexp = {}
 
-            # Loop through all guild members' gexp, adding it to dict
-            for member in guild_data["members"]:
-                member_gexp[member["uuid"]] = sum(
-                    member["expHistory"].values())
+        # Loop through all guild members' gexp, adding it to dict
+        for member in guild_data["members"]:
+            member_gexp[member["uuid"]] = sum(
+                member["expHistory"].values())
 
-            # Sort member gexp
-            member_gexp = sorted(member_gexp.items(),
-                                 key=lambda item: item[1], reverse=True)
+        # Sort member gexp
+        member_gexp = sorted(member_gexp.items(),
+                             key=lambda item: item[1], reverse=True)
 
-            # Create url
-            text = "&f&lWeekly Top&r%5Cn"
-            count = 0
-            for i in member_gexp[:10]:
-                count += 1
-                user_data = i
-                name = await get_name_by_uuid(user_data[0])
-                rank, _ = await get_hypixel_player_rank(await get_hypixel_player(uuid=user_data[0]))
+        # Create url
+        text = "&f&lWeekly Top&r%5Cn"
+        count = 0
+        for i in member_gexp[:10]:
+            count += 1
+            user_data = i
+            name = await get_name_by_uuid(user_data[0])
+            rank, _ = await get_hypixel_player_rank(await get_hypixel_player(uuid=user_data[0]))
 
-                # Add new entry to image content
-                text += f"&6{count}. {rank} {name} &2{format(user_data[1], ',d')} Guild Experience"
-                # Add new line
-                if count < 10:
-                    text += "%5Cn"
+            # Add new entry to image content
+            text += f"&6{count}. {rank} {name} &2{format(user_data[1], ',d')} Guild Experience"
+            # Add new line
+            if count < 10:
+                text += "%5Cn"
 
-            # Replace characters for URL
-            text = text.replace("+", "%2B")
-            text = text.replace("&", "%26")
-            text = text.replace(" ", "%20")
-            text = text.replace(",", "%2C")
+        # Replace characters for URL
+        text = text.replace("+", "%2B")
+        text = text.replace("&", "%26")
+        text = text.replace(" ", "%20")
+        text = text.replace(",", "%2C")
 
-            # Return image
-            return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
+        # Return image
+        return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
 
     async def dnkllist(ctx):
         # Fetch all rows
@@ -142,7 +141,8 @@ class General:
             if name in guild_names:
                 # Checks if the member meets the requirements for the active rank
                 for guild_member in guild_members:
-                    if guild_uuids[guild_names.index(name)] == guild_member['uuid']:  # Finds the users uuid from their name using the list and finds their corresponding hypixel data
+                    if guild_uuids[guild_names.index(name)] == guild_member[
+                        'uuid']:  # Finds the users uuid from their name using the list and finds their corresponding hypixel data
                         weekly_exp = sum(guild_member["expHistory"].values())
                         if weekly_exp >= active_req:  # If the member meets the active requirements
                             await member.add_roles(bot.active_role)
@@ -197,7 +197,6 @@ class General:
 
         await progress_message.edit(content="Rolecheck complete!")
 
-
     async def delete(ctx):
         embed = discord.Embed(title="This ticket will be deleted in 10 seconds!", color=neg_color)
         if not ctx.channel.category or ctx.channel.category.name not in ticket_categories.values():
@@ -221,7 +220,8 @@ class General:
             # Log outcome
             await log_event(f"{ctx.channel.name} was deleted by {ctx.author}")
             try:
-                await (await bot.fetch_user(ctx.channel.topic.split("|")[0])).send(embed=ticket_deleted_embed.set_footer(text=ctx.channel.name), file=transcript)
+                await (await bot.fetch_user(ctx.channel.topic.split("|")[0])).send(
+                    embed=ticket_deleted_embed.set_footer(text=ctx.channel.name), file=transcript)
             except:
                 pass
             await bot.get_channel(log_channel_id).send(file=transcript)
@@ -256,13 +256,18 @@ class General:
         # Wait for description
         description = (await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)).content
 
-        await ctx.send("Please provide the logo of the organization/guild. (Please provide the URL. If they don't have a logo, type `None`)")
+        await ctx.send(
+            "Please provide the logo of the organization/guild. (Please provide the URL. If they don't have a logo, type `None`)")
         # Wait for Logo
-        logo = (await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)).content if (await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)).content.lower() != "none" else None
+        logo = (await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)).content if (
+                                                                                                              await bot.wait_for(
+                                                                                                                  "message",
+                                                                                                                  check=lambda
+                                                                                                                      x: x.author == ctx.message.author)).content.lower() != "none" else None
         if logo:
-            return discord.Embed(title=organization_name, description=description, color=neutral_color).set_thumbnail(url=logo)
+            return discord.Embed(title=organization_name, description=description, color=neutral_color).set_thumbnail(
+                url=logo)
         return discord.Embed(title=organization_name, description=description, color=neutral_color)
-
 
     async def deny(ctx, channel: discord.TextChannel):
         # Copy real question list and append 0th element for general critiquing
@@ -486,9 +491,9 @@ class General:
             if duration[:-2:-1] == "s":
                 duration = int(duration[:-1])
             elif duration[:-2:-1] == "m":
-                duration = int(duration[:-1])*60
+                duration = int(duration[:-1]) * 60
             elif duration[:-2:-1] == "d":
-                duration = int(duration[:-1])*86400
+                duration = int(duration[:-1]) * 86400
             if duration == "cancel":
                 return "Giveaway cancelled!"
             try:
@@ -691,16 +696,15 @@ class General:
 
             await ctx.send(embed=embed)
 
-
         if gamemode and milestone:
             if gamemode.upper() in [x for x in milestone_emojis.keys()]:
                 emoji = milestone_emojis.get(gamemode.upper())
                 await milestone_ticket_update(ctx, channel, emoji, milestone)
             else:
-                embed= discord.Embed(title="Invalid gamemode inserted!",
-                                    description=f"All the possible gamemodes are as follows:",
-                                     color= neg_color).set_footer(
-                    text=f"{f'{chr(10)}'.join([x.title() for x in milestone_emojis.keys()])}")  #   chr(10) is a new line character
+                embed = discord.Embed(title="Invalid gamemode inserted!",
+                                      description=f"All the possible gamemodes are as follows:",
+                                      color=neg_color).set_footer(
+                    text=f"{f'{chr(10)}'.join([x.title() for x in milestone_emojis.keys()])}")  # chr(10) is a new line character
                 await ctx.respond(embed=embed)
             return
         # Create view and embed, send to ticket
@@ -784,4 +788,3 @@ class General:
         milestone_message = milestone_message + "\n**Congrats to everyone this week. If you wish to submit a milestone, look over at <#650248396480970782>!**"
         await bot.get_channel(milestones_channel).send(milestone_message)
         return f"{count} milestones have been compiled and sent in {bot.get_channel(milestones_channel)}"
-
