@@ -176,7 +176,8 @@ gvg_info_embed = discord.Embed(title="GvG Information",
 # Errors
 unknown_ign_msg = "Unknown IGN!"
 
-invalid_date_msg = "This date is invalid! You have entered a date that has already passed!\n Enter dates in the form `YYYY/MM/DD`"
+invalid_date_msg = "This date is invalid!\n*Enter dates in the format* **YYYY/MM/DD**\n\n For example,\n" \
+                   "January 23rd 2022 would be 2022/01/23"
 
 missing_permissions_msg = "Your soul lacks the strength to utilize this feature!"
 
