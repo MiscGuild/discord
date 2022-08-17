@@ -6,7 +6,7 @@ from discord.ext import tasks
 from src.func.General import General
 from src.func.Integer import Integer
 from src.utils.db_utils import (connect_db, select_all)
-from src.utils.discord_utils import weekly_lb_channel, daily_lb_channel
+from src.utils.consts import weekly_lb_channel, daily_lb_channel
 from src.utils.giveaway_utils import roll_giveaway
 
 
