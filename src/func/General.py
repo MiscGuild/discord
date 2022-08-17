@@ -655,38 +655,31 @@ class General:
 
             return embed
 
-    async def add_milestone(ctx):
+    async def add_milestone(ctx, gamemode, milestone):
         member = await get_ticket_creator(ctx.channel)
         name = await name_grabber(member)
+        channel = ctx.channel
 
         class MilestoneTypeSelect(discord.ui.Select):
             def __init__(self):
                 super().__init__()
                 for key, value in milestone_emojis.items():
-                    self.add_option(label=key, emoji=f"{value}")
+                    self.add_option(label=key.replace("_", " ").title(), emoji=f"{value}")
 
             # Override default callback
             async def callback(self, interaction: discord.Interaction):
                 # Set option var and delete Select, so it cannot be used twice
                 option = list(interaction.data.values())[0][0]
                 option_emoji = milestone_emojis.get(option)
-                channel = ctx.channel
 
                 await interaction.response.send_message(f"**Milestone Category:** {option}"
                                                         f"\n**What is {name}'s milestone?**\n"
-                                                        f"{option_emoji}{name}.... (Complete the sentence)")
+                                                        f"{emoji}{name}.... (Complete the sentence)")
                 milestone = await bot.wait_for("message",
                                                check=lambda
                                                    x: x.channel == channel and x.author == interaction.user)
-                milestone_message = f"{option_emoji} {member.mention} {milestone.content}|"
-                channel_description = channel.topic + milestone_message
-                await ctx.send(
-                    "Please give the bot up to 10 minutes to add the milestone. Once it has done it, you'll receive a completion message.")
-                await channel.edit(topic=str(channel_description))
-                embed = discord.Embed(title="Milestone Registered!",
-                                      description=milestone_message[:-1], color=neutral_color)
+                await milestone_ticket_update(ctx, channel, option_emoji, milestone.content)
 
-                await ctx.send(embed=embed)
         async def milestone_ticket_update(ctx, channel, emoji, milestone):
             milestone_string = f"{emoji} {member.mention} {milestone}|"
             channel_description = channel.topic + milestone_string
@@ -696,6 +689,20 @@ class General:
             embed = discord.Embed(title="Milestone Registered!",
                                   description=milestone_string[:-1], color=neutral_color)
 
+            await ctx.send(embed=embed)
+
+
+        if gamemode and milestone:
+            if gamemode.upper() in [x for x in milestone_emojis.keys()]:
+                emoji = milestone_emojis.get(gamemode.upper())
+                await milestone_ticket_update(ctx, channel, emoji, milestone)
+            else:
+                embed= discord.Embed(title="Invalid gamemode inserted!",
+                                    description=f"All the possible gamemodes are as follows:",
+                                     color= neg_color).set_footer(
+                    text=f"{f'{chr(10)}'.join([x.title() for x in milestone_emojis.keys()])}")  #   chr(10) is a new line character
+                await ctx.respond(embed=embed)
+            return
         # Create view and embed, send to ticket
         view = discord.ui.View()
         view.add_item(MilestoneTypeSelect())
