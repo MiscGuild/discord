@@ -33,6 +33,8 @@ partner_channel_id = config["partner_channel"]
 qotd_channel_id = config["qotd_channel"]
 qotd_ans_channel_id = config["qotd_ans_channel"]
 milestones_channel = config["milestones_channel"]
+weekly_lb_channel = config["weekly_gexp_lb"]
+daily_lb_channel = config["daily_gexp_lb"]
 
 # Other variables
 guild_handle = config["guild_handle"]
