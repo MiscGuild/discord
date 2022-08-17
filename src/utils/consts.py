@@ -62,19 +62,19 @@ pronoun_roles = {
 }
 
 milestone_emojis = {
-    "Hypixel": "<:hypixel:823036946984730662>",
-    "Bedwars": "<:BedWars64:823036962150547477>",
-    "Skywars": "<:Skywars:823036980526972948>",
-    "Duels": "<:Duels:823036885089255434>",
-    "Skyblock": "<:sb:732824932177805405>",
-    "Build Battle": "<:buildbattle:828113746978406481>",
-    "Arcade": "<:arcade:825723888477929472>",
-    "Turbo Kart Racers": "<:TurboKartRacers64:846306861950304267>",
-    "Pit": "<:pit:851361342744690728>",
-    "Murder Mystery": "<:MurderMystery64:823036899974447105>",
-    "Miscellaneous": "<:Misc:540990817872117780>",
-    "Discord": "<:discord:977349801412788266>",
-    "Other": "❓"
+    "HYPIXEL": "<:hypixel:823036946984730662>",
+    "BEDWARS": "<:BedWars64:823036962150547477>",
+    "SKYWARS": "<:Skywars:823036980526972948>",
+    "DUELS": "<:Duels:823036885089255434>",
+    "SKYBLOCK": "<:sb:732824932177805405>",
+    "BUILD_BATTLE": "<:buildbattle:828113746978406481>",
+    "ARCADE": "<:arcade:825723888477929472>",
+    "TURBO_KART_RACERS": "<:TurboKartRacers64:846306861950304267>",
+    "PIT": "<:pit:851361342744690728>",
+    "MURDER_MYSTERY": "<:MurderMystery64:823036899974447105>",
+    "MISCELLANEOUS": "<:Misc:540990817872117780>",
+    "DISCORD": "<:discord:977349801412788266>",
+    "OTHER": "❓"
 }
 
 # General embeds
