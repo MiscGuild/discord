@@ -687,6 +687,14 @@ class General:
                                       description=milestone_message[:-1], color=neutral_color)
 
                 await ctx.send(embed=embed)
+        async def milestone_ticket_update(ctx, channel, emoji, milestone):
+            milestone_string = f"{emoji} {member.mention} {milestone}|"
+            channel_description = channel.topic + milestone_string
+            await ctx.send(
+                "Please give the bot up to 10 minutes to add the milestone. Once it has done it, you'll receive a completion message.")
+            await channel.edit(topic=str(channel_description))
+            embed = discord.Embed(title="Milestone Registered!",
+                                  description=milestone_string[:-1], color=neutral_color)
 
         # Create view and embed, send to ticket
         view = discord.ui.View()
