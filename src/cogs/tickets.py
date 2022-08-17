@@ -97,9 +97,9 @@ class Tickets(commands.Cog, name="tickets"):
 
     @bridge.bridge_command(aliases=['AddMilestone'])
     @commands.has_role('Staff')
-    async def milestoneadd(self, ctx):
+    async def milestoneadd(self, ctx, gamemode: str = None,*, milestone: str = None):
         """Register a milestone"""
-        embed, view = await General.add_milestone(ctx)
+        embed, view = await General.add_milestone(ctx, gamemode, milestone)
         await ctx.respond(embed=embed, view=view)
 
     @bridge.bridge_command(aliases=['UpdateMilestone'])
