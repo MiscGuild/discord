@@ -54,7 +54,7 @@ class General:
             count += 1
             user_data = i
             name = await get_name_by_uuid(user_data[0])
-            rank, _ = await get_hypixel_player_rank(await get_hypixel_player(uuid=user_data[0]))
+            rank, _ = await get_hypixel_player_rank(await get_hypixel_player(uuid=user_data[0]))    #   Ignores value without color formatting
 
             # Add new entry to image content
             text += f"&6{count}. {rank} {name} &2{format(user_data[1], ',d')} Guild Experience"
