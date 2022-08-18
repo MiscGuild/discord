@@ -452,6 +452,25 @@ async def create_transcript(channel: discord.TextChannel, limit: int = None):
 
 
 async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, author: discord.User):
+    class StartMonthSelect(ui.Select):
+        def __init__(self, year):
+            super().__init__(placeholder="Month")
+            self.year = year
+            import calendar
+            for x in range(1, 13):
+                self.add_option(label=str(calendar.month_name[x]))
+
+        # Override default callback
+        async def callback(self, interaction: discord.Interaction):
+            # Set option var and delete Select so it cannot be used twice
+            start_month = list(interaction.data.values())[0][0]
+            DayView = discord.ui.View()
+            DayView.add_item(StartDaySelect(month=start_month, year=self.year))  # Day Selection Dropdown
+            embed = discord.Embed(title=f"What is the closest day to the start of {ign}'s inactivity?",
+                                  color=neutral_color).set_footer(text=f"Start Date - ?/{start_month}/{self.year}")
+            await interaction.response.send_message(embed=embed, view=DayView)
+            self.view.stop()
+
     class StartYearSelect(ui.Select):
         def __init__(self):
             super().__init__(placeholder="Year")
