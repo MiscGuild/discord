@@ -617,6 +617,12 @@ async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, au
                     description="Please await staff assistance!",
                     color=neutral_color))
 
+    YearView = discord.ui.View()
+    YearView.add_item(StartYearSelect())  # Year Selection Dropdown
+    embed = discord.Embed(title=f"In which year will {ign}'s inactivity begin?",
+                          color=neutral_color)
+    await channel.send(embed=embed, view=YearView)
+
 
 async def get_rank_role(rank):
     ranks = {
