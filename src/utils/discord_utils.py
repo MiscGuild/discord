@@ -452,6 +452,56 @@ async def create_transcript(channel: discord.TextChannel, limit: int = None):
 
 
 async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, author: discord.User):
+    class InactivityLenSelect(ui.Select):
+        def __init__(self, day, month, year):
+            super().__init__(placeholder="Length")
+            self.month = month
+            self.year = year
+            self.day = day
+
+            self.add_option(label=f"1 Week", value=str(1))
+            for x in range(2, 4):
+                self.add_option(label=f"{x} Weeks", value=str(x))
+            self.add_option(label=f"More than {x} weeks", value='?')
+
+        async def callback(self, interaction: discord.Interaction):
+            length = list(interaction.data.values())[0][0]
+            if length == "?":
+                embed = discord.Embed(title=f"We do not accept do-not-kick-list applications for more than 3 weeks!",
+                                      description="If you think you won't be able to meet the guild requirements during your inactivity period,"
+                                                  " you can leave the guild and notify staff once you're back. We'll invite you back!",
+                                      color=neg_color)
+                await interaction.response.send_message(embed=embed)
+                return
+            await interaction.response.send_message(
+                embed=discord.Embed(title=f"What is the reason behind {ign}'s inactivity?",
+                                    description="Kindly type the reason as a single message",
+                                    color=neutral_color).set_footer(
+                    text=f"Start Date - {self.day}/{self.month}/{self.year}\n"
+                         f"Length - {int(length) * 7} Days"))
+            reason = await bot.wait_for("message", check=lambda
+                x: x.channel == channel and x.author == author)  # getting the reason
+            reason = reason.content
+            date = datetime.strptime(f"{self.day}/{self.month}/{self.year}", "%d/%B/%Y") + timedelta(weeks=int(length))
+            embed = discord.Embed(title=ign, url=f'https://plancke.io/hypixel/player/stats/{ign}', color=neutral_color)
+            embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{uuid}')
+            embed.add_field(name="IGN:", value=ign, inline=False)
+            embed.add_field(name="Start:", value=f"{self.day} {self.month} {self.year}", inline=False)
+            embed.add_field(name="End:", value=f"{date.day} {date.strftime('%B')} {date.year}", inline=False)
+            embed.add_field(name="Reason:", value=reason, inline=False)
+
+            DNKLView = discord.ui.View(timeout=None)  # View for staff members to approve/deny the DNKL
+            buttons = [["Approve", "DNKL_Approve", discord.enums.ButtonStyle.green],
+                       ["Deny", "DNKL_Deny", discord.enums.ButtonStyle.red],
+                       ["Error", "DNKL_Error", discord.enums.ButtonStyle.gray]]
+            # Loop through the list of roles and add a new button to the view for each role.
+            for button in buttons:
+                # Get the role from the guild by ID.
+                DNKLView.add_item(Dnkl_Buttons(button=button, embed=embed))
+
+            await channel.send("Staff, what do you wish to do with this application?", embed=embed, view=DNKLView)
+            self.view.stop()
+
     class StartDaySelect(ui.Select):
         def __init__(self, month, year):
             super().__init__(placeholder="Day")
