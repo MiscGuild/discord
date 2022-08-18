@@ -231,10 +231,18 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                         embed.add_field(name="Skywars KDR", value=f"`{sw_kdr}`")
                         embed.add_field(name="Duels WLR", value=f"`{duels_wlr}`")
                         embed.add_field(name="Duels Kills", value=f"`{duels_kills}`")
-                        await ticket.send(embed=embed)
 
                     # User is not eligible for any team
                     elif not all(eligibility.values()):
+                        embed=discord.Embed(title="You are ineligible for the GvG Team as you do not meet the requirements!",
+                                            description="If you think this is incorrect, please await staff assistance",
+                                            color=neg_color)
+                        embed.add_field(name="Bedwars Wins", value=f"`{bw_wins}`")
+                        embed.add_field(name="Bedwars FKDR", value=f"`{bw_fkdr}`")
+                        embed.add_field(name="Skywars Wins", value=f"`{sw_wins}`")
+                        embed.add_field(name="Skywars KDR", value=f"`{sw_kdr}`")
+                        embed.add_field(name="Duels WLR", value=f"`{duels_wlr}`")
+                        embed.add_field(name="Duels Kills", value=f"`{duels_kills}`")
                         await ticket.send(embed=discord.Embed(
                             title="You are ineligible for the GvG Team as you do not meet the requirements!",
                             description="Please await staff assistance for further information!",
@@ -256,7 +264,18 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                 embed.add_field(name=req2_name, value=f"`{req2}`")
 
                                 # Send embed and end loop
-                                await ticket.send(embed=embed)
+
+                    GvGView = discord.ui.View(timeout=None)  # View for staff members to approve/deny the DNKL
+                    buttons = [["Accept", "GvG_Approve", discord.enums.ButtonStyle.green],
+                               ["Deny", "GvG_Deny", discord.enums.ButtonStyle.red]]
+                    # Loop through the list of roles and add a new button to the view for each role.
+                    for button in buttons:
+                        # Get the role from the guild by ID.
+                        GvGView.add_item(
+                            uiutils.GvGButtons(channel=ticket, ign=ign, button=button,member=user))
+
+                    await ticket.send("Staff, what do you wish to do with this application?", embed=embed,
+                                            view=GvGView)
                 if option == "I want to join Miscellaneous":
                     # Edit category and send info embed with requirements
                     await ticket.edit(name=f"join-request-{ign}", topic=f"{interaction.user.id}|",
