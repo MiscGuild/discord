@@ -452,6 +452,26 @@ async def create_transcript(channel: discord.TextChannel, limit: int = None):
 
 
 async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, author: discord.User):
+    class StartDaySelect(ui.Select):
+        def __init__(self, month, year):
+            super().__init__(placeholder="Day")
+            self.month = month
+            self.year = year
+            for x in range(1, 32, 2):
+                self.add_option(label=str(x))
+
+        # Override default callback
+        async def callback(self, interaction: discord.Interaction):
+            start_day = list(interaction.data.values())[0][0]
+            LengthView = discord.ui.View()
+            LengthView.add_item(
+                InactivityLenSelect(day=start_day, month=self.month, year=self.year))  # Length Selection Dropdown
+            embed = discord.Embed(title=f"How long will {ign} be inactive?",
+                                  color=neutral_color).set_footer(
+                text=f"Start Date - {start_day}/{self.month}/{self.year}")
+            await interaction.response.send_message(embed=embed, view=LengthView)
+            self.view.stop()
+
     class StartMonthSelect(ui.Select):
         def __init__(self, year):
             super().__init__(placeholder="Month")
