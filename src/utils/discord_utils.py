@@ -3,15 +3,13 @@ from datetime import datetime, timedelta
 from io import BytesIO
 
 import chat_exporter
-
 import discord
-import discord.ui
+import discord.ui as ui
 from discord.ext import tasks
 
 from src.utils.consts import (config, dnkl_channel_id, dnkl_req,
-                              gvg_requirements, invalid_date_msg,
-                              log_channel_id, missing_permissions_embed,
-                              months, neg_color, neutral_color, staff_application_questions, ticket_categories,
+                              gvg_requirements, log_channel_id, missing_permissions_embed,
+                              neg_color, neutral_color, staff_application_questions, ticket_categories,
                               unknown_ign_embed, guild_handle)
 from src.utils.db_utils import insert_new_dnkl, select_one, update_dnkl, delete_dnkl
 from src.utils.minecraft_utils import get_player_gexp
@@ -64,7 +62,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                  read_message_history=True, external_emojis=True)
     if category_name != ticket_categories["registrees"]:
         # Send the dropdown for ticket creation
-        class TicketTypeSelect(discord.ui.Select):
+        class TicketTypeSelect(ui.Select):
             def __init__(self):
                 super().__init__()
 
@@ -127,7 +125,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
 
                     # Notify user if they don't meet gexp req, however ask questions anyway
                     _, weekly_gexp = await get_player_gexp(uuid)
-                    if not weekly_gexp:
+                    if weekly_gexp is None:
                         return await ticket.send(embed=unknown_ign_embed)
                     if weekly_gexp < dnkl_req:
                         await ticket.send(
@@ -138,72 +136,8 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                         await ticket.send(embed=discord.Embed(title="You meet the do-not-kick-list requirements!",
                                                               description=f"You have {format(weekly_gexp, ',d')} weekly guild experience!",
                                                               color=neutral_color))
+                    await dnkl_application(ign, uuid, ticket, interaction.user)
 
-                    class Dnkl_Buttons(discord.ui.Button):
-                        def __init__(self, button: list):
-                            """
-                            3 buttons for 3 dnkl actions. `custom_id` is needed for persistent views.
-                            """
-                            super().__init__(label=button[0], custom_id=button[1], style=button[2])
-
-                        async def callback(self, interaction: discord.Interaction):
-                            if bot.staff not in interaction.user.roles:
-                                await ticket.send(embed=missing_permissions_embed)
-                                return
-                            # if bot.staff not in interaction.user.roles and ticket.id != interaction.channel_id: return
-                            elif interaction.custom_id == "DNKL_Approve":
-                                msg = await bot.get_channel(dnkl_channel_id).send(embed=embed)
-
-                                # Check if user is already on DNKL
-                                current_message = await select_one("SELECT message_id FROM dnkl WHERE uuid = (?)",
-                                                                   (uuid,))
-                                # User is not currently on DNKL
-                                if not current_message:
-                                    await insert_new_dnkl(msg.id, uuid, ign)
-                                    return await ticket.send("**This user has been added to the do-not-kick-list!**")
-
-                                # User is already on DNKl
-                                # Try to delete current message
-                                try:
-                                    current_message = await bot.get_channel(dnkl_channel_id).fetch_message(
-                                        current_message)
-                                    await current_message.delete()
-                                except Exception:
-                                    pass
-
-                                await update_dnkl(msg.id, uuid)
-                                await ticket.send(
-                                    "**Since this user was already on the do-not-kick-list, their entry has been updated.**")
-
-                            elif interaction.custom_id == "DNKL_Deny":
-                                await ticket.send(
-                                    embed=discord.Embed(title="Your do-not-kick-list application has been denied!",
-                                                        description=f"You have {format(weekly_gexp, ',d')} of the required {format(dnkl_req, ',d')}",
-                                                        color=neg_color).set_footer(
-                                        text="If don't you think you can meet the requirements, you may rejoin the guild once your inactivity period has finished."))
-                                await delete_dnkl(ign)
-                                await interaction.response.send_message(
-                                    "If you wish to reverse your decision, add them to the DNKL using `,dnkladd`",
-                                    ephemeral=True)
-                                await interaction.followup
-
-                            elif interaction.custom_id == "DNKL_Error":
-                                await ticket.send(embed=discord.Embed(
-                                    title="Your application has been accepted, however there was an error!",
-                                    description="Please await staff assistance!",
-                                    color=neutral_color))
-
-                    view = discord.ui.View(timeout=None)
-                    buttons = [["Approve", "DNKL_Approve", discord.enums.ButtonStyle.green],
-                               ["Deny", "DNKL_Deny", discord.enums.ButtonStyle.red],
-                               ["Error", "DNKL_Error", discord.enums.ButtonStyle.gray]]
-                    # Loop through the list of roles and add a new button to the view for each role.
-                    for button in buttons:
-                        # Get the role from the guild by ID.
-                        view.add_item(Dnkl_Buttons(button))
-
-                    embed = await dnkl_application(ign, uuid, ticket, interaction.user)
-                    await ticket.send("Staff, what do you wish to do with this application?", embed=embed, view=view)
                 if option == "I want to join the staff team":
                     # Edit category and send info embed with requirements
                     await ticket.edit(name=f"staff-application-{ign}", topic=f"{interaction.user.id}|",
