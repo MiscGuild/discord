@@ -195,3 +195,27 @@ class Dnkl_Buttons(discord.ui.Button):
                 description="Please await staff assistance!",
                 color=neutral_color))
         self.view.stop()
+
+
+class GvGButtons(discord.ui.Button):
+    def __init__(self, channel: discord.TextChannel,member: discord.Member, ign: str, button: list):
+        super().__init__(label=button[0], custom_id=button[1], style=button[2])
+        self.channel = channel
+        self.member = member
+        self.ign = ign
+
+    async def callback(self, interaction: discord.Interaction):
+        if bot.staff not in interaction.user.roles:
+            await self.channel.send(embed=missing_permissions_embed)
+            return
+        # if bot.staff not in interaction.user.roles and ticket.id != interaction.channel_id: return
+        elif interaction.custom_id == "GvG_Approve":
+            await self.member.add_roles(bot.gvg)
+            print(self.channel, self.channel.name)
+            await self.channel.send(embed=discord.Embed(title=f"Welcome to the GvG team, {self.ign}!",
+                                color=neutral_color))
+        elif interaction.custom_id == "GvG_Deny":
+            await self.channel.send(embed=discord.Embed(title=f"Your GvG Application was denied because you didn't meet the requirements",
+                                                        color=neg_color))
+
+        self.view.stop()
