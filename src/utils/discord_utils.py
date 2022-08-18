@@ -452,6 +452,24 @@ async def create_transcript(channel: discord.TextChannel, limit: int = None):
 
 
 async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, author: discord.User):
+    class StartYearSelect(ui.Select):
+        def __init__(self):
+            super().__init__(placeholder="Year")
+            self.add_option(label=str(datetime.now().year))
+            self.add_option(label=str(datetime.now().year + 1))
+
+        # Override default callback
+        async def callback(self, interaction: discord.Interaction):
+            # Set option var and delete Select so it cannot be used twice
+
+            start_year = list(interaction.data.values())[0][0]
+            MonthView = discord.ui.View()
+            MonthView.add_item(StartMonthSelect(year=start_year))  # Month Selection Dropdown
+            embed = discord.Embed(title=f"In which month of {start_year} will {ign}'s inactivity begin?",
+                                  color=neutral_color).set_footer(text=f"Start Date - ?/?/{start_year}")
+            await interaction.response.send_message(embed=embed, view=MonthView)
+            YearView.stop()
+
     class Dnkl_Buttons(discord.ui.Button):
         def __init__(self, button: list, embed: discord.Embed):
             """
