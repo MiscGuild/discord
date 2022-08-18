@@ -452,6 +452,63 @@ async def create_transcript(channel: discord.TextChannel, limit: int = None):
 
 
 async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, author: discord.User):
+    class Dnkl_Buttons(discord.ui.Button):
+        def __init__(self, button: list, embed: discord.Embed):
+            """
+            3 buttons for 3 dnkl actions. `custom_id` is needed for persistent views.
+            """
+            self.embed = embed
+            super().__init__(label=button[0], custom_id=button[1], style=button[2])
+
+        async def callback(self, interaction: discord.Interaction):
+            for child in self.children:  # loop through all the children of the view
+                child.disabled = True  # set the button to disabled
+            await interaction.response.edit_message(view=self)
+            if bot.staff not in interaction.user.roles:
+                await channel.send(embed=missing_permissions_embed)
+                return
+            # if bot.staff not in interaction.user.roles and ticket.id != interaction.channel_id: return
+            elif interaction.custom_id == "DNKL_Approve":
+                msg = await bot.get_channel(dnkl_channel_id).send(embed=self.embed)
+
+                # Check if user is already on DNKL
+                current_message = await select_one("SELECT message_id FROM dnkl WHERE uuid = (?)",
+                                                   (uuid,))
+                # User is not currently on DNKL
+                if not current_message:
+                    await insert_new_dnkl(msg.id, uuid, ign)
+                    return await channel.send("**This user has been added to the do-not-kick-list!**")
+
+                # User is already on DNKl
+                # Try to delete current message
+                try:
+                    current_message = await bot.get_channel(dnkl_channel_id).fetch_message(
+                        current_message)
+                    await current_message.delete()
+                except Exception:
+                    pass
+
+                await update_dnkl(msg.id, uuid)
+                await channel.send(
+                    "**Since this user was already on the do-not-kick-list, their entry has been updated.**")
+                self.view.stop()
+            elif interaction.custom_id == "DNKL_Deny":
+                await channel.send(
+                    embed=discord.Embed(title="Your do-not-kick-list application has been denied!",
+                                        description=f"You do not meet the DNKL requirements of {format(dnkl_req, ',d')} weekly guild experience.",
+                                        color=neg_color).set_footer(
+                        text="If don't you think you can meet the requirements, you may rejoin the guild once your inactivity period has finished."))
+                await delete_dnkl(ign)
+                await interaction.response.send_message(
+                    "If you wish to reverse your decision, add them to the DNKL using `,dnkladd`",
+                    ephemeral=True)
+                await interaction.followup
+                self.view.stop()
+            elif interaction.custom_id == "DNKL_Error":
+                await channel.send(embed=discord.Embed(
+                    title="Your application has been accepted, however there was an error!",
+                    description="Please await staff assistance!",
+                    color=neutral_color))
 
 
 async def get_rank_role(rank):
