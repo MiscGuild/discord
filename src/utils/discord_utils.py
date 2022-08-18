@@ -502,9 +502,6 @@ async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, au
             super().__init__(label=button[0], custom_id=button[1], style=button[2])
 
         async def callback(self, interaction: discord.Interaction):
-            for child in self.children:  # loop through all the children of the view
-                child.disabled = True  # set the button to disabled
-            await interaction.response.edit_message(view=self)
             if bot.staff not in interaction.user.roles:
                 await channel.send(embed=missing_permissions_embed)
                 return
