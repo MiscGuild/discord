@@ -296,6 +296,8 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     await ticket.send("Staff, what do you wish to do with this application?", embed=embed,
                                             view=GvGView)
                 if option == "I want to join Miscellaneous":
+                                      view=GvGView)
+                if option == f"I want to join {guild_handle}":
                     # Edit category and send info embed with requirements
                     await ticket.edit(name=f"join-request-{ign}", topic=f"{interaction.user.id}|",
                                       category=discord.utils.get(interaction.guild.categories,
@@ -307,10 +309,10 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                             color=neutral_color))
                     await interaction.user.add_roles(bot.guest, reason="Registration - Guest")
                 if option == "I want to organize a GvG":
+                if option == f"I want to organize a GvG with {guild_handle}":
                     await ticket.edit(name=f"gvg-request-{ign}", topic=f"{interaction.user.id}|",
                                       category=discord.utils.get(interaction.guild.categories,
                                                                  name=ticket_categories["generic"]))
-                    await ticket.purge(limit=100)
                     guild = await get_player_guild(uuid)
                     if not guild:
                         embed = discord.Embed(title="Error! Guild not found!", color=neg_color)
