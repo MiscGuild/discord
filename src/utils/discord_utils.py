@@ -91,6 +91,8 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                 # Set option var and delete Select so it cannot be used twice
                 option = list(interaction.data.values())[0][0]
                 await interaction.message.delete()
+                await ticket.purge(
+                    limit=100)  # Deleting the interaction like this so that we can respond to the interaction later
 
                 # Logic for handling ticket types
                 if option == "Report a player":
@@ -102,6 +104,19 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                                                       "> Username of the accused\n> Time of offense\n> Explanation of offense\n> Proof of offense\n"
                                                                       "If you wish to report a staff member, please DM the guild master or an admin.",
                                                           color=neutral_color))
+                                                                 name=ticket_categories["generic"]))
+                    fields = [
+                        ["What was the username of the accused", "", discord.InputTextStyle.short,
+                         "Username of the accused"],
+                        ["What was the offense?", "", discord.InputTextStyle.short, "Offense"],
+                        ["When did this happen?", "", discord.InputTextStyle.short, "TIme of Offense"],
+                        ["Provide a brief description of what happened.",
+                         "Answer the question in no more than 100 words.",
+                         discord.InputTextStyle.long, "Description"]
+                    ]
+                    embed = discord.Embed(title="Player Report", color=neutral_color)
+                    await interaction.response.send_modal(
+                        modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, title="Player Report"))
                 if option == "Query/Problem":
                     await ticket.edit(name=f"general-{ign}", topic=f"{interaction.user.id}|",
                                       category=discord.utils.get(interaction.guild.categories,
