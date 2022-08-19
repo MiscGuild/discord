@@ -252,6 +252,10 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                         embed=discord.Embed(title="You are ineligible for the GvG Team as you do not meet the requirements!",
                                             description="If you think this is incorrect, please await staff assistance",
                                             color=neg_color)
+                        embed = discord.Embed(
+                            title="You are ineligible for the GvG Team as you do not meet the requirements!",
+                            description="If you think this is incorrect, please await staff assistance",
+                            color=neg_color)
                         embed.add_field(name="Bedwars Wins", value=f"`{bw_wins}`")
                         embed.add_field(name="Bedwars FKDR", value=f"`{bw_fkdr}`")
                         embed.add_field(name="Skywars Wins", value=f"`{sw_wins}`")
@@ -287,7 +291,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     for button in buttons:
                         # Get the role from the guild by ID.
                         GvGView.add_item(
-                            uiutils.GvGButtons(channel=ticket, ign=ign, button=button,member=user))
+                            uiutils.GvGButtons(channel=ticket, ign=ign, button=button, member=user))
 
                     await ticket.send("Staff, what do you wish to do with this application?", embed=embed,
                                             view=GvGView)
