@@ -90,7 +90,6 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                 ign, uuid = await get_mojang_profile(await name_grabber(interaction.user))
                 # Set option var and delete Select so it cannot be used twice
                 option = list(interaction.data.values())[0][0]
-                await interaction.message.delete()
                 await ticket.purge(
                     limit=100)  # Deleting the interaction like this so that we can respond to the interaction later
 
@@ -98,12 +97,6 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                 if option == "Report a player":
                     await ticket.edit(name=f"report-{ign}", topic=f"{interaction.user.id}|",
                                       category=discord.utils.get(interaction.guild.categories,
-                                                                 name=ticket_categories["report"]))
-                    await ticket.send(embed=discord.Embed(title=f"{ign} wishes to file a player report!",
-                                                          description="You are expected to provide maximum detail about the offense.\n"
-                                                                      "> Username of the accused\n> Time of offense\n> Explanation of offense\n> Proof of offense\n"
-                                                                      "If you wish to report a staff member, please DM the guild master or an admin.",
-                                                          color=neutral_color))
                                                                  name=ticket_categories["generic"]))
                     fields = [
                         ["What was the username of the accused", "", discord.InputTextStyle.short,
@@ -249,9 +242,6 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
 
                     # User is not eligible for any team
                     elif not all(eligibility.values()):
-                        embed=discord.Embed(title="You are ineligible for the GvG Team as you do not meet the requirements!",
-                                            description="If you think this is incorrect, please await staff assistance",
-                                            color=neg_color)
                         embed = discord.Embed(
                             title="You are ineligible for the GvG Team as you do not meet the requirements!",
                             description="If you think this is incorrect, please await staff assistance",
@@ -294,8 +284,6 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                             uiutils.GvGButtons(channel=ticket, ign=ign, button=button, member=user))
 
                     await ticket.send("Staff, what do you wish to do with this application?", embed=embed,
-                                            view=GvGView)
-                if option == "I want to join Miscellaneous":
                                       view=GvGView)
                 if option == f"I want to join {guild_handle}":
                     # Edit category and send info embed with requirements
@@ -308,7 +296,6 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                             description=f"Please await staff assistance!\nIn the meanwhile, you may explore the Discord!",
                                             color=neutral_color))
                     await interaction.user.add_roles(bot.guest, reason="Registration - Guest")
-                if option == "I want to organize a GvG":
                 if option == f"I want to organize a GvG with {guild_handle}":
                     await ticket.edit(name=f"gvg-request-{ign}", topic=f"{interaction.user.id}|",
                                       category=discord.utils.get(interaction.guild.categories,
@@ -332,32 +319,35 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     await interaction.response.send_modal(
                         modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, title="GvG Request"))
                     return
-                if option == "My guild wishes to ally Miscellaneous":
+
+                if option == f"My guild wishes to ally {guild_handle}":
                     await ticket.edit(name=f"alliance-request-{ign}", topic=f"{interaction.user.id}|",
                                       category=discord.utils.get(interaction.guild.categories,
                                                                  name=ticket_categories["generic"]))
-                    await ticket.purge(limit=100)
                     guild = await get_player_guild(uuid)
+                    fields = []
+
                     if not guild:
-                        embed = discord.Embed(title="Error! Guild not found!", color=neg_color)
-                        embed.add_field(name=f"If you wish to form an alliance with us, please provide the following",
-                                        value="Guild Name\n"
-                                              "Guild Level\n"
-                                              "Guild Logo\n"
-                                              "Guild Advertisement Message\n")
-                        embed.set_footer(text="Once you have done so, please await staff assistance!")
-                        await ticket.send(embed=embed)
-                        return
-                    embed = discord.Embed(
+                        fields.extend(
+                            [["What is the name of your guild?", "", discord.InputTextStyle.short, "Guild Name"],
+                             ["What is your guild's level?", "", discord.InputTextStyle.short, "Guild Level"]])
+                        embed = discord.Embed(title="Alliance Request Request", color=neutral_color)
+                    else:
+                        embed = discord.Embed(
                         title=f"{ign} wishes to ally with Miscellaneous on behalf of {guild['name']}",
                         description=f"Guild Level: {await get_guild_level(guild['exp'])}",
                         color=neutral_color)
-                    embed.add_field(name=f"If you wish to form an alliance with us, please provide the following",
-                                    value="Guild Logo\n"
-                                          "Guild Advertisement Message\n")
-                    embed.set_footer(text="Once you have done so, please await staff assistance!")
-                    await ticket.send(embed=embed)
+                    embed.set_footer(text="Please provide:\nGuild Logo\nGuild Advertisement Message")
+                    fields.extend(
+                        [["What is the IGN of your guild master?", "", discord.InputTextStyle.short, "Guild Master"],
+                         ["What is your guild's preferred gamemode?", "You needn't have one",
+                          discord.InputTextStyle.short, "Guild's Preferred Gamemodes"],
+                         [f"Why should we ally?", "", discord.InputTextStyle.long,
+                          "Why we should consider allying"]])
+                    await interaction.response.send_modal(
+                        modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, title="Alliance Request"))
                     return
+
                 if option == "Other":
                     await ticket.edit(name=f"other-{ign}", topic=f"{interaction.user.id}|",
                                       category=discord.utils.get(interaction.guild.categories,
