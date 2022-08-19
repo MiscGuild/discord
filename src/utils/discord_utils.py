@@ -314,25 +314,23 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                       category=discord.utils.get(interaction.guild.categories,
                                                                  name=ticket_categories["generic"]))
                     guild = await get_player_guild(uuid)
+                    fields = []
                     if not guild:
-                        embed = discord.Embed(title="Error! Guild not found!", color=neg_color)
-                        embed.add_field(name="If you wish to GvG us, please list the following",
-                                        value="Guild Name\nGuild Level\n"
-                                              "Preferred gamemode(s) for the GvG"
-                                              "\nAny special rules"
-                                              "\nNumber of Players\nTime & Timezone")
-                        await ticket.send(embed=embed)
-                        return
-                    embed = discord.Embed(
-                        title=f"{ign} wishes to organize a GvG with Miscellaneous on behalf of {guild['name']}",
-                        description=f"Guild Level: {await get_guild_level(guild['exp'])}",
-                        color=neutral_color)
-                    embed.add_field(name=f"If you wish to GvG us, please list the following",
-                                    value="Preferred gamemode(s) for the GvG"
-                                          "\nAny special rules"
-                                          "\nNumber of Players\nTime & Timezone")
-                    embed.set_footer(text="Once you have done so, please await staff assistance!")
-                    await ticket.send(embed=embed)
+                        fields.extend(
+                            [["What is the name of your guild?", "", discord.InputTextStyle.short, "Guild Name"]])
+                        embed = discord.Embed(title="GvG Request", color=neutral_color)
+                    else:
+                        embed = discord.Embed(
+                            title=f"{ign} wishes to organize a GvG with Miscellaneous on behalf of {guild['name']}",
+                            description=f"Guild Level: {await get_guild_level(guild['exp'])}",
+                            color=neutral_color)
+                    fields.extend(
+                        [["What are your preferred gamemodes", "", discord.InputTextStyle.short, "Gamemode(s)"],
+                         ["Do you have any special rules?", "", discord.InputTextStyle.long, "Rule(s)"],
+                         ["Number of Players", "", discord.InputTextStyle.short, "Number of Players"],
+                         ["Time & Timezone", "", discord.InputTextStyle.short, "Time & Timezone"]])
+                    await interaction.response.send_modal(
+                        modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, title="GvG Request"))
                     return
                 if option == "My guild wishes to ally Miscellaneous":
                     await ticket.edit(name=f"alliance-request-{ign}", topic=f"{interaction.user.id}|",
