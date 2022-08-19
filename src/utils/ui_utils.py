@@ -219,3 +219,27 @@ class GvGButtons(discord.ui.Button):
                                                         color=neg_color))
 
         self.view.stop()
+
+class ModalCreator(discord.ui.Modal):
+    def __init__(self,embed: discord.Embed, fields: list, title: str, ign: str) -> None:
+        #   fields = ["LABEL", "PLACEHOLDER", STYLE]
+        super().__init__(title=title)
+        self.embed = embed
+        self.ign = ign
+        self.fields = fields
+        self.title = title
+        for field in fields:
+            self.add_item(discord.ui.InputText(label=field[0],
+                                               placeholder=field[1],
+                                               style=field[2]))
+
+    async def callback(self, interaction: discord.Interaction):
+        count = 0
+        for field in self.fields:
+            self.embed.add_field(name=field[3],
+                            value=self.children[count].value,
+                            inline=False)
+            count+=1
+
+
+        await interaction.response.send_message(embeds=[self.embed])
