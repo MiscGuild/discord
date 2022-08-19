@@ -675,15 +675,15 @@ class General:
             async def callback(self, interaction: discord.Interaction):
                 # Set option var and delete Select, so it cannot be used twice
                 option = list(interaction.data.values())[0][0]
-                option_emoji = milestone_emojis.get(option)
+                option_emoji = milestone_emojis.get(option.upper())
 
                 await interaction.response.send_message(f"**Milestone Category:** {option}"
                                                         f"\n**What is {name}'s milestone?**\n"
-                                                        f"{emoji}{name}.... (Complete the sentence)")
+                                                        f"{option_emoji}{name}.... (Complete the sentence)")
                 milestone = await bot.wait_for("message",
                                                check=lambda
                                                    x: x.channel == channel and x.author == interaction.user)
-                await milestone_ticket_update(ctx, channel, option_emoji, milestone.content)
+                await channel.send(embed=await milestone_ticket_update(ctx, channel, option_emoji, milestone.content))
 
         async def milestone_ticket_update(ctx, channel, emoji, milestone):
             milestone_string = f"{emoji} {member.mention} {milestone}|"
@@ -694,19 +694,18 @@ class General:
             embed = discord.Embed(title="Milestone Registered!",
                                   description=milestone_string[:-1], color=neutral_color)
 
-            await ctx.send(embed=embed)
+            return embed
 
         if gamemode and milestone:
             if gamemode.upper() in [x for x in milestone_emojis.keys()]:
                 emoji = milestone_emojis.get(gamemode.upper())
-                await milestone_ticket_update(ctx, channel, emoji, milestone)
+                embed = await milestone_ticket_update(ctx, channel, emoji, milestone)
             else:
                 embed = discord.Embed(title="Invalid gamemode inserted!",
                                       description=f"All the possible gamemodes are as follows:",
                                       color=neg_color).set_footer(
                     text=f"{f'{chr(10)}'.join([x.title() for x in milestone_emojis.keys()])}")  # chr(10) is a new line character
-                await ctx.respond(embed=embed)
-            return
+            return embed, None
         # Create view and embed, send to ticket
         view = discord.ui.View()
         view.add_item(MilestoneTypeSelect())
