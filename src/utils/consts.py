@@ -44,7 +44,7 @@ allies = config["allies"]
 # Colors
 neg_color = 0xff3333
 pos_color = 0x00A86B
-neutral_color = 0x8368ff
+neutral_color = 0x8369ff
 error_color = 0xDE3163
 
 # Pronoun roles
