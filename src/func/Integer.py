@@ -5,7 +5,7 @@ import chat_exporter
 
 from src.utils.consts import error_color, invalid_guild_embed, guild_handle, log_channel_id, neutral_color
 from src.utils.db_utils import get_giveaway_status
-from src.utils.discord_utils import log_event, name_grabber, create_transcript
+from src.utils.discord_utils import name_grabber, create_transcript
 from src.utils.giveaway_utils import roll_giveaway
 from src.utils.minecraft_utils import get_hypixel_player_rank
 from src.utils.request_utils import (get_guild_by_name, get_hypixel_player,
@@ -90,9 +90,10 @@ class Integer:
         return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={image_content}&t=1")
 
     async def purge(self, ctx, reason):
-        transcript = await create_transcript(ctx.channel,self.integer)
+        transcript = await create_transcript(ctx.channel, self.integer)
         await ctx.channel.purge(limit=self.integer)
-        await ctx.guild.get_channel(log_channel_id).send(embed= discord.Embed(title=f"{await name_grabber(ctx.author)} purged {self.integer} message(s) in {ctx.channel.name}",
-                                                                              description=f"**Reason:** {reason}",
-                                                                              color=neutral_color).set_footer(text="Following is the transcript of the deleted messages"),
+        await ctx.guild.get_channel(log_channel_id).send(embed=discord.Embed(
+            title=f"{await name_grabber(ctx.author)} purged {self.integer} message(s) in {ctx.channel.name}",
+            description=f"**Reason:** {reason}",
+            color=neutral_color).set_footer(text="Following is the transcript of the deleted messages"),
                                                          file=transcript)
