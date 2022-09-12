@@ -785,3 +785,98 @@ class General:
         milestone_message = milestone_message + "\n**Congrats to everyone this week. If you wish to submit a milestone, look over at <#650248396480970782>!**"
         await bot.get_channel(milestones_channel).send(milestone_message)
         return f"{count} milestones have been compiled and sent in {bot.get_channel(milestones_channel)}"
+
+    async def resident_membership(ctx, member: discord.Member = None, reason: int = None):
+        if not (member and reason):
+            await ctx.send(embed=discord.Embed(title="Who would you like to grant residency to?",
+                                               description="Kindly mention the user",
+                                               color=neutral_color))
+            member = await bot.wait_for("message",
+                                        check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+            member_id = member.content[2:-1]
+            member = bot.guild.get_member(int(member.content[2:-1]))
+
+            name = await name_grabber(member)
+            ign, uuid = await get_mojang_profile(name)
+
+            class ReasonSelect(discord.ui.Select):
+                def __init__(self):
+                    super().__init__()
+                    index = 1
+                    for reason, value in residency_reasons.items():
+                        self.add_option(label=f"{reason.title()}",
+                                        value=f"{value[1]}|{reason.title()}",
+                                        emoji=value[0])
+                        index += 1
+
+                # Override default callback
+                async def callback(self, interaction: discord.Interaction):
+                    # Set option var
+                    values = (list(interaction.data.values())[0][0]).split("|")
+                    duration = eval(values[0])
+                    reason = values[1]
+                    start_date = await select_one(
+                        "SELECT time_of_finish FROM residency WHERE discord_id = (?)",
+                        (member_id,))
+                    if reason == "Gvg":
+                        embed = discord.Embed(title=f"Did {ign} win the GvG?", color=neutral_color)
+                        GvGView = discord.ui.View(timeout=15)  # View for staff members to approve/deny the DNKL
+                        buttons = [["Yes", "GvG_Residency_Positive", discord.enums.ButtonStyle.green],
+                                   ["No", "GvG_Residency_Negative", discord.enums.ButtonStyle.red]]
+                        # Loop through the list of roles and add a new button to the view for each role.
+                        for button in buttons:
+                            # Get the role from the guild by ID.
+                            GvGView.add_item(
+                                uiutils.Button_Creator(channel=ctx.channel, ign=ign, button=button, member=member,
+                                                       uuid=uuid))
+
+                        await interaction.response.send_message(embed=embed, view=GvGView)
+                        bot_response = await bot.wait_for("message",
+                                                          check=lambda
+                                                              x: x.channel == ctx.channel and x.author.id == bot.user.id)
+                        color = int(
+                            (bot_response.embeds[0]).to_dict()[
+                                'color'])  # Gets the color of the embed to determine win/loss
+
+                        if color == neutral_color:  # Won the GvG
+                            duration = timedelta(weeks=residency_reasons['GVG'][1]['WIN'])
+                        elif color == neg_color:  # Lost the GvG
+                            duration = timedelta(weeks=residency_reasons['GVG'][1]['loss'])
+
+                    elif reason == "Donor":
+                        while True:
+                            await interaction.response.send_message("**How much money did the user donate?**\nOnly reply with the number in USD")
+                            donation_amount = await bot.wait_for("message",
+                                                      check=lambda
+                                                          x: x.channel == ctx.channel and x.author == ctx.author)
+                            donation_amount = donation_amount.content
+                            if donation_amount.isnumeric():
+                                duration = timedelta(weeks=((int(donation_amount)//5) * residency_reasons["DONOR"][1]))
+                                break
+                            else:
+                                await ctx.send("**Invalid donation amount. Please only give the number.**\n"
+                                               "For example, if someone donated 65 USD, you respond with `65`")
+                                continue
+
+                    elif reason == "Booster":
+                        duration = timedelta(weeks=(residency_reasons["BOOSTER"][1]))
+                    elif reason == "Youtuber":
+                        duration = timedelta(weeks=(residency_reasons["YOUTUBER"][1]))
+
+                    if start_date:
+                        print(duration)
+                        end = (datetime.strptime(start_date[0], "%Y-%m-%d %H:%M") + duration).strftime("%Y-%m-%d %H:%M")
+                        await update_residency(member_id, reason, end)
+                        await ctx.send(f"**{ign} is already a resident so their residency was extended**\n"
+                                       f"Their residency ends on {str(end)}")
+                    if not start_date:
+                        end = (datetime.now() + duration).strftime("%Y-%m-%d %H:%M")
+                        await insert_new_residency(member_id, uuid, reason, end)
+                        await ctx.send(f"**{ign} has been granted residency!**\n"
+                                       f"Their residency ends on {str(end)}")
+
+
+            view = discord.ui.View()
+            view.add_item(ReasonSelect())
+            await ctx.send(embed=discord.Embed(title=   f"Why should {ign} gain residency?",
+                                               color=neutral_color), view=view)
