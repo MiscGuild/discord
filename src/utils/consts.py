@@ -79,6 +79,28 @@ milestone_emojis = {
     "OTHER": "❓"
 }
 
+residency_reasons = {
+    "GVG": ["⚔️", {"LOSS": 1, "WIN": 2}],
+    "DONOR": ["💰", 4],
+    "BOOSTER": ["⬆️", 4],
+    "YOUTUBER": ["<:youtube:1011088525506117642>", 9999]
+}  # The number represents
+
+button_types = {"GvG_Application_Positive": {"roleadd": "GvG Team", "roleremove": None,
+                                             "title": ", welcome to the GvG team!", "color": neutral_color},
+                "GvG_Application_Negative": {"roleadd": None, "roleremove": "GvG Team",
+                                             "title": ", your GvG Application was denied because you didn't meet the "
+                                                      "requirements",
+                                             "color": neg_color},
+                "GvG_Residency_Positive": {"roleadd": None, "roleremove": None,
+                                           "title": f", was granted {residency_reasons['GVG'][1]['WIN']} weeks of "
+                                                    f"residency!",
+                                           "color": neutral_color},
+                "GvG_Residency_Negative": {"roleadd": None, "roleremove": None,
+                                           "title": f", was granted {residency_reasons['GVG'][1]['LOSS']} week of "
+                                                    f"residency!",
+                                           "color": neg_color}}
+
 # General embeds
 registration_embed = discord.Embed(title=f"Welcome to the {guild_handle} Discord!",
                                    description="Before you can view the server, please register with your Minecraft username.",
