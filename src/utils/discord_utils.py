@@ -275,13 +275,13 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                 # Send embed and end loop
 
                     GvGView = discord.ui.View(timeout=None)  # View for staff members to approve/deny the DNKL
-                    buttons = [["Accept", "GvG_Approve", discord.enums.ButtonStyle.green],
-                               ["Deny", "GvG_Deny", discord.enums.ButtonStyle.red]]
+                    buttons = [["Accept", "GvG_Application_Positive", discord.enums.ButtonStyle.green],
+                               ["Deny", "GvG_Application_Negative", discord.enums.ButtonStyle.red]]
                     # Loop through the list of roles and add a new button to the view for each role.
                     for button in buttons:
                         # Get the role from the guild by ID.
                         GvGView.add_item(
-                            uiutils.GvGButtons(channel=ticket, ign=ign, button=button, member=user))
+                            uiutils.Button_Creator(channel=ticket, ign=ign, button=button, member=user, uuid=uuid))
 
                     await ticket.send("Staff, what do you wish to do with this application?", embed=embed,
                                       view=GvGView)
@@ -430,6 +430,9 @@ async def get_rank_role(rank):
         "[VIP]": bot.vip,
     }
     return ranks.get(rank)
+
+
+
 
 
 @tasks.loop(count=1)

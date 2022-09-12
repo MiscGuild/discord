@@ -1,7 +1,6 @@
 # The following file contains: giveawayend, giveawayreroll, gtop, purge
 
 import discord
-import chat_exporter
 
 from src.utils.consts import error_color, invalid_guild_embed, guild_handle, log_channel_id, neutral_color
 from src.utils.db_utils import get_giveaway_status
