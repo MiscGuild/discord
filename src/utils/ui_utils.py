@@ -6,8 +6,8 @@ import discord.ui as ui
 
 from src.utils.consts import (dnkl_channel_id, dnkl_req,
                               missing_permissions_embed,
-                              neg_color, neutral_color)
-from src.utils.db_utils import insert_new_dnkl, select_one, update_dnkl, delete_dnkl
+                              neg_color, neutral_color, residency_reasons, button_types)
+from src.utils.db_utils import insert_new_dnkl, select_one, update_dnkl, delete_dnkl, insert_new_residency
 
 
 class StartYearSelect(ui.Select):
@@ -197,31 +197,38 @@ class Dnkl_Buttons(discord.ui.Button):
         self.view.stop()
 
 
-class GvGButtons(discord.ui.Button):
-    def __init__(self, channel: discord.TextChannel,member: discord.Member, ign: str, button: list):
+class Button_Creator(discord.ui.Button):
+    def __init__(self, channel: discord.TextChannel, member: discord.Member, ign: str, uuid: str, button: list):
         super().__init__(label=button[0], custom_id=button[1], style=button[2])
         self.channel = channel
         self.member = member
         self.ign = ign
+        self.uuid = uuid
 
     async def callback(self, interaction: discord.Interaction):
         if bot.staff not in interaction.user.roles:
             await self.channel.send(embed=missing_permissions_embed)
             return
-        # if bot.staff not in interaction.user.roles and ticket.id != interaction.channel_id: return
-        elif interaction.custom_id == "GvG_Approve":
-            await self.member.add_roles(bot.gvg)
-            print(self.channel, self.channel.name)
-            await self.channel.send(embed=discord.Embed(title=f"Welcome to the GvG team, {self.ign}!",
-                                color=neutral_color))
-        elif interaction.custom_id == "GvG_Deny":
-            await self.channel.send(embed=discord.Embed(title=f"Your GvG Application was denied because you didn't meet the requirements",
-                                                        color=neg_color))
+
+        try:
+            await self.member.add_roles(
+            discord.utils.get(bot.guild.roles, name=button_types[interaction.custom_id]["roleadd"]))
+        except:
+            pass
+        try:
+            await self.member.remove_roles(
+            discord.utils.get(bot.guild.roles, name=button_types[interaction.custom_id]["roleremove"]))
+        except:
+            pass
+
+        await interaction.response.send_message(embed=discord.Embed(title=self.ign + button_types[interaction.custom_id]["title"],
+                                                    color=button_types[interaction.custom_id]["color"]))
 
         self.view.stop()
 
+
 class ModalCreator(discord.ui.Modal):
-    def __init__(self,embed: discord.Embed, fields: list, title: str, ign: str) -> None:
+    def __init__(self, embed: discord.Embed, fields: list, title: str, ign: str) -> None:
         #   fields = ["LABEL", "PLACEHOLDER", STYLE]
         super().__init__(title=title)
         self.embed = embed
@@ -237,9 +244,8 @@ class ModalCreator(discord.ui.Modal):
         count = 0
         for field in self.fields:
             self.embed.add_field(name=field[3],
-                            value=self.children[count].value,
-                            inline=False)
-            count+=1
-
+                                 value=self.children[count].value,
+                                 inline=False)
+            count += 1
 
         await interaction.response.send_message(embeds=[self.embed])
