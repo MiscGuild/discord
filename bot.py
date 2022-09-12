@@ -20,7 +20,6 @@ bot = bridge.Bot(command_prefix=config["prefix"], intents=intents,
 from src.utils.discord_utils import after_cache_ready
 
 bot.remove_command("help")
-
 after_cache_ready.start()
 # Load extensions
 for extension in ["src.cogs.general", "src.cogs.giveaways", "src.cogs.guild", "src.cogs.hypixel",
