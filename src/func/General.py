@@ -9,6 +9,7 @@ import aiohttp
 import discord
 import discord.ui
 
+import src.utils.ui_utils as uiutils
 from src.func.Union import Union
 from src.utils.consts import (accepted_staff_application_embed, active_req,
                               allies, error_color, guild_handle,
@@ -16,8 +17,8 @@ from src.utils.consts import (accepted_staff_application_embed, active_req,
                               milestone_emojis, milestones_channel, neg_color,
                               neutral_color, pos_color, ticket_deleted_embed,
                               registration_channel_id, registration_embed,
-                              staff_application_questions, ticket_categories)
-from src.utils.db_utils import insert_new_giveaway, select_all
+                              staff_application_questions, ticket_categories, residency_reasons)
+from src.utils.db_utils import insert_new_giveaway, select_all, insert_new_residency, select_one, update_residency
 from src.utils.discord_utils import (create_ticket, create_transcript,
                                      get_ticket_creator, log_event,
                                      name_grabber)
@@ -32,11 +33,10 @@ class General:
     async def weeklylb(ctx):
         # Get guild data
         guild_data = await get_guild_by_name(guild_handle)
+        member_gexp = {}
 
         if not guild_data:
             return invalid_guild_embed
-
-        member_gexp = {}
 
         # Loop through all guild members' gexp, adding it to dict
         for member in guild_data["members"]:
@@ -54,7 +54,8 @@ class General:
             count += 1
             user_data = i
             name = await get_name_by_uuid(user_data[0])
-            rank, _ = await get_hypixel_player_rank(await get_hypixel_player(uuid=user_data[0]))    #   Ignores value without color formatting
+            rank, _ = await get_hypixel_player_rank(
+                await get_hypixel_player(uuid=user_data[0]))  # Ignores value without color formatting
 
             # Add new entry to image content
             text += f"&6{count}. {rank} {name} &2{format(user_data[1], ',d')} Guild Experience"
@@ -62,11 +63,8 @@ class General:
             if count < 10:
                 text += "%5Cn"
 
-        # Replace characters for URL
-        text = text.replace("+", "%2B")
-        text = text.replace("&", "%26")
-        text = text.replace(" ", "%20")
-        text = text.replace(",", "%2C")
+        # Replace characters for the URL
+        text = text.replace("+", "%2B").replace("&", "%26").replace(" ", "%20").replace(",", "%2C")
 
         # Return image
         return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
@@ -76,7 +74,8 @@ class General:
         rows = await select_all("SELECT * FROM dnkl")
 
         if not rows:
-            return discord.Embed(title="No entries!", description="There are no users on the do-not-kick-list!",
+            return discord.Embed(title="No entries!",
+                                 description="There are no users on the do-not-kick-list!",
                                  color=neg_color)
 
         # Create embed
@@ -201,7 +200,7 @@ class General:
         embed = discord.Embed(title="This ticket will be deleted in 10 seconds!", color=neg_color)
         if not ctx.channel.category or ctx.channel.category.name not in ticket_categories.values():
             return "This command cannot be used here"
-        if ctx.channel.category.name == ticket_categories["registrees"]:
+        elif ctx.channel.category.name == ticket_categories["registrees"]:
             member = await get_ticket_creator(ctx.channel)
             if member:
                 ign, uuid = await get_mojang_profile(await name_grabber(member))
@@ -229,18 +228,15 @@ class General:
     async def accept(ctx):
         if ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
-
         return accepted_staff_application_embed
 
     async def transcript(ctx):
         if ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
-
         # Create transcript
         transcript = await create_transcript(ctx.channel)
         if not transcript:
             return discord.Embed(title="Transcript creation failed!", color=error_color)
-
         # Transcript is valid
         return transcript
 
@@ -259,11 +255,12 @@ class General:
         await ctx.send(
             "Please provide the logo of the organization/guild. (Please provide the URL. If they don't have a logo, type `None`)")
         # Wait for Logo
-        logo = (await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)).content if (
-                                                                                                              await bot.wait_for(
-                                                                                                                  "message",
-                                                                                                                  check=lambda
-                                                                                                                      x: x.author == ctx.message.author)).content.lower() != "none" else None
+        logo = (await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)) \
+            .content if (
+                            await bot.wait_for(
+                                "message",
+                                check=lambda
+                                    x: x.author == ctx.message.author)).content.lower() != "none" else None
         if logo:
             return discord.Embed(title=organization_name, description=description, color=neutral_color).set_thumbnail(
                 url=logo)
@@ -285,7 +282,8 @@ class General:
         while True:
             while True:
                 await ctx.send(
-                    "What is the question number of the reply that you would like to critique?\nIf you would like to critique something in general, reply with `0`")
+                    "What is the question number of the reply that you would like to critique?"
+                    "\nIf you would like to critique something in general, reply with `0`")
                 question = await bot.wait_for("message",
                                               check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
                 # Try-except for checking if the given number is valid
