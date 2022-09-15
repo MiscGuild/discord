@@ -358,12 +358,33 @@ class General:
                 guild_rank = member["rank"]
                 # Remove dnkl users from list
 
+                if guild_rank == "Resident" or uuid in [data[0] for data in resident_data]:  # data[0] is the uuid
+                    if uuid in [data[0] for data in resident_data]:
+                        warnings = [data[1] for data in resident_data if data[0] == uuid][0]
+                        warnings_updated = [data[2] for data in resident_data if data[0] == uuid][0]
+                        current_date = datetime.now().strftime("%Y/%d/%m")
+
+                        if weekly_exp < resident_req and (not warnings_updated or warnings_updated < current_date):
+                            warnings += 1
+                            warnings_updated = current_date
+                            individual_data = (await select_all(f"SELECT * FROM residency where uuid == '{uuid}'"))[0]
+                            await update_residency(individual_data[0], individual_data[2], individual_data[3], warnings, warnings_updated)
+
+
+                    if uuid in [data[0] for data in resident_data] and guild_rank != "Resident":
+                        to_promote_resident[name] = weekly_exp
+                    elif guild_rank == "Resident" and uuid not in [data[0] for data in resident_data]:
+                        to_demote_resident[name] = weekly_exp
+
+
                 # Members who need to be promoted
-                if guild_rank == "Member" and weekly_exp >= active_req:
-                    to_promote[name] = weekly_exp
+                elif guild_rank == "Member" and weekly_exp >= active_req:
+                    to_promote_active[name] = weekly_exp
+
                 # Active members who need to be demoted
                 elif guild_rank == "Active" and weekly_exp < active_req:
-                    to_demote[name] = weekly_exp
+                    to_demote_active[name] = weekly_exp
+
                 # Members who do not meet the requirements
                 elif weekly_exp < member_req:
                     if guild_rank == "Member":
@@ -373,17 +394,16 @@ class General:
                         if days_since_join <= 7 and weekly_exp > member_req / 7 * days_since_join:
                             continue
                         inactive[name] = weekly_exp
-                    elif guild_rank == "Resident":
-                        residents[name] = weekly_exp
 
             # Define embeds array to be returned
             embeds = []
 
             # Loop through dicts, descriptions and colors
-            for _dict, title, color in [[to_promote, "Promote the following users:", pos_color],
-                                        [to_demote, "Demote the following users:",
+            for _dict, title, color in [[to_promote_active, "Promote the following users to active:", pos_color],
+                                        [to_demote_active, "Demote the following users from active:",
                                          neg_color],
-                                        [residents, "Following are the inactive residents:", 0xe5ba6c],
+                                        [to_promote_resident, "Promote the following to resident:", 0xe5ba6c],
+                                        [to_demote_resident, "Demote the following from resident:", neg_color],
                                         [inactive, "Following are the users to be kicked:", neg_color]]:
                 # Filter categories with no users
                 if _dict:
@@ -815,8 +835,7 @@ class General:
                     values = (list(interaction.data.values())[0][0]).split("|")
                     duration = eval(values[0])
                     reason = values[1]
-                    start_date = await select_one(
-                        "SELECT time_of_finish FROM residency WHERE discord_id = (?)",
+                    existing_record = await select_one(
                         (member_id,))
                     if reason == "Gvg":
                         embed = discord.Embed(title=f"Did {ign} win the GvG?", color=neutral_color)
