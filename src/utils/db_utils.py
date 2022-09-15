@@ -1,7 +1,7 @@
+from __main__ import bot
 from typing import Tuple
 
 import aiosqlite
-from __main__ import bot
 
 
 async def connect_db():
@@ -26,6 +26,7 @@ async def connect_db():
         sponsors text NOT NULL,
         is_active boolean NOT NULL)""")
 
+    # Residents table:
     await bot.db.execute("""CREATE TABLE IF NOT EXISTS residency(
     discord_id integer PRIMARY KEY NOT NULL,
     uuid text NOT NULL,
@@ -109,6 +110,6 @@ async def update_residency(discord_id: int, reason: str, time_of_finish: str, wa
     await bot.db.commit()
 
 
-async def update_residency(discord_id: int, reason: str, time_of_finish: str):
-    await bot.db.execute("UPDATE residency SET reason = (?), time_of_finish = (?) WHERE discord_id = (?)", (reason, time_of_finish, discord_id))
+async def delete_residency(discord_id: int):
+    await bot.db.execute("DELETE FROM residency WHERE discord_id = (?)", (discord_id,))
     await bot.db.commit()
