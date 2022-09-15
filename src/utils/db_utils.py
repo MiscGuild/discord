@@ -103,7 +103,7 @@ async def insert_new_residency(discord_id: int, uuid: str, reason: str, time_of_
     await bot.db.commit()
 
 
-async def update_residency(discord_id: int, reason: str, time_of_finish: str, warnings: int, warnings_updated: str):
+async def update_residency(discord_id: int, reason: str, time_of_finish: str, warnings: int = 0, warnings_updated: str = 0):
     await bot.db.execute(
         "UPDATE residency SET reason = (?), time_of_finish = (?), warnings = (?), warnings_updated = (?) WHERE discord_id = (?)",
         (reason, time_of_finish, warnings, warnings_updated, discord_id))

@@ -891,7 +891,7 @@ class General:
                     if existing_record:
                         end = (datetime.strptime(existing_record[0], "%Y-%m-%d %H:%M") + duration).strftime(
                             "%Y-%m-%d %H:%M")
-                        await update_residency(member_id, reason, end, existing_record[1], existing_record[2])
+                        await update_residency(member_id, reason, end)
                         await ctx.send(f"**{ign} is already a resident so their residency was extended**\n"
                                        f"Their residency ends on {str(end)}")
                     if not existing_record:
