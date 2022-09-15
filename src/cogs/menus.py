@@ -1,4 +1,4 @@
-from discord.ext import commands
+from discord.ext import commands, bridge
 from src.func.Listener import Listener
 
 
@@ -10,7 +10,7 @@ class Menus(commands.Cog, command_attrs=dict(hidden=True), name="menus"):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @bridge.bridge_command()
     @commands.is_owner()
     async def reactionroles(self, ctx):
         """Send the reaction roles embeds!"""
