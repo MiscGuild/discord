@@ -1,6 +1,6 @@
 import discord
-
 from discord.ext import commands, bridge
+
 from src.func.General import General
 from src.func.Listener import Listener
 from src.func.String import String

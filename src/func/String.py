@@ -2,11 +2,12 @@
 
 import inspect
 import os
+from __main__ import bot
 from datetime import datetime
 
 import discord
-from __main__ import bot
 from quickchart import QuickChart
+
 from src.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed,
                               months, neg_color, neutral_color, pos_color,
                               qotd_ans_channel_id, qotd_channel_id,
@@ -238,7 +239,8 @@ class String:
         # Channel is a ticket
         channel_name = self.string.replace(" ", "-")
         await ctx.channel.edit(name=channel_name)
-        return discord.Embed(title=f"The channel name was changed from {old_name} to {channel_name}", color=neutral_color)
+        return discord.Embed(title=f"The channel name was changed from {old_name} to {channel_name}",
+                             color=neutral_color)
 
     async def qotd(self, ctx):
         # 15th May 2022 was the 473rd QOTD day. It is used as a reference point to calculate the day number.

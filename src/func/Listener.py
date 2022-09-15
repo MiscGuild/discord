@@ -1,20 +1,19 @@
 # The following file contains: on_member_join, on_error, on_command_error, reactionroles, tickets, on_interaction
 
 import traceback
+from __main__ import bot
 
 import discord
-from __main__ import bot
-from discord.ext import commands, bridge
+from discord.ext import commands
 from discord.ui import Button, Select, View
+
 from src.utils.consts import (error_channel_id, invalid_command_embed,
-                              member_not_found_embed, allies,
-                              missing_permissions_embed, missing_role_embed,
+                              member_not_found_embed, missing_permissions_embed, missing_role_embed,
                               neutral_color, not_owner_embed, pronoun_roles,
                               reaction_roles, registration_channel_id,
                               registration_embed, err_404_embed, bot_missing_perms_embed)
 from src.utils.discord_utils import create_ticket
-from src.utils.request_utils import get_jpg_file, get_player_guild, get_mojang_profile
-
+from src.utils.request_utils import get_jpg_file
 
 
 class Listener:
@@ -130,10 +129,8 @@ class Listener:
                 print("The below exception could not be sent to the error channel:")
                 print(tb)
 
-
     async def on_interaction(self):
         self.obj: discord.Interaction
-        # Ticket creation
         if "custom_id" not in self.obj.data:
             pass
         elif self.obj.data["custom_id"] == "tickets":
@@ -171,6 +168,7 @@ class Listener:
                 else:
                     await self.obj.user.add_roles(role)
                     await self.obj.response.send_message(content=f"Added {label}", ephemeral=True)
+        # Ticket creation
 
     async def reactionroles(ctx):
         # Reaction roles
@@ -264,4 +262,3 @@ class Listener:
                                      style=discord.ButtonStyle.blurple, emoji="✉️"))
 
         return image, embed, TicketView()
-

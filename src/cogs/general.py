@@ -24,10 +24,8 @@ class General(commands.Cog, name="general"):
         """See the avatar of a given user!"""
         await ctx.respond(embed=await Union(user=user or ctx.author).avatar())
 
-
-
     @bridge.bridge_command()
-    @commands.has_any_role("QOTD Manager","Staff")
+    @commands.has_any_role("QOTD Manager", "Staff")
     async def qotd(self, ctx):
         """Used by QOTD Managers to register a QOTD"""
         await ctx.respond("**What is the question of the day?**")

@@ -334,9 +334,9 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                         embed = discord.Embed(title="Alliance Request Request", color=neutral_color)
                     else:
                         embed = discord.Embed(
-                        title=f"{ign} wishes to ally with Miscellaneous on behalf of {guild['name']}",
-                        description=f"Guild Level: {await get_guild_level(guild['exp'])}",
-                        color=neutral_color)
+                            title=f"{ign} wishes to ally with Miscellaneous on behalf of {guild['name']}",
+                            description=f"Guild Level: {await get_guild_level(guild['exp'])}",
+                            color=neutral_color)
                     embed.set_footer(text="Please provide:\nGuild Logo\nGuild Advertisement Message")
                     fields.extend(
                         [["What is the IGN of your guild master?", "", discord.InputTextStyle.short, "Guild Master"],
@@ -432,9 +432,6 @@ async def get_rank_role(rank):
     return ranks.get(rank)
 
 
-
-
-
 @tasks.loop(count=1)
 async def after_cache_ready():
     # Set owner id(s) and guild
@@ -467,9 +464,10 @@ async def after_cache_ready():
     from src.utils.discord_utils import name_grabber
     bot.staff_names = [await name_grabber(member) for member in bot.staff.members]
 
-    from src.utils.loop_utils import check_giveaways, send_gexp_lb
+    from src.utils.loop_utils import check_giveaways, send_gexp_lb, check_residents
     check_giveaways.start()
     send_gexp_lb.start()
+    check_residents.start()
 
 
 @after_cache_ready.before_loop

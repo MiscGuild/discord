@@ -1,6 +1,7 @@
 import discord
 from discord.errors import Forbidden
 from discord.ext import commands, bridge
+
 from src.utils.consts import config, neutral_color
 
 """This custom help command is a perfect replacement for the default one on any Discord Bot written in Discord.py!
@@ -50,6 +51,7 @@ class Help(commands.Cog):
         # !SET THOSE VARIABLES TO MAKE THE COG FUNCTIONAL!
         prefix = config['prefix']
         version = 1.0
+
         async def predicate(cmd):
             try:
                 return await cmd.can_run(ctx)
@@ -121,7 +123,8 @@ class Help(commands.Cog):
                                         color=discord.Color.green())
 
                     # getting commands from cog
-                    for command in self.bot.get_cog(cog).get_commands()[::2]:   # Ignores all the duplicate commands returned by bridge slash commands
+                    for command in self.bot.get_cog(cog).get_commands()[
+                                   ::2]:  # Ignores all the duplicate commands returned by bridge slash commands
                         syntax = f"{prefix}{command.name}"
                         for key, value in command.clean_params.items():
                             if not value.default:
@@ -130,7 +133,8 @@ class Help(commands.Cog):
                                 syntax += " <" + key + ">"
                         emb.add_field(name=f"`{syntax}`", value=command.help, inline=False)
 
-                    emb.set_footer(text="\n\n[] represent compulsory fields\n<> represent optional fields\nDo not type the brackets!")
+                    emb.set_footer(
+                        text="\n\n[] represent compulsory fields\n<> represent optional fields\nDo not type the brackets!")
                     # found cog - breaking loop
                     break
 

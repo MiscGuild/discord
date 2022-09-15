@@ -6,8 +6,8 @@ import discord.ui as ui
 
 from src.utils.consts import (dnkl_channel_id, dnkl_req,
                               missing_permissions_embed,
-                              neg_color, neutral_color, residency_reasons, button_types)
-from src.utils.db_utils import insert_new_dnkl, select_one, update_dnkl, delete_dnkl, insert_new_residency
+                              neg_color, neutral_color, button_types)
+from src.utils.db_utils import insert_new_dnkl, select_one, update_dnkl, delete_dnkl
 
 
 class StartYearSelect(ui.Select):
@@ -212,17 +212,18 @@ class Button_Creator(discord.ui.Button):
 
         try:
             await self.member.add_roles(
-            discord.utils.get(bot.guild.roles, name=button_types[interaction.custom_id]["roleadd"]))
+                discord.utils.get(bot.guild.roles, name=button_types[interaction.custom_id]["roleadd"]))
         except:
             pass
         try:
             await self.member.remove_roles(
-            discord.utils.get(bot.guild.roles, name=button_types[interaction.custom_id]["roleremove"]))
+                discord.utils.get(bot.guild.roles, name=button_types[interaction.custom_id]["roleremove"]))
         except:
             pass
 
-        await interaction.response.send_message(embed=discord.Embed(title=self.ign + button_types[interaction.custom_id]["title"],
-                                                    color=button_types[interaction.custom_id]["color"]))
+        await interaction.response.send_message(
+            embed=discord.Embed(title=self.ign + button_types[interaction.custom_id]["title"],
+                                color=button_types[interaction.custom_id]["color"]))
 
         self.view.stop()
 

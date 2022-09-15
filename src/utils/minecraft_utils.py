@@ -17,6 +17,7 @@ async def get_player_gexp(uuid: str):
     # Player is not in a guild
     return None, None
 
+
 async def get_color_by_gexp(rank: str, weekly_gexp: int):
     if rank == "Resident":
         # Member meets res reqs
@@ -41,6 +42,7 @@ async def get_color_by_gexp(rank: str, weekly_gexp: int):
         # Member is inactive
         return 0xff6464, "rgba(255, 100, 100,0.3)", "rgba(255, 100, 100,0.3)"
 
+
 async def get_hypixel_player_rank(player_data: dict):
     if not player_data:
         return None, None
@@ -55,7 +57,7 @@ async def get_hypixel_player_rank(player_data: dict):
                 return "&c[&fYOUTUBE&c]", "[YOUTUBE]"
             elif player_data["rank"] == "ADMIN":
                 return "&c[ADMIN]", "[ADMIN]"
-    
+
         else:
             rank = player_data["newPackageRank"]
 
@@ -81,14 +83,16 @@ async def get_hypixel_player_rank(player_data: dict):
                     else:
                         # Gold/Aqua MVP++
                         if "rankPlusColor" not in player_data:
-                            return "&6[MVP&c++&6]" if "monthlyRankColor" not in player_data or player_data["monthlyRankColor"] == "GOLD" else "&b[MVP&c++&b]", "[MVP++]"
-                        
+                            return "&6[MVP&c++&6]" if "monthlyRankColor" not in player_data or player_data[
+                                "monthlyRankColor"] == "GOLD" else "&b[MVP&c++&b]", "[MVP++]"
+
                         # MVP++ with custom + color
                         pluscolor = ChatColor[player_data["rankPlusColor"]].value
-                        return f"&6[MVP{pluscolor}++&6]" if "monthlyRankColor" not in player_data or player_data["monthlyRankColor"] == "GOLD" else f"&b[MVP{pluscolor}++&b]", "[MVP++]"
+                        return f"&6[MVP{pluscolor}++&6]" if "monthlyRankColor" not in player_data or player_data[
+                            "monthlyRankColor"] == "GOLD" else f"&b[MVP{pluscolor}++&b]", "[MVP++]"
 
                 # Player is MVP+
-                else: 
+                else:
                     # Custom + color
                     if "rankPlusColor" in player_data:
                         pluscolor = ChatColor[player_data["rankPlusColor"]].value
@@ -97,6 +101,7 @@ async def get_hypixel_player_rank(player_data: dict):
                     return "&b[MVP&c+&b]", "[MVP+]"
     else:
         return "&7", ""
+
 
 async def calculate_network_level(total_exp: int):
     return round((math.sqrt((2 * total_exp) + 30625) / 50) - 2.5, 2)

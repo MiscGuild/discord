@@ -1,4 +1,5 @@
-from discord.ext import commands, bridge
+from discord.ext import commands
+
 from src.func.General import General
 from src.func.Integer import Integer
 
@@ -7,6 +8,7 @@ class Giveaways(commands.Cog, name="giveaways"):
     """
     Everything to do with giveaway creation, deletion and updation!
     """
+
     def __init__(self, bot):
         self.bot = bot
 

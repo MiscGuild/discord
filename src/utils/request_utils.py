@@ -1,10 +1,11 @@
 import random
 import re
+from __main__ import bot
 from io import BytesIO
 
 import aiohttp
 import discord
-from __main__ import bot
+
 from src.utils.consts import config, error_channel_id
 
 
@@ -72,7 +73,7 @@ async def get_name_by_uuid(uuid: str):
 
         return resp["name"]
     api_key = await get_hyapi_key()
-    #If the Mojang API fails to return a name, the bot checks using the hypixel API
+    # If the Mojang API fails to return a name, the bot checks using the hypixel API
     resp = await get_json_response(f"https://api.hypixel.net/player?key={api_key}&uuid={uuid}")
     if "player" not in resp:
         return None
@@ -174,22 +175,22 @@ async def get_rank(uuid):
     if player is None:
         return None
     if "newPackageRank" in player:
-            rank = (player["newPackageRank"])
-            if rank == 'MVP_PLUS':
-                if "monthlyPackageRank" in player:
-                    mvp_plus_plus = (player["monthlyPackageRank"])
-                    if mvp_plus_plus == "NONE":
-                        return '[MVP+]'
-                    else:
-                        return"[MVP++]"
+        rank = (player["newPackageRank"])
+        if rank == 'MVP_PLUS':
+            if "monthlyPackageRank" in player:
+                mvp_plus_plus = (player["monthlyPackageRank"])
+                if mvp_plus_plus == "NONE":
+                    return '[MVP+]'
                 else:
-                    return"[MVP+]"
-            elif rank == 'MVP':
-                return '[MVP]'
-            elif rank == 'VIP_PLUS':
-                return 'VIP+'
-            elif rank == 'VIP':
-                return '[VIP]'
+                    return "[MVP++]"
+            else:
+                return "[MVP+]"
+        elif rank == 'MVP':
+            return '[MVP]'
+        elif rank == 'VIP_PLUS':
+            return 'VIP+'
+        elif rank == 'VIP':
+            return '[VIP]'
 
     else:
         return None
