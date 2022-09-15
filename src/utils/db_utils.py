@@ -30,7 +30,9 @@ async def connect_db():
     discord_id integer PRIMARY KEY NOT NULL,
     uuid text NOT NULL,
     reason text NOT NULL,
-    time_of_finish text NOT NULL)""")
+    time_of_finish text NOT NULL,
+    warnings integer,
+    warnings_updated text)""")
 
     # Commit any changes
     await bot.db.commit()
