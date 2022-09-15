@@ -54,7 +54,7 @@ async def select_one(query: str, values: Tuple = None):
 
 
 # Generic select many rows functions
-async def select_all(query: str, values:     Tuple = None):
+async def select_all(query: str, values: Tuple = None):
     cursor = await base_query(query, values)
     rows = await cursor.fetchall()
     await cursor.close()
@@ -95,9 +95,17 @@ async def set_giveaway_inactive(id: int):
     await bot.db.commit()
 
 
-async def insert_new_residency(discord_id: int, uuid: str, reason: str, time_of_finish: str):
-    print(reason, type(reason))
-    await bot.db.execute(f"INSERT INTO residency VALUES (?, ?, ?, ?)", (discord_id, uuid, reason, time_of_finish))
+async def insert_new_residency(discord_id: int, uuid: str, reason: str, time_of_finish: str, warnings: int = 0,
+                               warnings_updated: str = ""):
+    await bot.db.execute(f"INSERT INTO residency VALUES (?, ?, ?, ?, ?, ?)",
+                         (discord_id, uuid, reason, time_of_finish, warnings, warnings_updated))
+    await bot.db.commit()
+
+
+async def update_residency(discord_id: int, reason: str, time_of_finish: str, warnings: int, warnings_updated: str):
+    await bot.db.execute(
+        "UPDATE residency SET reason = (?), time_of_finish = (?), warnings = (?), warnings_updated = (?) WHERE discord_id = (?)",
+        (reason, time_of_finish, warnings, warnings_updated, discord_id))
     await bot.db.commit()
 
 
