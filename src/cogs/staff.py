@@ -34,31 +34,36 @@ class Staff(commands.Cog, name="staff"):
         elif isinstance(res, str):
             await ctx.respond(res)
 
-
     @bridge.bridge_command()
     @commands.has_role("Admin")
     async def partner(self, ctx, organization_name: str):
         """Create an embed with information about a partner!"""
         await bot.get_channel(partner_channel_id).send(embed=await General.partner(ctx, organization_name))
-        await ctx.respond(embed=discord.Embed(title=f"Miscellaneous has officially partnered with {organization_name}", color=neutral_color).set_footer(text="The partner embed has been sent to the partners channel!"))
-
+        await ctx.respond(embed=discord.Embed(title=f"Miscellaneous has officially partnered with {organization_name}",
+                                              color=neutral_color).set_footer(
+            text="The partner embed has been sent to the partners channel!"))
 
     @bridge.bridge_command()
     @commands.has_role("Admin")
     async def information(self, ctx):
         await ctx.respond(embed=information_embed)
 
-    @commands.command()
+    @bridge.bridge_command()
     @commands.has_role("Staff")
     async def rolecheck(self, ctx, send_ping: bool = True):
         """Sync the names and roles of everyone in the discord!"""
         await General.rolecheck(ctx, send_ping)
 
-    @commands.command(aliases=[])
+    @bridge.bridge_command(aliases=[])
     @commands.has_role("Moderator")
-    async def residency(self, ctx, member: discord.Member = None, reason: int = None ):
+    async def residency(self, ctx, member: discord.Member = None, reason: int = None):
         """Used to update a member's residency in the guild!"""
         await General.resident_membership(ctx, member, reason)
+
+    @bridge.bridge_command(aliases=['rl', 'reslist', 'residencylist'])
+    @commands.has_role("Staff")
+    async def residentlist(self, ctx):
+        await ctx.respond(embed=(await General.resident_list(ctx)))
 
 
 def setup(bot):
