@@ -17,7 +17,7 @@ from src.utils.consts import (accepted_staff_application_embed, active_req,
                               milestone_emojis, milestones_channel, neg_color,
                               neutral_color, pos_color, ticket_deleted_embed,
                               registration_channel_id, registration_embed,
-                              staff_application_questions, ticket_categories, residency_reasons)
+                              staff_application_questions, ticket_categories, residency_reasons, resident_req)
 from src.utils.db_utils import insert_new_giveaway, select_all, insert_new_residency, select_one, update_residency
 from src.utils.discord_utils import (create_ticket, create_transcript,
                                      get_ticket_creator, log_event,
@@ -336,8 +336,10 @@ class General:
             for tuple in dnkl_uuids:
                 dnkl_uuids[dnkl_uuids.index(tuple)] = tuple[0]
 
+            resident_data = await select_all("SELECT uuid, warnings, warnings_updated FROM residency")
+
             # Define dicts for each category of users
-            to_promote, to_demote, inactive, residents, skipped_users = {}, {}, {}, {}, []
+            to_promote_active, to_demote_active, to_promote_resident, to_demote_resident, inactive, skipped_users = {}, {}, {}, {}, {}, []
 
             # Loop through all guild members with a session to fetch names
             for member in guild_data["members"]:
@@ -347,6 +349,7 @@ class General:
                 guild_rank = member["rank"]
                 if uuid in dnkl_uuids:
                     guild_rank = "DNKL"
+
                 weekly_exp = sum(member["expHistory"].values())
                 name = await get_name_by_uuid(uuid)
                 if not name:
@@ -836,6 +839,7 @@ class General:
                     duration = eval(values[0])
                     reason = values[1]
                     existing_record = await select_one(
+                        "SELECT time_of_finish, warnings, warnings_updated FROM residency WHERE discord_id = (?)",
                         (member_id,))
                     if reason == "Gvg":
                         embed = discord.Embed(title=f"Did {ign} win the GvG?", color=neutral_color)
@@ -860,17 +864,19 @@ class General:
                         if color == neutral_color:  # Won the GvG
                             duration = timedelta(weeks=residency_reasons['GVG'][1]['WIN'])
                         elif color == neg_color:  # Lost the GvG
-                            duration = timedelta(weeks=residency_reasons['GVG'][1]['loss'])
+                            duration = timedelta(weeks=residency_reasons['GVG'][1]['LOSS'])
 
                     elif reason == "Donor":
                         while True:
-                            await interaction.response.send_message("**How much money did the user donate?**\nOnly reply with the number in USD")
+                            await interaction.response.send_message(
+                                "**How much money did the user donate?**\nOnly reply with the number in USD")
                             donation_amount = await bot.wait_for("message",
-                                                      check=lambda
-                                                          x: x.channel == ctx.channel and x.author == ctx.author)
+                                                                 check=lambda
+                                                                     x: x.channel == ctx.channel and x.author == ctx.author)
                             donation_amount = donation_amount.content
                             if donation_amount.isnumeric():
-                                duration = timedelta(weeks=((int(donation_amount)//5) * residency_reasons["DONOR"][1]))
+                                duration = timedelta(
+                                    weeks=((int(donation_amount) // 5) * residency_reasons["DONOR"][1]))
                                 break
                             else:
                                 await ctx.send("**Invalid donation amount. Please only give the number.**\n"
@@ -882,20 +888,27 @@ class General:
                     elif reason == "Youtuber":
                         duration = timedelta(weeks=(residency_reasons["YOUTUBER"][1]))
 
-                    if start_date:
-                        print(duration)
-                        end = (datetime.strptime(start_date[0], "%Y-%m-%d %H:%M") + duration).strftime("%Y-%m-%d %H:%M")
-                        await update_residency(member_id, reason, end)
+                    if existing_record:
+                        end = (datetime.strptime(existing_record[0], "%Y-%m-%d %H:%M") + duration).strftime(
+                            "%Y-%m-%d %H:%M")
+                        await update_residency(member_id, reason, end, existing_record[1], existing_record[2])
                         await ctx.send(f"**{ign} is already a resident so their residency was extended**\n"
                                        f"Their residency ends on {str(end)}")
-                    if not start_date:
+                    if not existing_record:
                         end = (datetime.now() + duration).strftime("%Y-%m-%d %H:%M")
                         await insert_new_residency(member_id, uuid, reason, end)
                         await ctx.send(f"**{ign} has been granted residency!**\n"
                                        f"Their residency ends on {str(end)}")
 
-
             view = discord.ui.View()
             view.add_item(ReasonSelect())
-            await ctx.send(embed=discord.Embed(title=   f"Why should {ign} gain residency?",
+            await ctx.send(embed=discord.Embed(title=f"Why should {ign} gain residency?",
                                                color=neutral_color), view=view)
+
+    async def resident_list(ctx):
+        residents = await select_all("SELECT * FROM residency")
+        embed=discord.Embed(title="Residents", color=neutral_color)
+        for resident in residents:
+            name = await get_name_by_uuid(resident[1])
+            embed.add_field(name=name, value=f"Reason: {resident[2]}\nWarnings: {resident[4]}\nEnd Date: {resident[3]}")
+        return embed
