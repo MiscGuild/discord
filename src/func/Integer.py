@@ -37,7 +37,7 @@ class Integer:
             return "This giveaway doesn't seem to exist!\n`Either it never existed, or its data was deleted after 10 days of disuse.`"
 
         # Giveaway exists
-        elif status:
+        elif status[0]:
             return "This giveaway hasn't ended yet!\n`To end it, use ,giveawayend`"
         await roll_giveaway(self.integer, reroll_number)
 
