@@ -30,14 +30,14 @@ class Integer:
 
     async def giveawayreroll(self, reroll_number: int = None):
         # Get giveaway status
-        status, = await get_giveaway_status(self.integer)
+        status = await get_giveaway_status(self.integer)
 
         # Giveaway does not exist
-        if not status:
+        if status is None:
             return "This giveaway doesn't seem to exist!\n`Either it never existed, or its data was deleted after 10 days of disuse.`"
 
         # Giveaway exists
-        if status:
+        elif status:
             return "This giveaway hasn't ended yet!\n`To end it, use ,giveawayend`"
         await roll_giveaway(self.integer, reroll_number)
 
