@@ -86,9 +86,9 @@ class Tickets(commands.Cog, name="tickets"):
         """Deny a staff application!"""
         # Get result and send file if it is returned
         embed, file = await General.deny(ctx, channel)
-        await channel.respond(embed=embed)
+        await channel.send(embed=embed)
         if file:
-            return await channel.respond(file=file)
+            return await channel.send(file=file)
 
     @bridge.bridge_command()
     async def new(self, ctx):
