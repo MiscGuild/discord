@@ -16,7 +16,7 @@ from src.utils.minecraft_utils import get_player_gexp
 from src.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild, get_guild_level
 
 
-async def name_grabber(author: discord.User) -> str:
+async def name_grabber(author: discord.Member) -> str:
     if not author.nick:
         return author.name
     return author.nick.split()[0]
