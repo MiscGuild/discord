@@ -462,7 +462,8 @@ async def after_cache_ready():
     bot.vip = discord.utils.get(bot.guild.roles, name="VIP")
 
     from src.utils.discord_utils import name_grabber
-    bot.staff_names = [await name_grabber(member) for member in bot.staff.members]
+    bot.staff_names = [(await get_mojang_profile(await name_grabber(member)))[0] for member in bot.staff.members]
+
 
     from src.utils.loop_utils import check_giveaways, send_gexp_lb, check_residents
     check_giveaways.start()
