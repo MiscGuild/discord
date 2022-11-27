@@ -64,11 +64,17 @@ async def check_residents():
         if record[2] == "Youtuber":
             continue
         if current_date.date() > end_date.date():
-            await user.send(embed=resident_removed.set_footer(text=f"Reason: Your residency expired on {end_date}."))
+            try:
+                await user.send(embed=resident_removed.set_footer(text=f"Reason: Your residency expired on {end_date}."))
+            except:
+                print(f"{user} has DMs disabled.")
             await delete_residency(record[0])
         elif warnings > 15:
-            await user.send(embed=resident_removed.set_footer(
+            try:
+                await user.send(embed=resident_removed.set_footer(
                 text=f"Reason: You failed to meet resident requirements for more than 15 days."))
+            except:
+                print(f"{user} has DMs disabled.")
             await delete_residency(record[0])
 
 
