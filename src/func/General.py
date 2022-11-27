@@ -352,6 +352,10 @@ class General:
 
                 weekly_exp = sum(member["expHistory"].values())
                 name = await get_name_by_uuid(uuid)
+
+                if name in bot.staff_names:
+                    continue
+
                 if not name:
                     skipped_users.append(uuid)
                     continue
