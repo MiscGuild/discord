@@ -45,7 +45,7 @@ async def send_gexp_lb():
             f"**{(datetime.utcnow() - timedelta(days=7)).strftime('%d %b %Y')} "
             f"-"
             f" {datetime.utcnow().strftime('%d %B %Y')}**")
-        await bot.get_channel(weekly_lb_channel).send(file=await General.weeklylb(bot.get_channel(weekly_lb_channel)))
+        await bot.get_channel(weekly_lb_channel).send(file=(await General.weeklylb(bot.get_channel(weekly_lb_channel))))
 
 
 @send_gexp_lb.before_loop
