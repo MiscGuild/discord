@@ -21,7 +21,7 @@ from src.utils.consts import (accepted_staff_application_embed, active_req,
 from src.utils.db_utils import insert_new_giveaway, select_all, insert_new_residency, select_one, update_residency
 from src.utils.discord_utils import (create_ticket, create_transcript,
                                      get_ticket_creator, log_event,
-                                     name_grabber)
+                                     name_grabber, has_tag_perms)
 from src.utils.minecraft_utils import get_hypixel_player_rank
 from src.utils.request_utils import (get_guild_by_name, get_guild_uuids,
                                      get_hypixel_player, get_jpg_file,
@@ -135,6 +135,7 @@ class General:
                 continue
 
             name = await name_grabber(member)
+            canTag = await has_tag_perms(member)
             await progress_message.edit(content=f"Checking {name} - {member}")
             # Member of guild
             if name in guild_names:
@@ -147,6 +148,9 @@ class General:
                             await member.add_roles(bot.active_role)
                         elif weekly_exp < active_req and bot.active_role in member.roles:  # If the member doesn't meet active requirements but has the active role
                             await member.remove_roles(bot.active_role)
+
+                if not canTag:
+                    await member.edit(nick=name)
 
                 # Edit roles
                 await member.add_roles(bot.member_role)
@@ -186,6 +190,8 @@ class General:
 
             # Guests
             else:
+                if not canTag:
+                    await member.edit(nick=name)
                 await member.add_roles(bot.guest)
                 await member.remove_roles(bot.new_member_role, bot.member_role, bot.active_role, bot.ally)
                 continue
