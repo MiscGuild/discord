@@ -375,8 +375,8 @@ class General:
                             warnings += 1
                             warnings_updated = current_date
                             individual_data = (await select_all(f"SELECT * FROM residency where uuid == '{uuid}'"))[0]
-                            await update_residency(individual_data[0], individual_data[2], individual_data[3], warnings, warnings_updated)
-
+                            await update_residency(individual_data[0], individual_data[2], individual_data[3], warnings,
+                                                   warnings_updated)
 
                     if uuid in [data[0] for data in resident_data] and guild_rank != "Resident":
                         to_promote_resident[name] = weekly_exp
@@ -911,17 +911,20 @@ class General:
 
     async def resident_list(ctx):
         residents = await select_all("SELECT * FROM residency")
-        embed=discord.Embed(title="Residents", color=neutral_color)
+        embed = discord.Embed(title="Residents", color=neutral_color)
         for resident in residents:
             name = await get_name_by_uuid(resident[1])
             embed.add_field(name=name, value=f"Reason: {resident[2]}\nWarnings: {resident[4]}\nEnd Date: {resident[3]}")
         return embed
-    async def player_residency(ctx, name:str):
+
+    async def player_residency(ctx, name: str):
         residents = await select_all("SELECT * FROM residency")
         ign, uuid = await get_mojang_profile(name)
         for resident in residents:
             if resident[1] == uuid:
-                embed=discord.Embed(title=f"Resident - {ign}", description=f"Reason: {resident[2]}\nWarnings: {resident[4]}\nEnd Date: {resident[3]}", color=neutral_color)
+                embed = discord.Embed(title=f"Resident - {ign}",
+                                      description=f"Reason: {resident[2]}\nWarnings: {resident[4]}\nEnd Date: {resident[3]}",
+                                      color=neutral_color)
                 embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
                 return embed
         return discord.Embed(title="You are not a resident!", color=neg_color)

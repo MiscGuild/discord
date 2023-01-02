@@ -36,7 +36,7 @@ class Staff(commands.Cog, name="staff"):
 
     @bridge.bridge_command()
     @commands.has_role("Admin")
-    async def partner(self, ctx, organization_name: str):
+    async def partner(self, ctx, *, organization_name: str):
         """Create an embed with information about a partner!"""
         await bot.get_channel(partner_channel_id).send(embed=await General.partner(ctx, organization_name))
         await ctx.respond(embed=discord.Embed(title=f"Miscellaneous has officially partnered with {organization_name}",
