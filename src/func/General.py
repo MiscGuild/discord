@@ -255,12 +255,9 @@ class General:
         await ctx.send(
             "Please provide the logo of the organization/guild. (Please provide the URL. If they don't have a logo, type `None`)")
         # Wait for Logo
-        logo = (await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)) \
-            .content if (
-                            await bot.wait_for(
-                                "message",
-                                check=lambda
-                                    x: x.author == ctx.message.author)).content.lower() != "none" else None
+        response = (await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)).content
+        logo = response if not response.lower() == "none" else None
+
         if logo:
             return discord.Embed(title=organization_name, description=description, color=neutral_color).set_thumbnail(
                 url=logo)
