@@ -48,11 +48,12 @@ class Integer:
                                  color=error_color)
 
         guild_data = await get_guild_by_name(guild_handle)
+        member_gexp = {}
+        date = None
+
         if not guild_data:
             return invalid_guild_embed
 
-        member_gexp = {}
-        date = None
         # Loop through all members to find top 10
         for member in guild_data["members"]:
             if not date:
@@ -85,8 +86,12 @@ class Integer:
         image_content = image_content.replace(" ", "%20")
         image_content = image_content.replace(",", "%2C")
 
+        for x in range(5):
+            file = await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={image_content}&t=1")
+            if file:
+                break
         # Return image
-        return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={image_content}&t=1")
+        return file
 
     async def purge(self, ctx, reason):
         transcript = await create_transcript(ctx.channel, self.integer)

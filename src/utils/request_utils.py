@@ -136,6 +136,8 @@ async def get_gtag(name):
 async def get_jpg_file(url: str):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
+            if resp.status != 200:
+                return None
             resp = BytesIO(await resp.read())
             await session.close()
     return discord.File(resp, "image.jpg")
