@@ -36,7 +36,7 @@ async def get_mojang_profile(name: str):
     resp = await get_json_response(f"https://api.mojang.com/users/profiles/minecraft/{name}")
 
     # If player and request is valid
-    if resp and "error" not in resp:
+    if resp and "errorMessage" not in resp:
         return resp["name"], resp["id"]
     api_key = await get_hyapi_key()
     resp = await get_json_response(f"https://api.hypixel.net/player?key={api_key}&name={name}")
