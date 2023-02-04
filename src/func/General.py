@@ -21,7 +21,7 @@ from src.utils.consts import (accepted_staff_application_embed, active_req,
 from src.utils.db_utils import insert_new_giveaway, select_all, insert_new_residency, select_one, update_residency
 from src.utils.discord_utils import (create_ticket, create_transcript,
                                      get_ticket_creator, log_event,
-                                     name_grabber)
+                                     name_grabber, get_ticket_properties)
 from src.utils.minecraft_utils import get_hypixel_player_rank
 from src.utils.request_utils import (get_guild_by_name, get_guild_uuids,
                                      get_hypixel_player, get_jpg_file,
@@ -218,12 +218,14 @@ class General:
         if transcript:
             # Log outcome
             await log_event(f"{ctx.channel.name} was deleted by {ctx.author}")
-            try:
-                await (await bot.fetch_user(ctx.channel.topic.split("|")[0])).send(
-                    embed=ticket_deleted_embed.set_footer(text=ctx.channel.name), file=transcript)
-            except:
-                pass
-            await bot.get_channel(log_channel_id).send(file=transcript)
+            ticket_details = await get_ticket_properties(ctx.channel)
+            if ticket_details:
+                try:
+                    await (await bot.fetch_user(ticket_details[0])).send(
+                        embed=ticket_deleted_embed.set_footer(text=ctx.channel.name), file=transcript)
+                except:
+                    pass
+                await bot.get_channel(log_channel_id).send(file=transcript)
 
     async def accept(ctx):
         if ctx.channel.category.name not in ticket_categories.values():
@@ -270,7 +272,8 @@ class General:
         # Copy real question list and append 0th element for general critiquing
         application_questions = staff_application_questions.copy()
         application_questions[0] = "General critiquing"
-        message = await channel.fetch_message(int(channel.topic.split("|")[1]))
+        ticket_details = await get_ticket_properties(channel)
+        message = await channel.fetch_message(int(ticket_details[1]))
         member = await get_ticket_creator(channel)
         await ctx.send(embed=message.embeds[0].set_footer(text=""))
 
@@ -743,10 +746,10 @@ class General:
         member = await get_ticket_creator(ctx.channel)
         name = await name_grabber(member)
 
-        channel_description_list = ctx.channel.topic.split(
-            "|")  # Has a list in the format ["MEMBER ID","MILESTONE 1", "MILESTONE 2"....}
-        all_milestones = ctx.channel.topic.split('|')[
-                         1:-1]  # Omits the Member ID from channel_description_list and also an empty string from the end
+        channel_details = await get_ticket_properties(ctx.channel)
+        # Has a list in the format ["MEMBER ID","MILESTONE 1", "MILESTONE 2"....}
+        all_milestones = channel_details[ 1:-1]
+        # Omits the Member ID from channel_description_list and also an empty string from the end
 
         class MilestoneTypeSelect(discord.ui.Select):
             def __init__(self):
@@ -777,9 +780,9 @@ class General:
                                                check=lambda
                                                    x: x.channel == ctx.channel and x.author == interaction.user)
                 new_milestone_message = f"{emoji} {member.mention} {milestone.content}"
-                channel_description_list[index] = new_milestone_message
+                channel_details[index] = new_milestone_message
 
-                await ctx.channel.edit(topic="|".join(channel_description_list))
+                await ctx.channel.edit(topic="|".join(channel_details))
                 embed = discord.Embed(title="Milestone Registered!",
                                       description=new_milestone_message, color=neutral_color)
 
@@ -800,7 +803,10 @@ class General:
         count = 0
         for channel in bot.guild.text_channels:
             if channel.category.name == ticket_categories["milestone"]:
-                player_milestones = channel.topic.split("|")[1:-1]
+                channel_details = await get_ticket_properties(channel)
+                # Has a list in the format ["MEMBER ID","MILESTONE 1", "MILESTONE 2"....}
+                player_milestones = channel_details[1:-1]
+                # Omits the Member ID from channel_description_list and also an empty string from the end
                 for milestone in player_milestones:
                     count += 1
                     milestone_message = milestone_message + milestone + "!\n"
