@@ -431,6 +431,11 @@ async def get_rank_role(rank):
     }
     return ranks.get(rank)
 
+async def get_ticket_properties(channel: discord.TextChannel):
+    topic = channel.topic
+    if '|' not in topic:
+        return None
+    return topic.split('|')
 
 @tasks.loop(count=1)
 async def after_cache_ready():
