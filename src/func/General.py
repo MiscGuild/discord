@@ -21,7 +21,8 @@ from src.utils.consts import (accepted_staff_application_embed, active_req,
 from src.utils.db_utils import insert_new_giveaway, select_all, insert_new_residency, select_one, update_residency
 from src.utils.discord_utils import (create_ticket, create_transcript,
                                      get_ticket_creator, log_event,
-                                     name_grabber, get_ticket_properties)
+                                     name_grabber, get_ticket_properties,
+                                     name_grabber, has_tag_perms)
 from src.utils.minecraft_utils import get_hypixel_player_rank
 from src.utils.request_utils import (get_guild_by_name, get_guild_uuids,
                                      get_hypixel_player, get_jpg_file,
@@ -135,6 +136,7 @@ class General:
                 continue
 
             name = await name_grabber(member)
+            canTag = await has_tag_perms(member)
             await progress_message.edit(content=f"Checking {name} - {member}")
             # Member of guild
             if name in guild_names:
@@ -147,6 +149,9 @@ class General:
                             await member.add_roles(bot.active_role)
                         elif weekly_exp < active_req and bot.active_role in member.roles:  # If the member doesn't meet active requirements but has the active role
                             await member.remove_roles(bot.active_role)
+
+                if not canTag:
+                    await member.edit(nick=name)
 
                 # Edit roles
                 await member.add_roles(bot.member_role)
@@ -186,6 +191,8 @@ class General:
 
             # Guests
             else:
+                if not canTag:
+                    await member.edit(nick=name)
                 await member.add_roles(bot.guest)
                 await member.remove_roles(bot.new_member_role, bot.member_role, bot.active_role, bot.ally)
                 continue
@@ -257,12 +264,9 @@ class General:
         await ctx.send(
             "Please provide the logo of the organization/guild. (Please provide the URL. If they don't have a logo, type `None`)")
         # Wait for Logo
-        logo = (await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)) \
-            .content if (
-                            await bot.wait_for(
-                                "message",
-                                check=lambda
-                                    x: x.author == ctx.message.author)).content.lower() != "none" else None
+        response = (await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)).content
+        logo = response if not response.lower() == "none" else None
+
         if logo:
             return discord.Embed(title=organization_name, description=description, color=neutral_color).set_thumbnail(
                 url=logo)
@@ -378,8 +382,8 @@ class General:
                             warnings += 1
                             warnings_updated = current_date
                             individual_data = (await select_all(f"SELECT * FROM residency where uuid == '{uuid}'"))[0]
-                            await update_residency(individual_data[0], individual_data[2], individual_data[3], warnings, warnings_updated)
-
+                            await update_residency(individual_data[0], individual_data[2], individual_data[3], warnings,
+                                                   warnings_updated)
 
                     if uuid in [data[0] for data in resident_data] and guild_rank != "Resident":
                         to_promote_resident[name] = weekly_exp
@@ -917,17 +921,20 @@ class General:
 
     async def resident_list(ctx):
         residents = await select_all("SELECT * FROM residency")
-        embed=discord.Embed(title="Residents", color=neutral_color)
+        embed = discord.Embed(title="Residents", color=neutral_color)
         for resident in residents:
             name = await get_name_by_uuid(resident[1])
             embed.add_field(name=name, value=f"Reason: {resident[2]}\nWarnings: {resident[4]}\nEnd Date: {resident[3]}")
         return embed
-    async def player_residency(ctx, name:str):
+
+    async def player_residency(ctx, name: str):
         residents = await select_all("SELECT * FROM residency")
         ign, uuid = await get_mojang_profile(name)
         for resident in residents:
             if resident[1] == uuid:
-                embed=discord.Embed(title=f"Resident - {ign}", description=f"Reason: {resident[2]}\nWarnings: {resident[4]}\nEnd Date: {resident[3]}", color=neutral_color)
+                embed = discord.Embed(title=f"Resident - {ign}",
+                                      description=f"Reason: {resident[2]}\nWarnings: {resident[4]}\nEnd Date: {resident[3]}",
+                                      color=neutral_color)
                 embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
                 return embed
         return discord.Embed(title="You are not a resident!", color=neg_color)

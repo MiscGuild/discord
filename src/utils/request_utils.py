@@ -25,7 +25,7 @@ async def get_json_response(url: str):
 
     # Check for invalid API keys
     if "cause" in resp and resp["cause"] == "Invalid API key":
-        bot.get_channel(error_channel_id).send(
+        await bot.get_channel(error_channel_id).send(
             f"WARNING: The API key {re.search(r'(?<=key=)(.*?)(?=&)', url).group(0)} is invalid!")
 
     # Return JSON response
@@ -136,6 +136,8 @@ async def get_gtag(name):
 async def get_jpg_file(url: str):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
+            if resp.status != 200:
+                return None
             resp = BytesIO(await resp.read())
             await session.close()
     return discord.File(resp, "image.jpg")
