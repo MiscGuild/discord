@@ -163,7 +163,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                         x: x.channel == ticket and x.author == interaction.user)
 
                     # If user doesn't meet requirements, deny application
-                    if meets_requirements.content not in ["y", "yes"]:
+                    if meets_requirements.content.lower() not in ["y", "yes", "yea", "yeah", "yup"]:
                         return await ticket.send(embed=discord.Embed(title="Your staff application has been denied!",
                                                                      description="Since you do not meet the requirements, your staff application has been denied.",
                                                                      color=neg_color))
