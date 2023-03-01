@@ -433,7 +433,7 @@ async def get_rank_role(rank):
 
 async def get_ticket_properties(channel: discord.TextChannel):
     topic = channel.topic
-    if '|' not in topic:
+    if not topic or '|' not in topic:
         return None
     return topic.split('|')
 
