@@ -279,6 +279,10 @@ class General:
         ticket_details = await get_ticket_properties(channel)
         message = await channel.fetch_message(int(ticket_details[1]))
         member = await get_ticket_creator(channel)
+        if not member.nick:
+            nick = member.name
+        else:
+            nick = member.nick
         await ctx.send(embed=message.embeds[0].set_footer(text=""))
 
         # Define the embed to be sent to the applicant
@@ -301,7 +305,7 @@ class General:
                 except:
                     await ctx.send("Please respond with a valid question number.")
 
-            await ctx.send(f"`{question}`\n**What was the issue that you found with {member.nick}'s reply?**")
+            await ctx.send(f"`{question}`\n**What was the issue that you found with {nick}'s reply?**")
             critique = await bot.wait_for("message",
                                           check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
 
