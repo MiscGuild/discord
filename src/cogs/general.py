@@ -7,7 +7,7 @@ from src.func.Union import Union
 
 class General(commands.Cog, name="general"):
     """
-    Contains all source, avatar, qotd.
+    Contains source, avatar, qotd.
     """
 
     def __init__(self, bot):

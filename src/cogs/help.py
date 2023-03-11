@@ -48,7 +48,6 @@ class Help(commands.Cog):
     async def help(self, ctx, module=None):
         """Shows all modules of the Miscellaneous bot"""
 
-        # !SET THOSE VARIABLES TO MAKE THE COG FUNCTIONAL!
         prefix = config['prefix']
         version = 1.0
 
