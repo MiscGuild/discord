@@ -128,9 +128,8 @@ async def get_gtag(name):
         return (" ")
     if not resp["guild"]["tag"]:
         return (" ")
-    else:
-        gtag = resp["guild"]["tag"]
-        return (f"[{gtag}]")
+    gtag = resp["guild"]["tag"]
+    return (f"[{gtag}]")
 
 
 async def get_jpg_file(url: str):
@@ -183,16 +182,13 @@ async def get_rank(uuid):
                 mvp_plus_plus = (player["monthlyPackageRank"])
                 if mvp_plus_plus == "NONE":
                     return '[MVP+]'
-                else:
-                    return "[MVP++]"
-            else:
-                return "[MVP+]"
-        elif rank == 'MVP':
+                return "[MVP++]"
+            return "[MVP+]"
+        if rank == 'MVP':
             return '[MVP]'
-        elif rank == 'VIP_PLUS':
+        if rank == 'VIP_PLUS':
             return 'VIP+'
-        elif rank == 'VIP':
+        if rank == 'VIP':
             return '[VIP]'
 
-    else:
-        return None
+    return None
