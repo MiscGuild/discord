@@ -28,19 +28,18 @@ async def get_color_by_gexp(rank: str, weekly_gexp: int):
         # Member does not meet res reqs
         return 0xffb464, "rgba(255, 180, 100,0.3)", "rgba(255, 180, 100,0.3)"
 
-    else:
-        # Member meets active reqs
-        if weekly_gexp > active_req:
-            return 0x9c119c, "rgba(156, 17, 156,0.3)", "rgba(156, 17, 156,0.3)"
-            # return 0x64b4ff, "rgba(100, 180, 255,0.3)", "rgba(100, 180, 255,0.3)"
+    # Member meets active reqs
+    if weekly_gexp > active_req:
+        return 0x9c119c, "rgba(156, 17, 156,0.3)", "rgba(156, 17, 156,0.3)"
+        # return 0x64b4ff, "rgba(100, 180, 255,0.3)", "rgba(100, 180, 255,0.3)"
 
-        # Member meets normal reqs
-        if weekly_gexp > member_req:
-            return 0xFF55FF, "rgba(255,85,255, 0.3)", "rgba(255,85,255, 0.3)"
-            # return 0x64ffff, "rgba(100, 255, 255,0.3)", "rgba(100, 255, 255,0.3)"
+    # Member meets normal reqs
+    if weekly_gexp > member_req:
+        return 0xFF55FF, "rgba(255,85,255, 0.3)", "rgba(255,85,255, 0.3)"
+        # return 0x64ffff, "rgba(100, 255, 255,0.3)", "rgba(100, 255, 255,0.3)"
 
-        # Member is inactive
-        return 0xff6464, "rgba(255, 100, 100,0.3)", "rgba(255, 100, 100,0.3)"
+    # Member is inactive
+    return 0xff6464, "rgba(255, 100, 100,0.3)", "rgba(255, 100, 100,0.3)"
 
 
 async def get_hypixel_player_rank(player_data: dict):
@@ -58,49 +57,46 @@ async def get_hypixel_player_rank(player_data: dict):
             elif player_data["rank"] == "ADMIN":
                 return "&c[ADMIN]", "[ADMIN]"
 
-        else:
-            rank = player_data["newPackageRank"]
+        rank = player_data["newPackageRank"]
 
-            # VIP - MVP+
-            if rank == "VIP":
-                return "&a[VIP]", "[VIP]"
-            elif rank == "VIP_PLUS":
-                return "&a[VIP&6+&a]", "[VIP+]"
-            elif rank == "MVP":
-                return "&b[MVP]", "[MVP]"
-            elif rank == "MVP_PLUS":
-                if "monthlyPackageRank" in player_data:
-                    # Had MVP++ but now is an MVP+
-                    if player_data["monthlyPackageRank"] == "NONE":
-                        # Custom + color
-                        if "rankPlusColor" in player_data:
-                            pluscolor = ChatColor[player_data["rankPlusColor"]].value
-                            return f"&b[MVP{pluscolor}+&b]", "[MVP+]"
-                        # Default + color
-                        return "&b[MVP&c+&b]", "[MVP+]"
-
-                    # Player is MVP++
-                    else:
-                        # Gold/Aqua MVP++
-                        if "rankPlusColor" not in player_data:
-                            return "&6[MVP&c++&6]" if "monthlyRankColor" not in player_data or player_data[
-                                "monthlyRankColor"] == "GOLD" else "&b[MVP&c++&b]", "[MVP++]"
-
-                        # MVP++ with custom + color
-                        pluscolor = ChatColor[player_data["rankPlusColor"]].value
-                        return f"&6[MVP{pluscolor}++&6]" if "monthlyRankColor" not in player_data or player_data[
-                            "monthlyRankColor"] == "GOLD" else f"&b[MVP{pluscolor}++&b]", "[MVP++]"
-
-                # Player is MVP+
-                else:
+        # VIP - MVP+
+        if rank == "VIP":
+            return "&a[VIP]", "[VIP]"
+        elif rank == "VIP_PLUS":
+            return "&a[VIP&6+&a]", "[VIP+]"
+        elif rank == "MVP":
+            return "&b[MVP]", "[MVP]"
+        elif rank == "MVP_PLUS":
+            if "monthlyPackageRank" in player_data:
+                # Had MVP++ but now is an MVP+
+                if player_data["monthlyPackageRank"] == "NONE":
                     # Custom + color
                     if "rankPlusColor" in player_data:
                         pluscolor = ChatColor[player_data["rankPlusColor"]].value
                         return f"&b[MVP{pluscolor}+&b]", "[MVP+]"
                     # Default + color
                     return "&b[MVP&c+&b]", "[MVP+]"
-    else:
-        return "&7", ""
+
+                # Player is MVP++
+                # Gold/Aqua MVP++
+                if "rankPlusColor" not in player_data:
+                    return "&6[MVP&c++&6]" if "monthlyRankColor" not in player_data or player_data[
+                        "monthlyRankColor"] == "GOLD" else "&b[MVP&c++&b]", "[MVP++]"
+
+                # MVP++ with custom + color
+                pluscolor = ChatColor[player_data["rankPlusColor"]].value
+                return f"&6[MVP{pluscolor}++&6]" if "monthlyRankColor" not in player_data or player_data[
+                    "monthlyRankColor"] == "GOLD" else f"&b[MVP{pluscolor}++&b]", "[MVP++]"
+
+            #Player is MVP+
+            # Custom + color
+            if "rankPlusColor" in player_data:
+                pluscolor = ChatColor[player_data["rankPlusColor"]].value
+                return f"&b[MVP{pluscolor}+&b]", "[MVP+]"
+            # Default + color
+            return "&b[MVP&c+&b]", "[MVP+]"
+
+    return "&7", ""
 
 
 async def calculate_network_level(total_exp: int):
