@@ -58,12 +58,12 @@ async def before_gexp_lb():
 async def check_residents():
     residents = await select_all("SELECT * FROM residency")
     for record in residents:
+        if record[2] == "Youtuber":
+            continue
         current_date = datetime.now()
         user = await bot.fetch_user(record[0])
         end_date = datetime.strptime(record[3], "%Y-%m-%d %H:%M")
         warnings = record[4]
-        if record[2] == "Youtuber":
-            continue
         if current_date.date() > end_date.date():
             try:
                 await user.send(embed=resident_removed.set_footer(text=f"Reason: Your residency expired on {end_date}."))
