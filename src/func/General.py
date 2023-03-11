@@ -341,118 +341,116 @@ class General:
 
 
     async def inactive(ctx):
-        with ctx.channel.typing():
-            # Fetch guid data
-            guild_data = await get_guild_by_name(guild_handle)
-            if not guild_data:
-                return invalid_guild_embed
 
-            # Retrieve DNKL users so they can be filtered out
-            dnkl_uuids = await select_all("SELECT uuid FROM dnkl")
-            for tuple in dnkl_uuids:
-                dnkl_uuids[dnkl_uuids.index(tuple)] = tuple[0]
+        # Fetch guid data
+        guild_data = await get_guild_by_name(guild_handle)
+        if not guild_data:
+            return invalid_guild_embed
 
-            resident_data = await select_all("SELECT uuid, warnings, warnings_updated FROM residency")
+        # Retrieve DNKL users so they can be filtered out
+        dnkl_uuids = await select_all("SELECT uuid FROM dnkl")
+        for tup in dnkl_uuids:
+            dnkl_uuids[dnkl_uuids.index(tup)] = tuple[0]
 
-            # Define dicts for each category of users
-            to_promote_active, to_demote_active, to_promote_resident, to_demote_resident, inactive, skipped_users = {}, {}, {}, {}, {}, []
+        resident_data = await select_all("SELECT uuid, warnings, warnings_updated FROM residency")
 
-            # Loop through all guild members with a session to fetch names
-            for member in guild_data["members"]:
-                uuid = member["uuid"]
+        # Define dicts for each category of users
+        to_promote_active, to_demote_active, to_promote_resident, to_demote_resident, inactive, skipped_users = {}, {}, {}, {}, {}, []
 
-                # Gather data
-                guild_rank = member["rank"]
-                if uuid in dnkl_uuids:
-                    guild_rank = "DNKL"
+        # Loop through all guild members with a session to fetch names
+        for member in guild_data["members"]:
+            uuid = member["uuid"]
+            name = await get_name_by_uuid(uuid)
 
-                weekly_exp = sum(member["expHistory"].values())
-                name = await get_name_by_uuid(uuid)
+            if name in bot.staff_names:
+                continue
 
-                if name in bot.staff_names:
-                    continue
+            if not name:
+                skipped_users.append(uuid)
+                continue
 
-                if not name:
-                    skipped_users.append(uuid)
-                    continue
-                name += f" [{guild_rank}]\n" + \
-                        str(datetime.fromtimestamp(
-                            int(str(member["joined"])[:-3])))[0:10]
-                guild_rank = member["rank"]
-                # Remove dnkl users from list
+            # Gather data
+            guild_rank = member["rank"] if uuid not in dnkl_uuids else "DNKL"
+            weekly_exp = sum(member["expHistory"].values())
+            name += f" [{guild_rank}]\n" + \
+                    str(datetime.fromtimestamp(
+                        int(str(member["joined"])[:-3])))[0:10]
+            guild_rank = member["rank"]
+            # Remove dnkl users from list
 
-                if guild_rank == "Resident" or uuid in [data[0] for data in resident_data]:  # data[0] is the uuid
-                    if uuid in [data[0] for data in resident_data]:
-                        warnings = [data[1] for data in resident_data if data[0] == uuid][0]
-                        warnings_updated = [data[2] for data in resident_data if data[0] == uuid][0]
-                        current_date = datetime.now().strftime("%Y/%d/%m")
+            if guild_rank == "Resident" or uuid in [data[0] for data in resident_data]:  # data[0] is the uuid
+                if uuid in [data[0] for data in resident_data]:
+                    warnings = [data[1] for data in resident_data if data[0] == uuid][0]
+                    warnings_updated = [data[2] for data in resident_data if data[0] == uuid][0]
+                    current_date = datetime.now().strftime("%Y/%d/%m")
 
-                        if weekly_exp < resident_req and (not warnings_updated or warnings_updated < current_date):
-                            warnings += 1
-                            warnings_updated = current_date
-                            individual_data = (await select_all(f"SELECT * FROM residency where uuid == '{uuid}'"))[0]
-                            await update_residency(individual_data[0], individual_data[2], individual_data[3], warnings,
-                                                   warnings_updated)
+                    if weekly_exp < resident_req and (not warnings_updated or warnings_updated < current_date):
+                        warnings += 1
+                        warnings_updated = current_date
+                        individual_data = (await select_all(f"SELECT * FROM residency where uuid == '{uuid}'"))[0]
+                        await update_residency(individual_data[0], individual_data[2], individual_data[3], warnings,
+                                                warnings_updated)
 
-                    if uuid in [data[0] for data in resident_data] and guild_rank != "Resident":
-                        to_promote_resident[name] = weekly_exp
-                    elif guild_rank == "Resident" and uuid not in [data[0] for data in resident_data]:
-                        to_demote_resident[name] = weekly_exp
+                if uuid in [data[0] for data in resident_data] and guild_rank != "Resident":
+                    to_promote_resident[name] = weekly_exp
+                elif guild_rank == "Resident" and uuid not in [data[0] for data in resident_data]:
+                    to_demote_resident[name] = weekly_exp
 
 
-                # Members who need to be promoted
-                elif guild_rank == "Member" and weekly_exp >= active_req:
-                    to_promote_active[name] = weekly_exp
+            # Members who need to be promoted
+            elif guild_rank == "Member" and weekly_exp >= active_req:
+                to_promote_active[name] = weekly_exp
 
-                # Active members who need to be demoted
-                elif guild_rank == "Active" and weekly_exp < active_req:
-                    to_demote_active[name] = weekly_exp
+            # Active members who need to be demoted
+            elif guild_rank == "Active" and weekly_exp < active_req:
+                to_demote_active[name] = weekly_exp
 
-                # Members who do not meet the requirements
-                elif weekly_exp < member_req:
-                    if guild_rank == "Member":
-                        # Filter new members who meet their requirements
-                        days_since_join = (
-                                datetime.now() - datetime.fromtimestamp(member["joined"] / 1000.0)).days
-                        if days_since_join <= 7 and weekly_exp > member_req / 7 * days_since_join:
-                            continue
-                        inactive[name] = weekly_exp
+            # Members who do not meet the requirements
+            elif weekly_exp < member_req:
+                if guild_rank == "Member":
+                    # Filter new members who meet their requirements
+                    days_since_join = (
+                            datetime.now() - datetime.fromtimestamp(member["joined"] / 1000.0)).days
+                    if days_since_join <= 7 and weekly_exp > ((member_req / 7) * days_since_join):
+                        continue
+                    
+                    inactive[name] = weekly_exp
 
-            # Define embeds array to be returned
-            embeds = []
+        # Define embeds array to be returned
+        embeds = []
 
-            # Loop through dicts, descriptions and colors
-            for _dict, title, color in [[to_promote_active, "Promote the following users to active:", pos_color],
-                                        [to_demote_active, "Demote the following users from active:",
-                                         neg_color],
-                                        [to_promote_resident, "Promote the following to resident:", 0xe5ba6c],
-                                        [to_demote_resident, "Demote the following from resident:", neg_color],
-                                        [inactive, "Following are the users to be kicked:", neg_color]]:
-                # Filter categories with no users
-                if _dict:
-                    # Sort values from lowest-highest
-                    _dict = sorted(
-                        _dict.items(), key=lambda item: item[1], reverse=True)
-                    length = len(_dict)
+        # Loop through dicts, descriptions and colors
+        for _dict, title, color in [[to_promote_active, "Promote the following users to active:", pos_color],
+                                    [to_demote_active, "Demote the following users from active:",
+                                        neg_color],
+                                    [to_promote_resident, "Promote the following to resident:", 0xe5ba6c],
+                                    [to_demote_resident, "Demote the following from resident:", neg_color],
+                                    [inactive, "Following are the users to be kicked:", neg_color]]:
+            # Filter categories with no users
+            if _dict:
+                # Sort values from lowest-highest
+                _dict = sorted(
+                    _dict.items(), key=lambda item: item[1], reverse=True)
+                length = len(_dict)
 
-                    # Create embed, append fields with data
-                    embed = discord.Embed(
-                        title=title, description=f"Total: {length}", color=color)
-                    for user in _dict:
-                        embed.add_field(
-                            name=f"{user[0]}", value=f"```cs\n{format(user[1], ',d')}```", inline=True)
+                # Create embed, append fields with data
+                embed = discord.Embed(
+                    title=title, description=f"Total: {length}", color=color)
+                for user in _dict:
+                    embed.add_field(
+                        name=f"{user[0]}", value=f"```cs\n{format(user[1], ',d')}```", inline=True)
 
-                        # If the embed is getting too large, append it and create a new one
-                        if len(embed.fields) >= 25 and length != 25:
-                            embeds.append(embed)
-                            embed = discord.Embed(color=color)
-                            if skipped_users:
-                                embed.set_footer(
-                                    text=f"Omitted {len(skipped_users)} user(s) to avoid an error!\nUUID(s):\n{str(*skipped_users)}")
-                    # Append embed to array
-                    embeds.append(embed)
+                    # If the embed is getting too large, append it and create a new one
+                    if len(embed.fields) >= 25 and length != 25:
+                        embeds.append(embed)
+                        embed = discord.Embed(color=color)
+                        if skipped_users:
+                            embed.set_footer(
+                                text=f"Omitted {len(skipped_users)} user(s) to avoid an error!\nUUID(s):\n{str(*skipped_users)}")
+                # Append embed to array
+                embeds.append(embed)
 
-            return embeds
+        return embeds
 
     async def giveawaycreate(ctx):
         # Define progress message for asking questions
