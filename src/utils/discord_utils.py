@@ -11,7 +11,7 @@ import src.utils.ui_utils as uiutils
 from src.utils.consts import (config, dnkl_req,
                               gvg_requirements, log_channel_id, neg_color, neutral_color, staff_application_questions,
                               ticket_categories,
-                              unknown_ign_embed, guild_handle)
+                              unknown_ign_embed, guild_handle, postive_responses)
 from src.utils.minecraft_utils import get_player_gexp
 from src.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild, get_guild_level
 
@@ -172,7 +172,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                         x: x.channel == ticket and x.author == interaction.user)
 
                     # If user doesn't meet requirements, deny application
-                    if meets_requirements.content.lower() not in ["y", "yes", "yea", "yeah", "yup"]:
+                    if meets_requirements.content.lower() not in positive_responses:
                         return await ticket.send(embed=discord.Embed(title="Your staff application has been denied!",
                                                                      description="Since you do not meet the requirements, your staff application has been denied.",
                                                                      color=neg_color))

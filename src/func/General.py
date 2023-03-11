@@ -17,7 +17,9 @@ from src.utils.consts import (accepted_staff_application_embed, active_req,
                               milestone_emojis, milestones_channel, neg_color,
                               neutral_color, pos_color, ticket_deleted_embed,
                               registration_channel_id, registration_embed,
-                              staff_application_questions, ticket_categories, residency_reasons, resident_req, dnkl_entries_not_found, postive_responses)
+                              staff_application_questions, ticket_categories, 
+                              residency_reasons, resident_req, dnkl_entries_not_found, 
+                              postive_responses)
 from src.utils.db_utils import insert_new_giveaway, select_all, insert_new_residency, select_one, update_residency
 from src.utils.discord_utils import (create_ticket, create_transcript,
                                      get_ticket_creator, log_event,
@@ -659,7 +661,7 @@ class General:
         confirmation = await bot.wait_for("message",
                                           check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
         confirmation = confirmation.content.lower()
-        if confirmation not in ["y", "yes"]:
+        if confirmation not in postive_responses:
             return "Giveaway cancelled!"
 
         # Send the giveaway in destination channel and add 🎉 reaction
