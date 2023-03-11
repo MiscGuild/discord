@@ -1,7 +1,7 @@
 from __main__ import bot
 from datetime import datetime, timedelta
 
-import discord
+import discord, calendar
 import discord.ui as ui
 
 from src.utils.consts import (dnkl_channel_id, dnkl_req,
@@ -40,7 +40,6 @@ class StartMonthSelect(ui.Select, object):
         self.year = year
         self.ign = ign
         self.uuid = uuid
-        import calendar
         for x in range(1, 13):
             self.add_option(label=str(calendar.month_name[x]))
 
