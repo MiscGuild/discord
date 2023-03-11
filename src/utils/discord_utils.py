@@ -393,9 +393,9 @@ async def check_tag(tag: str):
 
     if tag in badwords.split("\n"):
         return False, "Your tag may not include profanity."
-    elif not tag.isascii():
+    if not tag.isascii():
         return False, "Your tag may not include special characters unless it's the tag of an ally guild."
-    elif len(tag) > 6:
+    if len(tag) > 6:
         return False, "Your tag may not be longer than 6 characters."
     # Tag is okay to use
     return True, None
