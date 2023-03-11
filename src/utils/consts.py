@@ -136,6 +136,10 @@ requirements_embed = discord.Embed(title="Miscellaneous Guild Requirements",
 
 resident_removed = discord.Embed(title="Your resident rank has been removed!", color=neutral_color)
 
+dnkl_entries_not_found =  discord.Embed(title="No entries!",
+                                        description="There are no users on the do-not-kick-list!",
+                                        color=neg_color)
+
 information_embed = discord.Embed(title="Miscellaneous", url="https://plancke.io/hypixel/guild/name/Miscellaneous",
                                   description="Miscellaneous is an all games Hypixel guild. "
                                               "Our primary goal is to be a guild that is friendly to everyone. "
