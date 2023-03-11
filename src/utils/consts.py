@@ -203,6 +203,8 @@ gvg_info_embed = discord.Embed(title="GvG Information",
     inline=False
 )
 
+postive_responses = ("yes", "yeah", "yup", "yea", "sure", "ok", "okay", "affirmative", "y", "ye", "yea", "yep", "yuppers", "yessir", "yessum", "yessirree", "yessumree", "yessiree", "yessumree")
+
 # Errors
 unknown_ign_msg = "Unknown IGN!"
 
