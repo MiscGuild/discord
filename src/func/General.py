@@ -17,7 +17,7 @@ from src.utils.consts import (accepted_staff_application_embed, active_req,
                               milestone_emojis, milestones_channel, neg_color,
                               neutral_color, pos_color, ticket_deleted_embed,
                               registration_channel_id, registration_embed,
-                              staff_application_questions, ticket_categories, residency_reasons, resident_req, dnkl_entries_not_found)
+                              staff_application_questions, ticket_categories, residency_reasons, resident_req, dnkl_entries_not_found, postive_responses)
 from src.utils.db_utils import insert_new_giveaway, select_all, insert_new_residency, select_one, update_residency
 from src.utils.discord_utils import (create_ticket, create_transcript,
                                      get_ticket_creator, log_event,
@@ -203,8 +203,10 @@ class General:
 
     async def delete(ctx):
         embed = discord.Embed(title="This ticket will be deleted in 10 seconds!", color=neg_color)
+
         if not ctx.channel.category or ctx.channel.category.name not in ticket_categories.values():
             return "This command cannot be used here"
+        
         elif ctx.channel.category.name == ticket_categories["registrees"]:
             member = await get_ticket_creator(ctx.channel)
             if member:
@@ -274,14 +276,19 @@ class General:
         # Copy real question list and append 0th element for general critiquing
         application_questions = staff_application_questions.copy()
         application_questions[0] = "General critiquing"
-        ticket_details = await get_ticket_properties(channel)
-        message = await channel.fetch_message(int(ticket_details[1]))
+        application_embed_id = (await get_ticket_properties(channel))[1]
+        application_embed = (await channel.fetch_message(int(application_embed_id))).embeds[0]
         member = await get_ticket_creator(channel)
+
+
+
         if not member.nick:
             nick = member.name
         else:
             nick = member.nick
-        await ctx.send(embed=message.embeds[0].set_footer(text=""))
+
+
+        await ctx.send(embed=application_embed.set_footer(text=""))
 
         # Define the embed to be sent to the applicant
         denial_embed = discord.Embed(title="Your staff application has been denied!",
@@ -304,34 +311,34 @@ class General:
                     await ctx.send("Please respond with a valid question number.")
 
             await ctx.send(f"`{question}`\n**What was the issue that you found with {nick}'s reply?**")
-            critique = await bot.wait_for("message",
+            issue_found = await bot.wait_for("message",
                                           check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
 
             # Update embed and send preview
-            denial_embed.add_field(
-                name=question, value=critique.content, inline=False)
+            denial_embed.add_field(name=question,
+                                   value=issue_found.content, 
+                                   inline=False)
+            
             await ctx.send(embed=denial_embed)
 
             # Ask user if they want to critique more questions and wait for reply
             await ctx.send("Would you like to critique more questions? (y/n)")
-            while True:
-                more = await bot.wait_for("message",
-                                          check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
-                more = more.content.lower()
 
-                # User does not want to critique more questions
-                if more in ["n", "no"]:
-                    transcript = await create_transcript(channel)
+            continue_critiquing = await bot.wait_for("message",
+                                        check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+            continue_critiquing = continue_critiquing.content.lower()
 
-                    # Notify the user that the transcript failed
-                    if not transcript:
-                        return denial_embed.set_footer(text="Transcript creation failed!"), None
+            # User does not want to critique more questions
+            if continue_critiquing not in postive_responses:
+                transcript = await create_transcript(channel)
 
-                    return denial_embed.set_footer(
-                        text="You may reapply in 2 weeks.\nFollowing is the transcript so that you can refer to it while reapplying."), transcript
+                # Notify the user that the transcript failed
+                if not transcript:
+                    return denial_embed.set_footer(text="Transcript creation failed!"), None
 
-                # Break inner loop and let user answer more questions
-                break
+                return denial_embed.set_footer(text="You may reapply in 2 weeks.\
+                                               \nFollowing is the transcript so that you can refer to it while reapplying."), transcript
+
 
     async def inactive(ctx):
         with ctx.channel.typing():
