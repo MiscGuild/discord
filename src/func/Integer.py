@@ -56,14 +56,13 @@ class Integer:
 
         # Loop through all members to find top 10
         for member in guild_data["members"]:
-            if not date:
-                date = list(member["expHistory"].keys())[self.integer]
-            member_gexp[member["uuid"]] = list(
-                member["expHistory"].values())[self.integer]
+            date = list(member["expHistory"].keys())[self.integer]
+            member_gexp[member["uuid"]] = list(member["expHistory"].values())[self.integer]
 
         # Sort member gexp
         member_gexp = sorted(member_gexp.items(),
-                             key=lambda item: item[1], reverse=True)
+                             key=lambda item: item[1], 
+                             reverse=True)
 
         # Get image data
         image_content = f"&f&lDaily Top: {date}&r%5Cn"
@@ -100,4 +99,4 @@ class Integer:
             title=f"{await name_grabber(ctx.author)} purged {self.integer} message(s) in {ctx.channel.name}",
             description=f"**Reason:** {reason}",
             color=neutral_color).set_footer(text="Following is the transcript of the deleted messages"),
-                                                         file=transcript)
+                                            file=transcript)
