@@ -29,8 +29,7 @@ for extension in ["src.cogs.general", "src.cogs.giveaways", "src.cogs.guild", "s
         bot.load_extension(extension)
         print(f"Loaded {extension}")
     except Exception as e:
-        print(f"WARNING: Failed to load extension {extension}", file=sys.stderr)
-        print(e)
+        print(f"WARNING: Failed to load extension {extension}\n{e}", file=sys.stderr)
 
 # Run bot
 bot.run(config["token"])
