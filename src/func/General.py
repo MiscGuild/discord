@@ -331,7 +331,7 @@ class General:
             continue_critiquing = continue_critiquing.content.lower()
 
             # User does not want to critique more questions
-            if continue_critiquing not in postive_responses:
+            if continue_critiquing not in positive_responses:
                 transcript = await create_transcript(channel)
 
                 # Notify the user that the transcript failed
@@ -661,7 +661,7 @@ class General:
         confirmation = await bot.wait_for("message",
                                           check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
         confirmation = confirmation.content.lower()
-        if confirmation not in postive_responses:
+        if confirmation not in positive_responses:
             return "Giveaway cancelled!"
 
         # Send the giveaway in destination channel and add 🎉 reaction
