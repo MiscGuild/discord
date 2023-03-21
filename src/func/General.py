@@ -19,7 +19,7 @@ from src.utils.consts import (accepted_staff_application_embed, active_req,
                               registration_channel_id, registration_embed,
                               staff_application_questions, ticket_categories, 
                               residency_reasons, resident_req, dnkl_entries_not_found, 
-                              postive_responses)
+                              positive_responses)
 from src.utils.db_utils import insert_new_giveaway, select_all, insert_new_residency, select_one, update_residency
 from src.utils.discord_utils import (create_ticket, create_transcript,
                                      get_ticket_creator, log_event,
