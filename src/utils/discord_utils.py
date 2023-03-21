@@ -11,7 +11,7 @@ import src.utils.ui_utils as uiutils
 from src.utils.consts import (config, dnkl_req,
                               gvg_requirements, log_channel_id, neg_color, neutral_color, staff_application_questions,
                               ticket_categories,
-                              unknown_ign_embed, guild_handle, postive_responses)
+                              unknown_ign_embed, guild_handle, positive_responses)
 from src.utils.minecraft_utils import get_player_gexp
 from src.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild, get_guild_level
 
