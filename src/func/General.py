@@ -352,7 +352,7 @@ class General:
         # Retrieve DNKL users so they can be filtered out
         dnkl_uuids = await select_all("SELECT uuid FROM dnkl")
         for tup in dnkl_uuids:
-            dnkl_uuids[dnkl_uuids.index(tup)] = tuple[0]
+            dnkl_uuids[dnkl_uuids.index(tup)] = tup[0]
 
         resident_data = await select_all("SELECT uuid, warnings, warnings_updated FROM residency")
 

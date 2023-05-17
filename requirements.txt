@@ -1,4 +1,4 @@
-aiohttp==3.8.1
+aiohttp==3.8.4
 aiosqlite==0.17.0
 async-timeout==4.0.2
 attrs==22.1.0
@@ -11,7 +11,7 @@ emoji==2.2.0
 grapheme==0.6.0
 idna==3.3
 multidict==6.0.2
-py-cord==2.2.2
+py-cord==2.4
 pytz==2022.2.1
 quickchart.io==1.0.1
 requests==2.28.1
