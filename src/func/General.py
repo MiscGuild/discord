@@ -738,8 +738,8 @@ class General:
             return embed
 
         if gamemode and milestone:
-            if gamemode.upper() in [x for x in milestone_emojis.keys()]:
-                emoji = milestone_emojis.get(gamemode.upper())
+            if gamemode.lower() in [x for x in milestone_emojis.keys()]:
+                emoji = milestone_emojis.get(gamemode.lower())
                 embed = await milestone_ticket_update(ctx, channel, emoji, milestone)
             else:
                 embed = discord.Embed(title="Invalid gamemode inserted!",
