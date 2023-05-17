@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands, bridge
+from discord.commands import option
 
 from src.func.General import General
 from src.func.Integer import Integer
@@ -17,6 +18,12 @@ class Guild(commands.Cog, name="guild"):
         self.bot = bot
 
     @bridge.bridge_command(aliases=["gm", "g", "gexp"])
+    @option(
+        name="name",
+        description="The username of the player whose guild experience you'd like to view",
+        required=False,
+        input_type=str
+    )
     async def gmember(self, ctx, name: str = None):
         """View the given user's guild experience over the past week!"""
         if not name:
@@ -39,6 +46,12 @@ class Guild(commands.Cog, name="guild"):
             await ctx.respond(embed=res)
 
     @bridge.bridge_command(aliases=['dailylb', 'dlb'])
+    @option(
+        name="day",
+        description="Specify the number of days to go back in time and retrieve the corresponding leaderboard (0-6)",
+        required=False,
+        input_type=int
+    )
     async def gtop(self, ctx, day: int = 1):
         f"""View {guild_handle}'s daily guild experience leaderboard!"""
         await ctx.defer()
@@ -64,7 +77,13 @@ class Guild(commands.Cog, name="guild"):
         await ctx.respond(embed=gvg_info_embed)
 
     @bridge.bridge_command(aliases=['mr','myres','myresidence', 'myresident'])
-    async def myresidency(self, ctx, name:str = None):
+    @option(
+        name="name",
+        description="The username of the player whose residency you'd like to view",
+        required=False,
+        input_type=str
+    )
+    async def myresidency(self, ctx, name: str = None):
         if not name:
             name = await name_grabber(ctx.author)
         await ctx.respond(embed=(await General.player_residency(ctx, name)))

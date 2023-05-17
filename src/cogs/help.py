@@ -1,6 +1,7 @@
 import discord
 from discord.errors import Forbidden
 from discord.ext import commands, bridge
+from discord.commands import option
 
 from src.utils.consts import config, neutral_color
 
@@ -44,7 +45,12 @@ class Help(commands.Cog):
         self.bot = bot
 
     @bridge.bridge_command()
-    # @commands.bot_has_permissions(add_reactions=True,embed_links=True)
+    @option(
+        name="module",
+        description="The name of the module or command you'd like to view the details of",
+        required=False,
+        input_type=str
+    )
     async def help(self, ctx, module=None):
         """Shows all modules of the Miscellaneous bot"""
 

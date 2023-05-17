@@ -2,6 +2,7 @@ from __main__ import bot
 
 import discord
 from discord.ext import commands, bridge
+from discord.commands import option
 
 from src.func.General import General
 from src.func.Union import Union
@@ -26,6 +27,18 @@ class Staff(commands.Cog, name="staff"):
 
     @bridge.bridge_command(aliases=["fs"])
     @commands.has_role("Staff")
+    @option(
+        name="member",
+        description="The Discord member who you would like to forcesync",
+        required=True,
+        input_type=discord.Member
+    )
+    @option(
+        name="name",
+        description="Their Minecraft username",
+        required=True,
+        input_type=str
+    )
     async def forcesync(self, ctx, member: discord.Member, name: str):
         """Update a user's discord nick, tag and roles for them!"""
         res = await Union(user=member).sync(ctx, name, None, True)
@@ -36,6 +49,12 @@ class Staff(commands.Cog, name="staff"):
 
     @bridge.bridge_command()
     @commands.has_role("Admin")
+    @option(
+        name="organization_name",
+        description="The name of the organization you are partnering with",
+        required=True,
+        input_type=str
+    )
     async def partner(self, ctx, *, organization_name: str):
         """Create an embed with information about a partner!"""
         await bot.get_channel(partner_channel_id).send(embed=await General.partner(ctx, organization_name))
@@ -50,6 +69,12 @@ class Staff(commands.Cog, name="staff"):
 
     @bridge.bridge_command()
     @commands.has_role("Staff")
+    @option(
+        name="send_ping",
+        description="Enter 'False' if you don't want to ping New Members upon completion of rolecheck",
+        required=False,
+        input_type=bool
+    )
     async def rolecheck(self, ctx, send_ping: bool = True):
         """Sync the names and roles of everyone in the discord!"""
         await General.rolecheck(ctx, send_ping)

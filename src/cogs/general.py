@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands, bridge
+from discord.commands import option
 
 from src.func.String import String
 from src.func.Union import Union
@@ -14,12 +15,24 @@ class General(commands.Cog, name="general"):
         self.bot = bot
 
     # Command from https://github.com/Rapptz/RoboDanny
-    @bridge.bridge_command(aliases=['src'])
+    @bridge.bridge_command(name="source", aliases=['src'])
+    @option(
+        name="command",
+        description="The command you would like to see the source code for",
+        required=False,
+        input_type=str
+    )
     async def source(self, ctx, *, command: str = None):
-        """View the source code for a command!"""
+        """View the source code for the bot or a specific command"""
         await ctx.respond(await String(string=command).source())
 
     @bridge.bridge_command()
+    @option(
+        name="user",
+        description="User whose avatar you'd like to view",
+        required=False,
+        input_type=discord.Member
+    )
     async def avatar(self, ctx, user: discord.Member = None):
         """See the avatar of a given user!"""
         await ctx.respond(embed=await Union(user=user or ctx.author).avatar())
