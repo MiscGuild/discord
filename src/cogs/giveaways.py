@@ -1,4 +1,6 @@
-from discord.ext import commands
+from discord.ext import commands, bridge
+from discord.commands import option
+
 
 from src.func.General import General
 from src.func.Integer import Integer
@@ -12,29 +14,47 @@ class Giveaways(commands.Cog, name="giveaways"):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=["gcreate"])
+    @bridge.bridge_command(aliases=["gcreate"])
     @commands.has_role("Giveaway Creator")
     async def giveawaycreate(self, ctx):
         """Create a giveaway!"""
         await ctx.respond(await General.giveawaycreate(ctx))
 
-    @commands.command(aliases=["gend", "giveawayfinish", "gfinish"])
+    @bridge.bridge_command(aliases=["gend", "giveawayfinish", "gfinish"])
     @commands.has_role("Giveaway Creator")
-    async def giveawayend(self, ctx, message_ID: int):
+    @option(
+        name="message_id",
+        description="The message ID of the giveaway you would like to end",
+        required=True,
+        input_type=int
+    )
+    async def giveawayend(self, ctx, message_id: int):
         """Ends the giveaway with the given message ID!"""
-        res = await Integer(integer=message_ID).giveawayend()
+        res = await Integer(integer=message_id).giveawayend()
         if res:
             await ctx.respond(res)
 
-    @commands.command(aliases=["greroll", "reroll"])
+    @bridge.bridge_command(aliases=["greroll", "reroll"])
     @commands.has_role("Giveaway Creator")
-    async def giveawayreroll(self, ctx, message_ID: int, reroll_number: int = None):
+    @option(
+        name="message_id",
+        description="The message ID of the giveaway you would like to end",
+        required=True,
+        input_type=int
+    )
+    @option(
+        name="reroll_number",
+        description="Number of winners you would like to generate in the reroll",
+        required=False,
+        input_type=int
+    )
+    async def giveawayreroll(self, ctx, message_id: int, reroll_number: int = None):
         """Rerolls the giveaway with the given message ID!"""
-        res = await Integer(integer=message_ID).giveawayreroll(reroll_number)
+        res = await Integer(integer=message_id).giveawayreroll(reroll_number)
         if res:
             await ctx.respond(res)
 
-    @commands.command(aliases=["glist"])
+    @bridge.bridge_command(aliases=["glist"])
     async def giveawaylist(self, ctx):
         """View all giveaway from the last 10 days!"""
         await ctx.respond(embed=await General.giveawaylist(ctx))

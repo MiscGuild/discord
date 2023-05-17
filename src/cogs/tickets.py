@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands, bridge
+from discord.commands import option
 
+from src.utils.consts import milestone_categories
 from src.func.General import General
 from src.func.Listener import Listener
 from src.func.String import String
@@ -16,6 +18,12 @@ class Tickets(commands.Cog, name="tickets"):
         self.bot = bot
 
     @bridge.bridge_command(aliases=["reg", "verify"])
+    @option(
+        name="name",
+        description="Your Minecraft username",
+        required=True,
+        input_type=str
+    )
     async def register(self, ctx, name: str):
         """Register with your IGN to sync your roles!"""
         res = await Union(user=ctx.author).register(ctx, name)
@@ -34,6 +42,12 @@ class Tickets(commands.Cog, name="tickets"):
 
     @bridge.bridge_command()
     @commands.has_role("Staff")
+    @option(
+        name="member",
+        description="The Discord user you would like to add to the ticket",
+        required=True,
+        input_type=discord.Member
+    )
     async def add(self, ctx, member: discord.Member):
         """Add a user to a ticket!"""
         res = await Union(user=member).add(ctx)
@@ -44,6 +58,12 @@ class Tickets(commands.Cog, name="tickets"):
 
     @bridge.bridge_command()
     @commands.has_role("Staff")
+    @option(
+        name="member",
+        description="The Discord user you would like to remove from the ticket",
+        required=True,
+        input_type=discord.Member
+    )
     async def remove(self, ctx, member: discord.Member):
         """Remove a user from a ticket!"""
         res = await Union(user=member).remove(ctx)
@@ -54,6 +74,12 @@ class Tickets(commands.Cog, name="tickets"):
 
     @bridge.bridge_command()
     @commands.has_role("Staff")
+    @option(
+        name="channel_name",
+        description="The new name for the channel",
+        required=False,
+        input_type=str
+    )
     async def rename(self, ctx, *, channel_name: str):
         """Rename a ticket!"""
         await ctx.respond(embed=await String(string=channel_name).rename(ctx))
@@ -82,6 +108,12 @@ class Tickets(commands.Cog, name="tickets"):
 
     @bridge.bridge_command()
     @commands.has_any_role("Admin", "Moderator")
+    @option(
+        name="channel",
+        description="The name of the channel where the staff application is",
+        required=True,
+        input_type=discord.TextChannel
+    )
     async def deny(self, ctx, channel: discord.TextChannel):
         """Deny a staff application!"""
         # Get result and send file if it is returned
@@ -97,6 +129,12 @@ class Tickets(commands.Cog, name="tickets"):
 
     @bridge.bridge_command(aliases=['AddMilestone'])
     @commands.has_role('Staff')
+    @option(
+        name="gamemode",
+        description="The gamemode in which the milestone was achieved",
+        choices= [discord.OptionChoice(v, value=k) for k,v in milestone_categories.items()],
+        required=False
+    )
     async def milestoneadd(self, ctx, gamemode: str = None, *, milestone: str = None):
         """Register a milestone"""
         embed, view = await General.add_milestone(ctx, gamemode, milestone)
