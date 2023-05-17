@@ -63,20 +63,37 @@ pronoun_roles = {
     "Other": "❓",
 }
 
+milestone_categories = {
+    "hypixel": "Hypixel",
+    "bedwars": "BedWars",
+    "skywars": "SkyWars",
+    "duels": "Duels",
+    "skyblock": "SkyBlock",
+    "build_battle": "Build Battle",
+    "arcade": "Arcade",
+    "turbo_kart_racers": "Turbo Kart Racers",
+    "pit": "The Pit",
+    "murder_mystery": "Murder Mystery",
+    "miscellaneous": "Miscellaneous",
+    "discord": "Discord",
+    "other": "Other"
+}
+
+
 milestone_emojis = {
-    "HYPIXEL": "<:hypixel:823036946984730662>",
-    "BEDWARS": "<:BedWars64:823036962150547477>",
-    "SKYWARS": "<:Skywars:823036980526972948>",
-    "DUELS": "<:Duels:823036885089255434>",
-    "SKYBLOCK": "<:sb:732824932177805405>",
-    "BUILD_BATTLE": "<:buildbattle:828113746978406481>",
-    "ARCADE": "<:arcade:825723888477929472>",
-    "TURBO_KART_RACERS": "<:TurboKartRacers64:846306861950304267>",
-    "PIT": "<:pit:851361342744690728>",
-    "MURDER_MYSTERY": "<:MurderMystery64:823036899974447105>",
-    "MISCELLANEOUS": "<:Misc:540990817872117780>",
-    "DISCORD": "<:discord:977349801412788266>",
-    "OTHER": "❓"
+    "hypixel": "<:hypixel:823036946984730662>",
+    "bedwars": "<:BedWars64:823036962150547477>",
+    "skywars": "<:Skywars:823036980526972948>",
+    "duels": "<:Duels:823036885089255434>",
+    "skyblock": "<:sb:732824932177805405>",
+    "build_battle": "<:buildbattle:828113746978406481>",
+    "arcade": "<:arcade:825723888477929472>",
+    "turbo_kart_racers": "<:TurboKartRacers64:846306861950304267>",
+    "pit": "<:pit:851361342744690728>",
+    "murder_mystery": "<:MurderMystery64:823036899974447105>",
+    "miscellaneous": "<:Misc:540990817872117780>",
+    "discord": "<:discord:977349801412788266>",
+    "other": "❓"
 }
 
 residency_reasons = {
