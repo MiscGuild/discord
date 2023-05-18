@@ -18,9 +18,9 @@ from src.utils.consts import (accepted_staff_application_embed, active_req,
                               neutral_color, pos_color, ticket_deleted_embed,
                               registration_channel_id, registration_embed,
                               staff_application_questions, ticket_categories, 
-                              residency_reasons, resident_req, dnkl_entries_not_found, 
+                              resident_req, dnkl_entries_not_found,
                               positive_responses)
-from src.utils.db_utils import insert_new_giveaway, select_all, insert_new_residency, select_one, update_residency
+from src.utils.db_utils import insert_new_giveaway, select_all
 from src.utils.discord_utils import (create_ticket, create_transcript,
                                      get_ticket_creator, log_event,
                                      name_grabber, get_ticket_properties,
@@ -354,10 +354,8 @@ class General:
         for tup in dnkl_uuids:
             dnkl_uuids[dnkl_uuids.index(tup)] = tuple[0]
 
-        resident_data = await select_all("SELECT uuid, warnings, warnings_updated FROM residency")
-
         # Define dicts for each category of users
-        to_promote_active, to_demote_active, to_promote_resident, to_demote_resident, inactive, skipped_users = {}, {}, {}, {}, {}, []
+        to_promote_active, to_demote_active, to_demote_resident, inactive, skipped_users = {}, {}, {}, {}, []
 
         # Loop through all guild members with a session to fetch names
         for member in guild_data["members"]:
@@ -380,24 +378,9 @@ class General:
             guild_rank = member["rank"]
             # Remove dnkl users from list
 
-            if guild_rank == "Resident" or uuid in [data[0] for data in resident_data]:  # data[0] is the uuid
-                if uuid in [data[0] for data in resident_data]:
-                    warnings = [data[1] for data in resident_data if data[0] == uuid][0]
-                    warnings_updated = [data[2] for data in resident_data if data[0] == uuid][0]
-                    current_date = datetime.now().strftime("%Y/%d/%m")
-
-                    if weekly_exp < resident_req and (not warnings_updated or warnings_updated < current_date):
-                        warnings += 1
-                        warnings_updated = current_date
-                        individual_data = (await select_all(f"SELECT * FROM residency where uuid == '{uuid}'"))[0]
-                        await update_residency(individual_data[0], individual_data[2], individual_data[3], warnings,
-                                                warnings_updated)
-
-                if uuid in [data[0] for data in resident_data] and guild_rank != "Resident":
-                    to_promote_resident[name] = weekly_exp
-                elif guild_rank == "Resident" and uuid not in [data[0] for data in resident_data]:
+            if guild_rank == "Resident":
+                if weekly_exp < resident_req:
                     to_demote_resident[name] = weekly_exp
-
 
             # Members who need to be promoted
             elif guild_rank == "Member" and weekly_exp >= active_req:
@@ -425,7 +408,6 @@ class General:
         for _dict, title, color in [[to_promote_active, "Promote the following users to active:", pos_color],
                                     [to_demote_active, "Demote the following users from active:",
                                         neg_color],
-                                    [to_promote_resident, "Promote the following to resident:", 0xe5ba6c],
                                     [to_demote_resident, "Demote the following from resident:", neg_color],
                                     [inactive, "Following are the users to be kicked:", neg_color]]:
             # Filter categories with no users
@@ -831,119 +813,3 @@ class General:
         milestone_message = milestone_message + "\n**Congrats to everyone this week. If you wish to submit a milestone, look over at <#650248396480970782>!**"
         await bot.get_channel(milestones_channel).send(milestone_message)
         return f"{count} milestones have been compiled and sent in {bot.get_channel(milestones_channel)}"
-
-    async def resident_membership(ctx, member: discord.Member = None, reason: int = None):
-        if not (member and reason):
-            await ctx.send(embed=discord.Embed(title="Who would you like to grant residency to?",
-                                               description="Kindly mention the user",
-                                               color=neutral_color))
-            member = await bot.wait_for("message",
-                                        check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
-            member_id = member.content[2:-1]
-            member = bot.guild.get_member(int(member.content[2:-1]))
-
-            name = await name_grabber(member)
-            ign, uuid = await get_mojang_profile(name)
-
-            class ReasonSelect(discord.ui.Select):
-                def __init__(self):
-                    super().__init__()
-                    index = 1
-                    for reason, value in residency_reasons.items():
-                        self.add_option(label=f"{reason.title()}",
-                                        value=f"{value[1]}|{reason.title()}",
-                                        emoji=value[0])
-                        index += 1
-
-                # Override default callback
-                async def callback(self, interaction: discord.Interaction):
-                    # Set option var
-                    values = (list(interaction.data.values())[0][0]).split("|")
-                    duration = eval(values[0])
-                    reason = values[1]
-                    existing_record = await select_one(
-                        "SELECT time_of_finish, warnings, warnings_updated FROM residency WHERE discord_id = (?)",
-                        (member_id,))
-                    if reason == "Gvg":
-                        embed = discord.Embed(title=f"Did {ign} win the GvG?", color=neutral_color)
-                        GvGView = discord.ui.View(timeout=15)  # View for staff members to approve/deny the DNKL
-                        buttons = [["Yes", "GvG_Residency_Positive", discord.enums.ButtonStyle.green],
-                                   ["No", "GvG_Residency_Negative", discord.enums.ButtonStyle.red]]
-                        # Loop through the list of roles and add a new button to the view for each role.
-                        for button in buttons:
-                            # Get the role from the guild by ID.
-                            GvGView.add_item(
-                                uiutils.Button_Creator(channel=ctx.channel, ign=ign, button=button, member=member,
-                                                       uuid=uuid))
-
-                        await interaction.response.send_message(embed=embed, view=GvGView)
-                        bot_response = await bot.wait_for("message",
-                                                          check=lambda
-                                                              x: x.channel == ctx.channel and x.author.id == bot.user.id)
-                        color = int(
-                            (bot_response.embeds[0]).to_dict()[
-                                'color'])  # Gets the color of the embed to determine win/loss
-
-                        if color == neutral_color:  # Won the GvG
-                            duration = timedelta(weeks=residency_reasons['GVG'][1]['WIN'])
-                        elif color == neg_color:  # Lost the GvG
-                            duration = timedelta(weeks=residency_reasons['GVG'][1]['LOSS'])
-
-                    elif reason == "Donor":
-                        while True:
-                            await interaction.response.send_message(
-                                "**How much money did the user donate?**\nOnly reply with the number in USD")
-                            donation_amount = await bot.wait_for("message",
-                                                                 check=lambda
-                                                                     x: x.channel == ctx.channel and x.author == ctx.author)
-                            donation_amount = donation_amount.content
-                            if donation_amount.isnumeric():
-                                duration = timedelta(
-                                    weeks=((int(donation_amount) // 5) * residency_reasons["DONOR"][1]))
-                                break
-                            else:
-                                await ctx.send("**Invalid donation amount. Please only give the number.**\n"
-                                               "For example, if someone donated 65 USD, you respond with `65`")
-                                continue
-
-                    elif reason == "Booster":
-                        duration = timedelta(weeks=(residency_reasons["BOOSTER"][1]))
-                    elif reason == "Youtuber":
-                        duration = timedelta(weeks=(residency_reasons["YOUTUBER"][1]))
-
-                    if existing_record:
-                        end = (datetime.strptime(existing_record[0], "%Y-%m-%d %H:%M") + duration).strftime(
-                            "%Y-%m-%d %H:%M")
-                        await update_residency(member_id, reason, end)
-                        await ctx.send(f"**{ign} is already a resident so their residency was extended**\n"
-                                       f"Their residency ends on {str(end)}")
-                    if not existing_record:
-                        end = (datetime.now() + duration).strftime("%Y-%m-%d %H:%M")
-                        await insert_new_residency(member_id, uuid, reason, end)
-                        await ctx.send(f"**{ign} has been granted residency!**\n"
-                                       f"Their residency ends on {str(end)}")
-
-            view = discord.ui.View()
-            view.add_item(ReasonSelect())
-            await ctx.send(embed=discord.Embed(title=f"Why should {ign} gain residency?",
-                                               color=neutral_color), view=view)
-
-    async def resident_list(ctx):
-        residents = await select_all("SELECT * FROM residency")
-        embed = discord.Embed(title="Residents", color=neutral_color)
-        for resident in residents:
-            name = await get_name_by_uuid(resident[1])
-            embed.add_field(name=name, value=f"Reason: {resident[2]}\nWarnings: {resident[4]}\nEnd Date: {resident[3]}")
-        return embed
-
-    async def player_residency(ctx, name: str):
-        residents = await select_all("SELECT * FROM residency")
-        ign, uuid = await get_mojang_profile(name)
-        for resident in residents:
-            if resident[1] == uuid:
-                embed = discord.Embed(title=f"Resident - {ign}",
-                                      description=f"Reason: {resident[2]}\nWarnings: {resident[4]}\nEnd Date: {resident[3]}",
-                                      color=neutral_color)
-                embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
-                return embed
-        return discord.Embed(title="You are not a resident!", color=neg_color)

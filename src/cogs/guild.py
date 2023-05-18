@@ -76,19 +76,6 @@ class Guild(commands.Cog, name="guild"):
         f"""View information about {guild_handle}'s GvG team and the requirements!!"""
         await ctx.respond(embed=gvg_info_embed)
 
-    @bridge.bridge_command(aliases=['mr','myres','myresidence', 'myresident'])
-    @option(
-        name="name",
-        description="The username of the player whose residency you'd like to view",
-        required=False,
-        input_type=str
-    )
-    async def myresidency(self, ctx, name: str = None):
-        if not name:
-            name = await name_grabber(ctx.author)
-        await ctx.respond(embed=(await General.player_residency(ctx, name)))
-
-
 
 def setup(bot):
     bot.add_cog(Guild(bot))

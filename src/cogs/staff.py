@@ -79,16 +79,6 @@ class Staff(commands.Cog, name="staff"):
         """Sync the names and roles of everyone in the discord!"""
         await General.rolecheck(ctx, send_ping)
 
-    @bridge.bridge_command(aliases=[])
-    @commands.has_role("Moderator")
-    async def residency(self, ctx, member: discord.Member = None, reason: int = None):
-        """Used to update a member's residency in the guild!"""
-        await General.resident_membership(ctx, member, reason)
-
-    @bridge.bridge_command(aliases=['rl', 'reslist', 'residencylist'])
-    @commands.has_role("Staff")
-    async def residentlist(self, ctx):
-        await ctx.respond(embed=(await General.resident_list(ctx)))
 
 
 def setup(bot):
