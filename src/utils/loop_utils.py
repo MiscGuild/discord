@@ -5,8 +5,8 @@ from discord.ext import tasks
 
 from src.func.General import General
 from src.func.Integer import Integer
-from src.utils.consts import weekly_lb_channel, daily_lb_channel, resident_removed
-from src.utils.db_utils import (connect_db, select_all, delete_residency)
+from src.utils.consts import weekly_lb_channel, daily_lb_channel
+from src.utils.db_utils import (connect_db, select_all)
 from src.utils.giveaway_utils import roll_giveaway
 
 
@@ -52,34 +52,3 @@ async def send_gexp_lb():
 @send_gexp_lb.before_loop
 async def before_gexp_lb():
     await bot.wait_until_ready()
-
-
-@tasks.loop(hours=24)
-async def check_residents():
-    residents = await select_all("SELECT * FROM residency")
-    for record in residents:
-        if record[2] == "Youtuber":
-            continue
-        current_date = datetime.now()
-        user = await bot.fetch_user(record[0])
-        end_date = datetime.strptime(record[3], "%Y-%m-%d %H:%M")
-        warnings = record[4]
-        if current_date.date() > end_date.date():
-            try:
-                await user.send(embed=resident_removed.set_footer(text=f"Reason: Your residency expired on {end_date}."))
-            except:
-                print(f"{user} has DMs disabled.")
-            await delete_residency(record[0])
-        elif warnings > 15:
-            try:
-                await user.send(embed=resident_removed.set_footer(
-                text=f"Reason: You failed to meet resident requirements for more than 15 days."))
-            except:
-                print(f"{user} has DMs disabled.")
-            await delete_residency(record[0])
-
-
-@check_residents.before_loop
-async def before_check_residents():
-    await bot.wait_until_ready()
-    await connect_db()

@@ -154,7 +154,6 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                                               description=f"You have {format(weekly_gexp, ',d')} weekly guild experience!",
                                                               color=neutral_color))
                     await dnkl_application(ign, uuid, ticket, interaction.user)
-
                 if option == "I want to join the staff team":
                     # Edit category and send info embed with requirements
                     await ticket.edit(name=f"staff-application-{ign}", topic=f"{interaction.user.id}|",
@@ -328,7 +327,6 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     await interaction.response.send_modal(
                         modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, title="GvG Request"))
                     return
-
                 if option == f"My guild wishes to ally {guild_handle}":
                     await ticket.edit(name=f"alliance-request-{ign}", topic=f"{interaction.user.id}|",
                                       category=discord.utils.get(interaction.guild.categories,
@@ -356,7 +354,6 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     await interaction.response.send_modal(
                         modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, title="Alliance Request"))
                     return
-
                 if option == "Other":
                     await ticket.edit(name=f"other-{ign}", topic=f"{interaction.user.id}|",
                                       category=discord.utils.get(interaction.guild.categories,
@@ -479,10 +476,9 @@ async def after_cache_ready():
     bot.staff_names = [(await get_mojang_profile(await name_grabber(member)))[0] for member in bot.staff.members]
 
 
-    from src.utils.loop_utils import check_giveaways, send_gexp_lb, check_residents
+    from src.utils.loop_utils import check_giveaways, send_gexp_lb
     check_giveaways.start()
     send_gexp_lb.start()
-    check_residents.start()
 
 
 @after_cache_ready.before_loop

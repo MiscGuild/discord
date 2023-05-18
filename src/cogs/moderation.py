@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands, bridge
 from discord.commands import option
-
 from src.func.Integer import Integer
 from src.func.Union import Union
 

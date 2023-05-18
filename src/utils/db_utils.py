@@ -26,15 +26,6 @@ async def connect_db():
         sponsors text NOT NULL,
         is_active boolean NOT NULL)""")
 
-    # Residents table:
-    await bot.db.execute("""CREATE TABLE IF NOT EXISTS residency(
-    discord_id integer PRIMARY KEY NOT NULL,
-    uuid text NOT NULL,
-    reason text NOT NULL,
-    time_of_finish text NOT NULL,
-    warnings integer,
-    warnings_updated text)""")
-
     # Commit any changes
     await bot.db.commit()
 
@@ -95,21 +86,3 @@ async def set_giveaway_inactive(id: int):
     await bot.db.execute(f"Update giveaways SET is_active = 0 WHERE message_id = (?)", (id,))
     await bot.db.commit()
 
-
-async def insert_new_residency(discord_id: int, uuid: str, reason: str, time_of_finish: str, warnings: int = 0,
-                               warnings_updated: str = ""):
-    await bot.db.execute(f"INSERT INTO residency VALUES (?, ?, ?, ?, ?, ?)",
-                         (discord_id, uuid, reason, time_of_finish, warnings, warnings_updated))
-    await bot.db.commit()
-
-
-async def update_residency(discord_id: int, reason: str, time_of_finish: str, warnings: int = 0, warnings_updated: str = 0):
-    await bot.db.execute(
-        "UPDATE residency SET reason = (?), time_of_finish = (?), warnings = (?), warnings_updated = (?) WHERE discord_id = (?)",
-        (reason, time_of_finish, warnings, warnings_updated, discord_id))
-    await bot.db.commit()
-
-
-async def delete_residency(discord_id: int):
-    await bot.db.execute("DELETE FROM residency WHERE discord_id = (?)", (discord_id,))
-    await bot.db.commit()
