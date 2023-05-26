@@ -289,6 +289,8 @@ discord_not_linked_embed = discord.Embed(title="This account is not linked to yo
 discord_not_linked_embed.set_image(
     url="https://media.discordapp.net/attachments/796061149593731128/953770877395284008/osl_.gif")
 
+rainbow_separator = "http://rainbowdivider.com/images/dividers/movrblin02.gif"
+
 
 class ChatColor(Enum):
     RED = "&c"

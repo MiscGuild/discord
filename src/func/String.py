@@ -11,7 +11,7 @@ from quickchart import QuickChart
 from src.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed,
                               months, neg_color, neutral_color, pos_color,
                               qotd_ans_channel_id, qotd_channel_id,
-                              ticket_categories, unknown_ign_embed)
+                              ticket_categories, unknown_ign_embed, rainbow_separator)
 from src.utils.db_utils import (delete_dnkl, insert_new_dnkl, select_one,
                                 update_dnkl)
 from src.utils.discord_utils import dnkl_application
@@ -277,5 +277,4 @@ class String:
 
         await bot.get_channel(qotd_channel_id).send("<@&923978802818871356>", embed=embed)
         await ctx.send(f"**The QOTD has been sent to <#{qotd_channel_id}>!**")
-        await bot.get_channel(qotd_ans_channel_id).send(
-            "https://i.imgur.com/4M7IWwP.gif")
+        await bot.get_channel(qotd_ans_channel_id).send(rainbow_separator)
