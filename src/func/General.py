@@ -95,7 +95,7 @@ class General:
         # Define arrays for guild and ally uuids and names
         guild_members = (await get_guild_by_name(guild_handle))['members']
         guild_uuids = await get_guild_uuids(guild_handle)
-        guild_names, ally_names, ally_uuids, ally_divisions = [], [], [], []
+        guild_usernames, ally_usernames, ally_uuids, ally_divisions = [], [], [], []
 
         # Appending UUIDs of members of all ally guilds into one array
         for ally in allies:
@@ -103,8 +103,8 @@ class General:
             ally_uuids.extend(await get_guild_uuids(ally))
             req = await get_player_guild(ally_uuids[-1])
             gtag = " " if not req["tag"] or not req else req["tag"]
-            ally_divisions.append([len(ally_uuids),
-                                   gtag])  # Ally divisions marks the separation point of one guild from another in the ally_uuids array along with the guild's gtag
+            ally_divisions.append([len(ally_uuids), gtag])
+            # Ally divisions marks the separation point of one guild from another in the ally_uuids array along with the guild's gtag
 
         # Limiting the maximum concurrency
         async def gather_with_concurrency(n, *tasks):
@@ -118,56 +118,56 @@ class General:
 
         # Get guild and ally names from their respective UUIDs
         await progress_message.edit(content="Retrieving names...")
-        for _set in [[guild_uuids, guild_names], [ally_uuids, ally_names]]:
+        for _set in [[guild_uuids, guild_usernames], [ally_uuids, ally_usernames]]:
             draw, dump = _set
             async with aiohttp.ClientSession():
                 tasks = await gather_with_concurrency(2,
                                                       *[
                                                           get_name_by_uuid(uuid) for uuid in draw
-                                                      ])  # Gathering with a max concurrency of 5
+                                                      ])  # Gathering with a max concurrency of 2
             dump.extend(tasks)
         # Loop through discord members
         await ctx.send("If you see the bot is stuck on a member along with an error message, "
                        "forcesync member the bot is stuck on.")
         bot.admin_ids = [member.id for member in bot.admin.members]
-        for member in bot.guild.members:
+        for discord_member in bot.guild.members:
             # Do not check admins and bots
-            if member.id in bot.admin_ids or member.bot:
+            if discord_member.id in bot.admin_ids or discord_member.bot:
                 continue
 
-            name = await name_grabber(member)
-            canTag = await has_tag_perms(member)
-            await progress_message.edit(content=f"Checking {name} - {member}")
+            username = await name_grabber(discord_member)
+            has_tag_permission = await has_tag_perms(discord_member)
+            await progress_message.edit(content=f"Checking {username} - {discord_member}")
             # Member of guild
-            if name in guild_names:
-                # Checks if the member meets the requirements for the active rank
+            if username in guild_usernames:
                 for guild_member in guild_members:
-                    if guild_uuids[guild_names.index(name)] == guild_member[
-                        'uuid']:  # Finds the users uuid from their name using the list and finds their corresponding hypixel data
-                        weekly_exp = sum(guild_member["expHistory"].values())
-                        if weekly_exp >= active_req:  # If the member meets the active requirements
-                            await member.add_roles(bot.active_role)
-                        elif weekly_exp < active_req and bot.active_role in member.roles:  # If the member doesn't meet active requirements but has the active role
-                            await member.remove_roles(bot.active_role)
+                    if guild_uuids[guild_usernames.index(username)] == guild_member['uuid']:
+                        # Finds a given UUID's corresponding hypixel data
 
-                if not canTag:
-                    await member.edit(nick=name)
+                        weekly_exp = sum(guild_member["expHistory"].values())
+                        if weekly_exp >= active_req:    # Meets active req
+                            await discord_member.add_roles(bot.active_role)
+                        elif weekly_exp < active_req and bot.active_role in discord_member.roles:   # Doesn't meet active req
+                            await discord_member.remove_roles(bot.active_role)
+
+                if not has_tag_permission:
+                    await discord_member.edit(nick=username)
 
                 # Edit roles
-                await member.add_roles(bot.member_role)
-                await member.remove_roles(bot.new_member_role, bot.guest, bot.ally)
+                await discord_member.add_roles(bot.member_role)
+                await discord_member.remove_roles(bot.new_member_role, bot.guest, bot.ally)
                 continue
 
             # Get player data
-            name, uuid = await get_mojang_profile(name)
-            if not name:
+            username, uuid = await get_mojang_profile(username)
+            if not username:
                 # Edit roles and continue loop
-                await member.remove_roles(bot.member_role, bot.ally, bot.guest)
-                await member.add_roles(bot.new_member_role)
+                await discord_member.remove_roles(bot.member_role, bot.ally, bot.guest, bot.active_role)
+                await discord_member.add_roles(bot.new_member_role)
                 continue
 
             # Member of an ally guild
-            if name in ally_names:
+            if username in ally_usernames:
                 # Get player gtag
                 position = ally_uuids.index(uuid)
                 last_value = 1
@@ -181,20 +181,20 @@ class General:
                     last_value = guild_division[0]
 
                 # Set nick
-                if not member.nick or gtag not in member.nick:
-                    await member.edit(nick=name + f' [{gtag}]')
+                if not discord_member.nick or gtag not in discord_member.nick:
+                    await discord_member.edit(nick=username + f' [{gtag}]')
 
                 # Edit roles
-                await member.add_roles(bot.guest, bot.ally)
-                await member.remove_roles(bot.new_member_role, bot.member_role, bot.active_role)
+                await discord_member.add_roles(bot.guest, bot.ally)
+                await discord_member.remove_roles(bot.new_member_role, bot.member_role, bot.active_role)
                 continue
 
             # Guests
             else:
-                if not canTag:
-                    await member.edit(nick=name)
-                await member.add_roles(bot.guest)
-                await member.remove_roles(bot.new_member_role, bot.member_role, bot.active_role, bot.ally)
+                if not has_tag_permission:
+                    await discord_member.edit(nick=username)
+                await discord_member.add_roles(bot.guest)
+                await discord_member.remove_roles(bot.new_member_role, bot.member_role, bot.active_role, bot.ally)
                 continue
 
         # Send ping to new member role in registration channel
@@ -698,7 +698,7 @@ class General:
             async def callback(self, interaction: discord.Interaction):
                 # Set option var and delete Select, so it cannot be used twice
                 option = list(interaction.data.values())[0][0]
-                option_emoji = milestone_emojis.get(option.upper())
+                option_emoji = milestone_emojis.get(option.lower())
 
                 await interaction.response.send_message(f"**Milestone Category:** {option}"
                                                         f"\n**What is {name}'s milestone?**\n"

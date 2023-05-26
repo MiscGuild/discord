@@ -54,8 +54,7 @@ class Help(commands.Cog):
     async def help(self, ctx, module=None):
         """Shows all modules of the Miscellaneous bot"""
 
-        prefix = config['prefix']
-        version = 1.0
+        prefix = config['prefix'] if not ctx.is_app else '/'
 
         async def predicate(cmd):
             try:
@@ -128,8 +127,8 @@ class Help(commands.Cog):
                                         color=discord.Color.green())
 
                     # getting commands from cog
-                    for command in self.bot.get_cog(cog).get_commands()[
-                                   ::2]:  # Ignores all the duplicate commands returned by bridge slash commands
+                    for command in self.bot.get_cog(cog).get_commands()[::3]:  # Ignores all the duplicate commands returned by bridge slash commands
+
                         syntax = f"{prefix}{command.name}"
                         for key, value in command.clean_params.items():
                             if not value.default:
