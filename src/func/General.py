@@ -761,7 +761,7 @@ class General:
 
         channel_details = await get_ticket_properties(ctx.channel)
         # Has a list in the format ["MEMBER ID","MILESTONE 1", "MILESTONE 2"....}
-        all_milestones = channel_details[ 1:-1]
+        all_milestones = channel_details[1:-1]
         # Omits the Member ID from channel_description_list and also an empty string from the end
 
         class MilestoneTypeSelect(discord.ui.Select):

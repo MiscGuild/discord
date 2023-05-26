@@ -13,7 +13,7 @@ from src.utils.consts import (active_req, allies, bot_missing_perms_embed,
                               staff_impersonation_embed, ticket_categories,
                               unknown_ign_embed)
 from src.utils.discord_utils import (check_tag, create_ticket, has_tag_perms,
-                                     is_linked_discord, get_rank_role)
+                                     is_linked_discord)
 from src.utils.request_utils import (get_gtag, get_hypixel_player,
                                      get_mojang_profile, get_player_guild, get_rank)
 
@@ -97,10 +97,6 @@ class Union:
         player_data = await get_hypixel_player(uuid=uuid)
         guild_data = await get_player_guild(uuid)
         rank = await get_rank(uuid)
-        rank_role = await get_rank_role(rank)
-
-        if rank_role:   # Checks if the player has a rank
-            roles_to_add.append(rank_role)
 
         # Account is not linked to discord
         if not await is_linked_discord(player_data, self.user) and is_fs is False:
@@ -166,9 +162,7 @@ class Union:
             return "This command can only be used in the registration channel!"
 
         ign, uuid = await get_mojang_profile(name)
-        rank_role = await get_rank_role(await get_rank(uuid))
-        if rank_role:
-            await ctx.author.add_roles(rank_role, reason=f"Registration - {rank_role.name}")
+
 
         if not ign:
             return unknown_ign_embed
