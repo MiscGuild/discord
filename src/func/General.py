@@ -698,7 +698,7 @@ class General:
             async def callback(self, interaction: discord.Interaction):
                 # Set option var and delete Select, so it cannot be used twice
                 option = list(interaction.data.values())[0][0]
-                option_emoji = milestone_emojis.get(option.upper())
+                option_emoji = milestone_emojis.get(option.lower())
 
                 await interaction.response.send_message(f"**Milestone Category:** {option}"
                                                         f"\n**What is {name}'s milestone?**\n"
