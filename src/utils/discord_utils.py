@@ -460,9 +460,10 @@ async def after_cache_ready():
     bot.staff_names = [(await get_mojang_profile(await name_grabber(member)))[0] for member in bot.staff.members]
 
 
-    from src.utils.loop_utils import check_giveaways, send_gexp_lb
+    from src.utils.loop_utils import check_giveaways, send_gexp_lb, updategexp
     check_giveaways.start()
     send_gexp_lb.start()
+    updategexp.start()
 
 
 @after_cache_ready.before_loop

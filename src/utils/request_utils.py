@@ -68,7 +68,7 @@ async def get_name_by_uuid(uuid: str):
         i += 1
         resp = await get_json_response(f"https://sessionserver.mojang.com/session/minecraft/profile/{uuid}")
         # Player does not exist
-        if not resp:
+        if not resp or "errorMessage" in resp:
             continue
 
         return resp["name"]
