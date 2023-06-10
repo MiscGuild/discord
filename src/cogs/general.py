@@ -6,6 +6,7 @@ from src.func.String import String
 from src.func.Union import Union
 
 
+
 class General(commands.Cog, name="general"):
     """
     Contains source, avatar, qotd.
@@ -37,14 +38,25 @@ class General(commands.Cog, name="general"):
         """See the avatar of a given user!"""
         await ctx.respond(embed=await Union(user=user or ctx.author).avatar())
 
-    @bridge.bridge_command()
+    @commands.slash_command()
     @commands.has_any_role("QOTD Manager", "Staff")
     async def qotd(self, ctx):
         """Used by QOTD Managers to register a QOTD"""
-        await ctx.respond("**What is the question of the day?**")
-        question = await self.bot.wait_for("message",
-                                           check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
-        await String(string=question.content).qotd(ctx)
+
+        class ModalCreator(discord.ui.Modal):
+            def __init__(self) -> None:
+                #   fields = ["LABEL", "PLACEHOLDER", STYLE]
+                super().__init__(title="QOTD Creator")
+                self.add_item(discord.ui.InputText(label="What is the question of the day?", placeholder="Enter the question here", style=discord.InputTextStyle.long))
+
+
+            async def callback(self, interaction: discord.Interaction):
+                await interaction.response.send_message("The QOTD has been sent!")
+                await String(string=self.children[0].value).qotd(ctx)
+
+
+        await ctx.send_modal(modal=ModalCreator())
+
 
 
 def setup(bot):
