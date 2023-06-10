@@ -82,7 +82,6 @@ async def updategexp():
                 gexp_history = member["expHistory"]
 
                 for k,v in gexp_history.items():
-                    print(str(k).split('-'))
                     if (str(k).split('-'))[1] == month:
                         wk.update_value(f'{dates[k]}{cell_no}', v)
 
