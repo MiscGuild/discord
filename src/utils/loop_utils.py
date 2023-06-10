@@ -38,7 +38,7 @@ async def before_giveaway_check():
 
 @tasks.loop(hours=24)
 async def updategexp():
-    month = "06"
+    month = "07"
     progress_message = await bot.get_channel(error_channel_id).send("Authorizing connection...")
 
     import pygsheets
@@ -83,7 +83,7 @@ async def updategexp():
 
                 for k,v in gexp_history.items():
                     print(str(k).split('-'))
-                    if (str(k).split('-'))[1] == '06':
+                    if (str(k).split('-'))[1] == month:
                         wk.update_value(f'{dates[k]}{cell_no}', v)
 
         cell_no += 1
