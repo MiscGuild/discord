@@ -284,7 +284,7 @@ unknown_ign_embed = discord.Embed(title="Please enter a valid Minecraft username
                                   color=error_color)
 
 discord_not_linked_embed = discord.Embed(title="This account is not linked to your discord account!",
-                                         description="Please follow the following steps to link your Hypixel profile with discord:\nGo to 'Your Profile' > Social Media > DISCORD and paste your discord info.",
+                                         description="Please follow the following steps to link your Hypixel profile with discord:\nGo to 'Your Profile' > Social Media > DISCORD",
                                          color=error_color)
 discord_not_linked_embed.set_image(
     url="https://media.discordapp.net/attachments/796061149593731128/953770877395284008/osl_.gif")
