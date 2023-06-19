@@ -96,11 +96,10 @@ class Union:
         # Fetch player & guild data
         player_data = await get_hypixel_player(uuid=uuid)
         guild_data = await get_player_guild(uuid)
-        rank = await get_rank(uuid)
 
         # Account is not linked to discord
         if not await is_linked_discord(player_data, self.user) and is_fs is False:
-            return discord_not_linked_embed
+            return discord_not_linked_embed.add_field(name="Do the above and then enter the following in chat:", value=f"`{str(self.user)}`")
 
         guild_name = "no guild" if not guild_data else guild_data["name"]
         can_tag = await has_tag_perms(self.user)
