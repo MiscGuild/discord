@@ -92,6 +92,8 @@ class General:
         # Define a message for sending progress updates
         progress_message = await ctx.send("Processing prerequisites...")
 
+        discord_members = bot.guild.members
+
         # Define arrays for guild and ally uuids and names
         guild_members = (await get_guild_by_name(guild_handle))['members']
         guild_uuids = await get_guild_uuids(guild_handle)
@@ -117,7 +119,9 @@ class General:
             return await asyncio.gather(*(sem_task(task) for task in tasks))
 
         # Get guild and ally names from their respective UUIDs
-        await progress_message.edit(content="Retrieving names...")
+        await progress_message.edit(content="Retrieving usernames...")
+
+
         for _set in [[guild_uuids, guild_usernames], [ally_uuids, ally_usernames]]:
             draw, dump = _set
             async with aiohttp.ClientSession():
@@ -127,10 +131,15 @@ class General:
                                                       ])  # Gathering with a max concurrency of 2
             dump.extend(tasks)
         # Loop through discord members
+
+        print(guild_usernames)
+        print(ally_usernames)
+
+
         await ctx.send("If you see the bot is stuck on a member along with an error message, "
                        "forcesync member the bot is stuck on.")
         bot.admin_ids = [member.id for member in bot.admin.members]
-        for discord_member in bot.guild.members:
+        for discord_member in discord_members:
             # Do not check admins and bots
             if discord_member.id in bot.admin_ids or discord_member.bot:
                 continue
@@ -158,18 +167,11 @@ class General:
                 await discord_member.remove_roles(bot.new_member_role, bot.guest, bot.ally)
                 continue
 
-            # Get player data
-            username, uuid = await get_mojang_profile(username)
-            if not username:
-                # Edit roles and continue loop
-                await discord_member.remove_roles(bot.member_role, bot.ally, bot.guest, bot.active_role)
-                await discord_member.add_roles(bot.new_member_role)
-                continue
 
             # Member of an ally guild
             if username in ally_usernames:
                 # Get player gtag
-                position = ally_uuids.index(uuid)
+                position = ally_usernames.index(username)
                 last_value = 1
                 for guild_division in ally_divisions:
                     if last_value > 1:
@@ -189,8 +191,17 @@ class General:
                 await discord_member.remove_roles(bot.new_member_role, bot.member_role, bot.active_role)
                 continue
 
+            # Get player data
+            username, uuid = await get_mojang_profile(username)
+            if not username:
+                # Edit roles and continue loop
+                await discord_member.remove_roles(bot.member_role, bot.ally, bot.guest, bot.active_role)
+                await discord_member.add_roles(bot.new_member_role)
+                continue
+
             # Guests
             else:
+                print("Rolecheck reached guests.", username, uuid, discord_member)
                 if not has_tag_permission:
                     await discord_member.edit(nick=username)
                 await discord_member.add_roles(bot.guest)
