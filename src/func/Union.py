@@ -11,7 +11,7 @@ from src.utils.consts import (active_req, allies, bot_missing_perms_embed,
                               guild_handle, neg_color, neutral_color,
                               pos_color, registration_channel_id,
                               staff_impersonation_embed, ticket_categories,
-                              unknown_ign_embed)
+                              unknown_ign_embed, join_request_embed)
 from src.utils.discord_utils import (check_tag, create_ticket, has_tag_perms,
                                      is_linked_discord)
 from src.utils.request_utils import (get_gtag, get_hypixel_player,
@@ -211,11 +211,13 @@ class Union:
                     # if bot.staff not in interaction.user.roles and ticket.id != interaction.channel_id: return
                     if interaction.custom_id == "Yes":
                         await ticket.purge(limit=100)
-                        await ticket.send(
-                            embed=discord.Embed(title=f"{ign} wishes to join Miscellaneous!",
-                                                description=f"Please await staff assistance!\nIn the meanwhile, you may explore the Discord!",
-                                                color=neutral_color))
+                        await ticket.send(embed=join_request_embed.set_author(name=f"{ign} wishes to join Miscellaneous"))
                         await interaction.user.add_roles(bot.guest, reason="Registration - Guest")
+
+                        if guild_name != "Guildless":
+                            await ticket.send(f"{interaction.user.mention} kindly leave your current guild so that we can can invite you to Miscellaneous.")
+
+
 
                     elif interaction.custom_id == "No":
                         await ticket.purge(limit=100)

@@ -286,6 +286,16 @@ unknown_ign_embed = discord.Embed(title="Please enter a valid Minecraft username
 discord_not_linked_embed = discord.Embed(title="This account is not linked to your discord account!",
                                          description="Please follow the following steps to link your Hypixel profile with discord:\nGo to 'Your Profile' > Social Media > DISCORD",
                                          color=error_color)
+join_request_embed =discord.Embed(color=neutral_color).add_field(name="Our requirements are as follows:",
+                                value="__Active__\n"
+                                  f"➤ {format(active_req, ',d')} Weekly Guild Experience\n"
+                                  "__Member__\n"
+                                  f"➤ {format(member_req, ',d')} Weekly Guild Experience\n"
+                                  f"__Resident__\n"
+                                  f"➤ {format(resident_req, ',d')} Weekly Guild Experience\n\n"
+                                  f"You will join the guild as a Member.\n\n",
+                                inline=False).set_footer(
+                                text="Staff should invite you to the guild within 2 hours.\nWhile you wait, you can explore the guild discord!")
 discord_not_linked_embed.set_image(
     url="https://media.discordapp.net/attachments/796061149593731128/953770877395284008/osl_.gif")
 
