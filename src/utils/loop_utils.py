@@ -62,13 +62,12 @@ async def updategexp():
 
     cell_no = 2
     dates = {}
-    for i in range(2, 33):
-        if i > 25:
-            dates[f"2023-{month}-{i:0>2}"] = 'A' + string.ascii_uppercase[i - 26]
+    for i in range(1, 32):
+        if i > 24:
+            dates[f"2023-{month}-{i:0>2}"] = 'A' + string.ascii_uppercase[i - 25]
             continue
 
-        dates[f"2023-{month}-{i:0>2}"] = string.ascii_uppercase[i]
-
+        dates[f"2023-{month}-{i:0>2}"] = string.ascii_uppercase[i + 1]
 
     for name in participant_names:
         await progress_message.edit(content=f"Updating {name}")
