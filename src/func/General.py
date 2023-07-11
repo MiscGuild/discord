@@ -132,9 +132,6 @@ class General:
             dump.extend(tasks)
         # Loop through discord members
 
-
-
-
         await ctx.send("If you see the bot is stuck on a member along with an error message, "
                        "forcesync member the bot is stuck on.")
         bot.admin_ids = [member.id for member in bot.admin.members]
