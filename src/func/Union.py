@@ -99,7 +99,7 @@ class Union:
 
         # Account is not linked to discord
         if not await is_linked_discord(player_data, self.user) and is_fs is False:
-            embed = discord_not_linked_embed
+            embed = discord_not_linked_embed.copy()
             return embed.add_field(name="Do the above and then enter the following in chat:", value=f"`{str(self.user)}`")
 
         guild_name = "no guild" if not guild_data else guild_data["name"]

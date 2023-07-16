@@ -35,8 +35,9 @@ async def is_linked_discord(player_data: dict, user: discord.User) -> bool:
         return False
     if "DISCORD" not in player_data["socialMedia"]["links"]:
         return False
+    discord = player_data["socialMedia"]["links"]["DISCORD"]
 
-    return ((player_data["socialMedia"]["links"]["DISCORD"] == str(user)[:-2]) or (player_data["socialMedia"]["links"]["DISCORD"] == (str(user.id)+"#0000")))
+    return (discord == str(user)[:-2]) or (discord == (str(user.id) + "#0000") or (discord == str(user)))
 
 
 
