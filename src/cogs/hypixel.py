@@ -20,7 +20,7 @@ class Hypixel(commands.Cog, name="hypixel"):
     @option(
         name="name",
         description="Your Minecraft Username",
-        required=False,
+        required=True,
         input_type=str
     )
     @option(
