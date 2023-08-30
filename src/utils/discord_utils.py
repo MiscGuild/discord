@@ -11,7 +11,7 @@ import src.utils.ui_utils as uiutils
 from src.utils.consts import (config, dnkl_req,
                               gvg_requirements, log_channel_id, neg_color, neutral_color, staff_application_questions,
                               ticket_categories,
-                              unknown_ign_embed, guild_handle, positive_responses)
+                              unknown_ign_embed, guild_handle, positive_responses, dnkl_creation_embed)
 from src.utils.minecraft_utils import get_player_gexp
 from src.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild, get_guild_level
 
@@ -146,6 +146,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     _, weekly_gexp = await get_player_gexp(uuid)
                     if weekly_gexp is None:
                         return await ticket.send(embed=unknown_ign_embed)
+                    await ticket.send(embed=dnkl_creation_embed)
                     if weekly_gexp < dnkl_req:
                         await ticket.send(
                             embed=discord.Embed(title="You do not meet the do-not-kick-list requirements!",
@@ -155,7 +156,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                         await ticket.send(embed=discord.Embed(title="You meet the do-not-kick-list requirements!",
                                                               description=f"You have {format(weekly_gexp, ',d')} weekly guild experience!",
                                                               color=neutral_color))
-                    await dnkl_application(ign, uuid, ticket, interaction.user)
+                    await dnkl_application(ign, uuid, ticket, interaction.user, weekly_gexp)
                 if option == "I want to join the staff team":
                     # Edit category and send info embed with requirements
                     await ticket.edit(name=f"staff-application-{ign}", topic=f"{interaction.user.id}|",
@@ -421,9 +422,9 @@ async def create_transcript(channel: discord.TextChannel, limit: int = None):
     return discord.File(BytesIO(transcript.encode()), filename=f"transcript-{channel.name}.html")
 
 
-async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, author: discord.User):
+async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, author: discord.User, weekly_gexp: int):
     YearView = discord.ui.View()
-    YearView.add_item(uiutils.StartYearSelect(channel=channel, ign=ign, uuid=uuid))  # Year Selection Dropdown
+    YearView.add_item(uiutils.StartYearSelect(channel=channel, ign=ign, uuid=uuid, weekly_gexp=weekly_gexp))  # Year Selection Dropdown
     embed = discord.Embed(title=f"In which year will {ign}'s inactivity begin?",
                           color=neutral_color)
     await channel.send(embed=embed, view=YearView)

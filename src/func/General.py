@@ -236,12 +236,12 @@ class General:
             await log_event(f"{ctx.channel.name} was deleted by {ctx.author}")
             ticket_details = await get_ticket_properties(ctx.channel)
             if ticket_details:
+                await bot.get_channel(log_channel_id).send(file=transcript)
                 try:
                     await (await bot.fetch_user(ticket_details[0])).send(
                         embed=ticket_deleted_embed.set_footer(text=ctx.channel.name), file=transcript)
                 except:
                     pass
-                await bot.get_channel(log_channel_id).send(file=transcript)
 
     async def accept(ctx):
         if ctx.channel.category.name not in ticket_categories.values():

@@ -1,23 +1,29 @@
 from __main__ import bot
 from datetime import datetime, timedelta
+import chat_exporter
+import asyncio
+from io import BytesIO
+
+
 
 import discord, calendar
 import discord.ui as ui
 
 from src.utils.consts import (dnkl_channel_id, dnkl_req,
                               missing_permissions_embed,
-                              neg_color, neutral_color)
+                              neg_color, neutral_color, log_channel_id)
 from src.utils.db_utils import insert_new_dnkl, select_one, update_dnkl, delete_dnkl
 
-
 class StartYearSelect(ui.Select):
-    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str):
+    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, weekly_gexp: int):
         super().__init__(placeholder="Year")
         self.channel = channel
         self.ign = ign
         self.uuid = uuid
+        self.weekly_gexp = weekly_gexp
         self.add_option(label=str(datetime.now().year))
-        self.add_option(label=str(datetime.now().year + 1))
+        if datetime.now().month == 11:
+            self.add_option(label=str(datetime.now().year + 1))
 
     # Override default callback
     async def callback(self, interaction: discord.Interaction):
@@ -26,7 +32,7 @@ class StartYearSelect(ui.Select):
         start_year = list(interaction.data.values())[0][0]
         MonthView = discord.ui.View()
         MonthView.add_item(StartMonthSelect(channel=self.channel, ign=self.ign, uuid=self.uuid,
-                                            year=start_year))  # Month Selection Dropdown
+                                            year=start_year, weekly_gexp=self.weekly_gexp))  # Month Selection Dropdown
         embed = discord.Embed(title=f"In which month of {start_year} will {self.ign}'s inactivity begin?",
                               color=neutral_color).set_footer(text=f"Start Date - ?/?/{start_year}")
         await interaction.response.send_message(embed=embed, view=MonthView)
@@ -34,13 +40,17 @@ class StartYearSelect(ui.Select):
 
 
 class StartMonthSelect(ui.Select, object):
-    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, year):
+    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, year: int, weekly_gexp: int):
         super().__init__(placeholder="Month")
         self.channel = channel
         self.year = year
         self.ign = ign
         self.uuid = uuid
-        for x in range(1, 13):
+        self.weekly_gexp = weekly_gexp
+        
+        for x in range(datetime.now().month, datetime.now().month+2):
+            if x > 12:
+                x = x-12
             self.add_option(label=str(calendar.month_name[x]))
 
     # Override default callback
@@ -50,7 +60,7 @@ class StartMonthSelect(ui.Select, object):
         DayView = discord.ui.View()
 
         DayView.add_item(StartDaySelect(channel=self.channel, ign=self.ign, uuid=self.uuid, month=start_month,
-                                        year=self.year))  # Day Selection Dropdown
+                                        year=self.year, weekly_gexp = self.weekly_gexp))  # Day Selection Dropdown
         embed = discord.Embed(title=f"What is the closest day to the start of {self.ign}'s inactivity?",
                               color=neutral_color).set_footer(text=f"Start Date - ?/{start_month}/{self.year}")
         await interaction.response.send_message(embed=embed, view=DayView)
@@ -58,15 +68,25 @@ class StartMonthSelect(ui.Select, object):
 
 
 class StartDaySelect(ui.Select):
-    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, month, year):
+    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, month: str, year: int, weekly_gexp: int):
         super().__init__(placeholder="Day")
         self.channel = channel
         self.ign = ign
         self.uuid = uuid
         self.month = month
         self.year = year
-        for x in range(1, 32, 2):
-            self.add_option(label=str(x))
+        self.weekly_gexp = weekly_gexp
+        
+        monthNumber = datetime.strptime(self.month, "%B").month
+        if datetime.now().month == monthNumber:
+            step = 2
+            if datetime.now().day - (calendar.monthrange(int(self.year), monthNumber)[1] + 1) < 20: # Adding a check to change step value if the number of days is less
+                step = 1
+            for x in range(datetime.now().day, calendar.monthrange(int(self.year), monthNumber)[1] + 1, step): # A range from current day to last day of month; step 2
+                self.add_option(label=str(x))
+        else:
+            for x in range(1, calendar.monthrange(int(self.year), monthNumber)[1] + 1, 2): # A range from 1 to last day of month; step 2
+                self.add_option(label=str(x))
 
     # Override default callback
     async def callback(self, interaction: discord.Interaction):
@@ -74,7 +94,7 @@ class StartDaySelect(ui.Select):
         LengthView = discord.ui.View()
         LengthView.add_item(
             InactivityLenSelect(author=interaction.user, channel=self.channel, ign=self.ign, uuid=self.uuid,
-                                day=start_day, month=self.month, year=self.year))  # Length Selection Dropdown
+                                day=start_day, month=self.month, year=self.year, weekly_gexp = self.weekly_gexp))
         embed = discord.Embed(title=f"How long will {self.ign} be inactive?",
                               color=neutral_color).set_footer(
             text=f"Start Date - {start_day}/{self.month}/{self.year}")
@@ -83,7 +103,7 @@ class StartDaySelect(ui.Select):
 
 
 class InactivityLenSelect(ui.Select):
-    def __init__(self, author: discord.User, channel: discord.TextChannel, ign: str, uuid: str, day, month, year):
+    def __init__(self, author: discord.User, channel: discord.TextChannel, ign: str, uuid: str, day: int, month:str, year: int, weekly_gexp: int):
         super().__init__(placeholder="Length")
         self.author = author
         self.channel = channel
@@ -92,6 +112,7 @@ class InactivityLenSelect(ui.Select):
         self.month = month
         self.year = year
         self.day = day
+        self.weekly_gexp = weekly_gexp
 
         self.add_option(label=f"1 Week", value=str(1))
         for x in range(2, 4):
@@ -107,40 +128,91 @@ class InactivityLenSelect(ui.Select):
                                   color=neg_color)
             await interaction.response.send_message(embed=embed)
             return
-        await interaction.response.send_message(
-            embed=discord.Embed(title=f"What is the reason behind {self.ign}'s inactivity?",
-                                description="Kindly type the reason as a single message",
-                                color=neutral_color).set_footer(
-                text=f"Start Date - {self.day}/{self.month}/{self.year}\n"
-                     f"Length - {int(length) * 7} Days"))
-        reason = await bot.wait_for("message", check=lambda
-            x: x.channel == self.channel and x.author == self.author)  # getting the reason
-        reason = reason.content
-        date = datetime.strptime(f"{self.day}/{self.month}/{self.year}", "%d/%B/%Y") + timedelta(weeks=int(length))
-        embed = discord.Embed(title=self.ign, url=f'https://plancke.io/hypixel/player/stats/{self.ign}',
-                              color=neutral_color)
-        embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{self.uuid}')
-        embed.add_field(name="IGN:", value=self.ign, inline=False)
-        embed.add_field(name="Start:", value=f"{self.day} {self.month} {self.year}", inline=False)
-        embed.add_field(name="End:", value=f"{date.day} {date.strftime('%B')} {date.year}", inline=False)
-        embed.add_field(name="Reason:", value=reason, inline=False)
+        
+        reason_view = discord.ui.View()
+        reason_view.add_item(InactivityReasonSelect(author=self.author,
+                                                    channel=self.channel,
+                                                    ign=self.ign,
+                                                    uuid=self.uuid,
+                                                    day=self.day,
+                                                    month=self.month,
+                                                    year=self.year,
+                                                    length=length,
+                                                    weekly_gexp = self.weekly_gexp))
+       
+        embed=discord.Embed(title=f"What is the reason behind {self.ign}'s inactivity?",
+                            color=neutral_color)
+        embed.set_footer(text=f"Start Date - {self.day}/{self.month}/{self.year}\n"
+                        f"Length - {int(length) * 7} Days")
+        await interaction.response.send_message(embed=embed, view=reason_view)
+        self.view.stop()
+        
+        
+        
+        
 
+class InactivityReasonSelect(ui.Select):
+    def __init__(self, author: discord.User, channel: discord.TextChannel, ign: str, uuid: str, day: int, month: str, year: int, length: int, weekly_gexp: int):
+        super().__init__(placeholder="Reason")
+        self.author = author
+        self.channel = channel
+        self.ign = ign
+        self.uuid = uuid
+        self.month = month
+        self.year = year
+        self.day = day
+        self.length = length
+        self.weekly_gexp = weekly_gexp
+        
+        reasons = ["Exams", "Medical Issues", "Vacation", "Computer Problems", "Other"]
+        for reason in reasons:
+            self.add_option(label=reason, value=reason)
+    
+    async def callback(self, interaction: discord.Interaction):
+        reason = list(interaction.data.values())[0][0]
+        
+        other_reason = ""
+        if reason == "Other":
+            await interaction.response.send_message("Please elaborate on the reason for your inactivity.\n"\
+                                                    "This information will only be visible to staff members.\n\n"\
+                                                    "*Kindly type the reason as a single message.*")
+            other_reason = await bot.wait_for("message", check=lambda
+                x: x.channel == self.channel and x.author == self.author)
+            other_reason = other_reason.content
+            await self.channel.send("**Application submitted successfully!\nPlease await staff approval.**")
+        else:
+            await interaction.response.send_message("**Application submitted successfully!\nPlease await staff approval.**")
+
+        date = datetime.strptime(f"{self.day}/{self.month}/{self.year}", "%d/%B/%Y") + timedelta(weeks=int(self.length))
+        final_embed = discord.Embed(title=self.ign, url=f'https://plancke.io/hypixel/player/stats/{self.ign}',
+                            color=neutral_color)
+        final_embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{self.uuid}')
+        final_embed.add_field(name="IGN:", value=self.ign, inline=False)
+        final_embed.add_field(name="Start:", value=f"{self.day} {self.month} {self.year}", inline=False)
+        final_embed.add_field(name="End:", value=f"{date.day} {date.strftime('%B')} {date.year}", inline=False)
+        final_embed.add_field(name="Reason:", value=reason, inline=False)
+
+        staff_approval_embed = final_embed.copy()
+        staff_approval_embed.add_field(name="Guild Experience:", value=f"{format(self.weekly_gexp, ',d')} Weekly Guild Experience", inline=False)
+        if other_reason:
+            staff_approval_embed.set_footer(text="Other Elaboration: \n" + other_reason)
+        
         DNKLView = discord.ui.View(timeout=None)  # View for staff members to approve/deny the DNKL
         buttons = [["Approve", "DNKL_Approve", discord.enums.ButtonStyle.green],
-                   ["Deny", "DNKL_Deny", discord.enums.ButtonStyle.red],
-                   ["Error", "DNKL_Error", discord.enums.ButtonStyle.gray]]
+                ["Deny", "DNKL_Deny", discord.enums.ButtonStyle.red],
+                ["Error", "DNKL_Error", discord.enums.ButtonStyle.gray]]
         # Loop through the list of roles and add a new button to the view for each role.
         for button in buttons:
             # Get the role from the guild by ID.
             DNKLView.add_item(
-                Dnkl_Buttons(channel=self.channel, ign=self.ign, uuid=self.uuid, button=button, embed=embed))
+                Dnkl_Buttons(channel=self.channel, author=self.author, ign=self.ign, uuid=self.uuid, button=button, embed=final_embed))
 
-        await self.channel.send("Staff, what do you wish to do with this application?", embed=embed, view=DNKLView)
+        await self.channel.send("**Staff**, what do you wish to do with this application?", embed=staff_approval_embed, view=DNKLView)
         self.view.stop()
 
 
 class Dnkl_Buttons(discord.ui.Button):
-    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, button: list, embed: discord.Embed):
+    def __init__(self, channel: discord.TextChannel, author:discord.User, ign: str, uuid: str, button: list, embed: discord.Embed):
         """
         3 buttons for 3 dnkl actions. `custom_id` is needed for persistent views.
         """
@@ -148,6 +220,7 @@ class Dnkl_Buttons(discord.ui.Button):
         self.channel = channel
         self.ign = ign
         self.uuid = uuid
+        self.author = author
         super().__init__(label=button[0], custom_id=button[1], style=button[2])
 
     async def callback(self, interaction: discord.Interaction):
@@ -164,7 +237,7 @@ class Dnkl_Buttons(discord.ui.Button):
             # User is not currently on DNKL
             if not current_message:
                 await insert_new_dnkl(msg.id, self.uuid, self.ign)
-                return await self.channel.send("**This user has been added to the do-not-kick-list!**")
+                return await interaction.response.send_message("**This user has been added to the do-not-kick-list!**")
 
             # User is already on DNKl
             # Try to delete current message
@@ -176,25 +249,62 @@ class Dnkl_Buttons(discord.ui.Button):
                 pass
 
             await update_dnkl(msg.id, self.uuid)
-            await self.channel.send(
+            await  interaction.response.send_message(
                 "**Since this user was already on the do-not-kick-list, their entry has been updated.**")
         elif interaction.custom_id == "DNKL_Deny":
-            await self.channel.send(
-                embed=discord.Embed(title="Your do-not-kick-list application has been denied!",
-                                    description=f"You do not meet the DNKL requirements of {format(dnkl_req, ',d')} weekly guild experience.",
-                                    color=neg_color).set_footer(
-                    text="If don't you think you can meet the requirements, you may rejoin the guild once your inactivity period has finished."))
+            await interaction.response.send_message("**This user's do-not-kick-list application has been denied!.**\n"
+                                                    "If you didn't mean to hit deny, you can add them using `/dnkl_add`.",
+                                                    ephemeral=True)
+    
+            denial_embed=discord.Embed(title="Your do-not-kick-list application has been denied!",
+                                description=f"You do not meet the DNKL requirements of {format(dnkl_req, ',d')} weekly guild experience.",
+                                color=neg_color)
+            denial_embed.set_footer(
+                text="If don't you think you can meet the requirements, you may rejoin the guild once your inactivity period has ended.")
+            closeView = discord.ui.View(timeout=None)  # View for staff members to approve/deny the DNKL
+            button = ("Close This Ticket", discord.enums.ButtonStyle.red)
+            closeView.add_item(
+                CloseDNKLTicket(channel=self.channel, author=self.author, ign=self.ign, uuid=self.uuid, button=button))
+            await self.channel.send(embed=denial_embed, view=closeView)
             await delete_dnkl(self.ign)
-            await interaction.response.send_message(
-                "If you wish to reverse your decision, add them to the DNKL using `,dnkladd`",
-                ephemeral=True)
+
         elif interaction.custom_id == "DNKL_Error":
-            await self.channel.send(embed=discord.Embed(
+            await interaction.response.send_message(embed=discord.Embed(
                 title="Your application has been accepted, however there was an error!",
                 description="Please await staff assistance!",
                 color=neutral_color))
         self.view.stop()
 
+
+class CloseDNKLTicket(discord.ui.Button):
+    def __init__(self, channel: discord.TextChannel, author: discord.User, ign: str, uuid: str, button: list):
+        self.channel = channel
+        self.ign = ign
+        self.uuid = uuid
+        self.author = author
+        
+        super().__init__(label=button[0], style=button[1])
+
+    async def callback(self, interaction: discord.Interaction):
+        if self.author != interaction.user:
+            await self.channel.send(embed=missing_permissions_embed)
+            return
+        
+        embed = discord.Embed(title="This ticket will be deleted in 20 seconds!", color=neg_color)
+
+        # Send deletion warning and gather transcript
+        await interaction.response.send_message(embed=embed)
+        transcript = await chat_exporter.export(self.channel, limit=None)
+        if transcript:
+            transcript = discord.File(BytesIO(transcript.encode()), filename=f"transcript-{self.channel.name}.html")
+            await bot.get_channel(log_channel_id).send(f"DNKL Request was denied and channel was deleted by {self.author}") 
+            await bot.get_channel(log_channel_id).send(file=transcript)
+        
+        # Sleep and delete channel
+        await asyncio.sleep(20)
+        await discord.TextChannel.delete(self.channel)
+    
+        self.view.stop()
 
 
 class ModalCreator(discord.ui.Modal):

@@ -148,6 +148,9 @@ information_embed = discord.Embed(title="Miscellaneous", url="https://plancke.io
                                                                        "Betrayed - https://discord.gg/kcJkAr2tW2\n"
                                                                        "Blight - https://discord.gg/dgTWpgy\n"
                                                                        "The Happy Pixels - https://discord.gg/JVTqPr9t\n"
+                                                                       "FireTree V2 - https://discord.gg/UcrACnWTpE\n"
+                                                                       "High Altitude - https://discord.gg/highaltitude\n"
+                                                                       "Alpha Project - https://discord.gg/cN6fSAErtz\n"
                                                                        "Cubelify - https://cubelify.com/ / https://discord.gg/cubelify",
                                                                  inline=False).add_field(
     name="Useful Resources",
@@ -184,10 +187,11 @@ tickets_embed = discord.Embed(title="Tickets",
                               color=neutral_color).add_field(name="Do-not-kick-list Application",
                         value="You  must have a valid reason for applying and also meet the DNKL requiremnets.\n"
                               "Accepted Reasons:\n"
-                              "> School\n"
+                              "> Exams\n"
                               "> Medical Reasons\n"
-                              "> Situations out of your control\n"
-                              "> Vacation\n\n"
+                              "> Computer Problems\n"
+                              "> Vacation\n"
+                              "> Other (subject to staff judgment)\n"
                               "If your account is banned, it may be temporarily kicked until unbanned.",
                         inline=False).add_field(name="Player Report",
                         value="When reporting a player, you're expected to explain the situation in maximum detail. Providing the following is considered the bare minimum:\n"
@@ -298,6 +302,24 @@ join_request_embed =discord.Embed(color=neutral_color).add_field(name="Our requi
                                 text="Staff should invite you to the guild within 2 hours.\nWhile you wait, you can explore the guild discord!")
 discord_not_linked_embed.set_image(
     url="https://media.discordapp.net/attachments/796061149593731128/953770877395284008/osl_.gif")
+
+dnkl_creation_embed = discord.Embed(title="Do-not-kick-list", 
+                                    description="In order to create a do-not-kick-list entry, you need to have a valid reason and meet the DNKL requirements.",
+                                    color=neutral_color
+                                    ).add_field(
+                                        name = "Accepted Reasons",
+                                        value = "- Exams\n"\
+                                                "- Vacation\n"\
+                                                "- Medical reasons\n"\
+                                                "- Computer Problems\n"\
+                                                "- Other (Subject to staff judgement)",
+                                        inline = False
+                                    ).add_field(
+                                        name = "Requirements",
+                                        value = f"- {format(dnkl_req, ',d')} weekly guild experience\n"\
+                                                f"- DNKL period must be less than 3 weeks",
+                                        inline = False  
+                                    )
 
 rainbow_separator = "http://rainbowdivider.com/images/dividers/movrblin02.gif"
 
