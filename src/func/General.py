@@ -63,7 +63,7 @@ class General:
 
     async def rolecheck(ctx, send_ping: bool):
         # Define a message for sending progress updates
-        progress_message = await ctx.send("Processing prerequisites...")
+        progress_message = await ctx.respond("Processing prerequisites...")
 
         discord_members = bot.guild.members
 
