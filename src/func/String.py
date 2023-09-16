@@ -88,7 +88,7 @@ class String:
             weekly_gexp = sum(gexp_history.values())
 
             # Send shortened version for non-command and non-ticket channels
-            if "commands" not in ctx.channel.name or ctx.channel.category not in ticket_categories.values():
+            if "commands" not in ctx.channel.name and str(ctx.channel.category) not in ticket_categories.values():
                 return f"__**{name}**__\n**Guild Experience -** `{format(weekly_gexp, ',d')}`"
 
             week_dict = {
