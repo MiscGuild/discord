@@ -155,7 +155,7 @@ class Union:
 
         return embed
 
-    async def register(self, ctx, name):
+    async def register(self, ctx, name, reference):
         await ctx.defer()
         # Make sure it is only used in registration channel
         if ctx.channel.id != registration_channel_id:
@@ -177,8 +177,10 @@ class Union:
 
         guild_name = "Guildless" if not guild_data else guild_data["name"]
 
+        reference_message = None
         # User is a member
         if guild_name == guild_handle:
+            reference_message = await validate_reference(ctx, uuid, reference) if reference else None
             await ctx.author.add_roles(bot.member_role, reason="Registration - Member")
 
 
@@ -251,6 +253,8 @@ class Union:
         embed = discord.Embed(
             title="Registration successful!", color=neutral_color)
         embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
+        if reference_message:
+            embed.set_footer(text=reference_message)
         return embed.add_field(name=ign, value=f"Member of {guild_name}")
 
     async def add(self, ctx):
