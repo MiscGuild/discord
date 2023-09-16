@@ -2,11 +2,12 @@ import math
 import re
 
 from src.utils.consts import ChatColor, active_req, member_req, resident_req
-from src.utils.request_utils import get_player_guild
+from src.utils.request_utils import get_player_guild, get_name_by_uuid, get_hypixel_player
 
 
-async def get_player_gexp(uuid: str):
-    guild_data = await get_player_guild(uuid)
+async def get_player_gexp(uuid: str, guild_data: dict = None):
+    if not guild_data:
+        guild_data = await get_player_guild(uuid)
 
     # Player is in a guild
     if guild_data:
@@ -88,7 +89,7 @@ async def get_hypixel_player_rank(player_data: dict):
                 return f"&6[MVP{pluscolor}++&6]" if "monthlyRankColor" not in player_data or player_data[
                     "monthlyRankColor"] == "GOLD" else f"&b[MVP{pluscolor}++&b]", "[MVP++]"
 
-            #Player is MVP+
+            # Player is MVP+
             # Custom + color
             if "rankPlusColor" in player_data:
                 pluscolor = ChatColor[player_data["rankPlusColor"]].value

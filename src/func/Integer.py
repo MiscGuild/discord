@@ -6,9 +6,8 @@ from src.utils.consts import error_color, invalid_guild_embed, guild_handle, log
 from src.utils.db_utils import get_giveaway_status
 from src.utils.discord_utils import name_grabber, create_transcript
 from src.utils.giveaway_utils import roll_giveaway
-from src.utils.minecraft_utils import get_hypixel_player_rank
-from src.utils.request_utils import (get_guild_by_name, get_hypixel_player,
-                                     get_jpg_file, get_name_by_uuid)
+from src.utils.minecraft_utils import generate_lb_text
+from src.utils.request_utils import (get_guild_by_name, get_jpg_file)
 
 
 class Integer:
@@ -61,7 +60,7 @@ class Integer:
 
         # Sort member gexp
         member_gexp = sorted(member_gexp.items(),
-                             key=lambda item: item[1], 
+                             key=lambda item: item[1],
                              reverse=True)
 
         # Get image data
@@ -82,4 +81,4 @@ class Integer:
             title=f"{await name_grabber(ctx.author)} purged {self.integer} message(s) in {ctx.channel.name}",
             description=f"**Reason:** {reason}",
             color=neutral_color).set_footer(text="Following is the transcript of the deleted messages"),
-                                            file=transcript)
+                                                         file=transcript)

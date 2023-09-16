@@ -102,7 +102,7 @@ milestone_emojis = {
 registration_embed = discord.Embed(title=f"Welcome to the {guild_handle} Discord!",
                                    description="Before you can view the server, please register with your Minecraft username.",
                                    color=neutral_color).add_field(name="To register use the following command:",
-                                                                  value="/register `Your Minecraft Name`\n\nExample:\n/register John",
+                                                                  value="/register `Your Minecraft Name` `MEMBERS OF MISC: The name of the person who invited you to Miscellaneous`\n\nExample:\n/register John MinecraftPlayer123",
                                                                   inline=False)
 
 ticket_deleted_embed = discord.Embed(title="Your ticket was deleted!",

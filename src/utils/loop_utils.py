@@ -1,3 +1,4 @@
+import asyncio
 from __main__ import bot
 from datetime import datetime, timedelta
 
@@ -8,6 +9,7 @@ from src.func.Integer import Integer
 from src.utils.consts import weekly_lb_channel, daily_lb_channel
 from src.utils.db_utils import (connect_db, select_all)
 from src.utils.giveaway_utils import roll_giveaway
+from src.utils.referral_utils import check_invitation_validity, generate_rank_upgrade
 
 
 @tasks.loop(minutes=1)
@@ -36,8 +38,6 @@ async def before_giveaway_check():
 
 @tasks.loop(hours=24)
 async def send_gexp_lb():
-    import asyncio
-    await asyncio.sleep(1)
     file = await Integer(integer=1).gtop(bot.get_channel(daily_lb_channel))
     await bot.get_channel(daily_lb_channel).send(file=file)
     if datetime.utcnow().weekday() == 0:
@@ -75,12 +75,6 @@ async def update_invites():
 
     await generate_rank_upgrade(weekly_invitations)
 
-    '''await bot.db.execute("UPDATE invites SET total_invites = total_invites + current_invitee_uuids, "
-                         "total_valid_invites = total_valid_invites + current_invitee_uuids")
-    await bot.db.commit()
-    await bot.db.execute("UPDATE invites SET current_invitee_uuids = ''")
-    await bot.db.commit()
-'''
 
 
 @update_invites.before_loop

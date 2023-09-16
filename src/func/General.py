@@ -9,7 +9,6 @@ import aiohttp
 import discord
 import discord.ui
 
-import src.utils.ui_utils as uiutils
 from src.func.Union import Union
 from src.utils.consts import (accepted_staff_application_embed, active_req,
                               allies, error_color, guild_handle,
@@ -17,17 +16,17 @@ from src.utils.consts import (accepted_staff_application_embed, active_req,
                               milestone_emojis, milestones_channel, neg_color,
                               neutral_color, pos_color, ticket_deleted_embed,
                               registration_channel_id, registration_embed,
-                              staff_application_questions, ticket_categories, 
+                              staff_application_questions, ticket_categories,
                               resident_req, dnkl_entries_not_found,
                               positive_responses)
 from src.utils.db_utils import insert_new_giveaway, select_all
 from src.utils.discord_utils import (create_ticket, create_transcript,
                                      get_ticket_creator, log_event,
-                                     name_grabber, get_ticket_properties,
+                                     get_ticket_properties,
                                      name_grabber, has_tag_perms)
-from src.utils.minecraft_utils import get_hypixel_player_rank
+from src.utils.minecraft_utils import get_gexp_sorted, generate_lb_text
 from src.utils.request_utils import (get_guild_by_name, get_guild_uuids,
-                                     get_hypixel_player, get_jpg_file,
+                                     get_jpg_file,
                                      get_mojang_profile, get_name_by_uuid,
                                      get_player_guild)
 
@@ -36,7 +35,6 @@ class General:
     async def weeklylb(ctx):
         # Get guild data
         guild_data = await get_guild_by_name(guild_handle)
-        member_gexp = {}
 
         if not guild_data:
             return invalid_guild_embed
@@ -96,7 +94,6 @@ class General:
         # Get guild and ally names from their respective UUIDs
         await progress_message.edit(content="Retrieving usernames...")
 
-
         for _set in [[guild_uuids, guild_usernames], [ally_uuids, ally_usernames]]:
             draw, dump = _set
             async with aiohttp.ClientSession():
@@ -125,9 +122,9 @@ class General:
                         # Finds a given UUID's corresponding hypixel data
 
                         weekly_exp = sum(guild_member["expHistory"].values())
-                        if weekly_exp >= active_req:    # Meets active req
+                        if weekly_exp >= active_req:  # Meets active req
                             await discord_member.add_roles(bot.active_role)
-                        elif weekly_exp < active_req and bot.active_role in discord_member.roles:   # Doesn't meet active req
+                        elif weekly_exp < active_req and bot.active_role in discord_member.roles:  # Doesn't meet active req
                             await discord_member.remove_roles(bot.active_role)
 
                 if not has_tag_permission:
@@ -137,7 +134,6 @@ class General:
                 await discord_member.add_roles(bot.member_role)
                 await discord_member.remove_roles(bot.new_member_role, bot.guest, bot.ally)
                 continue
-
 
             # Member of an ally guild
             if username in ally_usernames:
@@ -172,7 +168,6 @@ class General:
 
             # Guests
             else:
-                print("Rolecheck reached guests.", username, uuid, discord_member)
                 if not has_tag_permission:
                     await discord_member.edit(nick=username)
                 await discord_member.add_roles(bot.guest)
@@ -190,7 +185,7 @@ class General:
 
         if not ctx.channel.category or ctx.channel.category.name not in ticket_categories.values():
             return "This command cannot be used here"
-        
+
         elif ctx.channel.category.name == ticket_categories["registrees"]:
             member = await get_ticket_creator(ctx.channel)
             if member:
@@ -264,13 +259,10 @@ class General:
         application_embed = (await channel.fetch_message(int(application_embed_id))).embeds[0]
         member = await get_ticket_creator(channel)
 
-
-
         if not member.nick:
             nick = member.name
         else:
             nick = member.nick
-
 
         await ctx.send(embed=application_embed.set_footer(text=""))
 
@@ -296,20 +288,21 @@ class General:
 
             await ctx.send(f"`{question}`\n**What was the issue that you found with {nick}'s reply?**")
             issue_found = await bot.wait_for("message",
-                                          check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+                                             check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
 
             # Update embed and send preview
             denial_embed.add_field(name=question,
-                                   value=issue_found.content, 
+                                   value=issue_found.content,
                                    inline=False)
-            
+
             await ctx.send(embed=denial_embed)
 
             # Ask user if they want to critique more questions and wait for reply
             await ctx.send("Would you like to critique more questions? (y/n)")
 
             continue_critiquing = await bot.wait_for("message",
-                                        check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+                                                     check=lambda
+                                                         x: x.channel == ctx.channel and x.author == ctx.author)
             continue_critiquing = continue_critiquing.content.lower()
 
             # User does not want to critique more questions
@@ -322,7 +315,6 @@ class General:
 
                 return denial_embed.set_footer(text="You may reapply in 2 weeks.\
                                                \nFollowing is the transcript so that you can refer to it while reapplying."), transcript
-
 
     async def inactive(ctx):
 
@@ -380,7 +372,7 @@ class General:
                             datetime.now() - datetime.fromtimestamp(member["joined"] / 1000.0)).days
                     if days_since_join <= 7 and weekly_exp > ((member_req / 7) * days_since_join):
                         continue
-                    
+
                     inactive[name] = weekly_exp
 
         # Define embeds array to be returned
@@ -389,7 +381,7 @@ class General:
         # Loop through dicts, descriptions and colors
         for _dict, title, color in [[to_promote_active, "Promote the following users to active:", pos_color],
                                     [to_demote_active, "Demote the following users from active:",
-                                        neg_color],
+                                     neg_color],
                                     [to_demote_resident, "Demote the following from resident:", neg_color],
                                     [inactive, "Following are the users to be kicked:", neg_color]]:
             # Filter categories with no users
@@ -726,6 +718,7 @@ class General:
         channel_details = await get_ticket_properties(ctx.channel)
         # Has a list in the format ["MEMBER ID","MILESTONE 1", "MILESTONE 2"....}
         all_milestones = channel_details[1:-1]
+
         # Omits the Member ID from channel_description_list and also an empty string from the end
 
         class MilestoneTypeSelect(discord.ui.Select):
