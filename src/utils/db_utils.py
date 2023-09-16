@@ -26,6 +26,12 @@ async def connect_db():
         sponsors text NOT NULL,
         is_active boolean NOT NULL)""")
 
+    await bot.db.execute("""CREATE TABLE IF NOT EXISTS invites(
+        inviter_uuid text NOT NULL,
+        current_invitee_uuids text,
+        total_invites integer,
+        total_valid_invites integer)""")
+
     # Commit any changes
     await bot.db.commit()
 
