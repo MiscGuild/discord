@@ -436,6 +436,8 @@ async def get_ticket_properties(channel: discord.TextChannel):
         return None
     return topic.split('|')
 
+
+
 @tasks.loop(count=1)
 async def after_cache_ready():
     # Set owner id(s) and guild
@@ -463,9 +465,10 @@ async def after_cache_ready():
     bot.staff_names = [(await get_mojang_profile(await name_grabber(member)))[0] for member in bot.staff.members]
 
 
-    from src.utils.loop_utils import check_giveaways, send_gexp_lb
+    from src.utils.loop_utils import check_giveaways, send_gexp_lb, update_invites
     check_giveaways.start()
     send_gexp_lb.start()
+    update_invites.start()
 
 
 @after_cache_ready.before_loop
