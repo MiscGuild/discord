@@ -127,10 +127,8 @@ class Help(commands.Cog):
                                         color=discord.Color.green())
 
                     # getting commands from cog
-                    print(self.bot.get_cog(cog).get_commands())
                     for command in self.bot.get_cog(cog).get_commands()[0::3]:  # Ignores all the duplicate commands returned by bridge slash commands
                         syntax = f"{prefix}{command.name}"
-                        print(syntax)
                         if not isinstance(command, discord.commands.SlashCommand):
                             for key, value in command.clean_params.items():
                                 if not value.default:
