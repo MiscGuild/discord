@@ -65,28 +65,11 @@ class Integer:
                              reverse=True)
 
         # Get image data
-        image_content = f"&f&lDaily Top: {date}&r%5Cn"
-        count = 0
-        for i in member_gexp[:10]:
-            count += 1
-            user_data = i
-            name = await get_name_by_uuid(user_data[0])
-            rank, _ = await get_hypixel_player_rank(await get_hypixel_player(uuid=user_data[0]))
-
-            # Add new entry to image content
-            image_content += f"&6{count}. {rank} {name} &2{format(user_data[1], ',d')} Guild Experience"
-            # Add new line
-            if count < 10:
-                image_content += "%5Cn"
-
-        # Replace characters for URL
-        image_content = image_content.replace("+", "%2B")
-        image_content = image_content.replace("&", "%26")
-        image_content = image_content.replace(" ", "%20")
-        image_content = image_content.replace(",", "%2C")
+        text = f"&f&lDaily Top: {date}&r%5Cn"
+        text = await generate_lb_text(member_gexp, text)
 
         for x in range(5):
-            file = await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={image_content}&t=1")
+            file = await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
             if file:
                 break
         # Return image
