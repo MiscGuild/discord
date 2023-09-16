@@ -76,6 +76,19 @@ class Guild(commands.Cog, name="guild"):
         f"""View information about {guild_handle}'s GvG team and the requirements!!"""
         await ctx.respond(embed=gvg_info_embed)
 
+    @bridge.bridge_command(aliases=["invite", "inv"])
+    @option(
+        name="name",
+        description="The username of the player whose guild experience you'd like to view",
+        required=False,
+        input_type=str
+    )
+    async def invites(self, ctx, name: str = None):
+        """View your invitation stats"""
+        await ctx.defer()
+        if not name:
+            name = await name_grabber(ctx.author)
+        await ctx.respond(embed=await String(name).invites())
 
 def setup(bot):
     bot.add_cog(Guild(bot))
