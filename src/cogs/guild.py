@@ -33,7 +33,7 @@ class Guild(commands.Cog, name="guild"):
         if isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
         if isinstance(res, str):
-            await ctx.respond(res)
+            await ctx.respond(res, ephemeral=True)
 
     @bridge.bridge_command(aliases=['weeklylb', 'wlb'])
     async def weekly_gexp_lb(self, ctx):
