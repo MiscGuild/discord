@@ -52,3 +52,38 @@ async def send_gexp_lb():
 @send_gexp_lb.before_loop
 async def before_gexp_lb():
     await bot.wait_until_ready()
+    await asyncio.sleep(5)
+
+
+@tasks.loop(hours=24)
+async def update_invites():
+    if datetime.utcnow().weekday() != 0:
+        return
+    invites_data = await select_all("SELECT * FROM invites")
+    weekly_invitations = []
+    for inviter_uuid, current_invitee_uuids, total_invites, total_valid_invites in invites_data:
+        weekly_uuids = current_invitee_uuids.split(" ")
+        weekly_count = len(weekly_uuids)
+        total_invites = total_invites + weekly_count
+        valid_invites = await check_invitation_validity(weekly_uuids)
+        weekly_invitations.append((inviter_uuid, valid_invites))
+        total_valid_invites = total_valid_invites + len(valid_invites)
+        await bot.db.execute(
+            "UPDATE invites SET total_invites = (?), total_valid_invites = (?), current_invitee_uuids = '' WHERE inviter_uuid = (?)",
+            (total_invites, total_valid_invites, inviter_uuid))
+    await bot.db.commit()
+
+    await generate_rank_upgrade(weekly_invitations)
+
+    '''await bot.db.execute("UPDATE invites SET total_invites = total_invites + current_invitee_uuids, "
+                         "total_valid_invites = total_valid_invites + current_invitee_uuids")
+    await bot.db.commit()
+    await bot.db.execute("UPDATE invites SET current_invitee_uuids = ''")
+    await bot.db.commit()
+'''
+
+
+@update_invites.before_loop
+async def before_update_invites():
+    await bot.wait_until_ready()
+    await asyncio.sleep(5)
