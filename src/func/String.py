@@ -88,7 +88,7 @@ class String:
             weekly_gexp = sum(gexp_history.values())
 
             # Send shortened version for non-command and non-ticket channels
-            if "commands" not in ctx.channel.name or ctx.channel.category not in ticket_categories.values():
+            if "commands" not in ctx.channel.name and str(ctx.channel.category) not in ticket_categories.values():
                 return f"__**{name}**__\n**Guild Experience -** `{format(weekly_gexp, ',d')}`"
 
             week_dict = {
@@ -287,15 +287,18 @@ class String:
         guild = await get_player_guild(uuid)
         if guild["name"] != guild_handle:
             return missing_permissions_embed
-        weekly_invites, total_invites, total_valid_invites = await get_invites(uuid)
-
-        weekly_invites = weekly_invites.split()
-        weekly_invites = [await get_name_by_uuid(invitee) for invitee in weekly_invites]
-        invites = ""
+        invites = await get_invites(uuid)
+        invites_text = ""
+        if not invites:
+            weekly_invites, total_invites, total_valid_invites = None, "0", "0"
+        else:
+            weekly_invites, total_invites, total_valid_invites = invites
+            weekly_invites = weekly_invites.split()
+            weekly_invites = [await get_name_by_uuid(invitee) for invitee in weekly_invites]
+            for invitee in weekly_invites:
+                invites_text += f"**▸** {invitee}\n"
         embed = discord.Embed(title=f"{ign}'s Invites", color=neutral_color)
-        for invitee in weekly_invites:
-            invites += f"**▸** {invitee}\n"
-        embed.add_field(name="Weekly Invites", value=invites, inline=False)
+        embed.add_field(name="Weekly Invites", value=None if not invites_text else invites_text, inline=False)
         embed.add_field(name="Total Invites", value=total_invites, inline=True)
         embed.add_field(name="Total Valid Invites", value=total_valid_invites, inline=True)
         embed.set_footer(text="Total invites and total valid invites do not include this week's invites. They are "

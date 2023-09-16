@@ -109,6 +109,6 @@ async def generate_rank_upgrade(weekly_invites: list):
 - Total unscaled guild experience earned - `{format(total_gexp, ',d')}`
 - Total players invited - `{format(total_invitations, ',d')}`
 
-*To know how the winner is picked, go here ASHGFAJHSFKJAHSFLAHl*'''
+*To know how the winner is picked, go here https://discord.com/channels/522586672148381726/1152480866585554994/1152521488356872222*'''
 
     await bot.get_channel(rank_upgrade_channel).send(announcement)
