@@ -11,16 +11,17 @@ from quickchart import QuickChart
 from src.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed,
                               months, neg_color, neutral_color, pos_color,
                               qotd_ans_channel_id, qotd_channel_id,
-                              ticket_categories, unknown_ign_embed, rainbow_separator)
+                              ticket_categories, unknown_ign_embed, rainbow_separator, guild_handle,
+                              missing_permissions_embed)
 from src.utils.db_utils import (delete_dnkl, insert_new_dnkl, select_one,
-                                update_dnkl)
+                                update_dnkl, get_invites)
 from src.utils.discord_utils import dnkl_application
 from src.utils.minecraft_utils import (calculate_network_level,
                                        get_color_by_gexp,
                                        get_hypixel_player_rank,
                                        get_player_gexp)
 from src.utils.request_utils import (get_hypixel_player, get_mojang_profile,
-                                     get_player_guild)
+                                     get_player_guild, get_name_by_uuid)
 
 
 class String:
@@ -66,7 +67,7 @@ class String:
         name, uuid = await get_mojang_profile(self.string)
         if not name:
             return unknown_ign_embed
-        
+
         guild = await get_player_guild(uuid)
 
         # Player is guildless
@@ -82,24 +83,23 @@ class String:
             if member["uuid"] != uuid:
                 continue
 
-
             # Get player data
             gexp_history = member["expHistory"]
             weekly_gexp = sum(gexp_history.values())
 
-            # Send shortened version for non-command channels
-            if "commands" not in ctx.channel.name:
+            # Send shortened version for non-command and non-ticket channels
+            if "commands" not in ctx.channel.name or ctx.channel.category not in ticket_categories.values():
                 return f"__**{name}**__\n**Guild Experience -** `{format(weekly_gexp, ',d')}`"
 
             week_dict = {
-                        0: "Today:",
-                        1: "Yesterday:", 
-                        2: "Two days ago:", 
-                        3: "Three days ago:",
-                        4: "Four days ago:", 
-                        5: "Five days ago:", 
-                        6: "Six days ago:"
-                        }
+                0: "Today:",
+                1: "Yesterday:",
+                2: "Two days ago:",
+                3: "Three days ago:",
+                4: "Four days ago:",
+                5: "Five days ago:",
+                6: "Six days ago:"
+            }
 
             # Fetch remaining data
             join_date = str(datetime.fromtimestamp(int(str(member["joined"])[:-3])))[:10]
@@ -120,9 +120,9 @@ class String:
             embed.set_author(name=f"{gname} {gtag}", url=f"https://plancke.io/hypixel/guild/player/{name}")
             embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
             embed.add_field(name="General Information:", value=f"`✚` **Rank**: `{rank}`\n"
-                                                                f"`✚` **Joined**: `{join_date}`\n"
-                                                                f"`✚` **Quests Completed**: `{quest_participation}`\n"
-                                                                f"`✚` **Overall Guild Experience**: `{format(weekly_gexp, ',d')}`\n\n{gexp_history_text}",
+                                                               f"`✚` **Joined**: `{join_date}`\n"
+                                                               f"`✚` **Quests Completed**: `{quest_participation}`\n"
+                                                               f"`✚` **Overall Guild Experience**: `{format(weekly_gexp, ',d')}`\n\n{gexp_history_text}",
                             inline=False)
 
             # Create chart
@@ -132,20 +132,20 @@ class String:
             chart.width = 1000
             chart.height = 500
             chart.background_color = "transparent"
-            chart.config = {"type": "line", 
+            chart.config = {"type": "line",
                             "data": {
-                                    "labels": dates,
-                                    "datasets": [
-                                                {
-                                                "label": "Experience",
-                                                "data": gexp_vals, 
-                                                "lineTension": 0.4, 
-                                                "backgroundColor": graph_color,
-                                                "borderColor": graph_border,
-                                                "pointRadius": 0, 
-                                                }
-                                                ]
+                                "labels": dates,
+                                "datasets": [
+                                    {
+                                        "label": "Experience",
+                                        "data": gexp_vals,
+                                        "lineTension": 0.4,
+                                        "backgroundColor": graph_color,
+                                        "borderColor": graph_border,
+                                        "pointRadius": 0,
                                     }
+                                ]
+                            }
                             }
             return embed.set_image(url=chart.get_url())
 
@@ -193,7 +193,7 @@ class String:
         dnkl_message = await bot.get_channel(dnkl_channel_id).send(embed=embed.set_author(name="Do-not-kick-list"))
 
         # Check if user is already on DNKL
-        current_message = await select_one("SELECT message_id FROM dnkl WHERE uuid = (?)", (uuid,))
+        current_message = await select_one("SELECT message_id FROM  dnkl WHERE uuid = (?)", (uuid,))
         # User is not currently on DNKL
         if not current_message:
             await insert_new_dnkl(dnkl_message.id, uuid, ign)
@@ -278,3 +278,26 @@ class String:
         await bot.get_channel(qotd_channel_id).send("<@&923978802818871356>", embed=embed)
         await ctx.send(f"**The QOTD has been sent to <#{qotd_channel_id}>!**")
         await bot.get_channel(qotd_ans_channel_id).send(rainbow_separator)
+
+    async def invites(self):
+        ign, uuid = await get_mojang_profile(self.string)
+        if not ign:
+            return unknown_ign_embed
+
+        guild = await get_player_guild(uuid)
+        if guild["name"] != guild_handle:
+            return missing_permissions_embed
+        weekly_invites, total_invites, total_valid_invites = await get_invites(uuid)
+
+        weekly_invites = weekly_invites.split()
+        weekly_invites = [await get_name_by_uuid(invitee) for invitee in weekly_invites]
+        invites = ""
+        embed = discord.Embed(title=f"{ign}'s Invites", color=neutral_color)
+        for invitee in weekly_invites:
+            invites += f"**▸** {invitee}\n"
+        embed.add_field(name="Weekly Invites", value=invites, inline=False)
+        embed.add_field(name="Total Invites", value=total_invites, inline=True)
+        embed.add_field(name="Total Valid Invites", value=total_valid_invites, inline=True)
+        embed.set_footer(text="Total invites and total valid invites do not include this week's invites. They are "
+                              "updated at the end of the week.")
+        return embed

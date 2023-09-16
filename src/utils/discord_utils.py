@@ -11,10 +11,9 @@ import src.utils.ui_utils as uiutils
 from src.utils.consts import (config, dnkl_req,
                               gvg_requirements, log_channel_id, neg_color, neutral_color, staff_application_questions,
                               ticket_categories,
-                              unknown_ign_embed, guild_handle, positive_responses, dnkl_creation_embed)
+                              unknown_ign_embed, guild_handle, positive_responses, dnkl_creation_embed, member_req)
 from src.utils.minecraft_utils import get_player_gexp
-from src.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild, get_guild_level
-
+from src.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild, get_guild_level, get_guild_by_name
 
 async def name_grabber(author: discord.Member) -> str:
     if not author.nick:
@@ -436,6 +435,8 @@ async def get_ticket_properties(channel: discord.TextChannel):
         return None
     return topic.split('|')
 
+
+
 @tasks.loop(count=1)
 async def after_cache_ready():
     # Set owner id(s) and guild
@@ -463,9 +464,10 @@ async def after_cache_ready():
     bot.staff_names = [(await get_mojang_profile(await name_grabber(member)))[0] for member in bot.staff.members]
 
 
-    from src.utils.loop_utils import check_giveaways, send_gexp_lb
+    from src.utils.loop_utils import check_giveaways, send_gexp_lb, update_invites
     check_giveaways.start()
     send_gexp_lb.start()
+    update_invites.start()
 
 
 @after_cache_ready.before_loop

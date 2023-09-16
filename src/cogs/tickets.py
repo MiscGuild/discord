@@ -24,9 +24,15 @@ class Tickets(commands.Cog, name="tickets"):
         required=True,
         input_type=str
     )
-    async def register(self, ctx, name: str):
+    @option(
+        name="reference",
+        description="MEMBERS OF MISC: The name of the person who invited you to Miscellaneous",
+        required=False,
+        input_type=str
+    )
+    async def register(self, ctx, name: str, reference: str = None):
         """Register with your IGN to sync your roles!"""
-        res = await Union(user=ctx.author).register(ctx, name)
+        res = await Union(user=ctx.author).register(ctx, name, reference)
         if isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
         if isinstance(res, String):

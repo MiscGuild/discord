@@ -1,21 +1,20 @@
 # The following file contains: mute, unmute, kick, ban, softban, unban, sync/forcesync, register, add, remove, avatar
 
 import asyncio
+from __main__ import bot
 from typing import Union
 
 import discord
-from __main__ import bot
-from discord.errors import Forbidden, NotFound
-from src.utils.consts import (active_req, allies, bot_missing_perms_embed,
-                              discord_not_linked_embed, err_404_embed,
-                              guild_handle, neg_color, neutral_color,
+
+from src.utils.consts import (active_req, allies, discord_not_linked_embed, guild_handle, neg_color, neutral_color,
                               pos_color, registration_channel_id,
                               staff_impersonation_embed, ticket_categories,
                               unknown_ign_embed, join_request_embed)
 from src.utils.discord_utils import (check_tag, create_ticket, has_tag_perms,
                                      is_linked_discord)
+from src.utils.referral_utils import (validate_reference)
 from src.utils.request_utils import (get_gtag, get_hypixel_player,
-                                     get_mojang_profile, get_player_guild, get_rank)
+                                     get_mojang_profile, get_player_guild)
 
 
 class Union:
@@ -57,7 +56,6 @@ class Union:
                              description=f"{self.user} was banned by {author}",
                              color=neg_color)
 
-
     async def softban(self, guild, author, reason: str = None):
         # Default reason is responsible moderator
         if not reason:
@@ -69,7 +67,6 @@ class Union:
                              description=f"{self.user} was softbanned by {author}",
                              color=neg_color)
 
-
     async def unban(self, guild, author, reason: str = None):
         # Default reason is responsible moderator
         if not reason:
@@ -79,7 +76,6 @@ class Union:
         return discord.Embed(title="Unbanned!",
                              description=f"{self.user} was unbanned by {author}",
                              color=neg_color)
-
 
     async def sync(self, ctx, name: str, tag: str = None, is_fs=False):
         await ctx.defer()
@@ -100,7 +96,8 @@ class Union:
         # Account is not linked to discord
         if not await is_linked_discord(player_data, self.user) and is_fs is False:
             embed = discord_not_linked_embed.copy()
-            return embed.add_field(name="Do the above and then enter the following in chat:", value=f"`{str(self.user)}`")
+            return embed.add_field(name="Do the above and then enter the following in chat:",
+                                   value=f"`{str(self.user)}`")
 
         guild_name = "no guild" if not guild_data else guild_data["name"]
         can_tag = await has_tag_perms(self.user)
@@ -155,14 +152,13 @@ class Union:
 
         return embed
 
-    async def register(self, ctx, name):
+    async def register(self, ctx, name, reference):
         await ctx.defer()
         # Make sure it is only used in registration channel
         if ctx.channel.id != registration_channel_id:
             return "This command can only be used in the registration channel!"
 
         ign, uuid = await get_mojang_profile(name)
-
 
         if not ign:
             return unknown_ign_embed
@@ -174,11 +170,12 @@ class Union:
         # Fetch player & guild data
         guild_data = await get_player_guild(uuid)
 
-
         guild_name = "Guildless" if not guild_data else guild_data["name"]
 
+        reference_message = None
         # User is a member
         if guild_name == guild_handle:
+            reference_message = await validate_reference(ctx, uuid, reference) if reference else None
             await ctx.author.add_roles(bot.member_role, reason="Registration - Member")
 
 
@@ -212,11 +209,14 @@ class Union:
                     # if bot.staff not in interaction.user.roles and ticket.id != interaction.channel_id: return
                     if interaction.custom_id == "Yes":
                         await ticket.purge(limit=100)
-                        await ticket.send(embed=join_request_embed.set_author(name=f"{ign} wishes to join Miscellaneous"))
+                        await ticket.send(
+                            embed=join_request_embed.set_author(name=f"{ign} wishes to join Miscellaneous"))
                         await interaction.user.add_roles(bot.guest, reason="Registration - Guest")
 
                         if guild_name != "Guildless":
-                            await ticket.send(f"{interaction.user.mention} kindly leave your current guild so that we can can invite you to Miscellaneous.")
+                            await ticket.send(
+                                f"{interaction.user.mention} kindly leave your current guild so that"
+                                f" we can can invite you to Miscellaneous.")
 
 
 
@@ -226,7 +226,10 @@ class Union:
                         await interaction.user.add_roles(bot.guest, reason="Registration - Guest")
                         await ticket.send(
                             embed=discord.Embed(
-                                title="You have been given the Guest role!\n**This ticket will be deleted in 10 seconds.** \n\n*If you need assistance with anything else, create a new ticket using* `,new`",
+                                title="You have been given the Guest role!\n"
+                                      "**This ticket will be deleted in 10 seconds.** "
+                                      "\n\n*If you need assistance with anything else,"
+                                      " create a new ticket using* `,new`",
                                 color=neg_color))
                         await asyncio.sleep(10)
                         await discord.TextChannel.delete(ticket)
@@ -251,6 +254,8 @@ class Union:
         embed = discord.Embed(
             title="Registration successful!", color=neutral_color)
         embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
+        if reference_message:
+            embed.set_footer(text=reference_message)
         return embed.add_field(name=ign, value=f"Member of {guild_name}")
 
     async def add(self, ctx):

@@ -26,6 +26,12 @@ async def connect_db():
         sponsors text NOT NULL,
         is_active boolean NOT NULL)""")
 
+    await bot.db.execute("""CREATE TABLE IF NOT EXISTS invites(
+        inviter_uuid text NOT NULL,
+        current_invitee_uuids text,
+        total_invites integer,
+        total_valid_invites integer)""")
+
     # Commit any changes
     await bot.db.commit()
 
@@ -86,3 +92,30 @@ async def set_giveaway_inactive(id: int):
     await bot.db.execute(f"Update giveaways SET is_active = 0 WHERE message_id = (?)", (id,))
     await bot.db.commit()
 
+
+async def insert_new_inviter(inviter_uuid: str, invitee_uuid: str):
+    await bot.db.execute("INSERT INTO invites VALUES (?, ?, 0, 0)",
+                         (inviter_uuid, invitee_uuid))
+    await bot.db.commit()
+
+
+async def add_invitee(inviter_uuid, invitee_uuid):
+    invitees = (await select_one("SELECT current_invitee_uuids FROM invites WHERE inviter_uuid = (?)",
+                                 (inviter_uuid,)))[0].split(" ")
+    if invitee_uuid in invitees:
+        return None
+
+    invitees.append(invitee_uuid)
+    count = len(invitees)
+    invitees = " ".join([str(invitee) for invitee in invitees])
+    await bot.db.execute("UPDATE invites SET current_invitee_uuids = (?) WHERE inviter_uuid = (?)",
+                         (invitees, inviter_uuid))
+    await bot.db.commit()
+
+    return count
+
+
+async def get_invites(inviter_uuid):
+    return (await select_one(
+        "SELECT current_invitee_uuids, total_invites, total_valid_invites FROM invites WHERE inviter_uuid = (?)",
+        (inviter_uuid,)))

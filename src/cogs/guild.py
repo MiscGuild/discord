@@ -37,7 +37,7 @@ class Guild(commands.Cog, name="guild"):
 
     @bridge.bridge_command(aliases=['weeklylb', 'wlb'])
     async def weekly_gexp_lb(self, ctx):
-        f"""View {guild_handle}'s weekly guild experience leaderboard!"""
+        """View the weekly guild experience leaderboard!"""
         await ctx.defer()
         res = await General.weeklylb(ctx)
         if isinstance(res, discord.File):
@@ -53,7 +53,7 @@ class Guild(commands.Cog, name="guild"):
         input_type=int
     )
     async def gtop(self, ctx, day: int = 1):
-        f"""View {guild_handle}'s daily guild experience leaderboard!"""
+        """View the daily guild experience leaderboard!"""
         await ctx.defer()
         res = await Integer(integer=day).gtop(ctx=ctx)
         if isinstance(res, discord.File):
@@ -63,7 +63,7 @@ class Guild(commands.Cog, name="guild"):
 
     @bridge.bridge_command(aliases=["req", "reqs"])
     async def requirements(self, ctx):
-        f"""View {guild_handle}'s guild experience requirements!"""
+        """View guild experience requirements!"""
         await ctx.respond(embed=requirements_embed)
 
     @bridge.bridge_command(aliases=["res"])
@@ -73,9 +73,22 @@ class Guild(commands.Cog, name="guild"):
 
     @bridge.bridge_command()
     async def gvg(self, ctx):
-        f"""View information about {guild_handle}'s GvG team and the requirements!!"""
+        """View information about GvG team and the requirements!!"""
         await ctx.respond(embed=gvg_info_embed)
 
+    @bridge.bridge_command(aliases=["invite", "inv"])
+    @option(
+        name="name",
+        description="The username of the player whose guild experience you'd like to view",
+        required=False,
+        input_type=str
+    )
+    async def invites(self, ctx, name: str = None):
+        """View your invitation stats"""
+        await ctx.defer()
+        if not name:
+            name = await name_grabber(ctx.author)
+        await ctx.respond(embed=await String(name).invites())
 
 def setup(bot):
     bot.add_cog(Guild(bot))

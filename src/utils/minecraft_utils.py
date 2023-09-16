@@ -2,11 +2,12 @@ import math
 import re
 
 from src.utils.consts import ChatColor, active_req, member_req, resident_req
-from src.utils.request_utils import get_player_guild
+from src.utils.request_utils import get_player_guild, get_name_by_uuid, get_hypixel_player
 
 
-async def get_player_gexp(uuid: str):
-    guild_data = await get_player_guild(uuid)
+async def get_player_gexp(uuid: str, guild_data: dict = None):
+    if not guild_data:
+        guild_data = await get_player_guild(uuid)
 
     # Player is in a guild
     if guild_data:
@@ -88,7 +89,7 @@ async def get_hypixel_player_rank(player_data: dict):
                 return f"&6[MVP{pluscolor}++&6]" if "monthlyRankColor" not in player_data or player_data[
                     "monthlyRankColor"] == "GOLD" else f"&b[MVP{pluscolor}++&b]", "[MVP++]"
 
-            #Player is MVP+
+            # Player is MVP+
             # Custom + color
             if "rankPlusColor" in player_data:
                 pluscolor = ChatColor[player_data["rankPlusColor"]].value
@@ -101,3 +102,38 @@ async def get_hypixel_player_rank(player_data: dict):
 
 async def calculate_network_level(total_exp: int):
     return round((math.sqrt((2 * total_exp) + 30625) / 50) - 2.5, 2)
+
+
+async def get_gexp_sorted(guild_data: dict):
+    member_gexp = {}
+
+    # Loop through all guild members' gexp, adding it to dict
+    for member in guild_data["members"]:
+        member_gexp[member["uuid"]] = sum(
+            member["expHistory"].values())
+    # Sort member gexp
+    member_gexp = sorted(member_gexp.items(), key=lambda item: item[1], reverse=True)
+
+    return member_gexp
+
+
+async def generate_lb_text(member_gexp: list, text: str):
+    # Generate leaderboard text
+    count = 0
+    for uuid, gexp in member_gexp[:10]:
+        count += 1
+        name = await get_name_by_uuid(uuid)
+        rank, _ = await get_hypixel_player_rank(
+            await get_hypixel_player(uuid=uuid))  # Ignores value without color formatting
+
+        # Add new entry to image content
+        text += f"&6{count}. {rank} {name} &2{format(gexp, ',d')} Guild Experience"
+        # Add new line
+        if count < 10:
+            text += "%5Cn"
+
+    # Replace characters for the URL
+    text = text.replace("+", "%2B").replace("&", "%26").replace(" ", "%20").replace(",", "%2C")
+
+    # Return image
+    return text

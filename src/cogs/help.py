@@ -127,15 +127,17 @@ class Help(commands.Cog):
                                         color=discord.Color.green())
 
                     # getting commands from cog
-                    for command in self.bot.get_cog(cog).get_commands()[::3]:  # Ignores all the duplicate commands returned by bridge slash commands
-
+                    for command in self.bot.get_cog(cog).get_commands()[0::3]:  # Ignores all the duplicate commands returned by bridge slash commands
                         syntax = f"{prefix}{command.name}"
-                        for key, value in command.clean_params.items():
-                            if not value.default:
-                                syntax += " [" + key + "]"
-                            else:
-                                syntax += " <" + key + ">"
-                        emb.add_field(name=f"`{syntax}`", value=command.help, inline=False)
+                        if not isinstance(command, discord.commands.SlashCommand):
+                            for key, value in command.clean_params.items():
+                                if not value.default:
+                                    syntax += " [" + key + "]"
+                                else:
+                                    syntax += " <" + key + ">"
+                            emb.add_field(name=f"`{syntax}`", value=command.help, inline=False)
+                        else:
+                            emb.add_field(name=f"`{syntax}`", value=command.description, inline=False)
 
                     emb.set_footer(
                         text="\n\n[] represent compulsory fields\n<> represent optional fields\nDo not type the brackets!")
