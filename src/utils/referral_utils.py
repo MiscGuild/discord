@@ -51,7 +51,14 @@ async def check_invitation_validity(invitations: list):
     return weekly_valid_invites
 
 
-async def generate_rank_upgrade(weekly_invites: list):
+async def get_entries(gexp):
+    if gexp < active_req:
+        return 1
+    else:
+        return round(50 * (1 - exp(-gexp / 500000)))
+
+
+async def generate_rank_upgrade(weekly_invites : list):
     guild_data = await get_guild_by_name(guild_handle)
     members = await get_gexp_sorted(guild_data)
     entries = {}
