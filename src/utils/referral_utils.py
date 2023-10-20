@@ -9,7 +9,7 @@ from src.utils.minecraft_utils import get_player_gexp, get_gexp_sorted
 from src.utils.request_utils import get_mojang_profile, get_player_guild, get_guild_by_name, get_name_by_uuid
 
 
-async def validate_reference(ctx, invitee_uuid, inviter_ign):
+async def validate_reference(invitee_uuid, inviter_ign):
     inviter_ign, inviter_uuid = await get_mojang_profile(inviter_ign) if inviter_ign else (None, None)
     if not inviter_uuid:
         return f"{inviter_ign} is not a valid minecraft username.\nThis reference will not count."
