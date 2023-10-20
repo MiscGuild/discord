@@ -285,8 +285,9 @@ class String:
             return unknown_ign_embed
 
         guild = await get_player_guild(uuid)
-        if guild["name"] != guild_handle:
+        if ("name" not in guild) or (guild["name"] != guild_handle):
             return missing_permissions_embed
+
         invites = await get_invites(uuid)
         invites_text = ""
         if not invites:

@@ -5,6 +5,8 @@ from __main__ import bot
 from typing import Union
 
 import discord
+import src.utils.ui_utils as uiutils
+
 
 from src.utils.consts import (active_req, allies, discord_not_linked_embed, guild_handle, neg_color, neutral_color,
                               pos_color, registration_channel_id,
@@ -152,8 +154,7 @@ class Union:
 
         return embed
 
-    async def register(self, ctx, name, reference):
-        await ctx.defer()
+    async def register(self, ctx, name):
         # Make sure it is only used in registration channel
         if ctx.channel.id != registration_channel_id:
             return "This command can only be used in the registration channel!"
@@ -172,10 +173,13 @@ class Union:
 
         guild_name = "Guildless" if not guild_data else guild_data["name"]
 
-        reference_message = None
+
+
+
+        getReference = False
         # User is a member
         if guild_name == guild_handle:
-            reference_message = await validate_reference(ctx, uuid, reference) if reference else None
+            getReference = True
             await ctx.author.add_roles(bot.member_role, reason="Registration - Member")
 
 
@@ -254,9 +258,18 @@ class Union:
         embed = discord.Embed(
             title="Registration successful!", color=neutral_color)
         embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
-        if reference_message:
-            embed.set_footer(text=reference_message)
-        return embed.add_field(name=ign, value=f"Member of {guild_name}")
+
+        embed.add_field(name=ign, value=f"Member of {guild_name}")
+        if getReference:
+
+            fields = [
+                ["Who invited you to Miscellaneous on Hypixel?", "Enter NONE if you joined on your own.", discord.InputTextStyle.short,
+                 "Invited by:"]
+            ]
+            await ctx.response.send_modal(
+                modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, uuid=uuid,title="Player Reference", function=validate_reference))
+        else:
+            return embed
 
     async def add(self, ctx):
         if ctx.channel.category.name not in ticket_categories.values():

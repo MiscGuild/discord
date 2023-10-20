@@ -17,22 +17,16 @@ class Tickets(commands.Cog, name="tickets"):
     def __init__(self, bot):
         self.bot = bot
 
-    @bridge.bridge_command(aliases=["reg", "verify"])
+    @commands.slash_command()
     @option(
         name="name",
         description="Your Minecraft username",
         required=True,
         input_type=str
     )
-    @option(
-        name="reference",
-        description="MEMBERS OF MISC: The name of the person who invited you to Miscellaneous",
-        required=False,
-        input_type=str
-    )
-    async def register(self, ctx, name: str, reference: str = None):
+    async def register(self, ctx, name: str):
         """Register with your IGN to sync your roles!"""
-        res = await Union(user=ctx.author).register(ctx, name, reference)
+        res = await Union(user=ctx.author).register(ctx, name)
         if isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
         if isinstance(res, String):

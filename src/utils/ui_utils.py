@@ -316,13 +316,15 @@ class CloseDNKLTicket(discord.ui.Button):
 
 
 class ModalCreator(discord.ui.Modal):
-    def __init__(self, embed: discord.Embed, fields: list, title: str, ign: str) -> None:
+    def __init__(self, embed: discord.Embed, fields: list, title: str, ign: str, uuid: str,function = None) -> None:
         #   fields = ["LABEL", "PLACEHOLDER", STYLE]
         super().__init__(title=title)
         self.embed = embed
         self.ign = ign
+        self.uuid = uuid
         self.fields = fields
         self.title = title
+        self.function = function
         for field in fields:
             self.add_item(discord.ui.InputText(label=field[0],
                                                placeholder=field[1],
@@ -334,6 +336,9 @@ class ModalCreator(discord.ui.Modal):
             self.embed.add_field(name=field[3],
                                  value=self.children[count].value,
                                  inline=False)
+            if self.function:
+                await self.function(self.uuid, self.children[count].value)
             count += 1
 
         await interaction.response.send_message(embeds=[self.embed])
+
