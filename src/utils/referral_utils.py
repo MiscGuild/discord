@@ -52,10 +52,11 @@ async def check_invitation_validity(invitations: list):
 
 
 async def get_entries(gexp):
-    if gexp < active_req:
-        return 1
-    else:
+    if gexp >= active_req:
         return round(50 * (1 - exp(-gexp / 500000)))
+    elif gexp >= member_req:
+        return 1
+    return 0
 
 
 async def generate_rank_upgrade(weekly_invites : list):
