@@ -152,7 +152,7 @@ class Union:
 
         return embed
 
-    async def register(self, ctx, name, reference):
+    async def register(self, ctx, name):
         await ctx.defer()
         # Make sure it is only used in registration channel
         if ctx.channel.id != registration_channel_id:
