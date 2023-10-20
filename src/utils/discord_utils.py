@@ -112,14 +112,15 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                         ["What was the username of the accused", "", discord.InputTextStyle.short,
                          "Username of the accused"],
                         ["What was the offense?", "", discord.InputTextStyle.short, "Offense"],
-                        ["When did this happen?", "", discord.InputTextStyle.short, "TIme of Offense"],
+                        ["When did this happen?", "", discord.InputTextStyle.short, "Time of Offense"],
                         ["Provide a brief description of what happened.",
                          "Answer the question in no more than 100 words.",
                          discord.InputTextStyle.long, "Description"]
                     ]
                     embed = discord.Embed(title="Player Report", color=neutral_color)
                     await interaction.response.send_modal(
-                        modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, title="Player Report"))
+                        modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, uuid=uuid, title="Player Report"))
+
                 if option == "Query/Problem":
                     await ticket.edit(name=f"general-{ign}", topic=f"{interaction.user.id}|",
                                       category=discord.utils.get(interaction.guild.categories,
