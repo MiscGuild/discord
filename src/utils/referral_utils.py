@@ -1,6 +1,6 @@
 from __main__ import bot
 from datetime import datetime, timedelta
-from math import ceil
+from math import exp
 from random import shuffle, choice
 
 from src.utils.consts import guild_handle, member_req, active_req, rank_upgrade_channel
@@ -64,20 +64,13 @@ async def generate_rank_upgrade(weekly_invites : list):
     entries = {}
     total_gexp = sum([gexp for uuid, gexp in members])
 
-    # 1) Active req is subtracted from the player's weekly guild experience
-    # 2) The difference is divided by 50,000 and rounded up
-    # 3) The quotient is multiplied by 10 and added to the player's entries
-    for uuid, gexp in members[:10]:
-        if gexp < active_req:
-            break
-        gexp = gexp - active_req
-        entry_multiplier = ceil(gexp / 50000)
-        entries[uuid] = 10 * entry_multiplier
+    for uuid, gexp in members:
+        entries[uuid] = await get_entries(gexp)
 
-    # A player gets 1 entry for every valid invite they have made
+    # A player gets 7 entries for every valid invite they have made
     total_invitations = 0
     for uuid, invitations in weekly_invites:
-        entries[uuid] = entries[uuid] + len(invitations) if uuid in entries else len(invitations)
+        entries[uuid] = entries[uuid] + (len(invitations)*7)
         total_invitations += len(invitations)
 
     weighted_entries = [uuid for uuid, weight in entries.items() for _ in range(weight)]
@@ -108,13 +101,13 @@ async def generate_rank_upgrade(weekly_invites : list):
 **The winner is....**
 ## {winner}
 > Total Guild Experience:- `{format(winner_gexp, ',d')}`
-> Invites:- `{format(len(winner_invites), ',d')}`
+> Valid Invites:- `{format(len(winner_invites), ',d')}`
 > Total Entries:- `{format(entries[winner_uuid], ',d') if winner_uuid in entries else 0}`
 
 
 ### Here are some statistics for the past week
 - Total unscaled guild experience earned - `{format(total_gexp, ',d')}`
-- Total players invited - `{format(total_invitations, ',d')}`
+- Total players invited (valid) - `{format(total_invitations, ',d')}`
 
 *To know how the winner is picked, go here https://discord.com/channels/522586672148381726/1152480866585554994/1152521488356872222*'''
 
