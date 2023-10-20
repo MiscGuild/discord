@@ -17,7 +17,7 @@ class Tickets(commands.Cog, name="tickets"):
     def __init__(self, bot):
         self.bot = bot
 
-    @bridge.bridge_command(aliases=["reg", "verify"])
+    @commands.slash_command()
     @option(
         name="name",
         description="Your Minecraft username",
