@@ -173,15 +173,21 @@ class Union:
 
         guild_name = "Guildless" if not guild_data else guild_data["name"]
 
+        embed = discord.Embed(
+            title="Registration successful!", color=neutral_color)
+        embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
+        embed.add_field(name=ign, value=f"Member of {guild_name}" if guild_name != "Guildless" else "Guildless")
 
-
-
-        getReference = False
         # User is a member
         if guild_name == guild_handle:
-            getReference = True
+            fields = [
+                ["Who invited you to Miscellaneous on Hypixel?", "Enter NONE if you joined on your own.",
+                 discord.InputTextStyle.short,
+                 "Invited by:"]
+            ]
+            await ctx.response.send_modal(modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, uuid=uuid, title="Player Reference",
+                                           function=validate_reference))
             await ctx.author.add_roles(bot.member_role, reason="Registration - Member")
-
 
         # User is in an allied guild
         elif guild_name in allies:
@@ -254,22 +260,7 @@ class Union:
         await ctx.author.remove_roles(bot.new_member_role, reason="Register")
         await ctx.author.edit(nick=ign)
 
-        # Send success embed
-        embed = discord.Embed(
-            title="Registration successful!", color=neutral_color)
-        embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
-
-        embed.add_field(name=ign, value=f"Member of {guild_name}")
-        if getReference:
-
-            fields = [
-                ["Who invited you to Miscellaneous on Hypixel?", "Enter NONE if you joined on your own.", discord.InputTextStyle.short,
-                 "Invited by:"]
-            ]
-            await ctx.response.send_modal(
-                modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, uuid=uuid,title="Player Reference", function=validate_reference))
-        else:
-            return embed
+        return embed if guild_name != guild_handle else None
 
     async def add(self, ctx):
         if ctx.channel.category.name not in ticket_categories.values():
