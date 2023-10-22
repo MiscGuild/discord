@@ -238,12 +238,12 @@ class General:
     async def partner(ctx, organization_name: str):
         await ctx.send("In one message, please provide a brief description of the guild/organization being partnered.")
         # Wait for description
-        description = (await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)).content
+        description = (await bot.wait_for("message", check=lambda x: x.author == ctx.author)).content
 
         await ctx.send(
             "Please provide the logo of the organization/guild. (Please provide the URL. If they don't have a logo, type `None`)")
         # Wait for Logo
-        response = (await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)).content
+        response = (await bot.wait_for("message", check=lambda x: x.author == ctx.author)).content
         logo = response if not response.lower() == "none" else None
 
         if logo:
