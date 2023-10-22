@@ -191,6 +191,7 @@ class Union:
 
         # User is in an allied guild
         elif guild_name in allies:
+            await ctx.defer()
             await ctx.author.add_roles(bot.guest, bot.ally, reason="Registration - Ally")
 
             # Add guild tag as nick
@@ -200,6 +201,7 @@ class Union:
 
         # User is a guest
         else:
+            await ctx.defer()
             await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
             ticket = await create_ticket(ctx.author, f"ticket-{ign}",
                                          category_name=ticket_categories["registrees"])
