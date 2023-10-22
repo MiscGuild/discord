@@ -41,7 +41,7 @@ class Staff(commands.Cog, name="staff"):
     )
     async def forcesync(self, ctx, member: discord.Member, name: str):
         """Update a user's discord nick, tag and roles for them!"""
-        res = await Union(user=member).sync(ctx, name, None, True)
+        res = await Union(user=ctx.guild.get_member(member.id)).sync(ctx, name, None, True)
         if isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
         elif isinstance(res, str):
