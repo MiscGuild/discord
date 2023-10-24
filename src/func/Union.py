@@ -162,11 +162,11 @@ class Union:
         ign, uuid = await get_mojang_profile(name)
 
         if not ign:
-            return unknown_ign_embed
+            return unknown_ign_embed, None
 
         # Filter out people impersonating staff
         if ign in bot.staff_names:
-            return staff_impersonation_embed
+            return staff_impersonation_embed, None
 
         # Fetch player & guild data
         guild_data = await get_player_guild(uuid)
@@ -188,6 +188,7 @@ class Union:
             await ctx.response.send_modal(modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, uuid=uuid, title="Player Reference",
                                            function=validate_reference))
             await ctx.author.add_roles(bot.member_role, reason="Registration - Member")
+            guest_ticket = None
 
         # User is in an allied guild
         elif guild_name in allies:
@@ -198,6 +199,7 @@ class Union:
             gtag = "" if "tag" not in guild_data else guild_data["tag"]
             if not ctx.author.nick or gtag not in ctx.author.nick:
                 ign = ign + " " + f"[{gtag}]"
+            guest_ticket = None
 
         # User is a guest
         else:
@@ -209,7 +211,7 @@ class Union:
             await ticket.edit(name=f"join-request-{ign}", topic=f"{ctx.author.id}|",
                               category=discord.utils.get(ctx.guild.categories,
                                                          name=ticket_categories["registrees"]))
-
+            guest_ticket = ticket
             class Join_Misc_Buttons(discord.ui.Button):
                 def __init__(self, button: list):
                     """
@@ -259,10 +261,10 @@ class Union:
                 view=view)
 
         # Remove new member role, edit nick and delete message
-        await ctx.author.remove_roles(bot.new_member_role, reason="Register")
-        await ctx.author.edit(nick=ign)
+        #await ctx.author.remove_roles(bot.new_member_role, reason="Register")
+        #await ctx.author.edit(nick=ign)
 
-        return embed if guild_name != guild_handle else None
+        return (embed, guest_ticket) if guild_name != guild_handle else (None, None)
 
     async def add(self, ctx):
         if ctx.channel.category.name not in ticket_categories.values():
