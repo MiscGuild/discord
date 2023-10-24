@@ -261,8 +261,8 @@ class Union:
                 view=view)
 
         # Remove new member role, edit nick and delete message
-        #await ctx.author.remove_roles(bot.new_member_role, reason="Register")
-        #await ctx.author.edit(nick=ign)
+        await ctx.author.remove_roles(bot.new_member_role, reason="Register")
+        await ctx.author.edit(nick=ign)
 
         return (embed, guest_ticket) if guild_name != guild_handle else (None, None)
 
