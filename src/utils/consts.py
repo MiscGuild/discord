@@ -75,6 +75,7 @@ milestone_categories = {
     "turbo_kart_racers": "Turbo Kart Racers",
     "pit": "The Pit",
     "murder_mystery": "Murder Mystery",
+    "copsvcrims": "Cops and Crims",
     "miscellaneous": "Miscellaneous",
     "discord": "Discord",
     "other": "Other"
@@ -92,6 +93,7 @@ milestone_emojis = {
     "turbo_kart_racers": "<:TurboKartRacers64:846306861950304267>",
     "pit": "<:pit:851361342744690728>",
     "murder_mystery": "<:MurderMystery64:823036899974447105>",
+    "copsvcrims": "<:CVC64:846306846717378560>",
     "miscellaneous": "<:Misc:540990817872117780>",
     "discord": "<:discord:977349801412788266>",
     "other": "❓"

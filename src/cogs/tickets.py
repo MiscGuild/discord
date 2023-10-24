@@ -26,9 +26,12 @@ class Tickets(commands.Cog, name="tickets"):
     )
     async def register(self, ctx, name: str):
         """Register with your IGN to sync your roles!"""
-        res = await Union(user=ctx.author).register(ctx, name)
+        res, guest_ticket = await Union(user=ctx.author).register(ctx, name)
         if isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
+            if guest_ticket:
+                print(guest_ticket)
+                await ctx.followup.send(f"Head on over to <#{guest_ticket.id}>!", ephemeral=True)
         if isinstance(res, String):
             await ctx.respond(res)
 
