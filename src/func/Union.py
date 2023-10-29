@@ -157,7 +157,7 @@ class Union:
     async def register(self, ctx, name):
         # Make sure it is only used in registration channel
         if ctx.channel.id != registration_channel_id:
-            return "This command can only be used in the registration channel!"
+            return "This command can only be used in the registration channel!", None
 
         ign, uuid = await get_mojang_profile(name)
 
@@ -264,7 +264,7 @@ class Union:
         await ctx.author.remove_roles(bot.new_member_role, reason="Register")
         await ctx.author.edit(nick=ign)
 
-        return (embed, guest_ticket) if guild_name != guild_handle else (None, None)
+        return embed, guest_ticket if guild_name != guild_handle else None, None
 
     async def add(self, ctx):
         if ctx.channel.category.name not in ticket_categories.values():
