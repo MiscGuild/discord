@@ -30,7 +30,6 @@ class Tickets(commands.Cog, name="tickets"):
         if isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
             if guest_ticket:
-                print(guest_ticket)
                 await ctx.followup.send(f"Head on over to <#{guest_ticket.id}>!", ephemeral=True)
         if isinstance(res, String):
             await ctx.respond(res)
