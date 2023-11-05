@@ -210,15 +210,13 @@ class InactivityReasonSelect(ui.Select):
             staff_approval_embed.set_footer(text="Other Elaboration: \n" + other_reason)
 
         DNKLView = discord.ui.View(timeout=None)  # View for staff members to approve/deny the DNKL
-        buttons = [["Approve", "DNKL_Approve", discord.enums.ButtonStyle.green],
-                   ["Deny", "DNKL_Deny", discord.enums.ButtonStyle.red],
-                   ["Error", "DNKL_Error", discord.enums.ButtonStyle.gray]]
+
         # Loop through the list of roles and add a new button to the view for each role.
-        for button in buttons:
+        for button in self.buttons:
             # Get the role from the guild by ID.
             DNKLView.add_item(
-                Dnkl_Buttons(channel=self.channel, author=self.author, ign=self.ign, uuid=self.uuid, button=button,
-                             embed=final_embed))
+                Button_Creator(channel=self.channel, author=self.author, ign=self.ign, uuid=self.uuid, button=button,
+                               embed=final_embed, function=button[3]))
 
         await self.channel.send("**Staff**, what do you wish to do with this application?", embed=staff_approval_embed,
                                 view=DNKLView)
