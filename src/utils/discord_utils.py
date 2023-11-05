@@ -64,6 +64,22 @@ async def close_ticket(channel: discord.TextChannel, author: discord.User, ign: 
         await bot.get_channel(log_channel_id).send(
             f"DNKL Request was denied and channel was deleted by {author}")
         await bot.get_channel(log_channel_id).send(file=transcript)
+
+    # Sleep and delete channel
+    await asyncio.sleep(20)
+    await discord.TextChannel.delete(channel)
+
+
+async def dnkl_error(channel: discord.TextChannel, author: discord.User, ign: str, uuid: str, embed: discord.Embed,
+                     interaction: discord.Interaction):
+    if bot.staff not in interaction.user.roles:
+        await channel.send(embed=missing_permissions_embed)
+        return None
+
+    await interaction.response.send_message(embed=discord.Embed(
+        title="Your application has been accepted, however there was an error!",
+        description="Please await staff assistance!",
+        color=neutral_color))
 async def create_ticket(user: discord.Member, ticket_name: str, category_name: str = ticket_categories["generic"]):
     # Create ticket
     ticket: discord.TextChannel = await bot.guild.create_text_channel(ticket_name,
