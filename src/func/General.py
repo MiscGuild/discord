@@ -150,7 +150,7 @@ class General:
                     last_value = guild_division[0]
 
                 # Set nick
-                if not discord_member.nick or gtag not in discord_member.nick:
+                if not discord_member.nick or f" [{gtag}]" not in discord_member.nick:
                     await discord_member.edit(nick=username + f' [{gtag}]')
 
                 # Edit roles

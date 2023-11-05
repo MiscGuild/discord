@@ -1,3 +1,4 @@
+import asyncio
 from __main__ import bot
 from datetime import datetime, timedelta
 from io import BytesIO
@@ -11,9 +12,12 @@ import src.utils.ui_utils as uiutils
 from src.utils.consts import (config, dnkl_req,
                               gvg_requirements, log_channel_id, neg_color, neutral_color, staff_application_questions,
                               ticket_categories,
-                              unknown_ign_embed, guild_handle, positive_responses, dnkl_creation_embed, member_req)
+                              unknown_ign_embed, guild_handle, positive_responses, dnkl_creation_embed, dnkl_channel_id,
+                              missing_permissions_embed)
+from src.utils.db_utils import select_one, insert_new_dnkl, update_dnkl, delete_dnkl
 from src.utils.minecraft_utils import get_player_gexp
-from src.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild, get_guild_level, get_guild_by_name
+from src.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild, get_guild_level
+
 
 async def name_grabber(author: discord.Member) -> str:
     if not author.nick:
@@ -39,9 +43,134 @@ async def is_linked_discord(player_data: dict, user: discord.User) -> bool:
     return (discord == str(user)[:-2]) or (discord == (str(user.id) + "#0000") or (discord == str(user)))
 
 
-
 async def get_ticket_creator(channel: discord.TextChannel):
     return bot.guild.get_member(int(channel.topic.split("|")[0]))
+
+
+async def close_ticket(channel: discord.TextChannel, author: discord.User, ign: str, uuid: str,
+                       embed: discord.Embed, interaction: discord.Interaction):
+    if author != interaction.user:
+        await channel.send(embed=missing_permissions_embed)
+        return None
+
+    embed = discord.Embed(title="This ticket will be deleted in 20 seconds!", color=neg_color)
+
+    # Send deletion warning and gather transcript
+    await interaction.response.send_message(embed=embed)
+    transcript = await chat_exporter.export(channel, limit=None)
+    if transcript:
+        transcript = discord.File(BytesIO(transcript.encode()),
+                                  filename=f"transcript-{channel.name}.html")
+        await bot.get_channel(log_channel_id).send(
+            f"DNKL Request was denied and channel was deleted by {author}")
+        await bot.get_channel(log_channel_id).send(file=transcript)
+
+    # Sleep and delete channel
+    await asyncio.sleep(20)
+    await discord.TextChannel.delete(channel)
+
+
+async def gvg_approve(channel: discord.TextChannel, author: discord.User, ign: str, uuid: str, embed: discord.Embed,
+                      interaction: discord.Interaction):
+    if bot.staff not in interaction.user.roles:
+        await channel.send(embed=missing_permissions_embed)
+        return None
+
+    await interaction.response.send_message(embed=discord.Embed(
+        title="Your application has been accepted!",
+        description="Please await staff assistance for more information!",
+        color=neutral_color))
+    member = await bot.guild.fetch_member(author.id)
+    await member.add_roles(bot.gvg)
+
+    return True
+
+
+async def gvg_deny(channel: discord.TextChannel, author: discord.User, ign: str, uuid: str, embed: discord.Embed,
+                   interaction: discord.Interaction):
+    if bot.staff not in interaction.user.roles:
+        await channel.send(embed=missing_permissions_embed)
+        return None
+
+    await interaction.response.send_message(embed=discord.Embed(
+        title="Your application has been denied!",
+        description="Please await staff assistance for more information!",
+        color=neg_color))
+
+    return True
+
+
+async def dnkl_error(channel: discord.TextChannel, author: discord.User, ign: str, uuid: str, embed: discord.Embed,
+                     interaction: discord.Interaction):
+    if bot.staff not in interaction.user.roles:
+        await channel.send(embed=missing_permissions_embed)
+        return None
+
+    await interaction.response.send_message(embed=discord.Embed(
+        title="Your application has been accepted, however there was an error!",
+        description="Please await staff assistance!",
+        color=neutral_color))
+    return True
+
+
+async def dnkl_deny(channel: discord.TextChannel, author: discord.User, ign: str, uuid: str, embed: discord.Embed,
+                    interaction: discord.Interaction, self_denial: bool = False):
+    if bot.staff not in interaction.user.roles and not self_denial:
+        await channel.send(embed=missing_permissions_embed)
+        return None
+
+    if not self_denial:
+        await interaction.response.send_message("**This user's do-not-kick-list application has been denied!.**\n"
+                                                "If you didn't mean to hit deny, you can add them using `/dnkl_add`.",
+                                                ephemeral=True)
+
+        embed = discord.Embed(title="Your do-not-kick-list application has been denied!",
+                              description=f"You do not meet the DNKL requirements of {format(dnkl_req, ',d')} weekly guild experience.",
+                              color=neg_color)
+        embed.set_footer(
+            text="If don't you think you can meet the requirements, you may rejoin the guild once your inactivity period has ended.")
+
+    closeView = discord.ui.View(timeout=None)  # View for staff members to approve/deny the DNKL
+    button = ("Close This Ticket", "close_ticket", discord.enums.ButtonStyle.red)
+    closeView.add_item(
+        uiutils.Button_Creator(channel=channel, author=author, ign=ign, uuid=uuid, button=button,
+                               function=close_ticket))
+    await channel.send(embed=embed, view=closeView)
+    await delete_dnkl(ign)
+
+    return True
+
+
+async def dnkl_approve(channel: discord.TextChannel, author: discord.User, ign: str, uuid: str, embed: discord.Embed,
+                       interaction: discord.Interaction):
+    if bot.staff not in interaction.user.roles:
+        await channel.send(embed=missing_permissions_embed)
+        return None
+
+    msg = await bot.get_channel(dnkl_channel_id).send(embed=embed)
+
+    # Check if user is already on DNKL
+    current_message = await select_one("SELECT message_id FROM dnkl WHERE uuid = (?)",
+                                       (uuid,))
+    # User is not currently on DNKL
+    if not current_message:
+        await insert_new_dnkl(msg.id, uuid, ign)
+        return await interaction.response.send_message("**This user has been added to the do-not-kick-list!**")
+
+    # User is already on DNKl
+    # Try to delete current message
+    try:
+        current_message = await bot.get_channel(dnkl_channel_id).fetch_message(
+            current_message)
+        await current_message.delete()
+    except Exception:
+        pass
+
+    await update_dnkl(msg.id, uuid)
+    await interaction.response.send_message(
+        "**Since this user was already on the do-not-kick-list, their entry has been updated.**")
+
+    return True
 
 
 async def create_ticket(user: discord.Member, ticket_name: str, category_name: str = ticket_categories["generic"]):
@@ -119,8 +248,8 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     ]
                     embed = discord.Embed(title="Player Report", color=neutral_color)
                     await interaction.response.send_modal(
-                        modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, uuid=uuid, title="Player Report"))
-
+                        modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, uuid=uuid,
+                                                   title="Player Report"))
                 if option == "Query/Problem":
                     await ticket.edit(name=f"general-{ign}", topic=f"{interaction.user.id}|",
                                       category=discord.utils.get(interaction.guild.categories,
@@ -214,9 +343,9 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                                                  name=ticket_categories["generic"]))
 
                     # Fetch player data
-                    player_data = await get_hypixel_player(ign)
+                    player_data = await get_hypixel_player(uuid=uuid)
                     if not player_data:
-                        return await ticket.send(unknown_ign_embed)
+                        return await ticket.send(embed=unknown_ign_embed)
                     player_data = player_data["stats"]
 
                     # Set vars for each stat
@@ -286,13 +415,14 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                 # Send embed and end loop
 
                     GvGView = discord.ui.View(timeout=None)  # View for staff members to approve/deny the DNKL
-                    buttons = [["Accept", "GvG_Application_Positive", discord.enums.ButtonStyle.green],
-                               ["Deny", "GvG_Application_Negative", discord.enums.ButtonStyle.red]]
+                    buttons = (("Accept", "GvG_Application_Positive", discord.enums.ButtonStyle.green, gvg_approve),
+                               ("Deny", "GvG_Application_Negative", discord.enums.ButtonStyle.red, gvg_deny))
                     # Loop through the list of roles and add a new button to the view for each role.
                     for button in buttons:
                         # Get the role from the guild by ID.
                         GvGView.add_item(
-                            uiutils.Button_Creator(channel=ticket, ign=ign, button=button, member=user, uuid=uuid))
+                            uiutils.Button_Creator(channel=ticket, ign=ign, button=button, author=user, uuid=uuid,
+                                                   function=button[3]))
 
                     await ticket.send("Staff, what do you wish to do with this application?", embed=embed,
                                       view=GvGView)
@@ -424,7 +554,11 @@ async def create_transcript(channel: discord.TextChannel, limit: int = None):
 
 async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, author: discord.User, weekly_gexp: int):
     YearView = discord.ui.View()
-    YearView.add_item(uiutils.StartYearSelect(channel=channel, ign=ign, uuid=uuid, weekly_gexp=weekly_gexp))  # Year Selection Dropdown
+    buttons = (("Approve", "DNKL_Approve", discord.enums.ButtonStyle.green, dnkl_approve),
+               ("Deny", "DNKL_Deny", discord.enums.ButtonStyle.red, dnkl_deny),
+               ("Error", "DNKL_Error", discord.enums.ButtonStyle.gray, dnkl_error))
+    YearView.add_item(uiutils.StartYearSelect(channel=channel, ign=ign, uuid=uuid,
+                                              weekly_gexp=weekly_gexp, buttons=buttons))  # Year Selection Dropdown
     embed = discord.Embed(title=f"In which year will {ign}'s inactivity begin?",
                           color=neutral_color)
     await channel.send(embed=embed, view=YearView)
@@ -435,7 +569,6 @@ async def get_ticket_properties(channel: discord.TextChannel):
     if not topic or '|' not in topic:
         return None
     return topic.split('|')
-
 
 
 @tasks.loop(count=1)
@@ -465,7 +598,6 @@ async def after_cache_ready():
 
     from src.utils.discord_utils import name_grabber
     bot.staff_names = [(await get_mojang_profile(await name_grabber(member)))[0] for member in bot.staff.members]
-
 
     from src.utils.loop_utils import check_giveaways, send_gexp_lb, update_invites
     check_giveaways.start()

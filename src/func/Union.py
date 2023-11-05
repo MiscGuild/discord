@@ -5,9 +5,8 @@ from __main__ import bot
 from typing import Union
 
 import discord
+
 import src.utils.ui_utils as uiutils
-
-
 from src.utils.consts import (active_req, allies, discord_not_linked_embed, guild_handle, neg_color, neutral_color,
                               pos_color, registration_channel_id,
                               staff_impersonation_embed, ticket_categories,
@@ -126,7 +125,7 @@ class Union:
         # User is an ally
         elif guild_name in allies:
             if not can_tag:
-                new_nick += f" [{await get_gtag(guild_name)}]"
+                new_nick += f" {await get_gtag(guild_name)}"
             roles_to_remove.extend([bot.new_member_role, bot.member_role])
             roles_to_add.extend([bot.guest, bot.ally])
 
@@ -185,7 +184,8 @@ class Union:
                  discord.InputTextStyle.short,
                  "Invited by:"]
             ]
-            await ctx.response.send_modal(modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, uuid=uuid, title="Player Reference",
+            await ctx.response.send_modal(
+                modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, uuid=uuid, title="Player Reference",
                                            function=validate_reference))
             await ctx.author.add_roles(bot.member_role, reason="Registration - Member")
             guest_ticket = None
@@ -212,6 +212,7 @@ class Union:
                               category=discord.utils.get(ctx.guild.categories,
                                                          name=ticket_categories["registrees"]))
             guest_ticket = ticket
+
             class Join_Misc_Buttons(discord.ui.Button):
                 def __init__(self, button: list):
                     """
@@ -231,8 +232,6 @@ class Union:
                             await ticket.send(
                                 f"{interaction.user.mention} kindly leave your current guild so that"
                                 f" we can can invite you to Miscellaneous.")
-
-
 
                     elif interaction.custom_id == "No":
                         await ticket.purge(limit=100)
@@ -264,7 +263,7 @@ class Union:
         await ctx.author.remove_roles(bot.new_member_role, reason="Register")
         await ctx.author.edit(nick=ign)
 
-        return embed, guest_ticket if guild_name != guild_handle else None, None
+        return (embed, guest_ticket) if guild_name != guild_handle else (None, None)
 
     async def add(self, ctx):
         if ctx.channel.category.name not in ticket_categories.values():
