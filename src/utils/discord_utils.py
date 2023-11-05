@@ -480,12 +480,13 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     embed.set_footer(text="Please provide:\nGuild Logo\nGuild Advertisement Message")
                     fields.extend(
                         [["What is the IGN of your guild master?", "", discord.InputTextStyle.short, "Guild Master"],
-                         ["What is your guild's preferred gamemode?", "You needn't have one",
+                         ["What is your guild's preferred gamemode?", "If you don't have one, just say 'None'",
                           discord.InputTextStyle.short, "Guild's Preferred Gamemodes"],
-                         [f"Why should we ally?", "", discord.InputTextStyle.long,
-                          "Why we should consider allying"]])
+                         [f"Why should we ally with you guys?", "", discord.InputTextStyle.long,
+                          f"Benefits of allying with {guild['name']}"]])
                     await interaction.response.send_modal(
-                        modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, title="Alliance Request"))
+                        modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, uuid=uuid,
+                                                   title="Alliance Request"))
                     return
                 if option == "Other":
                     await ticket.edit(name=f"other-{ign}", topic=f"{interaction.user.id}|",
