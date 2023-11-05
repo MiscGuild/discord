@@ -110,6 +110,7 @@ async def dnkl_error(channel: discord.TextChannel, author: discord.User, ign: st
         title="Your application has been accepted, however there was an error!",
         description="Please await staff assistance!",
         color=neutral_color))
+    return True
 
 
 async def dnkl_deny(channel: discord.TextChannel, author: discord.User, ign: str, uuid: str, embed: discord.Embed,
@@ -136,6 +137,8 @@ async def dnkl_deny(channel: discord.TextChannel, author: discord.User, ign: str
                                function=close_ticket))
     await channel.send(embed=embed, view=closeView)
     await delete_dnkl(ign)
+
+    return True
 
 
 async def dnkl_approve(channel: discord.TextChannel, author: discord.User, ign: str, uuid: str, embed: discord.Embed,
@@ -166,6 +169,8 @@ async def dnkl_approve(channel: discord.TextChannel, author: discord.User, ign: 
     await update_dnkl(msg.id, uuid)
     await interaction.response.send_message(
         "**Since this user was already on the do-not-kick-list, their entry has been updated.**")
+
+    return True
 
 
 async def create_ticket(user: discord.Member, ticket_name: str, category_name: str = ticket_categories["generic"]):
@@ -245,7 +250,6 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     await interaction.response.send_modal(
                         modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, uuid=uuid,
                                                    title="Player Report"))
-
                 if option == "Query/Problem":
                     await ticket.edit(name=f"general-{ign}", topic=f"{interaction.user.id}|",
                                       category=discord.utils.get(interaction.guild.categories,
@@ -339,9 +343,9 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                                                  name=ticket_categories["generic"]))
 
                     # Fetch player data
-                    player_data = await get_hypixel_player(ign)
+                    player_data = await get_hypixel_player(uuid=uuid)
                     if not player_data:
-                        return await ticket.send(unknown_ign_embed)
+                        return await ticket.send(embed=unknown_ign_embed)
                     player_data = player_data["stats"]
 
                     # Set vars for each stat
@@ -411,13 +415,14 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                 # Send embed and end loop
 
                     GvGView = discord.ui.View(timeout=None)  # View for staff members to approve/deny the DNKL
-                    buttons = [["Accept", "GvG_Application_Positive", discord.enums.ButtonStyle.green],
-                               ["Deny", "GvG_Application_Negative", discord.enums.ButtonStyle.red]]
+                    buttons = (("Accept", "GvG_Application_Positive", discord.enums.ButtonStyle.green, gvg_approve),
+                               ("Deny", "GvG_Application_Negative", discord.enums.ButtonStyle.red, gvg_deny))
                     # Loop through the list of roles and add a new button to the view for each role.
                     for button in buttons:
                         # Get the role from the guild by ID.
                         GvGView.add_item(
-                            uiutils.Button_Creator(channel=ticket, ign=ign, button=button, member=user, uuid=uuid))
+                            uiutils.Button_Creator(channel=ticket, ign=ign, button=button, author=user, uuid=uuid,
+                                                   function=button[3]))
 
                     await ticket.send("Staff, what do you wish to do with this application?", embed=embed,
                                       view=GvGView)
