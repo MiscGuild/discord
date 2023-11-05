@@ -107,6 +107,37 @@ async def dnkl_deny(channel: discord.TextChannel, author: discord.User, ign: str
     await channel.send(embed=embed, view=closeView)
     await delete_dnkl(ign)
 
+
+async def dnkl_approve(channel: discord.TextChannel, author: discord.User, ign: str, uuid: str, embed: discord.Embed,
+                       interaction: discord.Interaction):
+    if bot.staff not in interaction.user.roles:
+        await channel.send(embed=missing_permissions_embed)
+        return None
+
+    msg = await bot.get_channel(dnkl_channel_id).send(embed=embed)
+
+    # Check if user is already on DNKL
+    current_message = await select_one("SELECT message_id FROM dnkl WHERE uuid = (?)",
+                                       (uuid,))
+    # User is not currently on DNKL
+    if not current_message:
+        await insert_new_dnkl(msg.id, uuid, ign)
+        return await interaction.response.send_message("**This user has been added to the do-not-kick-list!**")
+
+    # User is already on DNKl
+    # Try to delete current message
+    try:
+        current_message = await bot.get_channel(dnkl_channel_id).fetch_message(
+            current_message)
+        await current_message.delete()
+    except Exception:
+        pass
+
+    await update_dnkl(msg.id, uuid)
+    await interaction.response.send_message(
+        "**Since this user was already on the do-not-kick-list, their entry has been updated.**")
+
+
 async def create_ticket(user: discord.Member, ticket_name: str, category_name: str = ticket_categories["generic"]):
     # Create ticket
     ticket: discord.TextChannel = await bot.guild.create_text_channel(ticket_name,
