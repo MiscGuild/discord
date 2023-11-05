@@ -84,6 +84,22 @@ async def gvg_approve(channel: discord.TextChannel, author: discord.User, ign: s
     await member.add_roles(bot.gvg)
 
     return True
+
+
+async def gvg_deny(channel: discord.TextChannel, author: discord.User, ign: str, uuid: str, embed: discord.Embed,
+                   interaction: discord.Interaction):
+    if bot.staff not in interaction.user.roles:
+        await channel.send(embed=missing_permissions_embed)
+        return None
+
+    await interaction.response.send_message(embed=discord.Embed(
+        title="Your application has been denied!",
+        description="Please await staff assistance for more information!",
+        color=neg_color))
+
+    return True
+
+
 async def dnkl_error(channel: discord.TextChannel, author: discord.User, ign: str, uuid: str, embed: discord.Embed,
                      interaction: discord.Interaction):
     if bot.staff not in interaction.user.roles:
