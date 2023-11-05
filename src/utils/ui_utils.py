@@ -126,11 +126,17 @@ class InactivityLenSelect(ui.Select):
     async def callback(self, interaction: discord.Interaction):
         length = list(interaction.data.values())[0][0]
         if length == "?":
-            embed = discord.Embed(title=f"We do not accept do-not-kick-list applications for more than 3 weeks!",
-                                  description="If you think you won't be able to meet the guild requirements during your inactivity period,"
-                                              " you can leave the guild and notify staff once you're back. We'll invite you back!",
+            embed = discord.Embed(title=f"We do not accept do-not-kick-list applications that are longer than 3 weeks!",
+                                  description="If you think you will be unable to meet the guild requirements during your inactivity period,"
+                                              " you can leave the guild and notify staff once you're back. We'll gladly invite you back!",
                                   color=neg_color)
-            await interaction.response.send_message(embed=embed)
+            await self.deny(channel=self.channel, author=self.author, ign=self.ign, uuid=self.uuid, embed=embed,
+                            interaction=interaction, self_denial=True)
+
+            await interaction.response.send_message("**If you missclicked, kindly create a new ticket!**\n"
+                                                    "You will be punished if you lie and abuse the DNKL system.",
+                                                    ephemeral=True)
+            self.view.stop()
             return
 
         reason_view = discord.ui.View()
