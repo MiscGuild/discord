@@ -70,6 +70,20 @@ async def close_ticket(channel: discord.TextChannel, author: discord.User, ign: 
     await discord.TextChannel.delete(channel)
 
 
+async def gvg_approve(channel: discord.TextChannel, author: discord.User, ign: str, uuid: str, embed: discord.Embed,
+                      interaction: discord.Interaction):
+    if bot.staff not in interaction.user.roles:
+        await channel.send(embed=missing_permissions_embed)
+        return None
+
+    await interaction.response.send_message(embed=discord.Embed(
+        title="Your application has been accepted!",
+        description="Please await staff assistance for more information!",
+        color=neutral_color))
+    member = await bot.guild.fetch_member(author.id)
+    await member.add_roles(bot.gvg)
+
+    return True
 async def dnkl_error(channel: discord.TextChannel, author: discord.User, ign: str, uuid: str, embed: discord.Embed,
                      interaction: discord.Interaction):
     if bot.staff not in interaction.user.roles:
