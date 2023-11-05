@@ -79,19 +79,14 @@ class StartDaySelect(ui.Select):
         self.weekly_gexp = weekly_gexp
         self.buttons = buttons
 
-        monthNumber = datetime.strptime(self.month, "%B").month
-        if datetime.now().month == monthNumber:
-            step = 2
-            if datetime.now().day - (calendar.monthrange(int(self.year), monthNumber)[
-                                         1] + 1) < 20:  # Adding a check to change step value if the number of days is less
-                step = 1
-            for x in range(datetime.now().day, calendar.monthrange(int(self.year), monthNumber)[1] + 1,
-                           step):  # A range from current day to last day of month; step 2
-                self.add_option(label=str(x))
-        else:
-            for x in range(1, calendar.monthrange(int(self.year), monthNumber)[1] + 1,
-                           2):  # A range from 1 to last day of month; step 2
-                self.add_option(label=str(x))
+        month_number = datetime.strptime(self.month, "%B").month
+        start_date = datetime.now().day if datetime.now().month == month_number else 1
+        end_date = calendar.monthrange(int(self.year), month_number)[1] + 1
+        number_of_days = end_date - start_date
+        step = 1 if number_of_days < 26 else 2
+
+        for day in range(start_date, end_date, step):
+            self.add_option(label=str(day))
 
     # Override default callback
     async def callback(self, interaction: discord.Interaction):
