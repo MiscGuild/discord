@@ -1,26 +1,22 @@
-import asyncio
+import calendar
 from __main__ import bot
 from datetime import datetime, timedelta
-from io import BytesIO
 
-import calendar
-import chat_exporter
 import discord
 import discord.ui as ui
 
-from src.utils.consts import (dnkl_channel_id, dnkl_req,
-                              missing_permissions_embed,
-                              neg_color, neutral_color, log_channel_id)
-from src.utils.db_utils import insert_new_dnkl, select_one, update_dnkl, delete_dnkl
+from src.utils.consts import (neg_color, neutral_color)
 
 
 class StartYearSelect(ui.Select):
-    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, weekly_gexp: int):
+    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, weekly_gexp: int, buttons: tuple):
         super().__init__(placeholder="Year")
         self.channel = channel
         self.ign = ign
         self.uuid = uuid
         self.weekly_gexp = weekly_gexp
+        self.buttons = buttons
+
         self.add_option(label=str(datetime.now().year))
         if datetime.now().month == 11:
             self.add_option(label=str(datetime.now().year + 1))
@@ -32,7 +28,8 @@ class StartYearSelect(ui.Select):
         start_year = list(interaction.data.values())[0][0]
         MonthView = discord.ui.View()
         MonthView.add_item(StartMonthSelect(channel=self.channel, ign=self.ign, uuid=self.uuid,
-                                            year=start_year, weekly_gexp=self.weekly_gexp))  # Month Selection Dropdown
+                                            year=start_year, weekly_gexp=self.weekly_gexp,
+                                            buttons=self.buttons))  # Month Selection Dropdown
         embed = discord.Embed(title=f"In which month of {start_year} will {self.ign}'s inactivity begin?",
                               color=neutral_color).set_footer(text=f"Start Date - ?/?/{start_year}")
         await interaction.response.send_message(embed=embed, view=MonthView)
@@ -40,13 +37,14 @@ class StartYearSelect(ui.Select):
 
 
 class StartMonthSelect(ui.Select, object):
-    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, year: int, weekly_gexp: int):
+    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, year: int, weekly_gexp: int, buttons: tuple):
         super().__init__(placeholder="Month")
         self.channel = channel
         self.year = year
         self.ign = ign
         self.uuid = uuid
         self.weekly_gexp = weekly_gexp
+        self.buttons = buttons
 
         for x in range(datetime.now().month, datetime.now().month + 2):
             if x > 12:
@@ -57,10 +55,12 @@ class StartMonthSelect(ui.Select, object):
     async def callback(self, interaction: discord.Interaction):
         # Set option var and delete Select so it cannot be used twice
         start_month = list(interaction.data.values())[0][0]
-        DayView = discord.ui.View()
 
+        DayView = discord.ui.View()
         DayView.add_item(StartDaySelect(channel=self.channel, ign=self.ign, uuid=self.uuid, month=start_month,
-                                        year=self.year, weekly_gexp=self.weekly_gexp))  # Day Selection Dropdown
+                                        year=self.year, weekly_gexp=self.weekly_gexp,
+                                        buttons=self.buttons))  # Day Selection Dropdown
+
         embed = discord.Embed(title=f"What is the closest day to the start of {self.ign}'s inactivity?",
                               color=neutral_color).set_footer(text=f"Start Date - ?/{start_month}/{self.year}")
         await interaction.response.send_message(embed=embed, view=DayView)
@@ -68,7 +68,8 @@ class StartMonthSelect(ui.Select, object):
 
 
 class StartDaySelect(ui.Select):
-    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, month: str, year: int, weekly_gexp: int):
+    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, month: str, year: int, weekly_gexp: int,
+                 buttons: tuple):
         super().__init__(placeholder="Day")
         self.channel = channel
         self.ign = ign
@@ -76,6 +77,7 @@ class StartDaySelect(ui.Select):
         self.month = month
         self.year = year
         self.weekly_gexp = weekly_gexp
+        self.buttons = buttons
 
         monthNumber = datetime.strptime(self.month, "%B").month
         if datetime.now().month == monthNumber:
@@ -97,7 +99,8 @@ class StartDaySelect(ui.Select):
         LengthView = discord.ui.View()
         LengthView.add_item(
             InactivityLenSelect(author=interaction.user, channel=self.channel, ign=self.ign, uuid=self.uuid,
-                                day=start_day, month=self.month, year=self.year, weekly_gexp=self.weekly_gexp))
+                                day=start_day, month=self.month, year=self.year, weekly_gexp=self.weekly_gexp,
+                                buttons=self.buttons))
         embed = discord.Embed(title=f"How long will {self.ign} be inactive?",
                               color=neutral_color).set_footer(
             text=f"Start Date - {start_day}/{self.month}/{self.year}")
@@ -107,7 +110,7 @@ class StartDaySelect(ui.Select):
 
 class InactivityLenSelect(ui.Select):
     def __init__(self, author: discord.User, channel: discord.TextChannel, ign: str, uuid: str, day: int, month: str,
-                 year: int, weekly_gexp: int):
+                 year: int, weekly_gexp: int, buttons: tuple):
         super().__init__(placeholder="Length")
         self.author = author
         self.channel = channel
@@ -117,6 +120,8 @@ class InactivityLenSelect(ui.Select):
         self.year = year
         self.day = day
         self.weekly_gexp = weekly_gexp
+        self.buttons = buttons
+        self.deny = buttons[1][3]
 
         self.add_option(label=f"1 Week", value=str(1))
         for x in range(2, 4):
@@ -142,7 +147,8 @@ class InactivityLenSelect(ui.Select):
                                                     month=self.month,
                                                     year=self.year,
                                                     length=length,
-                                                    weekly_gexp=self.weekly_gexp))
+                                                    weekly_gexp=self.weekly_gexp,
+                                                    buttons=self.buttons))
 
         embed = discord.Embed(title=f"What is the reason behind {self.ign}'s inactivity?",
                               color=neutral_color)
@@ -154,7 +160,7 @@ class InactivityLenSelect(ui.Select):
 
 class InactivityReasonSelect(ui.Select):
     def __init__(self, author: discord.User, channel: discord.TextChannel, ign: str, uuid: str, day: int, month: str,
-                 year: int, length: int, weekly_gexp: int):
+                 year: int, length: int, weekly_gexp: int, buttons: tuple):
         super().__init__(placeholder="Reason")
         self.author = author
         self.channel = channel
@@ -165,6 +171,7 @@ class InactivityReasonSelect(ui.Select):
         self.day = day
         self.length = length
         self.weekly_gexp = weekly_gexp
+        self.buttons = buttons
 
         reasons = ["Exams", "Medical Issues", "Vacation", "Computer Problems", "Other"]
         for reason in reasons:
