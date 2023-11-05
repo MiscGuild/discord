@@ -1,3 +1,4 @@
+import asyncio
 from __main__ import bot
 from datetime import datetime, timedelta
 from io import BytesIO
@@ -11,9 +12,12 @@ import src.utils.ui_utils as uiutils
 from src.utils.consts import (config, dnkl_req,
                               gvg_requirements, log_channel_id, neg_color, neutral_color, staff_application_questions,
                               ticket_categories,
-                              unknown_ign_embed, guild_handle, positive_responses, dnkl_creation_embed, member_req)
+                              unknown_ign_embed, guild_handle, positive_responses, dnkl_creation_embed, dnkl_channel_id,
+                              missing_permissions_embed)
+from src.utils.db_utils import select_one, insert_new_dnkl, update_dnkl, delete_dnkl
 from src.utils.minecraft_utils import get_player_gexp
-from src.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild, get_guild_level, get_guild_by_name
+from src.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild, get_guild_level
+
 
 async def name_grabber(author: discord.Member) -> str:
     if not author.nick:
@@ -39,11 +43,27 @@ async def is_linked_discord(player_data: dict, user: discord.User) -> bool:
     return (discord == str(user)[:-2]) or (discord == (str(user.id) + "#0000") or (discord == str(user)))
 
 
-
 async def get_ticket_creator(channel: discord.TextChannel):
     return bot.guild.get_member(int(channel.topic.split("|")[0]))
 
 
+async def close_ticket(channel: discord.TextChannel, author: discord.User, ign: str, uuid: str,
+                       embed: discord.Embed, interaction: discord.Interaction):
+    if author != interaction.user:
+        await channel.send(embed=missing_permissions_embed)
+        return None
+
+    embed = discord.Embed(title="This ticket will be deleted in 20 seconds!", color=neg_color)
+
+    # Send deletion warning and gather transcript
+    await interaction.response.send_message(embed=embed)
+    transcript = await chat_exporter.export(channel, limit=None)
+    if transcript:
+        transcript = discord.File(BytesIO(transcript.encode()),
+                                  filename=f"transcript-{channel.name}.html")
+        await bot.get_channel(log_channel_id).send(
+            f"DNKL Request was denied and channel was deleted by {author}")
+        await bot.get_channel(log_channel_id).send(file=transcript)
 async def create_ticket(user: discord.Member, ticket_name: str, category_name: str = ticket_categories["generic"]):
     # Create ticket
     ticket: discord.TextChannel = await bot.guild.create_text_channel(ticket_name,
@@ -119,7 +139,8 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     ]
                     embed = discord.Embed(title="Player Report", color=neutral_color)
                     await interaction.response.send_modal(
-                        modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, uuid=uuid, title="Player Report"))
+                        modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, uuid=uuid,
+                                                   title="Player Report"))
 
                 if option == "Query/Problem":
                     await ticket.edit(name=f"general-{ign}", topic=f"{interaction.user.id}|",
