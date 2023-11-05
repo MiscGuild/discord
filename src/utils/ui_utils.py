@@ -225,106 +225,30 @@ class InactivityReasonSelect(ui.Select):
         self.view.stop()
 
 
-class Dnkl_Buttons(discord.ui.Button):
+class Button_Creator(discord.ui.Button):
     def __init__(self, channel: discord.TextChannel, author: discord.User, ign: str, uuid: str, button: list,
-                 embed: discord.Embed):
-        """
-        3 buttons for 3 dnkl actions. `custom_id` is needed for persistent views.
-        """
+                 embed: discord.Embed = None, function=None):
+        # button = ["LABEL", "CUSTOM_ID", STYLE]
         self.embed = embed
         self.channel = channel
         self.ign = ign
         self.uuid = uuid
         self.author = author
+        self.function = function
+
         super().__init__(label=button[0], custom_id=button[1], style=button[2])
 
     async def callback(self, interaction: discord.Interaction):
-        if bot.staff not in interaction.user.roles:
-            await self.channel.send(embed=missing_permissions_embed)
+        meets_req = await self.function(channel=self.channel, author=self.author, ign=self.ign, uuid=self.uuid,
+                                        embed=self.embed,
+                                        interaction=interaction)
+        if not meets_req:
             return
-        # if bot.staff not in interaction.user.roles and ticket.id != interaction.channel_id: return
-        elif interaction.custom_id == "DNKL_Approve":
-            msg = await bot.get_channel(dnkl_channel_id).send(embed=self.embed)
-
-            # Check if user is already on DNKL
-            current_message = await select_one("SELECT message_id FROM dnkl WHERE uuid = (?)",
-                                               (self.uuid,))
-            # User is not currently on DNKL
-            if not current_message:
-                await insert_new_dnkl(msg.id, self.uuid, self.ign)
-                return await interaction.response.send_message("**This user has been added to the do-not-kick-list!**")
-
-            # User is already on DNKl
-            # Try to delete current message
-            try:
-                current_message = await bot.get_channel(dnkl_channel_id).fetch_message(
-                    current_message)
-                await current_message.delete()
-            except Exception:
-                pass
-
-            await update_dnkl(msg.id, self.uuid)
-            await  interaction.response.send_message(
-                "**Since this user was already on the do-not-kick-list, their entry has been updated.**")
-        elif interaction.custom_id == "DNKL_Deny":
-            await interaction.response.send_message("**This user's do-not-kick-list application has been denied!.**\n"
-                                                    "If you didn't mean to hit deny, you can add them using `/dnkl_add`.",
-                                                    ephemeral=True)
-
-            denial_embed = discord.Embed(title="Your do-not-kick-list application has been denied!",
-                                         description=f"You do not meet the DNKL requirements of {format(dnkl_req, ',d')} weekly guild experience.",
-                                         color=neg_color)
-            denial_embed.set_footer(
-                text="If don't you think you can meet the requirements, you may rejoin the guild once your inactivity period has ended.")
-            closeView = discord.ui.View(timeout=None)  # View for staff members to approve/deny the DNKL
-            button = ("Close This Ticket", discord.enums.ButtonStyle.red)
-            closeView.add_item(
-                CloseDNKLTicket(channel=self.channel, author=self.author, ign=self.ign, uuid=self.uuid, button=button))
-            await self.channel.send(embed=denial_embed, view=closeView)
-            await delete_dnkl(self.ign)
-
-        elif interaction.custom_id == "DNKL_Error":
-            await interaction.response.send_message(embed=discord.Embed(
-                title="Your application has been accepted, however there was an error!",
-                description="Please await staff assistance!",
-                color=neutral_color))
-        self.view.stop()
-
-
-class CloseDNKLTicket(discord.ui.Button):
-    def __init__(self, channel: discord.TextChannel, author: discord.User, ign: str, uuid: str, button: list):
-        self.channel = channel
-        self.ign = ign
-        self.uuid = uuid
-        self.author = author
-
-        super().__init__(label=button[0], style=button[1])
-
-    async def callback(self, interaction: discord.Interaction):
-        if self.author != interaction.user:
-            await self.channel.send(embed=missing_permissions_embed)
-            return
-
-        embed = discord.Embed(title="This ticket will be deleted in 20 seconds!", color=neg_color)
-
-        # Send deletion warning and gather transcript
-        await interaction.response.send_message(embed=embed)
-        transcript = await chat_exporter.export(self.channel, limit=None)
-        if transcript:
-            transcript = discord.File(BytesIO(transcript.encode()), filename=f"transcript-{self.channel.name}.html")
-            await bot.get_channel(log_channel_id).send(
-                f"DNKL Request was denied and channel was deleted by {self.author}")
-            await bot.get_channel(log_channel_id).send(file=transcript)
-
-        # Sleep and delete channel
-        await asyncio.sleep(20)
-        await discord.TextChannel.delete(self.channel)
-
         self.view.stop()
 
 
 class ModalCreator(discord.ui.Modal):
-    def __init__(self, embed: discord.Embed, fields: list, title: str, ign: str, uuid: str,function = None) -> None:
+    def __init__(self, embed: discord.Embed, fields: list, title: str, ign: str, uuid: str, function=None) -> None:
         #   fields = ["LABEL", "PLACEHOLDER", STYLE]
         super().__init__(title=title)
         self.embed = embed
@@ -349,4 +273,3 @@ class ModalCreator(discord.ui.Modal):
             count += 1
 
         await interaction.response.send_message(embeds=[self.embed])
-
