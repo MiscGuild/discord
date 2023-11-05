@@ -80,6 +80,33 @@ async def dnkl_error(channel: discord.TextChannel, author: discord.User, ign: st
         title="Your application has been accepted, however there was an error!",
         description="Please await staff assistance!",
         color=neutral_color))
+
+
+async def dnkl_deny(channel: discord.TextChannel, author: discord.User, ign: str, uuid: str, embed: discord.Embed,
+                    interaction: discord.Interaction, self_denial: bool = False):
+    if bot.staff not in interaction.user.roles and not self_denial:
+        await channel.send(embed=missing_permissions_embed)
+        return None
+
+    if not self_denial:
+        await interaction.response.send_message("**This user's do-not-kick-list application has been denied!.**\n"
+                                                "If you didn't mean to hit deny, you can add them using `/dnkl_add`.",
+                                                ephemeral=True)
+
+        embed = discord.Embed(title="Your do-not-kick-list application has been denied!",
+                              description=f"You do not meet the DNKL requirements of {format(dnkl_req, ',d')} weekly guild experience.",
+                              color=neg_color)
+        embed.set_footer(
+            text="If don't you think you can meet the requirements, you may rejoin the guild once your inactivity period has ended.")
+
+    closeView = discord.ui.View(timeout=None)  # View for staff members to approve/deny the DNKL
+    button = ("Close This Ticket", "close_ticket", discord.enums.ButtonStyle.red)
+    closeView.add_item(
+        uiutils.Button_Creator(channel=channel, author=author, ign=ign, uuid=uuid, button=button,
+                               function=close_ticket))
+    await channel.send(embed=embed, view=closeView)
+    await delete_dnkl(ign)
+
 async def create_ticket(user: discord.Member, ticket_name: str, category_name: str = ticket_categories["generic"]):
     # Create ticket
     ticket: discord.TextChannel = await bot.guild.create_text_channel(ticket_name,
@@ -474,7 +501,6 @@ async def get_ticket_properties(channel: discord.TextChannel):
     return topic.split('|')
 
 
-
 @tasks.loop(count=1)
 async def after_cache_ready():
     # Set owner id(s) and guild
@@ -502,7 +528,6 @@ async def after_cache_ready():
 
     from src.utils.discord_utils import name_grabber
     bot.staff_names = [(await get_mojang_profile(await name_grabber(member)))[0] for member in bot.staff.members]
-
 
     from src.utils.loop_utils import check_giveaways, send_gexp_lb, update_invites
     check_giveaways.start()
