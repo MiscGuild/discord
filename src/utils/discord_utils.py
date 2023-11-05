@@ -519,7 +519,11 @@ async def create_transcript(channel: discord.TextChannel, limit: int = None):
 
 async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, author: discord.User, weekly_gexp: int):
     YearView = discord.ui.View()
-    YearView.add_item(uiutils.StartYearSelect(channel=channel, ign=ign, uuid=uuid, weekly_gexp=weekly_gexp))  # Year Selection Dropdown
+    buttons = (("Approve", "DNKL_Approve", discord.enums.ButtonStyle.green, dnkl_approve),
+               ("Deny", "DNKL_Deny", discord.enums.ButtonStyle.red, dnkl_deny),
+               ("Error", "DNKL_Error", discord.enums.ButtonStyle.gray, dnkl_error))
+    YearView.add_item(uiutils.StartYearSelect(channel=channel, ign=ign, uuid=uuid,
+                                              weekly_gexp=weekly_gexp, buttons=buttons))  # Year Selection Dropdown
     embed = discord.Embed(title=f"In which year will {ign}'s inactivity begin?",
                           color=neutral_color)
     await channel.send(embed=embed, view=YearView)
