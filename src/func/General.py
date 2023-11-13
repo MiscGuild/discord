@@ -79,7 +79,8 @@ class General:
             req = await get_player_guild(ally_uuids[-1])
             gtag = " " if not req["tag"] or not req else req["tag"]
             ally_divisions.append([len(ally_uuids), gtag])
-            # Ally divisions marks the separation point of one guild from another in the ally_uuids array along with the guild's gtag
+            # Ally divisions marks the separation point of one guild
+            # from another in the ally_uuids array along with the guild's gtag
 
         # Limiting the maximum concurrency
         async def gather_with_concurrency(n, *tasks):
