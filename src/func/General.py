@@ -79,7 +79,8 @@ class General:
             req = await get_player_guild(ally_uuids[-1])
             gtag = " " if not req["tag"] or not req else req["tag"]
             ally_divisions.append([len(ally_uuids), gtag])
-            # Ally divisions marks the separation point of one guild from another in the ally_uuids array along with the guild's gtag
+            # Ally divisions marks the separation point of one guild
+            # from another in the ally_uuids array along with the guild's gtag
 
         # Limiting the maximum concurrency
         async def gather_with_concurrency(n, *tasks):
@@ -139,6 +140,17 @@ class General:
             if username in ally_usernames:
                 # Get player gtag
                 position = ally_usernames.index(username)
+                dividers = [x[0] for x in ally_divisions]
+                tags = [x[1] for x in ally_divisions]
+
+                start = 0
+                for divider in dividers:
+                    if start <= position < divider:
+                        gtag = tags[dividers.index(divider)]
+                        break
+                    start = divider
+
+                '''                
                 last_value = 1
                 for guild_division in ally_divisions:
                     if last_value > 1:
@@ -148,7 +160,7 @@ class General:
                     elif position < guild_division[0]:
                         gtag = guild_division[1]
                     last_value = guild_division[0]
-
+                '''
                 # Set nick
                 if not discord_member.nick or f" [{gtag}]" not in discord_member.nick:
                     await discord_member.edit(nick=username + f' [{gtag}]')
