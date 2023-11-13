@@ -140,6 +140,7 @@ class General:
             if username in ally_usernames:
                 # Get player gtag
                 position = ally_usernames.index(username)
+                '''                
                 last_value = 1
                 for guild_division in ally_divisions:
                     if last_value > 1:
@@ -149,7 +150,7 @@ class General:
                     elif position < guild_division[0]:
                         gtag = guild_division[1]
                     last_value = guild_division[0]
-
+                '''
                 # Set nick
                 if not discord_member.nick or f" [{gtag}]" not in discord_member.nick:
                     await discord_member.edit(nick=username + f' [{gtag}]')
