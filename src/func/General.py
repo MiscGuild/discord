@@ -140,6 +140,16 @@ class General:
             if username in ally_usernames:
                 # Get player gtag
                 position = ally_usernames.index(username)
+                dividers = [x[0] for x in ally_divisions]
+                tags = [x[1] for x in ally_divisions]
+
+                start = 0
+                for divider in dividers:
+                    if start <= position < divider:
+                        gtag = tags[dividers.index(divider)]
+                        break
+                    start = divider
+
                 '''                
                 last_value = 1
                 for guild_division in ally_divisions:
