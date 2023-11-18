@@ -70,7 +70,8 @@ async def get_name_by_uuid(uuid: str):
         # Player does not exist
         if not resp:
             continue
-
+        if "name" not in resp:
+            continue
         return resp["name"]
     api_key = await get_hyapi_key()
     # If the Mojang API fails to return a name, the bot checks using the hypixel API
