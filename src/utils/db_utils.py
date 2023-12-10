@@ -32,6 +32,14 @@ async def connect_db():
         total_invites integer,
         total_valid_invites integer)""")
 
+    await bot.db.execute("""CREATE TABLE IF NOT EXISTS tournament(
+        uuid text PRIMARY KEY NOT NULL,
+        start_data text NOT NULL,
+        end_data text NOT NULL,
+        week1_data text NOT NULL,
+        week2_data text NOT NULL,
+        week3_data text NOT NULL)""")
+
     # Commit any changes
     await bot.db.commit()
 
