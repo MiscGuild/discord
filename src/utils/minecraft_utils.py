@@ -180,37 +180,58 @@ async def get_points_from_data(start_data, end_data):
 
 async def get_game_data(player_data):
     bedwars_data = player_data["stats"]["Bedwars"]
-    total_challenges_completed = bedwars_data["challenges_completed_bedwars"]
-    games_played_bedwars = bedwars_data["games_played_bedwars"]
-    deaths_bedwars = bedwars_data["deaths_bedwars"]
-    wins_bedwars = bedwars_data["wins_bedwars"]
-    final_kills_bedwars = bedwars_data["final_kills_bedwars"]
-    final_deaths_bedwars = bedwars_data["final_deaths_bedwars"]
-    eight_one_final_kills_bedwars = bedwars_data["eight_one_final_kills_bedwars"]
-    eight_one_kills_bedwars = bedwars_data["eight_one_kills_bedwars"]
-    eight_one_beds_broken_bedwars = bedwars_data["eight_one_beds_broken_bedwars"]
-    eight_one_wins_bedwars = bedwars_data["eight_one_wins_bedwars"]
-    eight_one_games_played_bedwars = bedwars_data["eight_one_games_played_bedwars"]
-    eight_two_final_kills_bedwars = bedwars_data["eight_two_final_kills_bedwars"]
-    eight_two_kills_bedwars = bedwars_data["eight_two_kills_bedwars"]
-    eight_two_beds_broken_bedwars = bedwars_data["eight_two_beds_broken_bedwars"]
-    eight_two_wins_bedwars = bedwars_data["eight_two_wins_bedwars"]
-    eight_two_games_played_bedwars = bedwars_data["eight_two_games_played_bedwars"]
-    four_three_final_kills_bedwars = bedwars_data["four_three_final_kills_bedwars"]
-    four_three_kills_bedwars = bedwars_data["four_three_kills_bedwars"]
-    four_three_beds_broken_bedwars = bedwars_data["four_three_beds_broken_bedwars"]
-    four_three_wins_bedwars = bedwars_data["four_three_wins_bedwars"]
-    four_three_games_played_bedwars = bedwars_data["four_three_games_played_bedwars"]
-    four_four_final_kills_bedwars = bedwars_data["four_four_final_kills_bedwars"]
-    four_four_kills_bedwars = bedwars_data["four_four_kills_bedwars"]
-    four_four_beds_broken_bedwars = bedwars_data["four_four_beds_broken_bedwars"]
-    four_four_wins_bedwars = bedwars_data["four_four_wins_bedwars"]
-    four_four_games_played_bedwars = bedwars_data["four_four_games_played_bedwars"]
-    two_four_final_kills_bedwars = bedwars_data["two_four_final_kills_bedwars"]
-    two_four_kills_bedwars = bedwars_data["two_four_kills_bedwars"]
-    two_four_beds_broken_bedwars = bedwars_data["two_four_beds_broken_bedwars"]
-    two_four_wins_bedwars = bedwars_data["two_four_wins_bedwars"]
-    two_four_games_played_bedwars = bedwars_data["two_four_games_played_bedwars"]
+    total_challenges_completed = bedwars_data[
+        "challenges_completed_bedwars"] if "challenges_completed_bedwars" in bedwars_data else 0
+    games_played_bedwars = bedwars_data["games_played_bedwars"] if "games_played_bedwars" in bedwars_data else 0
+    deaths_bedwars = bedwars_data["deaths_bedwars"] if "deaths_bedwars" in bedwars_data else 0
+    wins_bedwars = bedwars_data["wins_bedwars"] if "wins_bedwars" in bedwars_data else 0
+    final_kills_bedwars = bedwars_data["final_kills_bedwars"] if "final_kills_bedwars" in bedwars_data else 0
+    final_deaths_bedwars = bedwars_data["final_deaths_bedwars"] if "final_deaths_bedwars" in bedwars_data else 0
+    eight_one_final_kills_bedwars = bedwars_data[
+        "eight_one_final_kills_bedwars"] if "eight_one_final_kills_bedwars" in bedwars_data else 0
+    eight_one_kills_bedwars = bedwars_data[
+        "eight_one_kills_bedwars"] if "eight_one_kills_bedwars" in bedwars_data else 0
+    eight_one_beds_broken_bedwars = bedwars_data[
+        "eight_one_beds_broken_bedwars"] if "eight_one_beds_broken_bedwars" in bedwars_data else 0
+    eight_one_wins_bedwars = bedwars_data["eight_one_wins_bedwars"] if "eight_one_wins_bedwars" in bedwars_data else 0
+    eight_one_games_played_bedwars = bedwars_data[
+        "eight_one_games_played_bedwars"] if "eight_one_games_played_bedwars" in bedwars_data else 0
+    eight_two_final_kills_bedwars = bedwars_data[
+        "eight_two_final_kills_bedwars"] if "eight_two_final_kills_bedwars" in bedwars_data else 0
+    eight_two_kills_bedwars = bedwars_data[
+        "eight_two_kills_bedwars"] if "eight_two_kills_bedwars" in bedwars_data else 0
+    eight_two_beds_broken_bedwars = bedwars_data[
+        "eight_two_beds_broken_bedwars"] if "eight_two_beds_broken_bedwars" in bedwars_data else 0
+    eight_two_wins_bedwars = bedwars_data["eight_two_wins_bedwars"] if "eight_two_wins_bedwars" in bedwars_data else 0
+    eight_two_games_played_bedwars = bedwars_data[
+        "eight_two_games_played_bedwars"] if "eight_two_games_played_bedwars" in bedwars_data else 0
+    four_three_final_kills_bedwars = bedwars_data[
+        "four_three_final_kills_bedwars"] if "four_three_final_kills_bedwars" in bedwars_data else 0
+    four_three_kills_bedwars = bedwars_data[
+        "four_three_kills_bedwars"] if "four_three_kills_bedwars" in bedwars_data else 0
+    four_three_beds_broken_bedwars = bedwars_data[
+        "four_three_beds_broken_bedwars"] if "four_three_beds_broken_bedwars" in bedwars_data else 0
+    four_three_wins_bedwars = bedwars_data[
+        "four_three_wins_bedwars"] if "four_three_wins_bedwars" in bedwars_data else 0
+    four_three_games_played_bedwars = bedwars_data[
+        "four_three_games_played_bedwars"] if "four_three_games_played_bedwars" in bedwars_data else 0
+    four_four_final_kills_bedwars = bedwars_data[
+        "four_four_final_kills_bedwars"] if "four_four_final_kills_bedwars" in bedwars_data else 0
+    four_four_kills_bedwars = bedwars_data[
+        "four_four_kills_bedwars"] if "four_four_kills_bedwars" in bedwars_data else 0
+    four_four_beds_broken_bedwars = bedwars_data[
+        "four_four_beds_broken_bedwars"] if "four_four_beds_broken_bedwars" in bedwars_data else 0
+    four_four_wins_bedwars = bedwars_data["four_four_wins_bedwars"] if "four_four_wins_bedwars" in bedwars_data else 0
+    four_four_games_played_bedwars = bedwars_data[
+        "four_four_games_played_bedwars"] if "four_four_games_played_bedwars" in bedwars_data else 0
+    two_four_final_kills_bedwars = bedwars_data[
+        "two_four_final_kills_bedwars"] if "two_four_final_kills_bedwars" in bedwars_data else 0
+    two_four_kills_bedwars = bedwars_data["two_four_kills_bedwars"] if "two_four_kills_bedwars" in bedwars_data else 0
+    two_four_beds_broken_bedwars = bedwars_data[
+        "two_four_beds_broken_bedwars"] if "two_four_beds_broken_bedwars" in bedwars_data else 0
+    two_four_wins_bedwars = bedwars_data["two_four_wins_bedwars"] if "two_four_wins_bedwars" in bedwars_data else 0
+    two_four_games_played_bedwars = bedwars_data[
+        "two_four_games_played_bedwars"] if "two_four_games_played_bedwars" in bedwars_data else 0
 
     data = {
         "total_challenges_completed": total_challenges_completed,
