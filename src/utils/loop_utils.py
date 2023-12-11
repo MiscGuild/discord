@@ -6,10 +6,12 @@ from discord.ext import tasks
 
 from src.func.General import General
 from src.func.Integer import Integer
-from src.utils.consts import weekly_lb_channel, daily_lb_channel
+from src.utils.consts import weekly_lb_channel, daily_lb_channel, guild_handle
 from src.utils.db_utils import (connect_db, select_all)
 from src.utils.giveaway_utils import roll_giveaway
+from src.utils.minecraft_utils import set_tourney_data
 from src.utils.referral_utils import check_invitation_validity, generate_rank_upgrade
+from src.utils.request_utils import get_guild_by_name
 
 
 @tasks.loop(minutes=1)
@@ -79,5 +81,20 @@ async def update_invites():
 
 @update_invites.before_loop
 async def before_update_invites():
+    await bot.wait_until_ready()
+    await asyncio.sleep(5)
+
+
+@tasks.loop(hours=24)
+async def update_bedwars_data():
+    guild = await get_guild_by_name(guild_handle)
+
+    for member in guild["members"]:
+        uuid = member["uuid"]
+        await set_tourney_data(uuid)
+
+
+@update_bedwars_data.before_loop
+async def before_update_bedwars_data():
     await bot.wait_until_ready()
     await asyncio.sleep(5)
