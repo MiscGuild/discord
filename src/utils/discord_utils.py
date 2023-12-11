@@ -576,7 +576,7 @@ async def find_player_score(uuid):
     start_stats = await select_one("SELECT start_data FROM tournament WHERE uuid = (?)", (uuid,))
     week_number = await get_week_number()
     player_data = await get_hypixel_player(uuid=uuid)
-    name = player_data["playername"]
+    name = player_data["displayname"]
 
     current_stats = await get_game_data(player_data)
     current_weekly_stats = None
