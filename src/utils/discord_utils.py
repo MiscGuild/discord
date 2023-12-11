@@ -15,7 +15,7 @@ from src.utils.consts import (config, dnkl_req,
                               unknown_ign_embed, guild_handle, positive_responses, dnkl_creation_embed, dnkl_channel_id,
                               missing_permissions_embed)
 from src.utils.db_utils import select_one, insert_new_dnkl, update_dnkl, delete_dnkl
-from src.utils.minecraft_utils import get_player_gexp
+from src.utils.minecraft_utils import get_player_gexp, get_week_number, get_game_data, get_points_from_data
 from src.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild, get_guild_level
 
 
@@ -653,10 +653,12 @@ async def after_cache_ready():
     from src.utils.discord_utils import name_grabber
     bot.staff_names = [(await get_mojang_profile(await name_grabber(member)))[0] for member in bot.staff.members]
 
-    from src.utils.loop_utils import check_giveaways, send_gexp_lb, update_invites
+    from src.utils.loop_utils import check_giveaways, send_gexp_lb, update_invites, update_bedwars_data
     check_giveaways.start()
     send_gexp_lb.start()
     update_invites.start()
+    update_bedwars_data.start()
+
 
 
 @after_cache_ready.before_loop
