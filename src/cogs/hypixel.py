@@ -1,6 +1,6 @@
 import discord
-from discord.ext import commands, bridge
 from discord.commands import option
+from discord.ext import commands, bridge
 
 from src.func.General import General
 from src.func.String import String
@@ -100,6 +100,19 @@ class Hypixel(commands.Cog, name="hypixel"):
             await ctx.respond(embed=res)
         elif isinstance(res, str):
             await ctx.respond(res)
+
+    @bridge.bridge_command()
+    @option(
+        name="name",
+        description="The Minecraft username of the player whose score you'd like to view",
+        required=False,
+        input_type=str
+    )
+    async def points(self, ctx, name: str = None):
+        """View Hypixel stats of the given user!"""
+        if not name:
+            name = await name_grabber(ctx.author)
+        await ctx.respond(embed=await String(string=name).score())
 
 
 def setup(bot):
