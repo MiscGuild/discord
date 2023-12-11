@@ -35,11 +35,11 @@ async def connect_db():
     await bot.db.execute("""CREATE TABLE IF NOT EXISTS tournament(
         uuid text PRIMARY KEY NOT NULL,
         start_data text NOT NULL,
-        week1_data text NOT NULL,
-        week2_data text NOT NULL,
-        week3_data text NOT NULL,
-        week3_end_data text NOT NULL,
-        end_data text NOT NULL)""")
+        week1_data text,
+        week2_data text,
+        week3_data text,
+        week3_end_data text,
+        end_data text)""")
 
     # Commit any changes
     await bot.db.commit()
