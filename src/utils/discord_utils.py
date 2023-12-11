@@ -572,6 +572,59 @@ async def get_ticket_properties(channel: discord.TextChannel):
     return topic.split('|')
 
 
+async def find_player_score(uuid):
+    start_stats = await select_one("SELECT start_data FROM tournament WHERE uuid = (?)", (uuid,))
+    week_number = await get_week_number()
+    player_data = await get_hypixel_player(uuid=uuid)
+    name = player_data["playername"]
+
+    current_stats = await get_game_data(player_data)
+    current_weekly_stats = None
+
+    week1_stats = (await select_one("SELECT week1_data FROM tournament WHERE uuid = (?)", (uuid,)))[0]
+    week2_stats = (await select_one("SELECT week2_data FROM tournament WHERE uuid = (?)", (uuid,)))[0]
+    week3_stats = (await select_one("SELECT week3_data FROM tournament WHERE uuid = (?)", (uuid,)))[0]
+    week3_end_stats = (await select_one("SELECT week3_end_data FROM tournament WHERE uuid = (?)", (uuid,)))[0]
+    end_stats = (await select_one("SELECT end_data FROM tournament WHERE uuid = (?)", (uuid,)))[0]
+
+    if week_number == -1:
+        week1_points = await get_points_from_data(week1_stats, week2_stats)
+        week2_points = await get_points_from_data(week2_stats, week3_stats)
+        week3_points = await get_points_from_data(week3_stats, week3_end_stats)
+        overall_points = await get_points_from_data(start_stats, end_stats)
+    elif week_number >= 3:
+        week1_points = await get_points_from_data(week1_stats, week2_stats)
+        week2_points = await get_points_from_data(week2_stats, week3_stats)
+        week3_points = await get_points_from_data(week3_stats, current_stats)
+        overall_points = await get_points_from_data(start_stats, current_stats)
+    elif week_number >= 2:
+        week1_points = await get_points_from_data(week1_stats, week2_stats)
+        week2_points = await get_points_from_data(week2_stats, current_stats)
+        week3_points = None
+        overall_points = await get_points_from_data(start_stats, current_stats)
+    elif week_number >= 1:
+        week1_points = await get_points_from_data(week1_stats, current_stats)
+        week2_points = None
+        week3_points = None
+        overall_points = await get_points_from_data(start_stats, current_stats)
+
+    scores_embed = discord.Embed(title=f"{name}'s Tournament Points",
+                                 url=f"https://plancke.io/hypixel/player/stats/{name}", color=neutral_color)
+    scores_embed.set_author(name=f"Miscellaneous Guild Experience Tournament",
+                            url=f"https://discord.com/channels/522586672148381726/522861704921481229/1174807396686770339")
+    scores_embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
+    scores_embed.add_field(name="Week 1", value=f"{week1_points} points", inline=False)
+
+    if week2_points:
+        scores_embed.add_field(name="Week 2", value=f"{week2_points} points", inline=False)
+    if week3_points:
+        scores_embed.add_field(name="Week 3", value=f"{week3_points} points", inline=False)
+
+    scores_embed.add_field(name="Overall", value=f"{overall_points} points", inline=False)
+
+    return scores_embed
+
+
 @tasks.loop(count=1)
 async def after_cache_ready():
     # Set owner id(s) and guild
