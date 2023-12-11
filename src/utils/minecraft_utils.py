@@ -1,7 +1,9 @@
 import math
 import re
+from datetime import datetime
 
 from src.utils.consts import ChatColor, active_req, member_req, resident_req
+from src.utils.db_utils import select_one, new_tournament_player, base_query
 from src.utils.request_utils import get_player_guild, get_name_by_uuid, get_hypixel_player
 
 
@@ -137,3 +139,32 @@ async def generate_lb_text(member_gexp: list, text: str):
 
     # Return image
     return text
+
+async def get_week_number(date_string=None):
+    # Use today's date if no date is provided
+    if date_string is None:
+        date_obj = datetime.now()
+    else:
+        # Define the date format
+        date_format = "%d %B"
+
+        # Parse the input date string
+        date_obj = datetime.strptime(date_string, date_format)
+
+    if date_obj.month == 1 and date_obj.day == 16:
+        return -1
+
+    # Define the week boundaries
+    week_boundaries = [
+        (datetime(date_obj.year, 12, 15), datetime(date_obj.year, 12, 21)),
+        (datetime(date_obj.year, 12, 22), datetime(date_obj.year, 12, 28)),
+        (datetime(date_obj.year, 12, 29), datetime(date_obj.year + (date_obj.month == 12), 1, 4)),
+        (datetime(date_obj.year, 1, 5), datetime(date_obj.year, 1, 11))
+    ]
+
+    # Determine the week number
+    for week_num, (start_date, end_date) in enumerate(week_boundaries, start=1):
+        if start_date <= date_obj <= end_date:
+            return week_num
+
+    return None  # Return None if the date doesn't fall into any specified week
