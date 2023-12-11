@@ -46,6 +46,53 @@ async def connect_db():
     await bot.db.commit()
 
 
+'''
+
+games_played_bedwars
+deaths_bedwars
+wins_bedwars
+final_kills_bedwars
+final_deaths_bedwars
+challenges
+
+SOLO
+eight_one_final_kills_bedwars
+eight_one_kills_bedwars
+eight_one_beds_broken_bedwars
+eight_one_wins_bedwars
+eight_one_games_played_bedwars
+
+DOUBLES
+eight_two_final_kills_bedwars
+eight_two_kills_bedwars
+eight_two_beds_broken_bedwars
+eight_two_wins_bedwars
+eight_two_games_played_bedwars
+
+THREES
+four_three_final_kills_bedwars
+four_three_kills_bedwars
+four_three_beds_broken_bedwars
+four_three_wins_bedwars
+four_three_games_played_bedwars
+
+FOURS
+four_four_final_kills_bedwars
+four_four_kills_bedwars
+four_four_beds_broken_bedwars
+four_four_wins_bedwars
+four_four_games_played_bedwars
+
+4v4
+two_four_final_kills_bedwars
+two_four_kills_bedwars
+two_four_beds_broken_bedwars
+two_four_wins_bedwars
+two_four_games_played_bedwars
+
+'''
+
+
 async def base_query(query: str, values: Tuple = None):
     # Insert values into query if necessary
     if not values:
