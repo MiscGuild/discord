@@ -15,7 +15,7 @@ from src.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed,
                               missing_permissions_embed)
 from src.utils.db_utils import (delete_dnkl, insert_new_dnkl, select_one,
                                 update_dnkl, get_invites)
-from src.utils.discord_utils import dnkl_application
+from src.utils.discord_utils import dnkl_application, find_player_score
 from src.utils.minecraft_utils import (calculate_network_level,
                                        get_color_by_gexp,
                                        get_hypixel_player_rank,
@@ -305,3 +305,16 @@ class String:
         embed.set_footer(text="Total invites and total valid invites do not include this week's invites. They are "
                               "updated at the end of the week.")
         return embed
+
+    async def score(self):
+        ign, uuid = await get_mojang_profile(self.string)
+        if not ign:
+            return unknown_ign_embed
+
+        guild = await get_player_guild(uuid)
+        if ("name" not in guild) or (guild["name"] != guild_handle):
+            return missing_permissions_embed
+
+        score_embed = await find_player_score(uuid)
+
+        return score_embed
