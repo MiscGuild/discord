@@ -34,6 +34,7 @@ async def connect_db():
 
     await bot.db.execute("""CREATE TABLE IF NOT EXISTS tournament(
         uuid text PRIMARY KEY NOT NULL,
+        gexp_data text NOT NULL,
         start_data text NOT NULL,
         end_data text NOT NULL,
         week1_data text NOT NULL,
