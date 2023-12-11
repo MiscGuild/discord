@@ -176,3 +176,12 @@ async def get_invites(inviter_uuid):
     return (await select_one(
         "SELECT current_invitee_uuids, total_invites, total_valid_invites FROM invites WHERE inviter_uuid = (?)",
         (inviter_uuid,)))
+
+
+async def new_tournament_player(uuid: str, start_data: dict, week_data: dict, week_num: int):
+    await bot.db.execute("INSERT INTO tournament VALUES (?, ?, ?, ?, ?, ?)",
+                         (uuid, str(start_data), None, None, None, None))
+
+    await bot.db.execute(f"UPDATE tournament SET week{week_num}_data = (?) WHERE uuid = (?)",
+                         (str(week_data), uuid))
+    await bot.db.commit()
