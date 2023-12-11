@@ -142,6 +142,12 @@ async def generate_lb_text(member_gexp: list, text: str):
 
 
 async def get_points_from_data(start_data, end_data):
+    start_data = eval(start_data)
+    if not isinstance(end_data, dict):
+        end_data = eval(start_data)
+    else:
+        end_data = dict(end_data)
+
     start_points = 0
     start_points += (end_data["total_challenges_completed"] - start_data["total_challenges_completed"]) * 5
 
