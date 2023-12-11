@@ -141,6 +141,37 @@ async def generate_lb_text(member_gexp: list, text: str):
     return text
 
 
+async def get_points_from_data(start_data, end_data):
+    start_points = 0
+    start_points += (end_data["total_challenges_completed"] - start_data["total_challenges_completed"]) * 5
+
+    start_points += (end_data["eight_one_final_kills_bedwars"] - start_data["eight_one_final_kills_bedwars"]) * 30
+    start_points += (end_data["eight_one_kills_bedwars"] - start_data["eight_one_kills_bedwars"]) * 1
+    start_points += (end_data["eight_one_beds_broken_bedwars"] - start_data["eight_one_beds_broken_bedwars"]) * 20
+    start_points += (end_data["eight_one_wins_bedwars"] - start_data["eight_one_wins_bedwars"]) * 40
+
+    start_points += (end_data["eight_two_final_kills_bedwars"] - start_data["eight_two_final_kills_bedwars"]) * 15
+    start_points += (end_data["eight_two_kills_bedwars"] - start_data["eight_two_kills_bedwars"]) * 1
+    start_points += (end_data["eight_two_beds_broken_bedwars"] - start_data["eight_two_beds_broken_bedwars"]) * 20
+    start_points += (end_data["eight_two_wins_bedwars"] - start_data["eight_two_wins_bedwars"]) * 40
+
+    start_points += (end_data["four_three_final_kills_bedwars"] - start_data["four_three_final_kills_bedwars"]) * 20
+    start_points += (end_data["four_three_kills_bedwars"] - start_data["four_three_kills_bedwars"]) * 1
+    start_points += (end_data["four_three_beds_broken_bedwars"] - start_data["four_three_beds_broken_bedwars"]) * 30
+    start_points += (end_data["four_three_wins_bedwars"] - start_data["four_three_wins_bedwars"]) * 30
+
+    start_points += (end_data["four_four_final_kills_bedwars"] - start_data["four_four_final_kills_bedwars"]) * 15
+    start_points += (end_data["four_four_kills_bedwars"] - start_data["four_four_kills_bedwars"]) * 1
+    start_points += (end_data["four_four_beds_broken_bedwars"] - start_data["four_four_beds_broken_bedwars"]) * 30
+    start_points += (end_data["four_four_wins_bedwars"] - start_data["four_four_wins_bedwars"]) * 30
+
+    start_points += (end_data["two_four_final_kills_bedwars"] - start_data["two_four_final_kills_bedwars"]) * 20
+    start_points += (end_data["two_four_kills_bedwars"] - start_data["two_four_kills_bedwars"]) * 1
+    start_points += (end_data["two_four_beds_broken_bedwars"] - start_data["two_four_beds_broken_bedwars"]) * 20
+    start_points += (end_data["two_four_wins_bedwars"] - start_data["two_four_wins_bedwars"]) * 20
+
+    return start_points
+
 async def get_game_data(player_data):
     bedwars_data = player_data["stats"]["Bedwars"]
     total_challenges_completed = bedwars_data["challenges_completed_bedwars"]
