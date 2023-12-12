@@ -184,3 +184,17 @@ async def new_tournament_player(uuid: str, start_data: dict, week_data: dict, we
     await bot.db.execute(f"UPDATE tournament SET week{week_num}_data = (?) WHERE uuid = (?)",
                          (str(week_data), uuid))
     await bot.db.commit()
+
+
+async def set_weekly_data(uuid: str, week_data: dict, week_num: int):
+    if week_num == 4:
+        await bot.db.execute(f"UPDATE tournament SET week3_end_data = (?) WHERE uuid = (?)",
+                             (str(week_data), uuid))
+    elif week_num == -1:
+        await bot.db.execute(f"UPDATE tournament SET end_data = (?) WHERE uuid = (?)",
+                             (str(week_data), uuid))
+    else:
+        await bot.db.execute(f"UPDATE tournament SET week{week_num}_data = (?) WHERE uuid = (?)",
+                             (str(week_data), uuid))
+
+    await bot.db.commit()
