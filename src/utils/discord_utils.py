@@ -697,7 +697,6 @@ async def after_cache_ready():
     update_bedwars_data.start()
 
 
-
 @after_cache_ready.before_loop
 async def before_cache_loop():
     print("Waiting for cache...")
