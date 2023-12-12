@@ -303,7 +303,7 @@ async def get_week_number(date_string=None):
 
 async def set_tourney_data(uuid):
     player_exists = await select_one("SELECT * FROM tournament WHERE uuid = (?)",
-                                    (uuid,))
+                                     (uuid,))
 
     if not player_exists:
         player_data = await get_hypixel_player(uuid=uuid)
