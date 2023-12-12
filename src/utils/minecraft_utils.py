@@ -312,12 +312,12 @@ async def set_tourney_data(uuid):
         await new_tournament_player(uuid, start_data, start_data, week_number)
 
     if player_exists:
-        week1_exists = await select_one("SELECT week1_data FROM tournament WHERE uuid = (?)",
-                                       (uuid,))
-        week2_exists = await select_one("SELECT week2_data FROM tournament WHERE uuid = (?)",
-                                       (uuid,))
-        week3_exists = await select_one("SELECT week3_data FROM tournament WHERE uuid = (?)",
-                                       (uuid,))
+        week1_exists = any(await select_one("SELECT week1_data FROM tournament WHERE uuid = (?)",
+                                            (uuid,)))
+        week2_exists = any(await select_one("SELECT week2_data FROM tournament WHERE uuid = (?)",
+                                            (uuid,)))
+        week3_exists = any(await select_one("SELECT week3_data FROM tournament WHERE uuid = (?)",
+                                            (uuid,)))
 
         week_number = await get_week_number()
         if (week_number == 1) and not week1_exists:
