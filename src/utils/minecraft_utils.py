@@ -143,7 +143,7 @@ async def generate_lb_text(member_gexp: list, text: str):
 
 async def get_points_from_data(start_data, end_data):
     start_data = eval(start_data)
-    if not isinstance(end_data, dict):
+    if not isinstance(end_data, dict) and end_data:
         end_data = eval(end_data)
     else:
         end_data = dict(end_data)
