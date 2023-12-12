@@ -589,24 +589,35 @@ async def find_player_score(uuid):
     end_stats = (await select_one("SELECT end_data FROM tournament WHERE uuid = (?)", (uuid,)))[0]
 
     if week_number == -1:
-        week1_points = await get_points_from_data(week1_stats, week2_stats)
-        week2_points = await get_points_from_data(week2_stats, week3_stats)
-        week3_points = await get_points_from_data(week3_stats, week3_end_stats)
-        overall_points = await get_points_from_data(start_stats, end_stats)
+        week1_points, w1_games_played, w1_wins, w1_wlr, w1_final_kills, w1_fkdr = await get_points_from_data(
+            week1_stats, week2_stats)
+        week2_points, w2_games_played, w2_wins, w2_wlr, w2_final_kills, w2_fkdr = await get_points_from_data(
+            week2_stats, week3_stats)
+        week3_points, w3_games_played, w3_wins, w3_wlr, w3_final_kills, w3_fkdr = await get_points_from_data(
+            week3_stats, week3_end_stats)
+        overall_points, games_played, wins, wlr, final_kills, fkdr = await get_points_from_data(start_stats, end_stats)
     elif week_number >= 3:
-        week1_points = await get_points_from_data(week1_stats, week2_stats)
-        week2_points = await get_points_from_data(week2_stats, week3_stats)
-        week3_points = await get_points_from_data(week3_stats, current_stats)
-        overall_points = await get_points_from_data(start_stats, current_stats)
+        week1_points, w1_games_played, w1_wins, w1_wlr, w1_final_kills, w1_fkdr = await get_points_from_data(
+            week1_stats, week2_stats)
+        week2_points, w2_games_played, w2_wins, w2_wlr, w2_final_kills, w2_fkdr = await get_points_from_data(
+            week2_stats, week3_stats)
+        week3_points, w3_games_played, w3_wins, w3_wlr, w3_final_kills, w3_fkdr = await get_points_from_data(
+            week3_stats, current_stats)
+        overall_points, games_played, wins, wlr, final_kills, fkdr = await get_points_from_data(start_stats,
+                                                                                                current_stats)
     elif week_number == 2:
-        week1_points = await get_points_from_data(week1_stats, week2_stats)
-        week2_points = await get_points_from_data(week2_stats, current_stats)
-        week3_points = None
-        overall_points = await get_points_from_data(start_stats, current_stats)
+        week1_points, w1_games_played, w1_wins, w1_wlr, w1_final_kills, w1_fkdr = await get_points_from_data(
+            week1_stats, week2_stats)
+        week2_points, w2_games_played, w2_wins, w2_wlr, w2_final_kills, w2_fkdr = await get_points_from_data(
+            week2_stats, current_stats)
+        week3_points, w3_games_played, w3_wins, w3_wlr, w3_final_kills, w3_fkdr = None, None, None, None, None, None
+        overall_points, games_played, wins, wlr, final_kills, fkdr = await get_points_from_data(start_stats,
+                                                                                                current_stats)
     elif week_number == 1:
-        week1_points = await get_points_from_data(week1_stats, current_stats)
-        week2_points = None
-        week3_points = None
+        week1_points, w1_games_played, w1_wins, w1_wlr, w1_final_kills, w1_fkdr = await get_points_from_data(
+            week1_stats, current_stats)
+        week2_points, w2_games_played, w2_wins, w2_wlr, w2_final_kills, w2_fkdr = None, None, None, None, None, None
+        week3_points, w3_games_played, w3_wins, w3_wlr, w3_final_kills, w3_fkdr = None, None, None, None, None, None
         overall_points = await get_points_from_data(start_stats, current_stats)
 
     scores_embed = discord.Embed(title=f"{name}'s Tournament Points",
@@ -614,14 +625,39 @@ async def find_player_score(uuid):
     scores_embed.set_author(name=f"Miscellaneous Guild Experience Tournament",
                             url=f"https://discord.com/channels/522586672148381726/522861704921481229/1174807396686770339")
     scores_embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
-    scores_embed.add_field(name="Week 1", value=f"{week1_points} points", inline=False)
+    scores_embed.add_field(name=f"Week 1: {week1_points} points", value=
+    f"Games Played: {w1_games_played}\n"
+    f"Wins: {w1_wins}\n"
+    f"Final Kills: {w1_final_kills}\n"
+    f"Session WLR: {w1_wlr}\n"
+    f"Session FKDR: {w1_fkdr}\n",
+                           inline=False)
 
     if week_number >= 2 or week_number == -1:
-        scores_embed.add_field(name="Week 2", value=f"{week2_points} points", inline=False)
-    if week_number >= 3 or week_number == -1:
-        scores_embed.add_field(name="Week 3", value=f"{week3_points} points", inline=False)
+        scores_embed.add_field(name=f"Week 2: {week2_points} points", value=
+        f"Games Played: {w2_games_played}\n"
+        f"Wins: {w2_wins}\n"
+        f"Final Kills: {w2_final_kills}\n"
+        f"Session WLR: {w2_wlr}\n"
+        f"Session FKDR: {w2_fkdr}\n",
+                               inline=False)
 
-    scores_embed.add_field(name="Overall", value=f"{overall_points} points", inline=False)
+    if week_number >= 3 or week_number == -1:
+        scores_embed.add_field(name=f"Week 3: {week3_points} points", value=
+        f"Games Played: {w3_games_played}\n"
+        f"Wins: {w3_wins}\n"
+        f"Final Kills: {w3_final_kills}\n"
+        f"Session WLR: {w3_wlr}\n"
+        f"Session FKDR: {w3_fkdr}\n",
+                               inline=False)
+
+    scores_embed.add_field(name=f"Overall: {overall_points} points", value=
+    f"Games Played: {games_played}\n"
+    f"Wins: {wins}\n"
+    f"Final Kills: {final_kills}\n"
+    f"Overall WLR: {wlr}\n"
+    f"Overall FKDR: {fkdr}\n",
+                           inline=False)
 
     return scores_embed
 
