@@ -598,12 +598,12 @@ async def find_player_score(uuid):
         week2_points = await get_points_from_data(week2_stats, week3_stats)
         week3_points = await get_points_from_data(week3_stats, current_stats)
         overall_points = await get_points_from_data(start_stats, current_stats)
-    elif week_number >= 2:
+    elif week_number == 2:
         week1_points = await get_points_from_data(week1_stats, week2_stats)
         week2_points = await get_points_from_data(week2_stats, current_stats)
         week3_points = None
         overall_points = await get_points_from_data(start_stats, current_stats)
-    elif week_number >= 1:
+    elif week_number == 1:
         week1_points = await get_points_from_data(week1_stats, current_stats)
         week2_points = None
         week3_points = None
