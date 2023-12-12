@@ -616,9 +616,9 @@ async def find_player_score(uuid):
     scores_embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
     scores_embed.add_field(name="Week 1", value=f"{week1_points} points", inline=False)
 
-    if week2_points:
+    if week_number >= 2 or week_number == -1:
         scores_embed.add_field(name="Week 2", value=f"{week2_points} points", inline=False)
-    if week3_points:
+    if week_number >= 3 or week_number == -1:
         scores_embed.add_field(name="Week 3", value=f"{week3_points} points", inline=False)
 
     scores_embed.add_field(name="Overall", value=f"{overall_points} points", inline=False)
