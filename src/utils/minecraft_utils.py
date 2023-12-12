@@ -3,7 +3,7 @@ import re
 from datetime import datetime
 
 from src.utils.consts import ChatColor, active_req, member_req, resident_req
-from src.utils.db_utils import select_one, new_tournament_player, base_query
+from src.utils.db_utils import select_one, new_tournament_player, set_weekly_data
 from src.utils.request_utils import get_player_guild, get_name_by_uuid, get_hypixel_player
 
 
@@ -178,6 +178,7 @@ async def get_points_from_data(start_data, end_data):
 
     return start_points
 
+
 async def get_game_data(player_data):
     bedwars_data = player_data["stats"]["Bedwars"]
     total_challenges_completed = bedwars_data[
@@ -322,24 +323,24 @@ async def set_tourney_data(uuid):
         if (week_number == 1) and not week1_exists:
             player_data = await get_hypixel_player(uuid=uuid)
             week1_data = await get_game_data(player_data)
-            await base_query("UPDATE tournament SET week1_data = (?) WHERE uuid = (?)", (week1_data, uuid))
+            await set_weekly_data(uuid, week1_data, week_number)
 
         elif (week_number == 2) and not week2_exists:
             player_data = await get_hypixel_player(uuid=uuid)
             week2_data = await get_game_data(player_data)
-            await base_query("UPDATE tournament SET week2_data = (?) WHERE uuid = (?)", (week2_data, uuid))
+            await set_weekly_data(uuid, week2_data, week_number)
 
         elif (week_number == 3) and not week3_exists:
             player_data = await get_hypixel_player(uuid=uuid)
             week3_data = await get_game_data(player_data)
-            await base_query("UPDATE tournament SET week3_data = (?) WHERE uuid = (?)", (week3_data, uuid))
+            await set_weekly_data(uuid, week3_data, week_number)
 
         elif week_number == 4 and week3_exists:
             player_data = await get_hypixel_player(uuid=uuid)
             week3_end_data = await get_game_data(player_data)
-            await base_query("UPDATE tournament SET week3_end_data = (?) WHERE uuid = (?)", (week3_end_data, uuid))
+            await set_weekly_data(uuid, week3_end_data, week_number)
 
         elif week_number == -1:
             player_data = await get_hypixel_player(uuid=uuid)
             end_data = await get_game_data(player_data)
-            await base_query("UPDATE tournament SET end_data = (?) WHERE uuid = (?)", (end_data, uuid))
+            await set_weekly_data(uuid, end_data, week_number)
