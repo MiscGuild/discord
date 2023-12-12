@@ -148,6 +148,16 @@ async def get_points_from_data(start_data, end_data):
     else:
         end_data = dict(end_data)
 
+    games_played = (end_data["games_played_bedwars"] - start_data["games_played_bedwars"])
+    wins = (end_data["wins_bedwars"] - start_data["wins_bedwars"])
+    losses = games_played - wins
+    wlr = round(wins / losses, 2) if losses != 0 else wins
+
+    final_kills = (end_data["final_kills_bedwars"] - start_data["final_kills_bedwars"])
+    final_deaths = (end_data["final_deaths_bedwars"] - start_data["final_deaths_bedwars"])
+    fkdr = round(final_kills / final_deaths, 2) if final_deaths != 0 else final_kills
+
+
     start_points = 0
     start_points += (end_data["total_challenges_completed"] - start_data["total_challenges_completed"]) * 5
 
@@ -176,7 +186,7 @@ async def get_points_from_data(start_data, end_data):
     start_points += (end_data["two_four_beds_broken_bedwars"] - start_data["two_four_beds_broken_bedwars"]) * 20
     start_points += (end_data["two_four_wins_bedwars"] - start_data["two_four_wins_bedwars"]) * 20
 
-    return start_points
+    return start_points, games_played, wins, wlr, final_kills, fkdr
 
 
 async def get_game_data(player_data):
