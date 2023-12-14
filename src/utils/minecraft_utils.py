@@ -312,13 +312,17 @@ async def get_week_number(date_string=None):
 
 
 async def set_tourney_data(uuid):
+    week_number = await get_week_number()
+    if not week_number:
+        return
+
     player_exists = await select_one("SELECT * FROM tournament WHERE uuid = (?)",
                                      (uuid,))
 
     if not player_exists:
         player_data = await get_hypixel_player(uuid=uuid)
         start_data = await get_game_data(player_data)
-        week_number = await get_week_number()
+
         await new_tournament_player(uuid, start_data, start_data, week_number)
 
     if player_exists:
@@ -329,9 +333,6 @@ async def set_tourney_data(uuid):
         week3_exists = any(await select_one("SELECT week3_data FROM tournament WHERE uuid = (?)",
                                             (uuid,)))
 
-        week_number = await get_week_number()
-        if not week_number:
-            return
         if (week_number == 1) and not week1_exists:
             player_data = await get_hypixel_player(uuid=uuid)
             week1_data = await get_game_data(player_data)
