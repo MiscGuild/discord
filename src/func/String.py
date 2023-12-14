@@ -316,5 +316,6 @@ class String:
             return missing_permissions_embed
 
         score_embed = await find_player_score(uuid)
-
+        if not score_embed:
+            score_embed = discord.Embed(title="The event has not started!", color=neg_color)
         return score_embed

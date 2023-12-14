@@ -573,9 +573,14 @@ async def get_ticket_properties(channel: discord.TextChannel):
 
 
 async def find_player_score(uuid):
-    start_stats = (await select_one("SELECT start_data FROM tournament WHERE uuid = (?)", (uuid,)))[0]
-
+    start_stats = (await select_one("SELECT start_data FROM tournament WHERE uuid = (?)", (uuid,)))
     week_number = await get_week_number()
+    if not start_stats:
+        return None
+    if not week_number:
+        return None
+
+    start_stats = start_stats[0]
     player_data = await get_hypixel_player(uuid=uuid)
     name = player_data["displayname"]
 
