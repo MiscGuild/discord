@@ -297,8 +297,8 @@ async def get_week_number(date_string=None):
 
     # Define the week boundaries
     week_boundaries = [
-        (datetime(date_obj.year, 12, 10), datetime(date_obj.year, 12, 11)),
-        (datetime(date_obj.year, 12, 12), datetime(date_obj.year, 12, 28)),
+        (datetime(date_obj.year, 12, 15), datetime(date_obj.year, 12, 21)),
+        (datetime(date_obj.year, 12, 22), datetime(date_obj.year, 12, 28)),
         (datetime(date_obj.year, 12, 29), datetime(date_obj.year + (date_obj.month == 12), 1, 4)),
         (datetime(date_obj.year, 1, 5), datetime(date_obj.year, 1, 11))
     ]
