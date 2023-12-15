@@ -623,7 +623,8 @@ async def find_player_score(uuid):
             week1_stats, current_stats)
         week2_points, w2_games_played, w2_wins, w2_wlr, w2_final_kills, w2_fkdr = None, None, None, None, None, None
         week3_points, w3_games_played, w3_wins, w3_wlr, w3_final_kills, w3_fkdr = None, None, None, None, None, None
-        overall_points = await get_points_from_data(start_stats, current_stats)
+        overall_points, games_played, wins, wlr, final_kills, fkdr = await get_points_from_data(start_stats,
+                                                                                                current_stats)
 
     scores_embed = discord.Embed(title=f"{name}'s Tournament Points",
                                  url=f"https://plancke.io/hypixel/player/stats/{name}", color=neutral_color)
