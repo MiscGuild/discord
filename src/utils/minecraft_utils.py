@@ -150,6 +150,13 @@ async def get_points_from_data(start_data, end_data):
 
     games_played = (end_data["games_played_bedwars"] - start_data["games_played_bedwars"])
     wins = (end_data["wins_bedwars"] - start_data["wins_bedwars"])
+    bed_breaks_end = (end_data["eight_one_beds_broken_bedwars"] + end_data["eight_two_beds_broken_bedwars"] +
+                      end_data["four_three_beds_broken_bedwars"] + end_data["four_four_beds_broken_bedwars"] +
+                      end_data["two_four_beds_broken_bedwars"])
+    bed_breaks_start = (start_data["eight_one_beds_broken_bedwars"] + start_data["eight_two_beds_broken_bedwars"] +
+                        start_data["four_three_beds_broken_bedwars"] + start_data["four_four_beds_broken_bedwars"] +
+                        start_data["two_four_beds_broken_bedwars"])
+    bed_breaks = bed_breaks_end - bed_breaks_start
     losses = games_played - wins
     wlr = round(wins / losses, 2) if losses != 0 else wins
 

@@ -594,37 +594,41 @@ async def find_player_score(uuid):
     end_stats = (await select_one("SELECT end_data FROM tournament WHERE uuid = (?)", (uuid,)))[0]
 
     if week_number == -1:
-        week1_points, w1_games_played, w1_wins, w1_wlr, w1_final_kills, w1_fkdr = await get_points_from_data(
+        week1_points, w1_games_played, w1_wins, w1_wlr, w1_final_kills, w1_fkdr, w1_beds_broken = await get_points_from_data(
             week1_stats, week2_stats)
-        week2_points, w2_games_played, w2_wins, w2_wlr, w2_final_kills, w2_fkdr = await get_points_from_data(
+        week2_points, w2_games_played, w2_wins, w2_wlr, w2_final_kills, w2_fkdr, w2_beds_broken = await get_points_from_data(
             week2_stats, week3_stats)
-        week3_points, w3_games_played, w3_wins, w3_wlr, w3_final_kills, w3_fkdr = await get_points_from_data(
+        week3_points, w3_games_played, w3_wins, w3_wlr, w3_final_kills, w3_fkdr, w3_beds_broken = await get_points_from_data(
             week3_stats, week3_end_stats)
-        overall_points, games_played, wins, wlr, final_kills, fkdr = await get_points_from_data(start_stats, end_stats)
+        overall_points, games_played, wins, wlr, final_kills, fkdr, beds_broken = await get_points_from_data(
+            start_stats, end_stats)
     elif week_number >= 3:
-        week1_points, w1_games_played, w1_wins, w1_wlr, w1_final_kills, w1_fkdr = await get_points_from_data(
+        week1_points, w1_games_played, w1_wins, w1_wlr, w1_final_kills, w1_fkdr, w1_beds_broken = await get_points_from_data(
             week1_stats, week2_stats)
-        week2_points, w2_games_played, w2_wins, w2_wlr, w2_final_kills, w2_fkdr = await get_points_from_data(
+        week2_points, w2_games_played, w2_wins, w2_wlr, w2_final_kills, w2_fkdr, w2_beds_broken = await get_points_from_data(
             week2_stats, week3_stats)
-        week3_points, w3_games_played, w3_wins, w3_wlr, w3_final_kills, w3_fkdr = await get_points_from_data(
+        week3_points, w3_games_played, w3_wins, w3_wlr, w3_final_kills, w3_fkdr, w3_beds_broken = await get_points_from_data(
             week3_stats, current_stats)
-        overall_points, games_played, wins, wlr, final_kills, fkdr = await get_points_from_data(start_stats,
-                                                                                                current_stats)
+        overall_points, games_played, wins, wlr, final_kills, fkdr, beds_broken = await get_points_from_data(
+            start_stats,
+            current_stats)
     elif week_number == 2:
-        week1_points, w1_games_played, w1_wins, w1_wlr, w1_final_kills, w1_fkdr = await get_points_from_data(
+        week1_points, w1_games_played, w1_wins, w1_wlr, w1_final_kills, w1_fkdr, w1_beds_broken = await get_points_from_data(
             week1_stats, week2_stats)
-        week2_points, w2_games_played, w2_wins, w2_wlr, w2_final_kills, w2_fkdr = await get_points_from_data(
+        week2_points, w2_games_played, w2_wins, w2_wlr, w2_final_kills, w2_fkdr, w2_beds_broken = await get_points_from_data(
             week2_stats, current_stats)
-        week3_points, w3_games_played, w3_wins, w3_wlr, w3_final_kills, w3_fkdr = None, None, None, None, None, None
-        overall_points, games_played, wins, wlr, final_kills, fkdr = await get_points_from_data(start_stats,
-                                                                                                current_stats)
+        week3_points, w3_games_played, w3_wins, w3_wlr, w3_final_kills, w3_fkdr, w3_beds_broken = None, None, None, None, None, None, None
+        overall_points, games_played, wins, wlr, final_kills, fkdr, beds_broken = await get_points_from_data(
+            start_stats,
+            current_stats)
     elif week_number == 1:
-        week1_points, w1_games_played, w1_wins, w1_wlr, w1_final_kills, w1_fkdr = await get_points_from_data(
+        week1_points, w1_games_played, w1_wins, w1_wlr, w1_final_kills, w1_fkdr, w1_beds_broken = await get_points_from_data(
             week1_stats, current_stats)
-        week2_points, w2_games_played, w2_wins, w2_wlr, w2_final_kills, w2_fkdr = None, None, None, None, None, None
-        week3_points, w3_games_played, w3_wins, w3_wlr, w3_final_kills, w3_fkdr = None, None, None, None, None, None
-        overall_points, games_played, wins, wlr, final_kills, fkdr = await get_points_from_data(start_stats,
-                                                                                                current_stats)
+        week2_points, w2_games_played, w2_wins, w2_wlr, w2_final_kills, w2_fkdr, w2_beds_broken = None, None, None, None, None, None, None
+        week3_points, w3_games_played, w3_wins, w3_wlr, w3_final_kills, w3_fkdr, w3_beds_broken = None, None, None, None, None, None, None
+        overall_points, games_played, wins, wlr, final_kills, fkdr, beds_broken = await get_points_from_data(
+            start_stats,
+            current_stats)
 
     scores_embed = discord.Embed(title=f"{name}'s Tournament Points",
                                  url=f"https://plancke.io/hypixel/player/stats/{name}", color=neutral_color)
