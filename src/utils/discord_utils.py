@@ -630,43 +630,81 @@ async def find_player_score(uuid):
             start_stats,
             current_stats)
 
+    week_1_points = format(week1_points, ',d') if week1_points else 0
+    week_2_points = format(week2_points, ',d') if week2_points else 0
+    week_3_points = format(week3_points, ',d') if week3_points else 0
+    overall_points = format(overall_points, ',d') if overall_points else 0
+
+    w1_games_played = format(w1_games_played, ',d') if w1_games_played else 0
+    w1_wins = format(w1_wins, ',d') if w1_wins else 0
+    w1_final_kills = format(w1_final_kills, ',d') if w1_final_kills else 0
+    w1_beds_broken = format(w1_beds_broken, ',d') if w1_beds_broken else 0
+    w1_wlr = round(w1_wlr, 2) if w1_wlr else 0
+    w1_fkdr = round(w1_fkdr, 2) if w1_fkdr else 0
+
+    w2_games_played = format(w2_games_played, ',d') if w2_games_played else 0
+    w2_wins = format(w2_wins, ',d') if w2_wins else 0
+    w2_final_kills = format(w2_final_kills, ',d') if w2_final_kills else 0
+    w2_beds_broken = format(w2_beds_broken, ',d') if w2_beds_broken else 0
+    w2_wlr = round(w2_wlr, 2) if w2_wlr else 0
+    w2_fkdr = round(w2_fkdr, 2) if w2_fkdr else 0
+
+    w3_games_played = format(w3_games_played, ',d') if w3_games_played else 0
+    w3_wins = format(w3_wins, ',d') if w3_wins else 0
+    w3_final_kills = format(w3_final_kills, ',d') if w3_final_kills else 0
+    w3_beds_broken = format(w3_beds_broken, ',d') if w3_beds_broken else 0
+    w3_wlr = round(w3_wlr, 2) if w3_wlr else 0
+    w3_fkdr = round(w3_fkdr, 2) if w3_fkdr else 0
+
+    games_played = format(games_played, ',d') if games_played else 0
+    wins = format(wins, ',d') if wins else 0
+    final_kills = format(final_kills, ',d') if final_kills else 0
+    beds_broken = format(beds_broken, ',d') if beds_broken else 0
+    wlr = round(wlr, 2) if wlr else 0
+    fkdr = round(fkdr, 2) if fkdr else 0
+
+
     scores_embed = discord.Embed(title=f"{name}'s Tournament Points",
                                  url=f"https://plancke.io/hypixel/player/stats/{name}", color=neutral_color)
     scores_embed.set_author(name=f"Miscellaneous Guild Experience Tournament",
                             url=f"https://discord.com/channels/522586672148381726/522861704921481229/1174807396686770339")
     scores_embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
-    scores_embed.add_field(name=f"Week 1: {week1_points if week1_points else 0} points", value=
-    f"Games Played: {w1_games_played if w1_games_played else 0}\n"
-    f"Wins: {w1_wins if w1_wins else 0}\n"
-    f"Final Kills: {w1_final_kills if w1_final_kills else 0}\n"
-    f"Session WLR: {w1_wlr if w1_wlr else 0}\n"
-    f"Session FKDR: {w1_fkdr if w1_fkdr else 0}\n",
+    scores_embed.add_field(name=f"Week 1: {week_1_points} points", value=
+    f"Games Played: {w1_games_played}\n"
+    f"Wins: {w1_wins}\n"
+    f"Final Kills: {w1_final_kills}\n"
+    f"Beds Broken: {w1_beds_broken}\n"
+    f"Session WLR: {w1_wlr}\n"
+    f"Session FKDR: {w1_fkdr}\n",
                            inline=False)
 
     if week_number >= 2 or week_number == -1:
-        scores_embed.add_field(name=f"Week 2: {week2_points if week2_points else 0} points", value=
-        f"Games Played: {w2_games_played if w2_games_played else 0}\n"
-        f"Wins: {w2_wins if w2_wins else 0}\n"
-        f"Final Kills: {w2_final_kills if w2_final_kills else 0}\n"
-        f"Session WLR: {w2_wlr if w2_wlr else 0}\n"
-        f"Session FKDR: {w2_fkdr if w2_fkdr else 0}\n",
+        scores_embed.add_field(name=f"Week 2: {week_2_points} points", value=
+        f"Games Played: {w2_games_played}\n"
+        f"Wins: {w2_wins}\n"
+        f"Final Kills: {w2_final_kills}\n"
+        f"Beds Broken: {w2_beds_broken}\n"
+        f"Session WLR: {w2_wlr}\n"
+        f"Session FKDR: {w2_fkdr}\n",
                                inline=False)
 
     if week_number >= 3 or week_number == -1:
-        scores_embed.add_field(name=f"Week 3: {week3_points if week3_points else 0} points", value=
-        f"Games Played: {w3_games_played if w3_games_played else 0}\n"
-        f"Wins: {w3_wins if w3_wins else 0}\n"
-        f"Final Kills: {w3_final_kills if w3_final_kills else 0}\n"
-        f"Session WLR: {w3_wlr if w3_wlr else 0}\n"
-        f"Session FKDR: {w3_fkdr if w3_fkdr else 0}\n",
+        scores_embed.add_field(name=f"Week 3: {week_3_points} points", value=
+        f"Games Played: {w3_games_played}\n"
+        f"Wins: {w3_wins}\n"
+        f"Final Kills: {w3_final_kills}\n"
+        f"Beds Broken: {w3_beds_broken}\n"
+        f"Session WLR: {w3_wlr}\n"
+        f"Session FKDR: {w3_fkdr}\n",
                                inline=False)
 
-    scores_embed.add_field(name=f"Overall: {overall_points if overall_points else 0} points", value=
-    f"Games Played: {games_played if games_played else 0}\n"
-    f"Wins: {wins if wins else 0}\n"
-    f"Final Kills: {final_kills if final_kills else 0}\n"
-    f"Overall WLR: {wlr if wlr else 0}\n"
-    f"Overall FKDR: {fkdr if fkdr else 0}\n",
+    scores_embed.add_field(name=f"Overall: {overall_points} points", value=
+    f"Games Played: {games_played}\n"
+    f"Wins: {wins}\n"
+    f"Final Kills: {final_kills}\n"
+    f"Beds Broken: {beds_broken}\n"
+    f"Overall WLR: {wlr}\n"
+    f"Overall FKDR: {fkdr}\n",
                            inline=False)
 
     return scores_embed
