@@ -707,6 +707,12 @@ async def find_player_score(uuid):
     f"Overall FKDR: {fkdr}\n",
                            inline=False)
 
+    scores_embed.set_footer(text=
+                            "Week 1: 15th December - 21st December"
+                            "\nWeek 2: 22nd December - 28th December"
+                            "\nWeek 3: 29th December - 4th January"
+                            "\nOverall: 15th December - 4th January"
+                            "\n\nIf a week has not concluded, it does (start of week - now).")
     return scores_embed
 
 
