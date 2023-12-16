@@ -150,10 +150,10 @@ async def get_points_from_data(start_data, end_data):
 
     games_played = (end_data["games_played_bedwars"] - start_data["games_played_bedwars"])
     wins = (end_data["wins_bedwars"] - start_data["wins_bedwars"])
-    bed_breaks_end = (end_data["eight_one_beds_broken_bedwars"] + end_data["eight_two_beds_broken_bedwars"] +
+    bed_breaks_end = int(end_data["eight_one_beds_broken_bedwars"] + end_data["eight_two_beds_broken_bedwars"] +
                       end_data["four_three_beds_broken_bedwars"] + end_data["four_four_beds_broken_bedwars"] +
                       end_data["two_four_beds_broken_bedwars"])
-    bed_breaks_start = (start_data["eight_one_beds_broken_bedwars"] + start_data["eight_two_beds_broken_bedwars"] +
+    bed_breaks_start = int(start_data["eight_one_beds_broken_bedwars"] + start_data["eight_two_beds_broken_bedwars"] +
                         start_data["four_three_beds_broken_bedwars"] + start_data["four_four_beds_broken_bedwars"] +
                         start_data["two_four_beds_broken_bedwars"])
     bed_breaks = bed_breaks_end - bed_breaks_start
@@ -193,7 +193,7 @@ async def get_points_from_data(start_data, end_data):
     start_points += (end_data["two_four_beds_broken_bedwars"] - start_data["two_four_beds_broken_bedwars"]) * 20
     start_points += (end_data["two_four_wins_bedwars"] - start_data["two_four_wins_bedwars"]) * 20
 
-    return start_points, games_played, wins, wlr, final_kills, fkdr
+    return start_points, games_played, wins, wlr, final_kills, fkdr, bed_breaks
 
 
 async def get_game_data(player_data):
