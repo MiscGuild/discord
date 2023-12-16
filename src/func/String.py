@@ -312,6 +312,9 @@ class String:
             return unknown_ign_embed
 
         guild = await get_player_guild(uuid)
+
+        if not guild:
+            return guildless_embed
         if ("name" not in guild) or (guild["name"] != guild_handle):
             return missing_permissions_embed
 
