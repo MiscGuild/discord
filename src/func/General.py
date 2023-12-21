@@ -827,7 +827,7 @@ class General:
             return embed
 
         count = 0
-        text = "&4&lMiscellaneous BedWars tournament%5Cn"
+        text = "&6&lMiscellaneous BedWars tournament%5Cn"
         for uuid, score in leaderboard[:15]:
             count += 1
             name = await get_name_by_uuid(uuid)
