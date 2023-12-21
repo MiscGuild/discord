@@ -294,7 +294,7 @@ async def get_week_number(date_string=None):
         date_obj = datetime.now()
     else:
         # Define the date format
-        date_format = "%d %B"
+        date_format = "%Y-%m-%d %H:%M:%S.%f"
 
         # Parse the input date string
         date_obj = datetime.strptime(date_string, date_format)
@@ -304,10 +304,10 @@ async def get_week_number(date_string=None):
 
     # Define the week boundaries
     week_boundaries = [
-        (datetime(date_obj.year, 12, 15), datetime(date_obj.year, 12, 21)),
-        (datetime(date_obj.year, 12, 22), datetime(date_obj.year, 12, 28)),
-        (datetime(date_obj.year, 12, 29), datetime(date_obj.year + (date_obj.month == 12), 1, 4)),
-        (datetime(date_obj.year, 1, 5), datetime(date_obj.year, 1, 11))
+        (datetime(date_obj.year, 12, 15), datetime(date_obj.year, 12, 21, 23, 59, 59)),
+        (datetime(date_obj.year, 12, 22), datetime(date_obj.year, 12, 28, 23, 59, 59)),
+        (datetime(date_obj.year, 12, 29), datetime(date_obj.year + (date_obj.month == 12), 1, 4, 23, 59, 59)),
+        (datetime(date_obj.year, 1, 5), datetime(date_obj.year, 1, 11, 23, 59, 59))
     ]
 
     # Determine the week number
