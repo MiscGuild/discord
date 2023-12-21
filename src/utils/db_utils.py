@@ -39,7 +39,8 @@ async def connect_db():
         week2_data text,
         week3_data text,
         week3_end_data text,
-        end_data text)""")
+        end_data text,
+        recent_data text)""")
 
     # Commit any changes
     await bot.db.commit()
