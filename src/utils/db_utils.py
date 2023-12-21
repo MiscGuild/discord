@@ -199,3 +199,9 @@ async def set_weekly_data(uuid: str, week_data: dict, week_num: int):
                              (str(week_data), uuid))
 
     await bot.db.commit()
+
+
+async def update_recent(uuid: str, recent_data: dict):
+    await bot.db.execute(f"UPDATE tournament SET recent_data = (?) WHERE uuid = (?)",
+                         (str(recent_data), uuid))
+    await bot.db.commit()
