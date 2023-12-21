@@ -14,7 +14,7 @@ from src.utils.consts import (config, dnkl_req,
                               ticket_categories,
                               unknown_ign_embed, guild_handle, positive_responses, dnkl_creation_embed, dnkl_channel_id,
                               missing_permissions_embed)
-from src.utils.db_utils import select_one, insert_new_dnkl, update_dnkl, delete_dnkl
+from src.utils.db_utils import select_one, insert_new_dnkl, update_dnkl, delete_dnkl, update_recent
 from src.utils.minecraft_utils import get_player_gexp, get_week_number, get_game_data, get_points_from_data
 from src.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild, get_guild_level
 
@@ -582,6 +582,7 @@ async def find_player_score(uuid):
 
     start_stats = start_stats[0]
     player_data = await get_hypixel_player(uuid=uuid)
+    await update_recent(uuid, player_data)
     name = player_data["displayname"]
 
     current_stats = await get_game_data(player_data)
