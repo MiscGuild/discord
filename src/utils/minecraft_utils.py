@@ -374,6 +374,54 @@ async def set_tourney_data(uuid):
             end_data = await get_game_data(player_data)
             await set_weekly_data(uuid, end_data, week_number)
 
+
+async def compile_scores(week_number=None):
+    # Leaderboard = {uuid, score}
+    lb = {}
+
+    if week_number == 0:
+        players = await select_all("SELECT uuid, start_data FROM tournament")
+        for player in players:
+            uuid = player[0]
+            player_data = await select_one("SELECT recent_data FROM tournament WHERE uuid = (?)", (uuid,))
+            current_stats = await get_game_data(player_data[0])
+            score = await get_points_from_data(player[1], current_stats)
+            lb[player[0]] = score
+
+        lb = sorted(lb.items(), key=lambda item: item[1], reverse=True)
+
+    elif week_number == -1:
+        players = await select_all("SELECT uuid, start_data, end_data  FROM tournament")
+        for player in players:
+            if not player[2]:
+                return None
+            score = get_points_from_data(player[1], player[2])
+            lb[player[0]] = score
+
+        lb = sorted(lb.items(), key=lambda item: item[1], reverse=True)
+
+    elif week_number == 3:
+        players = await select_all("SELECT uuid, week3_data, week3_end_data FROM tournament")
+        for player in players:
+            if not player[2]:
+                return None
+            score = get_points_from_data(player[1], player[2])
+            lb[player[0]] = score
+
+        lb = sorted(lb.items(), key=lambda item: item[1], reverse=True)
+
+    else:
+        players = await select_all(f"SELECT uuid, week{week_number}_data, week{week_number + 1} FROM tournament")
+        for player in players:
+            if not player[2]:
+                return None
+            score = get_points_from_data(player[1], player[2])
+            lb[player[0]] = score
+
+        lb = sorted(lb.items(), key=lambda item: item[1], reverse=True)
+    return lb
+
+
 async def update_recent_data(uuid):
     player_data = await get_hypixel_player(uuid=uuid)
     if not player_data:
