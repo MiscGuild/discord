@@ -324,7 +324,6 @@ async def get_week_number(date_string=None):
     for week_num, (start_date, end_date) in enumerate(week_boundaries, start=1):
         if start_date <= date_obj <= end_date:
             return week_num
-
     return None  # Return None if the date doesn't fall into any specified week
 
 
@@ -374,3 +373,9 @@ async def set_tourney_data(uuid):
             player_data = await get_hypixel_player(uuid=uuid)
             end_data = await get_game_data(player_data)
             await set_weekly_data(uuid, end_data, week_number)
+
+async def update_recent_data(uuid):
+    player_data = await get_hypixel_player(uuid=uuid)
+    if not player_data:
+        return None
+    await update_recent(uuid, player_data)
