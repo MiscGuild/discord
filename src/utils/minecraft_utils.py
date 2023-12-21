@@ -3,7 +3,7 @@ import re
 from datetime import datetime
 
 from src.utils.consts import ChatColor, active_req, member_req, resident_req
-from src.utils.db_utils import select_one, new_tournament_player, set_weekly_data
+from src.utils.db_utils import select_one, new_tournament_player, set_weekly_data, select_all, update_recent
 from src.utils.request_utils import get_player_guild, get_name_by_uuid, get_hypixel_player
 
 
@@ -197,6 +197,11 @@ async def get_points_from_data(start_data, end_data):
 
 
 async def get_game_data(player_data):
+    if not isinstance(player_data, dict) and player_data:
+        player_data = eval(player_data)
+    else:
+        player_data = dict(player_data)
+
     bedwars_data = player_data["stats"]["Bedwars"]
     total_challenges_completed = bedwars_data[
         "challenges_completed_bedwars"] if "challenges_completed_bedwars" in bedwars_data else 0
