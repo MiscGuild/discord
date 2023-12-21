@@ -9,7 +9,7 @@ from src.func.Integer import Integer
 from src.utils.consts import weekly_lb_channel, daily_lb_channel, guild_handle
 from src.utils.db_utils import (connect_db, select_all)
 from src.utils.giveaway_utils import roll_giveaway
-from src.utils.minecraft_utils import set_tourney_data
+from src.utils.minecraft_utils import set_tourney_data, update_recent_data
 from src.utils.referral_utils import check_invitation_validity, generate_rank_upgrade
 from src.utils.request_utils import get_guild_by_name
 
@@ -85,13 +85,20 @@ async def before_update_invites():
     await asyncio.sleep(5)
 
 
-@tasks.loop(hours=24)
+@tasks.loop(hours=1)
 async def update_bedwars_data():
-    guild = await get_guild_by_name(guild_handle)
+    if datetime.utcnow().hour == 0:
+        guild = await get_guild_by_name(guild_handle)
+        for member in guild["members"]:
+            uuid = member["uuid"]
+            await set_tourney_data(uuid)
 
-    for member in guild["members"]:
-        uuid = member["uuid"]
-        await set_tourney_data(uuid)
+    participants = await select_all("SELECT uuid FROM tournament")
+    for uuid in participants:
+        await update_recent_data(uuid[0])
+        await asyncio.sleep(1)
+
+
 
 
 @update_bedwars_data.before_loop
