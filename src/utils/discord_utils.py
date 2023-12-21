@@ -553,7 +553,8 @@ async def create_transcript(channel: discord.TextChannel, limit: int = None):
     return discord.File(BytesIO(transcript.encode()), filename=f"transcript-{channel.name}.html")
 
 
-async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, author: discord.User, weekly_gexp: int):
+async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, author: discord.User,
+                           weekly_gexp: int = None):
     YearView = discord.ui.View()
     buttons = (("Approve", "DNKL_Approve", discord.enums.ButtonStyle.green, dnkl_approve),
                ("Deny", "DNKL_Deny", discord.enums.ButtonStyle.red, dnkl_deny),
