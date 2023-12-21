@@ -114,6 +114,12 @@ class Hypixel(commands.Cog, name="hypixel"):
             name = await name_grabber(ctx.author)
         await ctx.respond(embed=await String(string=name).score())
 
+    @bridge.bridge_command(aliases=['tlb', 'tl'])
+    async def tourney_leaderboard(self, ctx):
+        """View the current tournament leaderboard!"""
+        await ctx.defer()
+        await ctx.respond(file=await General().tourney_leaderboard())
+
 
 def setup(bot):
     bot.add_cog(Hypixel(bot))
