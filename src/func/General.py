@@ -19,12 +19,12 @@ from src.utils.consts import (accepted_staff_application_embed, active_req,
                               staff_application_questions, ticket_categories,
                               resident_req, dnkl_entries_not_found,
                               positive_responses)
-from src.utils.db_utils import insert_new_giveaway, select_all
+from src.utils.db_utils import insert_new_giveaway, select_all, select_one
 from src.utils.discord_utils import (create_ticket, create_transcript,
                                      get_ticket_creator, log_event,
                                      get_ticket_properties,
                                      name_grabber, has_tag_perms)
-from src.utils.minecraft_utils import get_gexp_sorted, generate_lb_text
+from src.utils.minecraft_utils import get_gexp_sorted, generate_lb_text, compile_scores, get_hypixel_player_rank
 from src.utils.request_utils import (get_guild_by_name, get_guild_uuids,
                                      get_jpg_file,
                                      get_mojang_profile, get_name_by_uuid,
@@ -800,3 +800,48 @@ class General:
         milestone_message = milestone_message + "\n**Congrats to everyone this week. If you wish to submit a milestone, look over at <#650248396480970782>!**"
         await bot.get_channel(milestones_channel).send(milestone_message)
         return f"{count} milestones have been compiled and sent in {bot.get_channel(milestones_channel)}"
+
+    async def compiletournament(ctx, week_number):
+        leaderboard = await compile_scores(week_number)
+        if not leaderboard:
+            embed = discord.Embed(title="Invalid week number!",
+                                  description="The week number you have given might not have concluded!",
+                                  color=neg_color)
+            return embed
+
+        if week_number > 0:
+            username = await get_name_by_uuid(leaderboard[0][0])
+            text = (f"# Week {week_number}\n"
+                    f"Congratulations to \n"
+                    f"{username}\n"
+                    f"for winning this week's tournament prize with a score of {leaderboard[0][1]}!\n"
+                    f"Please make a ticket to claim your prize!")
+            return text
+
+    async def tourney_leaderboard(ctx):
+        leaderboard = await compile_scores(0)
+        if not leaderboard:
+            embed = discord.Embed(title="No tournament data found!",
+                                  description="There is no tournament data available!",
+                                  color=neg_color)
+            return embed
+
+        count = 0
+        text = "&4&lMiscellaneous BedWars tournament%5Cn"
+        for uuid, score in leaderboard[:15]:
+            count += 1
+            name = await get_name_by_uuid(uuid)
+            player_data = (await select_one("SELECT recent_data from tournament WHERE uuid = ?", (uuid,)))[0]
+            rank, _ = await get_hypixel_player_rank(player_data)  # Ignores value without color formatting
+
+            # Add new entry to image content
+            text += f"&6&l{count}.&r {rank} {name} &c{format(score[0], ',d')} points"
+            # Add new line
+            if count < 15:
+                text += "%5Cn"
+
+        # Replace characters for the URL
+        text = text.replace("+", "%2B").replace("&", "%26").replace(" ", "%20").replace(",", "%2C")
+
+        # Return image
+        return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
