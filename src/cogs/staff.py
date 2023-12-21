@@ -1,8 +1,8 @@
 from __main__ import bot
 
 import discord
-from discord.ext import commands, bridge
 from discord.commands import option
+from discord.ext import commands, bridge
 
 from src.func.General import General
 from src.func.Union import Union
@@ -78,6 +78,23 @@ class Staff(commands.Cog, name="staff"):
     async def rolecheck(self, ctx, send_ping: bool = True):
         """Sync the names and roles of everyone in the discord!"""
         await General.rolecheck(ctx, send_ping)
+
+    @bridge.bridge_command()
+    @commands.has_role("Staff")
+    @option(
+        name="week_number",
+        description="The week number of the tournament",
+        required=True,
+        input_type=int
+    )
+    async def compiletournament(self, ctx, week_number: int):
+        """Compile a tournament!"""
+        res = await General.compiletournament(ctx, week_number)
+
+        if isinstance(res, discord.Embed):
+            await ctx.respond(embed=res)
+        elif isinstance(res, str):
+            await bot.get_channel(870953729942253588).send(res)
 
 
 
