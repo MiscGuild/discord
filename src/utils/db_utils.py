@@ -179,8 +179,8 @@ async def get_invites(inviter_uuid):
 
 
 async def new_tournament_player(uuid: str, start_data: dict, week_data: dict, week_num: int):
-    await bot.db.execute("INSERT INTO tournament VALUES (?, ?, ?, ?, ?, ?, ?)",
-                         (uuid, str(start_data), None, None, None, None, None))
+    await bot.db.execute("INSERT INTO tournament VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                         (uuid, str(start_data), None, None, None, None, None, str(start_data)))
 
     await bot.db.execute(f"UPDATE tournament SET week{week_num}_data = (?) WHERE uuid = (?)",
                          (str(week_data), uuid))
