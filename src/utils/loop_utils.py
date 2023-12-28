@@ -87,7 +87,7 @@ async def before_update_invites():
 
 @tasks.loop(hours=1)
 async def update_bedwars_data():
-    if datetime.utcnow().hour == 0:
+    if datetime.utcnow().hour % 2 == 0:
         guild = await get_guild_by_name(guild_handle)
         for member in guild["members"]:
             uuid = member["uuid"]
