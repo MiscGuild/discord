@@ -321,5 +321,6 @@ class String:
 
         score_embed = await find_player_score(uuid)
         if not score_embed:
-            score_embed = discord.Embed(title="The event has not started!", color=neg_color)
+            score_embed = discord.Embed(title="Since you are new to the guild, please try again in 2 hours!", color=neg_color)
+
         return score_embed
