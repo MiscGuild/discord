@@ -101,7 +101,7 @@ class Hypixel(commands.Cog, name="hypixel"):
         elif isinstance(res, str):
             await ctx.respond(res)
 
-    @bridge.bridge_command()
+    @bridge.bridge_command(aliases=["p", "score", "point"])
     @option(
         name="name",
         description="The Minecraft username of the player whose score you'd like to view",
