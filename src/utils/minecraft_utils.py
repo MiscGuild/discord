@@ -316,10 +316,10 @@ async def get_week_number(date_string=None):
 
     # Define the week boundaries
     week_boundaries = [
-        (datetime(date_obj.year, 12, 15), datetime(date_obj.year, 12, 21, 23, 59, 59)),
-        (datetime(date_obj.year, 12, 22), datetime(date_obj.year, 12, 28, 23, 59, 59)),
-        (datetime(date_obj.year, 12, 29), datetime(date_obj.year + (date_obj.month == 12), 1, 4, 23, 59, 59)),
-        (datetime(date_obj.year, 1, 5), datetime(date_obj.year, 1, 11, 23, 59, 59))
+        (datetime(2023, 12, 15), datetime(2023, 12, 21, 23, 59, 59)),
+        (datetime(2023, 12, 22), datetime(2023, 12, 28, 23, 59, 59)),
+        (datetime(2023, 12, 29), datetime(2024, 1, 4, 23, 59, 59)),
+        (datetime(2024, 1, 5), datetime(2024, 1, 11, 23, 59, 59))
     ]
 
     # Determine the week number
