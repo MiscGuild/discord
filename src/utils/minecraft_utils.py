@@ -203,13 +203,14 @@ async def get_points_from_data(start_data, end_data):
     return start_points, games_played, wins, wlr, final_kills, fkdr, bed_breaks
 
 
-async def get_game_data(player_data):
-    if not isinstance(player_data, dict) and player_data:
-        player_data = eval(player_data)
+async def get_game_data(bedwars_data):
+    if not isinstance(bedwars_data, dict) and bedwars_data:
+        bedwars_data = eval(bedwars_data)
     else:
-        player_data = dict(player_data)
+        bedwars_data = dict(bedwars_data)
 
-    bedwars_data = player_data["stats"]["Bedwars"]
+    if not "total_challenges_completed" in bedwars_data:
+        bedwars_data = bedwars_data["stats"]["Bedwars"]
     total_challenges_completed = bedwars_data[
         "challenges_completed_bedwars"] if "challenges_completed_bedwars" in bedwars_data else 0
     games_played_bedwars = bedwars_data["games_played_bedwars"] if "games_played_bedwars" in bedwars_data else 0
