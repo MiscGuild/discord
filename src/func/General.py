@@ -827,21 +827,22 @@ class General:
             return embed
 
         count = 0
-        text = "&6&lMiscellaneous BedWars tournament%5Cn"
-        for uuid, score in leaderboard[:15]:
+        text = "# Miscellaneous BedWars Tournament\n## Overall Leaderboard\n\n"
+        for uuid, score in leaderboard[:20]:
             count += 1
             name = await get_name_by_uuid(uuid)
             player_data = (await select_one("SELECT recent_data from tournament WHERE uuid = ?", (uuid,)))[0]
             rank, _ = await get_hypixel_player_rank(player_data)  # Ignores value without color formatting
 
             # Add new entry to image content
-            text += f"&6&l{count}.&r {rank} {name} &c{format(score[0], ',d')} points"
-            # Add new line
-            if count < 15:
-                text += "%5Cn"
+            #text += f"&6&l{count}.&r {rank} {name} &c{format(score[0], ',d')} points"
 
+            text += f"{count}. **{name}** - __{format(score[0], ',d')} points__\n"
+
+
+        text += "*Everyone in the top 15 will win prizes.*"
         # Replace characters for the URL
-        text = text.replace("+", "%2B").replace("&", "%26").replace(" ", "%20").replace(",", "%2C")
-
+        #text = text.replace("+", "%2B").replace("&", "%26").replace(" ", "%20").replace(",", "%2C")
         # Return image
-        return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
+        #return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
+        return text
