@@ -118,7 +118,7 @@ class Hypixel(commands.Cog, name="hypixel"):
     async def tourney_leaderboard(self, ctx):
         """View the current tournament leaderboard!"""
         await ctx.defer()
-        await ctx.respond(file=await General().tourney_leaderboard())
+        await ctx.respond(await General().tourney_leaderboard())
 
 
 def setup(bot):
