@@ -104,7 +104,7 @@ async def generate_rank_upgrade(weekly_invites : list):
 > Total Guild Experience:- `{format(winner_gexp, ',d')}`
 > Valid Invites:- `{format(len(winner_invites), ',d') if winner_invites else 0}`
 > Total Entries:- `{format(entries[winner_uuid], ',d') if winner_uuid in entries else 0}`
-
+*If the winner does not create a ticket or contact a staff member within a week of this message, the rank upgrade will be lost.*
 
 ### Here are some statistics for the past week
 - Total unscaled guild experience earned - `{format(total_gexp, ',d')}`
