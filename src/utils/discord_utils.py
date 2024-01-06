@@ -15,7 +15,7 @@ from src.utils.consts import (config, dnkl_req,
                               unknown_ign_embed, guild_handle, positive_responses, dnkl_creation_embed, dnkl_channel_id,
                               missing_permissions_embed)
 from src.utils.db_utils import select_one, insert_new_dnkl, update_dnkl, delete_dnkl, update_recent
-from src.utils.minecraft_utils import get_player_gexp, get_week_number, get_game_data, get_points_from_data
+from src.utils.minecraft_utils import get_player_gexp, get_week_number, get_game_data, get_tournament_stats
 from src.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild, get_guild_level
 
 
@@ -53,7 +53,8 @@ async def close_ticket(channel: discord.TextChannel, author: discord.User, ign: 
         await channel.send(embed=missing_permissions_embed)
         return None
 
-    embed = discord.Embed(title="This ticket will be deleted in 20 seconds!", color=neg_color)
+    embed = discord.Embed(
+        title="This ticket will be deleted in 20 seconds!", color=neg_color)
 
     # Send deletion warning and gather transcript
     await interaction.response.send_message(embed=embed)
@@ -130,8 +131,10 @@ async def dnkl_deny(channel: discord.TextChannel, author: discord.User, ign: str
         embed.set_footer(
             text="If don't you think you can meet the requirements, you may rejoin the guild once your inactivity period has ended.")
 
-    closeView = discord.ui.View(timeout=None)  # View for staff members to approve/deny the DNKL
-    button = ("Close This Ticket", "close_ticket", discord.enums.ButtonStyle.red)
+    # View for staff members to approve/deny the DNKL
+    closeView = discord.ui.View(timeout=None)
+    button = ("Close This Ticket", "close_ticket",
+              discord.enums.ButtonStyle.red)
     closeView.add_item(
         uiutils.Button_Creator(channel=channel, author=author, ign=ign, uuid=uuid, button=button,
                                function=close_ticket))
@@ -206,16 +209,22 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                 super().__init__()
 
                 if bot.guest in user.roles:
-                    self.add_option(label=f"I want to join {guild_handle}", emoji="<:Misc:540990817872117780>")
-                    self.add_option(label=f"I want to organize a GvG with {guild_handle}", emoji="⚔️")
-                    self.add_option(label=f"My guild wishes to ally {guild_handle}", emoji="🤝")
+                    self.add_option(
+                        label=f"I want to join {guild_handle}", emoji="<:Misc:540990817872117780>")
+                    self.add_option(
+                        label=f"I want to organize a GvG with {guild_handle}", emoji="⚔️")
+                    self.add_option(
+                        label=f"My guild wishes to ally {guild_handle}", emoji="🤝")
 
                 # Add milestone, DNKL application, staff application, GvG application if user is a member
                 if bot.member_role in user.roles:
                     self.add_option(label="Register a milestone", emoji="🏆")
-                    self.add_option(label="I am going to be inactive", emoji="<:dnkl:877657298703634483>")
-                    self.add_option(label="I want to join the staff team", emoji="🤵")
-                    self.add_option(label="I want to join the GvG team", emoji="⚔️")
+                    self.add_option(label="I am going to be inactive",
+                                    emoji="<:dnkl:877657298703634483>")
+                    self.add_option(
+                        label="I want to join the staff team", emoji="🤵")
+                    self.add_option(
+                        label="I want to join the GvG team", emoji="⚔️")
 
                 # Add default options
                 self.add_option(label="Report a player", emoji="🗒️")
@@ -240,13 +249,16 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     fields = [
                         ["What was the username of the accused", "", discord.InputTextStyle.short,
                          "Username of the accused"],
-                        ["What was the offense?", "", discord.InputTextStyle.short, "Offense"],
-                        ["When did this happen?", "", discord.InputTextStyle.short, "Time of Offense"],
+                        ["What was the offense?", "",
+                            discord.InputTextStyle.short, "Offense"],
+                        ["When did this happen?", "",
+                            discord.InputTextStyle.short, "Time of Offense"],
                         ["Provide a brief description of what happened.",
                          "Answer the question in no more than 100 words.",
                          discord.InputTextStyle.long, "Description"]
                     ]
-                    embed = discord.Embed(title="Player Report", color=neutral_color)
+                    embed = discord.Embed(
+                        title="Player Report", color=neutral_color)
                     await interaction.response.send_modal(
                         modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, uuid=uuid,
                                                    title="Player Report"))
@@ -300,7 +312,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                         inline=False))
 
                     meets_requirements = await bot.wait_for("message", check=lambda
-                        x: x.channel == ticket and x.author == interaction.user)
+                                                            x: x.channel == ticket and x.author == interaction.user)
 
                     # If user doesn't meet requirements, deny application
                     if (meets_requirements.content).lower() not in positive_responses:
@@ -317,7 +329,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                                                               color=neutral_color))
                         answer = await bot.wait_for("message",
                                                     check=lambda
-                                                        x: x.channel == ticket and x.author == interaction.user)
+                                                    x: x.channel == ticket and x.author == interaction.user)
 
                         # Place answer into array with question number
                         answers[number] = answer.content
@@ -327,8 +339,10 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                         "Your staff application has been completed! Please wait while your answers are compiled.")
 
                     # Create overview embed
-                    review_embed = discord.Embed(title=f"{ign}'s Staff Application", color=neutral_color)
-                    review_embed.set_footer(text="If you made a mistake, please notify a staff member.")
+                    review_embed = discord.Embed(
+                        title=f"{ign}'s Staff Application", color=neutral_color)
+                    review_embed.set_footer(
+                        text="If you made a mistake, please notify a staff member.")
                     for number, answer in answers.items():
                         review_embed.add_field(name=f"{number}. {staff_application_questions[number]}", value=answer,
                                                inline=False)
@@ -351,34 +365,45 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     # Set vars for each stat
                     bw_wins = player_data["Bedwars"]["wins_bedwars"]
                     bw_fkdr = round(
-                        player_data["Bedwars"]["final_kills_bedwars"] / player_data["Bedwars"]["final_deaths_bedwars"],
+                        player_data["Bedwars"]["final_kills_bedwars"] /
+                        player_data["Bedwars"]["final_deaths_bedwars"],
                         2)
                     sw_wins = player_data["SkyWars"]["wins"]
-                    sw_kdr = round(player_data["SkyWars"]["kills"] / player_data["SkyWars"]["deaths"], 2)
-                    duels_wlr = round(player_data["Duels"]["wins"] / player_data["Duels"]["losses"], 2)
+                    sw_kdr = round(
+                        player_data["SkyWars"]["kills"] / player_data["SkyWars"]["deaths"], 2)
+                    duels_wlr = round(
+                        player_data["Duels"]["wins"] / player_data["Duels"]["losses"], 2)
                     duels_kills = player_data["Duels"]["kills"]
 
                     # Define dict for eligibility and set each gamemode boolean
                     eligibility = {}
                     eligibility["bedwars"] = False if bw_wins < gvg_requirements["bw_wins"] and bw_fkdr < \
-                                                      gvg_requirements[
-                                                          "bw_fkdr"] else True
+                        gvg_requirements[
+                        "bw_fkdr"] else True
                     eligibility["skywars"] = False if sw_wins < gvg_requirements["sw_wins"] and sw_kdr < \
-                                                      gvg_requirements[
-                                                          "sw_kdr"] else True
+                        gvg_requirements[
+                        "sw_kdr"] else True
                     eligibility["duels"] = False if duels_wlr < gvg_requirements["duels_wlr"] and duels_kills < \
-                                                    gvg_requirements["duels_kills"] else True
+                        gvg_requirements["duels_kills"] else True
 
                     # Polyvalent eligibility
                     if all(eligibility.values()):
-                        embed = discord.Embed(title="You are eligible for the polyvalent team!", color=neutral_color)
-                        embed.set_footer(text="Please await staff assistance for further information!")
-                        embed.add_field(name="Bedwars Wins", value=f"`{bw_wins}`")
-                        embed.add_field(name="Bedwars FKDR", value=f"`{bw_fkdr}`")
-                        embed.add_field(name="Skywars Wins", value=f"`{sw_wins}`")
-                        embed.add_field(name="Skywars KDR", value=f"`{sw_kdr}`")
-                        embed.add_field(name="Duels WLR", value=f"`{duels_wlr}`")
-                        embed.add_field(name="Duels Kills", value=f"`{duels_kills}`")
+                        embed = discord.Embed(
+                            title="You are eligible for the polyvalent team!", color=neutral_color)
+                        embed.set_footer(
+                            text="Please await staff assistance for further information!")
+                        embed.add_field(name="Bedwars Wins",
+                                        value=f"`{bw_wins}`")
+                        embed.add_field(name="Bedwars FKDR",
+                                        value=f"`{bw_fkdr}`")
+                        embed.add_field(name="Skywars Wins",
+                                        value=f"`{sw_wins}`")
+                        embed.add_field(name="Skywars KDR",
+                                        value=f"`{sw_kdr}`")
+                        embed.add_field(name="Duels WLR",
+                                        value=f"`{duels_wlr}`")
+                        embed.add_field(name="Duels Kills",
+                                        value=f"`{duels_kills}`")
 
                     # User is not eligible for any team
                     elif not all(eligibility.values()):
@@ -386,12 +411,18 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                             title="You are ineligible for the GvG Team as you do not meet the requirements!",
                             description="If you think this is incorrect, please await staff assistance",
                             color=neg_color)
-                        embed.add_field(name="Bedwars Wins", value=f"`{bw_wins}`")
-                        embed.add_field(name="Bedwars FKDR", value=f"`{bw_fkdr}`")
-                        embed.add_field(name="Skywars Wins", value=f"`{sw_wins}`")
-                        embed.add_field(name="Skywars KDR", value=f"`{sw_kdr}`")
-                        embed.add_field(name="Duels WLR", value=f"`{duels_wlr}`")
-                        embed.add_field(name="Duels Kills", value=f"`{duels_kills}`")
+                        embed.add_field(name="Bedwars Wins",
+                                        value=f"`{bw_wins}`")
+                        embed.add_field(name="Bedwars FKDR",
+                                        value=f"`{bw_fkdr}`")
+                        embed.add_field(name="Skywars Wins",
+                                        value=f"`{sw_wins}`")
+                        embed.add_field(name="Skywars KDR",
+                                        value=f"`{sw_kdr}`")
+                        embed.add_field(name="Duels WLR",
+                                        value=f"`{duels_wlr}`")
+                        embed.add_field(name="Duels Kills",
+                                        value=f"`{duels_kills}`")
                         await ticket.send(embed=discord.Embed(
                             title="You are ineligible for the GvG Team as you do not meet the requirements!",
                             description="Please await staff assistance for further information!",
@@ -401,20 +432,25 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     else:
                         # loop through all GvG gamemodes
                         for mode, req1_name, req1, req2_name, req2 in [["bedwars", "Wins", bw_wins, "FKDR", bw_fkdr],
-                                                                       ["skywars", "Wins", sw_wins, "KDR", sw_kdr],
+                                                                       ["skywars", "Wins",
+                                                                           sw_wins, "KDR", sw_kdr],
                                                                        ["duels", "WLR", duels_wlr, "Kills",
                                                                         duels_kills]]:
                             # If user is eligible for that gamemode, create embed
                             if eligibility[mode]:
                                 embed = discord.Embed(title=f"You are eiligible for the {mode.capitalize()} team!",
                                                       color=neutral_color)
-                                embed.set_footer(text="Please await staff assistance for further information!")
-                                embed.add_field(name=req1_name, value=f"`{req1}`")
-                                embed.add_field(name=req2_name, value=f"`{req2}`")
+                                embed.set_footer(
+                                    text="Please await staff assistance for further information!")
+                                embed.add_field(
+                                    name=req1_name, value=f"`{req1}`")
+                                embed.add_field(
+                                    name=req2_name, value=f"`{req2}`")
 
                                 # Send embed and end loop
 
-                    GvGView = discord.ui.View(timeout=None)  # View for staff members to approve/deny the DNKL
+                    # View for staff members to approve/deny the DNKL
+                    GvGView = discord.ui.View(timeout=None)
                     buttons = (("Accept", "GvG_Application_Positive", discord.enums.ButtonStyle.green, gvg_approve),
                                ("Deny", "GvG_Application_Negative", discord.enums.ButtonStyle.red, gvg_deny))
                     # Loop through the list of roles and add a new button to the view for each role.
@@ -446,7 +482,8 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     if not guild:
                         fields.extend(
                             [["What is the name of your guild?", "", discord.InputTextStyle.short, "Guild Name"]])
-                        embed = discord.Embed(title="GvG Request", color=neutral_color)
+                        embed = discord.Embed(
+                            title="GvG Request", color=neutral_color)
                     else:
                         embed = discord.Embed(
                             title=f"{ign} wishes to organize a GvG with Miscellaneous on behalf of {guild['name']}",
@@ -454,8 +491,10 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                             color=neutral_color)
                     fields.extend(
                         [["What are your preferred gamemodes", "", discord.InputTextStyle.short, "Gamemode(s)"],
-                         ["Do you have any special rules?", "", discord.InputTextStyle.long, "Rule(s)"],
-                         ["Number of Players", "", discord.InputTextStyle.short, "Number of Players"],
+                         ["Do you have any special rules?", "",
+                             discord.InputTextStyle.long, "Rule(s)"],
+                         ["Number of Players", "",
+                             discord.InputTextStyle.short, "Number of Players"],
                          ["Time & Timezone", "", discord.InputTextStyle.short, "Time & Timezone"]])
                     await interaction.response.send_modal(
                         modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, title="GvG Request"))
@@ -471,13 +510,15 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                         fields.extend(
                             [["What is the name of your guild?", "", discord.InputTextStyle.short, "Guild Name"],
                              ["What is your guild's level?", "", discord.InputTextStyle.short, "Guild Level"]])
-                        embed = discord.Embed(title="Alliance Request Request", color=neutral_color)
+                        embed = discord.Embed(
+                            title="Alliance Request Request", color=neutral_color)
                     else:
                         embed = discord.Embed(
                             title=f"{ign} wishes to ally with Miscellaneous on behalf of {guild['name']}",
                             description=f"Guild Level: {await get_guild_level(guild['exp'])}",
                             color=neutral_color)
-                    embed.set_footer(text="Please provide:\nGuild Logo\nGuild Advertisement Message")
+                    embed.set_footer(
+                        text="Please provide:\nGuild Logo\nGuild Advertisement Message")
                     fields.extend(
                         [["What is the IGN of your guild master?", "", discord.InputTextStyle.short, "Guild Master"],
                          ["What is your guild's preferred gamemode?", "If you don't have one, just say 'None'",
@@ -509,7 +550,8 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
 
 
 async def log_event(title: str, description: str = None):
-    embed = discord.Embed(title=title, description=description, color=neutral_color)
+    embed = discord.Embed(
+        title=title, description=description, color=neutral_color)
     await bot.get_channel(log_channel_id).send(embed=embed)
 
 
@@ -595,126 +637,53 @@ async def find_player_score(uuid):
     week3_end_stats = (await select_one("SELECT week3_end_data FROM tournament WHERE uuid = (?)", (uuid,)))[0]
     end_stats = (await select_one("SELECT end_data FROM tournament WHERE uuid = (?)", (uuid,)))[0]
 
-    if week_number == -1:
-        week1_points, w1_games_played, w1_wins, w1_wlr, w1_final_kills, w1_fkdr, w1_beds_broken = await get_points_from_data(
-            week1_stats, week2_stats)
-        week2_points, w2_games_played, w2_wins, w2_wlr, w2_final_kills, w2_fkdr, w2_beds_broken = await get_points_from_data(
-            week2_stats, week3_stats)
-        week3_points, w3_games_played, w3_wins, w3_wlr, w3_final_kills, w3_fkdr, w3_beds_broken = await get_points_from_data(
-            week3_stats, week3_end_stats)
-        overall_points, games_played, wins, wlr, final_kills, fkdr, beds_broken = await get_points_from_data(
-            start_stats, end_stats)
-    elif week_number >= 3:
-        week1_points, w1_games_played, w1_wins, w1_wlr, w1_final_kills, w1_fkdr, w1_beds_broken = await get_points_from_data(
-            week1_stats, week2_stats)
-        week2_points, w2_games_played, w2_wins, w2_wlr, w2_final_kills, w2_fkdr, w2_beds_broken = await get_points_from_data(
-            week2_stats, week3_stats)
-        week3_points, w3_games_played, w3_wins, w3_wlr, w3_final_kills, w3_fkdr, w3_beds_broken = await get_points_from_data(
-            week3_stats, current_stats)
-        overall_points, games_played, wins, wlr, final_kills, fkdr, beds_broken = await get_points_from_data(
-            start_stats,
-            current_stats)
-    elif week_number == 2:
-        week1_points, w1_games_played, w1_wins, w1_wlr, w1_final_kills, w1_fkdr, w1_beds_broken = await get_points_from_data(
-            week1_stats, week2_stats)
-        week2_points, w2_games_played, w2_wins, w2_wlr, w2_final_kills, w2_fkdr, w2_beds_broken = await get_points_from_data(
-            week2_stats, current_stats)
-        week3_points, w3_games_played, w3_wins, w3_wlr, w3_final_kills, w3_fkdr, w3_beds_broken = None, None, None, None, None, None, None
-        overall_points, games_played, wins, wlr, final_kills, fkdr, beds_broken = await get_points_from_data(
-            start_stats,
-            current_stats)
-    elif week_number == 1:
-        week1_points, w1_games_played, w1_wins, w1_wlr, w1_final_kills, w1_fkdr, w1_beds_broken = await get_points_from_data(
-            week1_stats, current_stats)
-        week2_points, w2_games_played, w2_wins, w2_wlr, w2_final_kills, w2_fkdr, w2_beds_broken = None, None, None, None, None, None, None
-        week3_points, w3_games_played, w3_wins, w3_wlr, w3_final_kills, w3_fkdr, w3_beds_broken = None, None, None, None, None, None, None
-        overall_points, games_played, wins, wlr, final_kills, fkdr, beds_broken = await get_points_from_data(
-            start_stats,
-            current_stats)
-
-    week_1_points = format(week1_points, ',d') if week1_points else 0
-    week_2_points = format(week2_points, ',d') if week2_points else 0
-    week_3_points = format(week3_points, ',d') if week3_points else 0
-    overall_points = format(overall_points, ',d') if overall_points else 0
-
-    w1_games_played = format(w1_games_played, ',d') if w1_games_played else 0
-    w1_wins = format(w1_wins, ',d') if w1_wins else 0
-    w1_final_kills = format(w1_final_kills, ',d') if w1_final_kills else 0
-    w1_beds_broken = format(w1_beds_broken, ',d') if w1_beds_broken else 0
-    w1_wlr = round(w1_wlr, 2) if w1_wlr else 0
-    w1_fkdr = round(w1_fkdr, 2) if w1_fkdr else 0
-
-    w2_games_played = format(w2_games_played, ',d') if w2_games_played else 0
-    w2_wins = format(w2_wins, ',d') if w2_wins else 0
-    w2_final_kills = format(w2_final_kills, ',d') if w2_final_kills else 0
-    w2_beds_broken = format(w2_beds_broken, ',d') if w2_beds_broken else 0
-    w2_wlr = round(w2_wlr, 2) if w2_wlr else 0
-    w2_fkdr = round(w2_fkdr, 2) if w2_fkdr else 0
-
-    w3_games_played = format(w3_games_played, ',d') if w3_games_played else 0
-    w3_wins = format(w3_wins, ',d') if w3_wins else 0
-    w3_final_kills = format(w3_final_kills, ',d') if w3_final_kills else 0
-    w3_beds_broken = format(w3_beds_broken, ',d') if w3_beds_broken else 0
-    w3_wlr = round(w3_wlr, 2) if w3_wlr else 0
-    w3_fkdr = round(w3_fkdr, 2) if w3_fkdr else 0
-
-    games_played = format(games_played, ',d') if games_played else 0
-    wins = format(wins, ',d') if wins else 0
-    final_kills = format(final_kills, ',d') if final_kills else 0
-    beds_broken = format(beds_broken, ',d') if beds_broken else 0
-    wlr = round(wlr, 2) if wlr else 0
-    fkdr = round(fkdr, 2) if fkdr else 0
-
+    compiled_stats = await get_tournament_stats(week_number, start_stats, week1_stats, week2_stats, week3_stats, week3_end_stats, end_stats)
 
     scores_embed = discord.Embed(title=f"{name}'s Tournament Points",
                                  url=f"https://plancke.io/hypixel/player/stats/{name}", color=neutral_color)
     scores_embed.set_author(name=f"Miscellaneous Guild Experience Tournament",
                             url=f"https://discord.com/channels/522586672148381726/522861704921481229/1174807396686770339")
     scores_embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
-    scores_embed.add_field(name=f"Week 1: {week_1_points} points", value=
-    f"Games Played: {w1_games_played}\n"
-    f"Wins: {w1_wins}\n"
-    f"Final Kills: {w1_final_kills}\n"
-    f"Beds Broken: {w1_beds_broken}\n"
-    f"Session WLR: {w1_wlr}\n"
-    f"Session FKDR: {w1_fkdr}\n",
+
+    scores_embed.add_field(name=f"Week 1: {compiled_stats['week1']['points']} points", value=f"Games Played: {compiled_stats['week1']['games_played']}\n"
+                           f"Wins: {compiled_stats['week1']['wins']}\n"
+                           f"Final Kills: {compiled_stats['week1']['final_kills']}\n"
+                           f"Beds Broken: {compiled_stats['week1']['beds_broken']}\n"
+                           f"Session WLR: {compiled_stats['week1']['wlr']}\n"
+                           f"Session FKDR: {compiled_stats['week1']['fkdr']}\n",
                            inline=False)
 
     if week_number >= 2 or week_number == -1:
-        scores_embed.add_field(name=f"Week 2: {week_2_points} points", value=
-        f"Games Played: {w2_games_played}\n"
-        f"Wins: {w2_wins}\n"
-        f"Final Kills: {w2_final_kills}\n"
-        f"Beds Broken: {w2_beds_broken}\n"
-        f"Session WLR: {w2_wlr}\n"
-        f"Session FKDR: {w2_fkdr}\n",
+        scores_embed.add_field(name=f"Week 2: {compiled_stats['week2']['points']} points", value=f"Games Played: {compiled_stats['week2']['games_played']}\n"
+                               f"Wins: {compiled_stats['week2']['wins']}\n"
+                               f"Final Kills: {compiled_stats['week2']['final_kills']}\n"
+                               f"Beds Broken: {compiled_stats['week2']['beds_broken']}\n"
+                               f"Session WLR: {compiled_stats['week2']['wlr']}\n"
+                               f"Session FKDR: {compiled_stats['week2']['fkdr']}\n",
                                inline=False)
 
     if week_number >= 3 or week_number == -1:
-        scores_embed.add_field(name=f"Week 3: {week_3_points} points", value=
-        f"Games Played: {w3_games_played}\n"
-        f"Wins: {w3_wins}\n"
-        f"Final Kills: {w3_final_kills}\n"
-        f"Beds Broken: {w3_beds_broken}\n"
-        f"Session WLR: {w3_wlr}\n"
-        f"Session FKDR: {w3_fkdr}\n",
+        scores_embed.add_field(name=f"Week 3: {compiled_stats['week3']['points']} points", value=f"Games Played: {compiled_stats['week3']['games_played']}\n"
+                               f"Wins: {compiled_stats['week3']['wins']}\n"
+                               f"Final Kills: {compiled_stats['week3']['final_kills']}\n"
+                               f"Beds Broken: {compiled_stats['week3']['beds_broken']}\n"
+                               f"Session WLR: {compiled_stats['week3']['wlr']}\n"
+                               f"Session FKDR: {compiled_stats['week3']['fkdr']}\n",
                                inline=False)
 
-    scores_embed.add_field(name=f"Overall: {overall_points} points", value=
-    f"Games Played: {games_played}\n"
-    f"Wins: {wins}\n"
-    f"Final Kills: {final_kills}\n"
-    f"Beds Broken: {beds_broken}\n"
-    f"Overall WLR: {wlr}\n"
-    f"Overall FKDR: {fkdr}\n",
+    scores_embed.add_field(name=f"Overall: {compiled_stats['overall']['points']} points", value=f"Games Played: {compiled_stats['overall']['games_played']}\n"
+                           f"Wins: {compiled_stats['overall']['wins']}\n"
+                           f"Final Kills: {compiled_stats['overall']['final_kills']}\n"
+                           f"Beds Broken: {compiled_stats['overall']['beds_broken']}\n"
+                           f"Session WLR: {compiled_stats['overall']['wlr']}\n"
+                           f"Session FKDR: {compiled_stats['overall']['fkdr']}\n",
                            inline=False)
 
-    scores_embed.set_footer(text=
-                            "Week 1: 15th December - 21st December"
+    scores_embed.set_footer(text="Week 1: 15th December - 21st December"
                             "\nWeek 2: 22nd December - 28th December"
                             "\nWeek 3: 29th December - 4th January"
                             "\nOverall: 15th December - 4th January"
-                            "\n\nIf a week has not concluded, it does (start of week - now).")
+                            "\n\nIf a week has not concluded, it does (now - start of week).")
     return scores_embed
 
 
@@ -735,10 +704,12 @@ async def after_cache_ready():
     bot.member_role = discord.utils.get(bot.guild.roles, name="Member")
     bot.active_role = discord.utils.get(bot.guild.roles, name="Active")
     bot.ally = discord.utils.get(bot.guild.roles, name="Ally")
-    bot.server_booster = discord.utils.get(bot.guild.roles, name="Server Booster")
+    bot.server_booster = discord.utils.get(
+        bot.guild.roles, name="Server Booster")
     bot.rich_kid = discord.utils.get(bot.guild.roles, name="Rich Kid")
     bot.gvg = discord.utils.get(bot.guild.roles, name="GvG Team")
-    bot.giveaways_events = discord.utils.get(bot.guild.roles, name="Giveaways/Events")
+    bot.giveaways_events = discord.utils.get(
+        bot.guild.roles, name="Giveaways/Events")
     bot.veteran = discord.utils.get(bot.guild.roles, name="Veteran")
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff,
                              bot.server_booster, bot.rich_kid, bot.gvg, bot.veteran)
