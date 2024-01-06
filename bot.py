@@ -1,4 +1,3 @@
-from src.utils.discord_utils import after_cache_ready
 import sys
 
 import discord
@@ -18,6 +17,8 @@ bot = bridge.Bot(command_prefix=config["prefix"], intents=intents,
                  status=discord.Status.idle, activity=discord.Game(config["status"]), case_insensitive=True)
 
 # Load all bot vars once cache is ready
+from src.utils.discord_utils import after_cache_ready
+
 
 bot.remove_command("help")
 after_cache_ready.start()
