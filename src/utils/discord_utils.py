@@ -637,7 +637,7 @@ async def find_player_score(uuid):
     week3_end_stats = (await select_one("SELECT week3_end_data FROM tournament WHERE uuid = (?)", (uuid,)))[0]
     end_stats = (await select_one("SELECT end_data FROM tournament WHERE uuid = (?)", (uuid,)))[0]
 
-    compiled_stats = await get_tournament_stats(week_number, start_stats, week1_stats, week2_stats, week3_stats, week3_end_stats, end_stats)
+    compiled_stats = await get_tournament_stats(week_number, start_stats, week1_stats, week2_stats, week3_stats, week3_end_stats, end_stats, current_stats)
 
     scores_embed = discord.Embed(title=f"{name}'s Tournament Points",
                                  url=f"https://plancke.io/hypixel/player/stats/{name}", color=neutral_color)

@@ -658,7 +658,7 @@ async def get_tournament_stats(
     week3_stats,
     week3_end_stats,
     end_stats,
-    current_stats,
+    current_stats
 ):
     if week_number == -1:
         (
