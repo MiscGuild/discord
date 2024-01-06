@@ -78,7 +78,6 @@ async def update_invites():
     await generate_rank_upgrade(weekly_invitations)
 
 
-
 @update_invites.before_loop
 async def before_update_invites():
     await bot.wait_until_ready()
@@ -97,8 +96,6 @@ async def update_bedwars_data():
     for uuid in participants:
         await update_recent_data(uuid[0])
         await asyncio.sleep(1)
-
-
 
 
 @update_bedwars_data.before_loop

@@ -116,7 +116,7 @@ async def select_all(query: str, values: Tuple = None):
     return rows
 
 
-### DNKL
+# DNKL
 async def insert_new_dnkl(message_id: int, uuid: str, username: str):
     await bot.db.execute("INSERT INTO dnkl VALUES (?, ?, ?)", (message_id, uuid, username,))
     await bot.db.commit()
@@ -132,7 +132,7 @@ async def delete_dnkl(username: str):
     await bot.db.commit()
 
 
-### Giveaways
+# Giveaways
 async def insert_new_giveaway(msg_id: int, channel_id: int, prize: str, number_winners: int, time_of_finish: str,
                               req_gexp: int, all_roles_required: bool, req_roles: str, sponsors: str):
     await bot.db.execute("INSERT INTO Giveaways VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (

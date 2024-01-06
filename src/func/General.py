@@ -193,7 +193,8 @@ class General:
         await progress_message.edit(content="Rolecheck complete!")
 
     async def delete(ctx):
-        embed = discord.Embed(title="This ticket will be deleted in 10 seconds!", color=neg_color)
+        embed = discord.Embed(
+            title="This ticket will be deleted in 10 seconds!", color=neg_color)
 
         if not ctx.channel.category or ctx.channel.category.name not in ticket_categories.values():
             return "This command cannot be used here"
@@ -203,7 +204,8 @@ class General:
             if member:
                 ign, uuid = await get_mojang_profile(await name_grabber(member))
                 await Union(user=member).sync(ctx, ign, None, True)
-                embed.set_footer(text=f"{ign}'s roles have been updated automatically!")
+                embed.set_footer(
+                    text=f"{ign}'s roles have been updated automatically!")
 
         # Send deletion warning and gather transcript
         await ctx.respond(embed=embed)
@@ -314,7 +316,7 @@ class General:
 
             continue_critiquing = await bot.wait_for("message",
                                                      check=lambda
-                                                         x: x.channel == ctx.channel and x.author == ctx.author)
+                                                     x: x.channel == ctx.channel and x.author == ctx.author)
             continue_critiquing = continue_critiquing.content.lower()
 
             # User does not want to critique more questions
@@ -381,7 +383,7 @@ class General:
                 if guild_rank == "Member":
                     # Filter new members who meet their requirements
                     days_since_join = (
-                            datetime.now() - datetime.fromtimestamp(member["joined"] / 1000.0)).days
+                        datetime.now() - datetime.fromtimestamp(member["joined"] / 1000.0)).days
                     if days_since_join <= 7 and weekly_exp > ((member_req / 7) * days_since_join):
                         continue
 
@@ -394,7 +396,8 @@ class General:
         for _dict, title, color in [[to_promote_active, "Promote the following users to active:", pos_color],
                                     [to_demote_active, "Demote the following users from active:",
                                      neg_color],
-                                    [to_demote_resident, "Demote the following from resident:", neg_color],
+                                    [to_demote_resident,
+                                        "Demote the following from resident:", neg_color],
                                     [inactive, "Following are the users to be kicked:", neg_color]]:
             # Filter categories with no users
             if _dict:
@@ -678,7 +681,8 @@ class General:
             def __init__(self):
                 super().__init__()
                 for key, value in milestone_emojis.items():
-                    self.add_option(label=key.replace("_", " ").title(), emoji=f"{value}")
+                    self.add_option(label=key.replace(
+                        "_", " ").title(), emoji=f"{value}")
 
             # Override default callback
             async def callback(self, interaction: discord.Interaction):
@@ -691,7 +695,7 @@ class General:
                                                         f"{option_emoji}{name}.... (Complete the sentence)")
                 milestone = await bot.wait_for("message",
                                                check=lambda
-                                                   x: x.channel == channel and x.author == interaction.user)
+                                               x: x.channel == channel and x.author == interaction.user)
                 await channel.send(embed=await milestone_ticket_update(ctx, channel, option_emoji, milestone.content))
 
         async def milestone_ticket_update(ctx, channel, emoji, milestone):
@@ -738,7 +742,8 @@ class General:
                 super().__init__()
                 index = 1
                 for milestone in all_milestones:
-                    category = [k for k, v in milestone_emojis.items() if v == milestone.split(" ")[0]][0]
+                    category = [k for k, v in milestone_emojis.items() if v == milestone.split(" ")[
+                        0]][0]
                     self.add_option(label=f"{name} {milestone.split(' ', 2)[2]}",
                                     value=f"{index} {category} {milestone.split(' ', 2)[2]}",
                                     emoji=milestone.split(" ")[0])
@@ -760,7 +765,7 @@ class General:
                     f"{emoji}{name}.... (Complete the sentence)")
                 milestone = await bot.wait_for("message",
                                                check=lambda
-                                                   x: x.channel == ctx.channel and x.author == interaction.user)
+                                               x: x.channel == ctx.channel and x.author == interaction.user)
                 new_milestone_message = f"{emoji} {member.mention} {milestone.content}"
                 channel_details[index] = new_milestone_message
 
@@ -779,7 +784,9 @@ class General:
         return embed, view
 
     async def compile_milestones(ctx):
-        day_number = 86 + round((datetime.utcnow() - datetime.strptime("2022/05/15", "%Y/%m/%d")).days / 7)
+        day_number = 86 + \
+            round(
+                (datetime.utcnow() - datetime.strptime("2022/05/15", "%Y/%m/%d")).days / 7)
 
         milestone_message = f"**Weekly Milestones**\nThis is week __{day_number}__ of weekly milestones\n\n"
         count = 0
@@ -797,7 +804,8 @@ class General:
                         milestone_message = ""
                         count = 0
                 await discord.TextChannel.delete(channel)
-        milestone_message = milestone_message + "\n**Congrats to everyone this week. If you wish to submit a milestone, look over at <#650248396480970782>!**"
+        milestone_message = milestone_message + \
+            "\n**Congrats to everyone this week. If you wish to submit a milestone, look over at <#650248396480970782>!**"
         await bot.get_channel(milestones_channel).send(milestone_message)
         return f"{count} milestones have been compiled and sent in {bot.get_channel(milestones_channel)}"
 
@@ -832,17 +840,17 @@ class General:
             count += 1
             name = await get_name_by_uuid(uuid)
             player_data = (await select_one("SELECT recent_data from tournament WHERE uuid = ?", (uuid,)))[0]
-            rank, _ = await get_hypixel_player_rank(player_data)  # Ignores value without color formatting
+            # Ignores value without color formatting
+            rank, _ = await get_hypixel_player_rank(player_data)
 
             # Add new entry to image content
-            #text += f"&6&l{count}.&r {rank} {name} &c{format(score[0], ',d')} points"
+            # text += f"&6&l{count}.&r {rank} {name} &c{format(score[0], ',d')} points"
 
             text += f"{count}. **{name}** - __{format(score[0], ',d')} points__\n"
 
-
         text += "*Everyone in the top 15 will win prizes.*"
         # Replace characters for the URL
-        #text = text.replace("+", "%2B").replace("&", "%26").replace(" ", "%20").replace(",", "%2C")
+        # text = text.replace("+", "%2B").replace("&", "%26").replace(" ", "%20").replace(",", "%2C")
         # Return image
-        #return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
+        # return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
         return text

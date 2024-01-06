@@ -6,7 +6,6 @@ from src.func.String import String
 from src.func.Union import Union
 
 
-
 class General(commands.Cog, name="general"):
     """
     Contains source, avatar, qotd.
@@ -47,16 +46,14 @@ class General(commands.Cog, name="general"):
             def __init__(self) -> None:
                 #   fields = ["LABEL", "PLACEHOLDER", STYLE]
                 super().__init__(title="QOTD Creator")
-                self.add_item(discord.ui.InputText(label="What is the question of the day?", placeholder="Enter the question here", style=discord.InputTextStyle.long))
-
+                self.add_item(discord.ui.InputText(label="What is the question of the day?",
+                              placeholder="Enter the question here", style=discord.InputTextStyle.long))
 
             async def callback(self, interaction: discord.Interaction):
                 await interaction.response.send_message("The QOTD has been sent!")
                 await String(string=self.children[0].value).qotd(ctx)
 
-
         await ctx.send_modal(modal=ModalCreator())
-
 
 
 def setup(bot):

@@ -136,7 +136,8 @@ class Union:
                 return "You cannot use this command in a registration ticket!\nKindly await staff assistance!"
 
             roles_to_add.append(bot.guest)
-            roles_to_remove.extend([bot.member_role, bot.new_member_role, bot.ally])
+            roles_to_remove.extend(
+                [bot.member_role, bot.new_member_role, bot.ally])
 
         # Create embed
         embed = discord.Embed(title=f"{ign}'s nick, roles, and tag have been successfully changed!",
@@ -175,7 +176,8 @@ class Union:
         embed = discord.Embed(
             title="Registration successful!", color=neutral_color)
         embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
-        embed.add_field(name=ign, value=f"Member of {guild_name}" if guild_name != "Guildless" else "Guildless")
+        embed.add_field(
+            name=ign, value=f"Member of {guild_name}" if guild_name != "Guildless" else "Guildless")
 
         # User is a member
         if guild_name == guild_handle:
@@ -218,7 +220,8 @@ class Union:
                     """
                     2 buttons for 2 registration actions. `custom_id` is needed for persistent views.
                     """
-                    super().__init__(label=button[0], custom_id=button[1], style=button[2])
+                    super().__init__(
+                        label=button[0], custom_id=button[1], style=button[2])
 
                 async def callback(self, interaction: discord.Interaction):
                     # if bot.staff not in interaction.user.roles and ticket.id != interaction.channel_id: return
@@ -256,7 +259,8 @@ class Union:
                 view.add_item(Join_Misc_Buttons(button))
 
             await ticket.send(
-                embed=discord.Embed(title="Do you wish to join Miscellaneous in-game?", color=neutral_color),
+                embed=discord.Embed(
+                    title="Do you wish to join Miscellaneous in-game?", color=neutral_color),
                 view=view)
 
         # Remove new member role, edit nick and delete message

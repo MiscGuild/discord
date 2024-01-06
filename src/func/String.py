@@ -102,7 +102,8 @@ class String:
             }
 
             # Fetch remaining data
-            join_date = str(datetime.fromtimestamp(int(str(member["joined"])[:-3])))[:10]
+            join_date = str(datetime.fromtimestamp(
+                int(str(member["joined"])[:-3])))[:10]
             rank = member["rank"]
             quest_participation = member["questParticipation"] if "questParticipation" in member else 0
             dates = [k for k, _ in gexp_history.items()]
@@ -110,14 +111,17 @@ class String:
             gexp_history_text = ""
             for i in range(0, 7):
                 date = week_dict.get(i, "None")
-                gexp_history_text = gexp_history_text + f"**▸** {date} **{format(gexp_vals[i], ',d')}**\n"
+                gexp_history_text = gexp_history_text + \
+                    f"**▸** {date} **{format(gexp_vals[i], ',d')}**\n"
 
             # Get graph color
             color, graph_color, graph_border = await get_color_by_gexp(rank, weekly_gexp)
 
             # Create embed
-            embed = discord.Embed(title=name, url=f"https://plancke.io/hypixel/player/stats/{name}", color=color)
-            embed.set_author(name=f"{gname} {gtag}", url=f"https://plancke.io/hypixel/guild/player/{name}")
+            embed = discord.Embed(
+                title=name, url=f"https://plancke.io/hypixel/player/stats/{name}", color=color)
+            embed.set_author(
+                name=f"{gname} {gtag}", url=f"https://plancke.io/hypixel/guild/player/{name}")
             embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
             embed.add_field(name="General Information:", value=f"`✚` **Rank**: `{rank}`\n"
                                                                f"`✚` **Joined**: `{join_date}`\n"
@@ -165,7 +169,8 @@ class String:
         completed_challenges = "0" if "general_challenger" not in player_data[
             "achievements"] else f"{int(player_data['achievements']['general_challenger']):,d}"
         completed_quests = "-" if "quests" not in player_data else f"{len(player_data['quests']):,d}"
-        first_login = datetime.fromtimestamp(int(str(player_data["firstLogin"])[:-3]))
+        first_login = datetime.fromtimestamp(
+            int(str(player_data["firstLogin"])[:-3]))
         last_login = "Unknown" if "lastLogin" not in player_data else datetime.fromtimestamp(
             int(str(player_data["lastLogin"])[:-3]))
         guild = await get_player_guild(uuid)
@@ -176,10 +181,14 @@ class String:
         embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
         embed.add_field(name="Network Level:", value=f"`{nwl}`", inline=True)
         embed.add_field(name="Karma:", value=f"`{karma}`", inline=True)
-        embed.add_field(name="Achievement Points:", value=f"`{achievement_points}`", inline=False)
-        embed.add_field(name="Challenges Finished:", value=f"`{completed_challenges}`", inline=True)
-        embed.add_field(name="Quests Completed:", value=f"`{completed_quests}`", inline=True)
-        embed.add_field(name="First • Last login", value=f"`{first_login} • {last_login}`", inline=False)
+        embed.add_field(name="Achievement Points:",
+                        value=f"`{achievement_points}`", inline=False)
+        embed.add_field(name="Challenges Finished:",
+                        value=f"`{completed_challenges}`", inline=True)
+        embed.add_field(name="Quests Completed:",
+                        value=f"`{completed_quests}`", inline=True)
+        embed.add_field(name="First • Last login",
+                        value=f"`{first_login} • {last_login}`", inline=False)
         return embed.set_image(url=f"https://gen.plancke.io/exp/{ign}.png")
 
     async def dnkladd(self, ctx):
@@ -270,7 +279,8 @@ class String:
 
     async def qotd(self, ctx):
         # 15th May 2022 was the 473rd QOTD day. It is used as a reference point to calculate the day number.
-        day_number = 473 + (datetime.utcnow() - datetime.strptime("2022/05/15", "%Y/%m/%d")).days
+        day_number = 473 + (datetime.utcnow() -
+                            datetime.strptime("2022/05/15", "%Y/%m/%d")).days
         embed = discord.Embed(
             title=f"Day {day_number}: {datetime.utcnow().day} {months[datetime.utcnow().month]} {datetime.utcnow().year}",
             description=self.string, color=neutral_color)
@@ -300,9 +310,11 @@ class String:
             for invitee in weekly_invites:
                 invites_text += f"**▸** {invitee}\n"
         embed = discord.Embed(title=f"{ign}'s Invites", color=neutral_color)
-        embed.add_field(name="Weekly Invites", value=None if not invites_text else invites_text, inline=False)
+        embed.add_field(name="Weekly Invites",
+                        value=None if not invites_text else invites_text, inline=False)
         embed.add_field(name="Total Invites", value=total_invites, inline=True)
-        embed.add_field(name="Total Valid Invites", value=total_valid_invites, inline=True)
+        embed.add_field(name="Total Valid Invites",
+                        value=total_valid_invites, inline=True)
         embed.set_footer(text="Total invites and total valid invites do not include this week's invites. They are "
                               "updated at the end of the week.")
         return embed
@@ -321,6 +333,7 @@ class String:
 
         score_embed = await find_player_score(uuid)
         if not score_embed:
-            score_embed = discord.Embed(title="Since you are new to the guild, please try again in 2 hours!", color=neg_color)
+            score_embed = discord.Embed(
+                title="Since you are new to the guild, please try again in 2 hours!", color=neg_color)
 
         return score_embed

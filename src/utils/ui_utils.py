@@ -174,7 +174,8 @@ class InactivityReasonSelect(ui.Select):
         self.weekly_gexp = weekly_gexp
         self.buttons = buttons
 
-        reasons = ["Exams", "Medical Issues", "Vacation", "Computer Problems", "Other"]
+        reasons = ["Exams", "Medical Issues",
+                   "Vacation", "Computer Problems", "Other"]
         for reason in reasons:
             self.add_option(label=reason, value=reason)
 
@@ -183,33 +184,39 @@ class InactivityReasonSelect(ui.Select):
 
         other_reason = ""
         if reason == "Other":
-            await interaction.response.send_message("Please elaborate on the reason for your inactivity.\n" \
-                                                    "This information will only be visible to staff members.\n\n" \
+            await interaction.response.send_message("Please elaborate on the reason for your inactivity.\n"
+                                                    "This information will only be visible to staff members.\n\n"
                                                     "*Kindly type the reason as a single message.*")
             other_reason = await bot.wait_for("message", check=lambda
-                x: x.channel == self.channel and x.author == self.author)
+                                              x: x.channel == self.channel and x.author == self.author)
             other_reason = other_reason.content
             await self.channel.send("**Application submitted successfully!\nPlease await staff approval.**")
         else:
             await interaction.response.send_message(
                 "**Application submitted successfully!\nPlease await staff approval.**")
 
-        date = datetime.strptime(f"{self.day}/{self.month}/{self.year}", "%d/%B/%Y") + timedelta(weeks=int(self.length))
+        date = datetime.strptime(
+            f"{self.day}/{self.month}/{self.year}", "%d/%B/%Y") + timedelta(weeks=int(self.length))
         final_embed = discord.Embed(title=self.ign, url=f'https://plancke.io/hypixel/player/stats/{self.ign}',
                                     color=neutral_color)
-        final_embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{self.uuid}')
+        final_embed.set_thumbnail(
+            url=f'https://crafatar.com/renders/body/{self.uuid}')
         final_embed.add_field(name="IGN:", value=self.ign, inline=False)
-        final_embed.add_field(name="Start:", value=f"{self.day} {self.month} {self.year}", inline=False)
-        final_embed.add_field(name="End:", value=f"{date.day} {date.strftime('%B')} {date.year}", inline=False)
+        final_embed.add_field(
+            name="Start:", value=f"{self.day} {self.month} {self.year}", inline=False)
+        final_embed.add_field(
+            name="End:", value=f"{date.day} {date.strftime('%B')} {date.year}", inline=False)
         final_embed.add_field(name="Reason:", value=reason, inline=False)
 
         staff_approval_embed = final_embed.copy()
         staff_approval_embed.add_field(name="Guild Experience:",
                                        value=f"{format(self.weekly_gexp, ',d')} Weekly Guild Experience", inline=False)
         if other_reason:
-            staff_approval_embed.set_footer(text="Other Elaboration: \n" + other_reason)
+            staff_approval_embed.set_footer(
+                text="Other Elaboration: \n" + other_reason)
 
-        DNKLView = discord.ui.View(timeout=None)  # View for staff members to approve/deny the DNKL
+        # View for staff members to approve/deny the DNKL
+        DNKLView = discord.ui.View(timeout=None)
 
         # Loop through the list of roles and add a new button to the view for each role.
         for button in self.buttons:

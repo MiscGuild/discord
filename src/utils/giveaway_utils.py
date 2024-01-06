@@ -17,7 +17,8 @@ async def roll_giveaway(message_id: int, reroll_target: int = None):
         "SELECT channel_id, prize, number_winners, time_of_finish, required_gexp, all_roles_required, required_roles, sponsors FROM giveaways WHERE message_id = (?)",
         (message_id,))
 
-    req_roles = None if not req_roles else [int(role) for role in req_roles.split(" ")]
+    req_roles = None if not req_roles else [
+        int(role) for role in req_roles.split(" ")]
 
     # Channel and message vars
     channel: discord.TextChannel = bot.get_channel(channel_id)
@@ -57,8 +58,8 @@ async def roll_giveaway(message_id: int, reroll_target: int = None):
             # Remove entrant if they do not meet role reqs
             if req_roles:
                 if not all_roles_required and not any(
-                        role.id in req_roles for role in winner.roles) or all_roles_required and not all(
-                    role.id in req_roles for role in winner.roles):
+                    role.id in req_roles for role in winner.roles) or all_roles_required and not all(
+                        role.id in req_roles for role in winner.roles):
                     entrants.remove(winner)
                     continue
 

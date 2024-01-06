@@ -134,7 +134,8 @@ class Tickets(commands.Cog, name="tickets"):
     @option(
         name="gamemode",
         description="The gamemode in which the milestone was achieved",
-        choices= [discord.OptionChoice(v, value=k) for k,v in milestone_categories.items()],
+        choices=[discord.OptionChoice(v, value=k)
+                 for k, v in milestone_categories.items()],
         required=False
     )
     async def milestoneadd(self, ctx, gamemode: str = None, *, milestone: str = None):

@@ -97,6 +97,5 @@ class Staff(commands.Cog, name="staff"):
             await bot.get_channel(870953729942253588).send(res)
 
 
-
 def setup(bot):
     bot.add_cog(Staff(bot))

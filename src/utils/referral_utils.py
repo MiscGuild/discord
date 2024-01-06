@@ -59,7 +59,7 @@ async def get_entries(gexp):
     return 0
 
 
-async def generate_rank_upgrade(weekly_invites : list):
+async def generate_rank_upgrade(weekly_invites: list):
     guild_data = await get_guild_by_name(guild_handle)
     members = await get_gexp_sorted(guild_data)
     entries = {}
@@ -71,10 +71,12 @@ async def generate_rank_upgrade(weekly_invites : list):
     # A player gets 7 entries for every valid invite they have made
     total_invitations = 0
     for uuid, invitations in weekly_invites:
-        entries[uuid] = entries[uuid] + (len(invitations)*7) if uuid in entries else (len(invitations)*7)
+        entries[uuid] = entries[uuid] + \
+            (len(invitations)*7) if uuid in entries else (len(invitations)*7)
         total_invitations += len(invitations)
 
-    weighted_entries = [uuid for uuid, weight in entries.items() for _ in range(weight)]
+    weighted_entries = [uuid for uuid, weight in entries.items()
+                        for _ in range(weight)]
     shuffle(weighted_entries)
     winner_uuid = choice(weighted_entries)
     winner = await get_name_by_uuid(winner_uuid)

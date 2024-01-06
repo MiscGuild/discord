@@ -90,5 +90,6 @@ class Guild(commands.Cog, name="guild"):
             name = await name_grabber(ctx.author)
         await ctx.respond(embed=await String(name).invites())
 
+
 def setup(bot):
     bot.add_cog(Guild(bot))

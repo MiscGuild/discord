@@ -812,17 +812,20 @@ async def get_tournament_stats(
             beds_broken,
         ) = await get_points_from_data(start_stats, current_stats)
 
-    
-    week1_points, week2_points, week3_points, overall_points = [format(i, ",d") if i else 0 for i in [week1_points, week2_points, week3_points, overall_points]]
-    
-    w1_games_played, w1_wins, w1_final_kills, w1_beds_broken = [format(i, ",d") if i else 0 for i in [w1_games_played, w1_wins, w1_final_kills, w1_beds_broken]]
-    
-    w2_games_played, w2_wins, w2_final_kills, w2_beds_broken = [format(i, ",d") if i else 0 for i in [w2_games_played, w2_wins, w2_final_kills, w2_beds_broken]]
-    
-    w3_games_played, w3_wins, w3_final_kills, w3_beds_broken = [format(i, ",d") if i else 0 for i in [w3_games_played, w3_wins, w3_final_kills, w3_beds_broken]]
-    
-    games_played, wins, final_kills, beds_broken = [format(i, ",d") if i else 0 for i in [games_played, wins, final_kills, beds_broken]]
+    week1_points, week2_points, week3_points, overall_points = [format(
+        i, ",d") if i else 0 for i in [week1_points, week2_points, week3_points, overall_points]]
 
+    w1_games_played, w1_wins, w1_final_kills, w1_beds_broken = [format(
+        i, ",d") if i else 0 for i in [w1_games_played, w1_wins, w1_final_kills, w1_beds_broken]]
+
+    w2_games_played, w2_wins, w2_final_kills, w2_beds_broken = [format(
+        i, ",d") if i else 0 for i in [w2_games_played, w2_wins, w2_final_kills, w2_beds_broken]]
+
+    w3_games_played, w3_wins, w3_final_kills, w3_beds_broken = [format(
+        i, ",d") if i else 0 for i in [w3_games_played, w3_wins, w3_final_kills, w3_beds_broken]]
+
+    games_played, wins, final_kills, beds_broken = [format(
+        i, ",d") if i else 0 for i in [games_played, wins, final_kills, beds_broken]]
 
     return {
         "week1": {

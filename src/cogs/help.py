@@ -95,8 +95,8 @@ class Help(commands.Cog):
 
             # adding those commands to embed
             if commands_desc:
-                emb.add_field(name='Not belonging to a module', value=commands_desc, inline=False)
-
+                emb.add_field(name='Not belonging to a module',
+                              value=commands_desc, inline=False)
 
         # block called when one cog-name is given
         # trying to find matching cog and it's commands
@@ -114,7 +114,8 @@ class Help(commands.Cog):
                     embed.add_field(name=f"`{syntax}`", value=command.help)
                     aliases = command.aliases
                     if aliases:
-                        embed.add_field(name="Aliases", value=", ".join(aliases), inline=False)
+                        embed.add_field(name="Aliases", value=", ".join(
+                            aliases), inline=False)
                     await ctx.respond(embed=embed)
                     return
 
@@ -127,7 +128,8 @@ class Help(commands.Cog):
                                         color=discord.Color.green())
 
                     # getting commands from cog
-                    for command in self.bot.get_cog(cog).get_commands()[0::3]:  # Ignores all the duplicate commands returned by bridge slash commands
+                    # Ignores all the duplicate commands returned by bridge slash commands
+                    for command in self.bot.get_cog(cog).get_commands()[0::3]:
                         syntax = f"{prefix}{command.name}"
                         if not isinstance(command, discord.commands.SlashCommand):
                             for key, value in command.clean_params.items():
@@ -135,9 +137,11 @@ class Help(commands.Cog):
                                     syntax += " [" + key + "]"
                                 else:
                                     syntax += " <" + key + ">"
-                            emb.add_field(name=f"`{syntax}`", value=command.help, inline=False)
+                            emb.add_field(
+                                name=f"`{syntax}`", value=command.help, inline=False)
                         else:
-                            emb.add_field(name=f"`{syntax}`", value=command.description, inline=False)
+                            emb.add_field(
+                                name=f"`{syntax}`", value=command.description, inline=False)
 
                     emb.set_footer(
                         text="\n\n[] represent compulsory fields\n<> represent optional fields\nDo not type the brackets!")
@@ -154,8 +158,10 @@ class Help(commands.Cog):
                 emb = discord.Embed(title="What's that?!",
                                     description=f"I've never heard of a module/command called `{module}` before :scream:",
                                     color=discord.Color.orange())
-                emb.add_field(name="Here is a list of all the fields and their descriptions", value=cogs_desc)
-                emb.set_footer(text="Use ,help <module/command> to gain more information about that module/command")
+                emb.add_field(
+                    name="Here is a list of all the fields and their descriptions", value=cogs_desc)
+                emb.set_footer(
+                    text="Use ,help <module/command> to gain more information about that module/command")
 
         # too many cogs requested - only one at a time allowed
         elif len(module.split()) > 1:
