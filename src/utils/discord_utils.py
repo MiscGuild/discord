@@ -497,7 +497,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                              discord.InputTextStyle.short, "Number of Players"],
                          ["Time & Timezone", "", discord.InputTextStyle.short, "Time & Timezone"]])
                     await interaction.response.send_modal(
-                        modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, title="GvG Request"))
+                        modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, uuid=uuid, title="GvG Request"))
                     return
                 if option == f"My guild wishes to ally  {guild_handle}":
                     await ticket.edit(name=f"alliance-request-{ign}", topic=f"{interaction.user.id}|",
