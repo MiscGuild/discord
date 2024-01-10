@@ -127,6 +127,7 @@ class Tickets(commands.Cog, name="tickets"):
     @bridge.bridge_command()
     async def new(self, ctx):
         """Create a new ticket!"""
+        await ctx.defer()
         await ctx.respond(await General.new(ctx))
 
     @bridge.bridge_command(aliases=['AddMilestone'])
