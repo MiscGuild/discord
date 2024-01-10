@@ -697,7 +697,44 @@ async def get_tournament_stats(
             fkdr,
             beds_broken,
         ) = await get_points_from_data(start_stats, end_stats)
-    elif week_number >= 3:
+    elif week_number == 4:
+        (
+            week1_points,
+            w1_games_played,
+            w1_wins,
+            w1_wlr,
+            w1_final_kills,
+            w1_fkdr,
+            w1_beds_broken,
+        ) = await get_points_from_data(week1_stats, week2_stats)
+        (
+            week2_points,
+            w2_games_played,
+            w2_wins,
+            w2_wlr,
+            w2_final_kills,
+            w2_fkdr,
+            w2_beds_broken,
+        ) = await get_points_from_data(week2_stats, week3_stats)
+        (
+            week3_points,
+            w3_games_played,
+            w3_wins,
+            w3_wlr,
+            w3_final_kills,
+            w3_fkdr,
+            w3_beds_broken,
+        ) = await get_points_from_data(week3_stats, week3_end_stats)
+        (
+            overall_points,
+            games_played,
+            wins,
+            wlr,
+            final_kills,
+            fkdr,
+            beds_broken,
+        ) = await get_points_from_data(start_stats, current_stats)
+    elif week_number == 3:
         (
             week1_points,
             w1_games_played,
