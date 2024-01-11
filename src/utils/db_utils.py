@@ -179,6 +179,8 @@ async def get_invites(inviter_uuid):
 
 
 async def new_tournament_player(uuid: str, start_data: dict, week_data: dict, week_num: int):
+    if week_num == 4:
+        week_num = "3_end"
     await bot.db.execute("INSERT INTO tournament VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                          (uuid, str(start_data), None, None, None, None, None, str(start_data)))
 
