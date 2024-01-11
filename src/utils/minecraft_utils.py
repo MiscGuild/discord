@@ -522,7 +522,7 @@ async def get_week_number(date_string=None):
         (datetime(2023, 12, 15), datetime(2023, 12, 21, 23, 59, 59)),
         (datetime(2023, 12, 22), datetime(2023, 12, 28, 23, 59, 59)),
         (datetime(2023, 12, 29), datetime(2024, 1, 4, 23, 59, 59)),
-        (datetime(2024, 1, 5), datetime(2024, 1, 11, 23, 59, 59)),
+        (datetime(2024, 1, 5), datetime(2024, 1, 15, 23, 59, 59)),
     ]
 
     # Determine the week number
