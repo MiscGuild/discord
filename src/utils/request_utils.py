@@ -17,6 +17,8 @@ async def get_hyapi_key():
 async def get_json_response(url: str):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
+            if resp.status != 200:
+                return None
             resp = await resp.json(content_type=None)
             await session.close()
 
@@ -105,6 +107,9 @@ async def get_player_guild(uuid):
 async def get_guild_by_name(name):
     api_key = await get_hyapi_key()
     resp = await get_json_response(f"https://api.hypixel.net/guild?key={api_key}&name={name}")
+
+    if not resp:
+        return None
 
     # Player is not in a guild
     if "guild" not in resp or not resp["guild"]:
