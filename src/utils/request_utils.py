@@ -108,6 +108,9 @@ async def get_guild_by_name(name):
     api_key = await get_hyapi_key()
     resp = await get_json_response(f"https://api.hypixel.net/guild?key={api_key}&name={name}")
 
+    if not resp:
+        return None
+
     # Player is not in a guild
     if "guild" not in resp or not resp["guild"]:
         return None
