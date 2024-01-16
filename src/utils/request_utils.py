@@ -17,6 +17,8 @@ async def get_hyapi_key():
 async def get_json_response(url: str):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
+            if resp.status != 200:
+                return None
             resp = await resp.json(content_type=None)
             await session.close()
 
