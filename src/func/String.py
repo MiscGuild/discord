@@ -185,11 +185,12 @@ class String:
     async def dnkladd(self, ctx):
         # start, end, reason
         ign, uuid = await get_mojang_profile(self.string)
+        _, weekly_gexp = await get_player_gexp(uuid)
         if not ign:
             return unknown_ign_embed
 
         # Ask DNKL application questions
-        embed = await dnkl_application(ign, uuid, ctx.channel, ctx.author)
+        embed = await dnkl_application(ign, uuid, ctx.channel, ctx.author, weekly_gexp)
         dnkl_message = await bot.get_channel(dnkl_channel_id).send(embed=embed.set_author(name="Do-not-kick-list"))
 
         # Check if user is already on DNKL
