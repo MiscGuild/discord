@@ -127,13 +127,15 @@ async def generate_lb_text(member_gexp: list, text: str):
             await get_hypixel_player(uuid=uuid))  # Ignores value without color formatting
 
         # Add new entry to image content
-        text += f"&6{count}. {rank} {name} &2{format(gexp, ',d')} Guild Experience"
+        ##text += f"&6{count}. {rank} {name} &2{format(gexp, ',d')} Guild Experience"
+        text += f"> {count}. {name} - {format(gexp, ',d')} Guild Experience"
         # Add new line
         if count < 10:
-            text += "%5Cn"
+            # text += "%5Cn"
+            text += "\n"
 
     # Replace characters for the URL
-    text = text.replace("+", "%2B").replace("&", "%26").replace(" ", "%20").replace(",", "%2C")
+    #text = text.replace("+", "%2B").replace("&", "%26").replace(" ", "%20").replace(",", "%2C")
 
     # Return image
     return text
