@@ -3,9 +3,9 @@ from __main__ import bot
 import discord
 
 import src.utils.ui_utils as uiutils
+from src.utils.calculation_utils import get_hypixel_player
 from src.utils.consts import unknown_ign_embed, neutral_color, ticket_categories, neg_color, gvg_requirements, \
     missing_permissions_embed
-from src.utils.minecraft_utils import get_hypixel_player
 
 
 async def gvg_approve(channel: discord.TextChannel, author: discord.User, ign: str, uuid: str, embed: discord.Embed,

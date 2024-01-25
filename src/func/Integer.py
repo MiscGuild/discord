@@ -2,11 +2,11 @@
 
 import discord
 
+from src.utils.calculation_utils import generate_lb_text
 from src.utils.consts import error_color, invalid_guild_embed, guild_handle, log_channel_id, neutral_color
 from src.utils.db_utils import get_giveaway_status
 from src.utils.discord_utils import name_grabber, create_transcript
 from src.utils.giveaway_utils import roll_giveaway
-from src.utils.minecraft_utils import generate_lb_text
 from src.utils.request_utils import (get_guild_by_name, get_jpg_file)
 
 

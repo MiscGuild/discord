@@ -3,9 +3,9 @@ from datetime import datetime, timedelta
 from math import exp
 from random import shuffle, choice
 
+from src.utils.calculation_utils import get_player_gexp, get_gexp_sorted
 from src.utils.consts import guild_handle, member_req, active_req, rank_upgrade_channel
 from src.utils.db_utils import select_one, insert_new_inviter, add_invitee
-from src.utils.minecraft_utils import get_player_gexp, get_gexp_sorted
 from src.utils.request_utils import get_mojang_profile, get_player_guild, get_guild_by_name, get_name_by_uuid
 
 

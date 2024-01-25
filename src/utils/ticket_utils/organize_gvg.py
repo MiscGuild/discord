@@ -1,8 +1,8 @@
 import discord
 
 import src.utils.ui_utils as uiutils
+from src.utils.calculation_utils import get_guild_level
 from src.utils.consts import neutral_color, ticket_categories
-from src.utils.minecraft_utils import get_guild_level
 from src.utils.request_utils import get_player_guild
 
 

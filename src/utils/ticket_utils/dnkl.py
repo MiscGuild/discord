@@ -3,10 +3,10 @@ from __main__ import bot
 import discord
 
 import src.utils.ui_utils as uiutils
+from src.utils.calculation_utils import get_player_gexp
 from src.utils.consts import neutral_color, ticket_categories, neg_color, unknown_ign_embed, dnkl_creation_embed, \
     dnkl_req, missing_permissions_embed, dnkl_channel_id
 from src.utils.db_utils import insert_new_dnkl, update_dnkl, select_one, delete_dnkl
-from src.utils.minecraft_utils import get_player_gexp
 from src.utils.ticket_utils.tickets import close_ticket
 
 
