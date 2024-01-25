@@ -27,4 +27,4 @@ async def organize_gvg(ticket: discord.TextChannel, interaction: discord.Interac
          ["Number of Players", "", discord.InputTextStyle.short, "Number of Players"],
          ["Time & Timezone", "", discord.InputTextStyle.short, "Time & Timezone"]])
     await interaction.response.send_modal(
-        modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, title="GvG Request"))
+        modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, title="GvG Request", uuid=uuid))
