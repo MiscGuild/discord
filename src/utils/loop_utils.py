@@ -39,14 +39,14 @@ async def before_giveaway_check():
 @tasks.loop(hours=24)
 async def send_gexp_lb():
     file = await Integer(integer=1).gtop(bot.get_channel(daily_lb_channel))
-    await bot.get_channel(daily_lb_channel).send(file=file)
+    await bot.get_channel(daily_lb_channel).send(file)
     if datetime.utcnow().weekday() == 0:
         await bot.get_channel(weekly_lb_channel).send(
             f"__Week {int(80 + round((datetime.utcnow() - datetime.strptime('14/08/2022', '%d/%m/%Y')).days / 7))}__\n"
             f"**{(datetime.utcnow() - timedelta(days=7)).strftime('%d %b %Y')} "
             f"-"
-            f" {datetime.utcnow().strftime('%d %B %Y')}**")
-        await bot.get_channel(weekly_lb_channel).send(file=await General.weeklylb(bot.get_channel(weekly_lb_channel)))
+            f" {datetime.utcnow().strftime('%d %B %Y')}**\n")
+        await bot.get_channel(weekly_lb_channel).send(await General.weeklylb(bot.get_channel(weekly_lb_channel)))
 
 
 @send_gexp_lb.before_loop
