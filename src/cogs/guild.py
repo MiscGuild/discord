@@ -1,11 +1,11 @@
 import discord
-from discord.ext import commands, bridge
 from discord.commands import option
+from discord.ext import commands, bridge
 
 from src.func.General import General
 from src.func.Integer import Integer
 from src.func.String import String
-from src.utils.consts import gvg_info_embed, requirements_embed, resident_embed, guild_handle
+from src.utils.consts import gvg_info_embed, requirements_embed, resident_embed
 from src.utils.discord_utils import name_grabber
 
 
@@ -40,6 +40,8 @@ class Guild(commands.Cog, name="guild"):
         """View the weekly guild experience leaderboard!"""
         await ctx.defer()
         res = await General.weeklylb(ctx)
+        if isinstance(res, str):
+            await ctx.respond(res)
         if isinstance(res, discord.File):
             await ctx.respond(file=res)
         if isinstance(res, discord.Embed):
@@ -56,7 +58,9 @@ class Guild(commands.Cog, name="guild"):
         """View the daily guild experience leaderboard!"""
         await ctx.defer()
         res = await Integer(integer=day).gtop(ctx=ctx)
-        if isinstance(res, discord.File):
+        if isinstance(res, str):
+            await ctx.respond(res)
+        elif isinstance(res, discord.File):
             await ctx.respond(file=res)
         elif isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
