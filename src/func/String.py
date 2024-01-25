@@ -8,6 +8,10 @@ from datetime import datetime
 import discord
 from quickchart import QuickChart
 
+from src.utils.calculation_utils import (calculate_network_level,
+                                         get_color_by_gexp,
+                                         get_hypixel_player_rank,
+                                         get_player_gexp)
 from src.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed,
                               months, neg_color, neutral_color, pos_color,
                               qotd_ans_channel_id, qotd_channel_id,
@@ -15,13 +19,9 @@ from src.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed,
                               missing_permissions_embed)
 from src.utils.db_utils import (delete_dnkl, insert_new_dnkl, select_one,
                                 update_dnkl, get_invites)
-from src.utils.discord_utils import dnkl_application
-from src.utils.minecraft_utils import (calculate_network_level,
-                                       get_color_by_gexp,
-                                       get_hypixel_player_rank,
-                                       get_player_gexp)
 from src.utils.request_utils import (get_hypixel_player, get_mojang_profile,
                                      get_player_guild, get_name_by_uuid)
+from src.utils.ticket_utils.dnkl import dnkl_application
 
 
 class String:

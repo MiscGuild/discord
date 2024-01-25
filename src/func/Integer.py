@@ -2,12 +2,13 @@
 
 import discord
 
+from src.utils.calculation_utils import generate_lb_text
 from src.utils.consts import error_color, invalid_guild_embed, guild_handle, log_channel_id, neutral_color
 from src.utils.db_utils import get_giveaway_status
-from src.utils.discord_utils import name_grabber, create_transcript
+from src.utils.discord_utils import name_grabber
 from src.utils.giveaway_utils import roll_giveaway
-from src.utils.minecraft_utils import generate_lb_text
 from src.utils.request_utils import (get_guild_by_name, get_jpg_file)
+from src.utils.ticket_utils.tickets import create_transcript
 
 
 class Integer:
@@ -64,7 +65,8 @@ class Integer:
                              reverse=True)
 
         # Get image data
-        text = f"&f&lDaily Top: {date}&r%5Cn"
+        # text = f"&f&lDaily Top: {date}&r%5Cn"
+        text = f"**Daily Top: {date}**\n"
         text = await generate_lb_text(member_gexp, text)
 
         for x in range(5):
@@ -72,7 +74,8 @@ class Integer:
             if file:
                 break
         # Return image
-        return file
+        # return file
+        return text
 
     async def purge(self, ctx, reason):
         transcript = await create_transcript(ctx.channel, self.integer)

@@ -10,6 +10,7 @@ import discord
 import discord.ui
 
 from src.func.Union import Union
+from src.utils.calculation_utils import get_gexp_sorted, generate_lb_text
 from src.utils.consts import (accepted_staff_application_embed, active_req,
                               allies, error_color, guild_handle,
                               invalid_guild_embed, log_channel_id, member_req,
@@ -20,15 +21,13 @@ from src.utils.consts import (accepted_staff_application_embed, active_req,
                               resident_req, dnkl_entries_not_found,
                               positive_responses)
 from src.utils.db_utils import insert_new_giveaway, select_all
-from src.utils.discord_utils import (create_ticket, create_transcript,
+from src.utils.discord_utils import (create_ticket,
                                      get_ticket_creator, log_event,
-                                     get_ticket_properties,
                                      name_grabber, has_tag_perms)
-from src.utils.minecraft_utils import get_gexp_sorted, generate_lb_text
 from src.utils.request_utils import (get_guild_by_name, get_guild_uuids,
-                                     get_jpg_file,
                                      get_mojang_profile, get_name_by_uuid,
                                      get_player_guild)
+from src.utils.ticket_utils.tickets import create_transcript, get_ticket_properties
 
 
 class General:
@@ -41,9 +40,11 @@ class General:
 
         member_gexp = await get_gexp_sorted(guild_data)
 
-        text = "&f&lWeekly Top&r%5Cn"
+        # text = "&f&lWeekly Top&r%5Cn"
+        text = "**Weekly Top**\n"
         text = await generate_lb_text(member_gexp, text)
-        return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
+        return text
+        # return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
 
     async def dnkllist(ctx):
         # Fetch all rows

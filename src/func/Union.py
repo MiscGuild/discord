@@ -7,11 +7,12 @@ from typing import Union
 import discord
 
 import src.utils.ui_utils as uiutils
+from src.utils.calculation_utils import check_tag
 from src.utils.consts import (active_req, allies, discord_not_linked_embed, guild_handle, neg_color, neutral_color,
                               pos_color, registration_channel_id,
                               staff_impersonation_embed, ticket_categories,
                               unknown_ign_embed, join_request_embed)
-from src.utils.discord_utils import (check_tag, create_ticket, has_tag_perms,
+from src.utils.discord_utils import (create_ticket, has_tag_perms,
                                      is_linked_discord)
 from src.utils.referral_utils import (validate_reference)
 from src.utils.request_utils import (get_gtag, get_hypixel_player,

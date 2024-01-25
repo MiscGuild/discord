@@ -1,5 +1,6 @@
 import math
 import re
+from datetime import datetime, timedelta
 
 from src.utils.consts import ChatColor, active_req, member_req, resident_req
 from src.utils.request_utils import get_player_guild, get_name_by_uuid, get_hypixel_player
@@ -127,13 +128,71 @@ async def generate_lb_text(member_gexp: list, text: str):
             await get_hypixel_player(uuid=uuid))  # Ignores value without color formatting
 
         # Add new entry to image content
-        text += f"&6{count}. {rank} {name} &2{format(gexp, ',d')} Guild Experience"
+        ##text += f"&6{count}. {rank} {name} &2{format(gexp, ',d')} Guild Experience"
+        text += f"> {count}. {name} - {format(gexp, ',d')} Guild Experience"
         # Add new line
         if count < 10:
-            text += "%5Cn"
+            # text += "%5Cn"
+            text += "\n"
 
     # Replace characters for the URL
-    text = text.replace("+", "%2B").replace("&", "%26").replace(" ", "%20").replace(",", "%2C")
+    #text = text.replace("+", "%2B").replace("&", "%26").replace(" ", "%20").replace(",", "%2C")
 
     # Return image
     return text
+
+
+async def get_guild_level(exp):
+    EXP_NEEDED = [100000, 150000, 250000, 500000, 750000, 1000000, 1250000, 1500000, 2000000, 2500000, 2500000, 2500000,
+                  2500000, 2500000, 3000000]
+    # A list of amount of XP required for leveling up in each of the beginning levels (1-15).
+
+    level = 0
+
+    for i in range(1000):
+        # Increment by one from zero to the level cap.
+        need = 0
+        if i >= len(EXP_NEEDED):
+            need = EXP_NEEDED[len(EXP_NEEDED) - 1]
+        else:
+            need = EXP_NEEDED[i]
+        # Determine the current amount of XP required to level up,
+        # in regards to the "i" variable.
+
+        if (exp - need) < 0:
+            return round(((level + (exp / need)) * 100) / 100, 2)
+        # If the remaining exp < the total amount of XP required for the next level,
+        # return their level using this formula.
+
+        level += 1
+        exp -= need
+        # Otherwise, increase their level by one,
+        # and subtract the required amount of XP to level up,
+        # from the total amount of XP that the guild had.
+
+
+async def check_tag(tag: str):
+    tag = tag.lower()
+    with open(r"src/utils/badwords.txt", "r") as f:
+        badwords = f.read()
+
+    if tag in badwords.split("\n"):
+        return False, "Your tag may not include profanity."
+    if not tag.isascii():
+        return False, "Your tag may not include special characters unless it's the tag of an ally guild."
+    if len(tag) > 6:
+        return False, "Your tag may not be longer than 6 characters."
+    # Tag is okay to use
+    return True, None
+
+
+async def is_valid_date(date: str):
+    # Return False if parsing fails
+    try:
+        parsed = datetime.strptime(date, "%Y/%m/%d")
+        # Validate time is within the last week
+        if parsed < datetime.utcnow() - timedelta(days=7):
+            return False, None, None, None
+        return True, parsed.day, parsed.month, parsed.year
+    except ValueError:
+        return False, None, None, None
