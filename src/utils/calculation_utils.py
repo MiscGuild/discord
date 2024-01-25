@@ -1,5 +1,6 @@
 import math
 import re
+from datetime import datetime, timedelta
 
 from src.utils.consts import ChatColor, active_req, member_req, resident_req
 from src.utils.request_utils import get_player_guild, get_name_by_uuid, get_hypixel_player
@@ -168,3 +169,30 @@ async def get_guild_level(exp):
         # Otherwise, increase their level by one,
         # and subtract the required amount of XP to level up,
         # from the total amount of XP that the guild had.
+
+
+async def check_tag(tag: str):
+    tag = tag.lower()
+    with open(r"src/utils/badwords.txt", "r") as f:
+        badwords = f.read()
+
+    if tag in badwords.split("\n"):
+        return False, "Your tag may not include profanity."
+    if not tag.isascii():
+        return False, "Your tag may not include special characters unless it's the tag of an ally guild."
+    if len(tag) > 6:
+        return False, "Your tag may not be longer than 6 characters."
+    # Tag is okay to use
+    return True, None
+
+
+async def is_valid_date(date: str):
+    # Return False if parsing fails
+    try:
+        parsed = datetime.strptime(date, "%Y/%m/%d")
+        # Validate time is within the last week
+        if parsed < datetime.utcnow() - timedelta(days=7):
+            return False, None, None, None
+        return True, parsed.day, parsed.month, parsed.year
+    except ValueError:
+        return False, None, None, None

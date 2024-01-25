@@ -1,5 +1,4 @@
 from __main__ import bot
-from datetime import datetime, timedelta
 
 import discord
 import discord.ui as ui
@@ -134,33 +133,6 @@ async def log_event(title: str, description: str = None):
 
 async def has_tag_perms(user: discord.User):
     return any(role in user.roles for role in bot.tag_allowed_roles)
-
-
-async def check_tag(tag: str):
-    tag = tag.lower()
-    with open(r"src/utils/badwords.txt", "r") as f:
-        badwords = f.read()
-
-    if tag in badwords.split("\n"):
-        return False, "Your tag may not include profanity."
-    if not tag.isascii():
-        return False, "Your tag may not include special characters unless it's the tag of an ally guild."
-    if len(tag) > 6:
-        return False, "Your tag may not be longer than 6 characters."
-    # Tag is okay to use
-    return True, None
-
-
-async def is_valid_date(date: str):
-    # Return False if parsing fails
-    try:
-        parsed = datetime.strptime(date, "%Y/%m/%d")
-        # Validate time is within the last week
-        if parsed < datetime.utcnow() - timedelta(days=7):
-            return False, None, None, None
-        return True, parsed.day, parsed.month, parsed.year
-    except ValueError:
-        return False, None, None, None
 
 
 @tasks.loop(count=1)
