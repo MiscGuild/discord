@@ -64,7 +64,8 @@ class Integer:
                              reverse=True)
 
         # Get image data
-        text = f"&f&lDaily Top: {date}&r%5Cn"
+        # text = f"&f&lDaily Top: {date}&r%5Cn"
+        text = f"**Daily Top: {date}**\n"
         text = await generate_lb_text(member_gexp, text)
 
         for x in range(5):
@@ -72,7 +73,8 @@ class Integer:
             if file:
                 break
         # Return image
-        return file
+        # return file
+        return text
 
     async def purge(self, ctx, reason):
         transcript = await create_transcript(ctx.channel, self.integer)
