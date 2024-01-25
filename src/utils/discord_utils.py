@@ -1,28 +1,15 @@
-import asyncio
 from __main__ import bot
 from datetime import datetime, timedelta
-from io import BytesIO
 
-import chat_exporter
 import discord
 import discord.ui as ui
 from discord.ext import tasks
 
-import src.utils.ui_utils as uiutils
-from src.utils.consts import (config, dnkl_req,
-                              gvg_requirements, log_channel_id, neg_color, neutral_color, staff_application_questions,
-                              ticket_categories,
-                              unknown_ign_embed, guild_handle, positive_responses, dnkl_creation_embed, dnkl_channel_id,
-                              missing_permissions_embed)
-from src.utils.db_utils import select_one, insert_new_dnkl, update_dnkl, delete_dnkl
-from src.utils.minecraft_utils import get_player_gexp
-from src.utils.request_utils import get_hypixel_player, get_mojang_profile, get_player_guild, get_guild_level
-
-
-async def name_grabber(author: discord.Member) -> str:
-    if not author.nick:
-        return author.name
-    return author.nick.split()[0]
+from src.utils.consts import (config, log_channel_id, neutral_color, ticket_categories,
+                              guild_handle)
+from src.utils.request_utils import get_mojang_profile
+from src.utils.ticket_utils import *
+from src.utils.ticket_utils.tickets import name_grabber
 
 
 async def is_linked_discord(player_data: dict, user: discord.User) -> bool:
