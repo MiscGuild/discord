@@ -26,7 +26,6 @@ from src.utils.discord_utils import (create_ticket, create_transcript,
                                      name_grabber, has_tag_perms)
 from src.utils.minecraft_utils import get_gexp_sorted, generate_lb_text
 from src.utils.request_utils import (get_guild_by_name, get_guild_uuids,
-                                     get_jpg_file,
                                      get_mojang_profile, get_name_by_uuid,
                                      get_player_guild)
 
@@ -41,9 +40,11 @@ class General:
 
         member_gexp = await get_gexp_sorted(guild_data)
 
-        text = "&f&lWeekly Top&r%5Cn"
+        # text = "&f&lWeekly Top&r%5Cn"
+        text = "**Weekly Top**\n"
         text = await generate_lb_text(member_gexp, text)
-        return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
+        return text
+        #return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
 
     async def dnkllist(ctx):
         # Fetch all rows
