@@ -19,9 +19,9 @@ from src.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed,
                               missing_permissions_embed)
 from src.utils.db_utils import (delete_dnkl, insert_new_dnkl, select_one,
                                 update_dnkl, get_invites)
-from src.utils.discord_utils import dnkl_application
 from src.utils.request_utils import (get_hypixel_player, get_mojang_profile,
                                      get_player_guild, get_name_by_uuid)
+from src.utils.ticket_utils.dnkl import dnkl_application
 
 
 class String:
