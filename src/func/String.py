@@ -17,8 +17,8 @@ from src.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed,
                               qotd_ans_channel_id, qotd_channel_id,
                               ticket_categories, unknown_ign_embed, rainbow_separator, guild_handle,
                               missing_permissions_embed)
-from src.utils.db_utils import (delete_dnkl, insert_new_dnkl, select_one,
-                                update_dnkl, get_invites)
+from src.utils.db_utils import (delete_dnkl, select_one,
+                                get_invites)
 from src.utils.request_utils import (get_hypixel_player, get_mojang_profile,
                                      get_player_guild, get_name_by_uuid)
 from src.utils.ticket_utils.dnkl import dnkl_application
@@ -188,28 +188,9 @@ class String:
         _, weekly_gexp = await get_player_gexp(uuid)
         if not ign:
             return unknown_ign_embed
-
+        await ctx.respond("Please respond to the following prompts: ")
         # Ask DNKL application questions
-        embed = await dnkl_application(ign, uuid, ctx.channel, ctx.author, weekly_gexp)
-        dnkl_message = await bot.get_channel(dnkl_channel_id).send(embed=embed.set_author(name="Do-not-kick-list"))
-
-        # Check if user is already on DNKL
-        current_message = await select_one("SELECT message_id FROM  dnkl WHERE uuid = (?)", (uuid,))
-        # User is not currently on DNKL
-        if not current_message:
-            await insert_new_dnkl(dnkl_message.id, uuid, ign)
-            return "This user has been added to the do-not-kick-list!"
-
-        # User is already on DNKl
-        # Try to delete current message
-        try:
-            current_message = await bot.get_channel(dnkl_channel_id).fetch_message(current_message)
-            await current_message.delete()
-        except Exception:
-            pass
-
-        await update_dnkl(dnkl_message.id, uuid)
-        return "Since this user was already on the do-not-kick-list, their entry has been updated."
+        dnkl_embed = await dnkl_application(ign, uuid, ctx.channel, ctx.author, weekly_gexp)
 
     async def dnklremove(self):
         ign, uuid = await get_mojang_profile(self.string)
