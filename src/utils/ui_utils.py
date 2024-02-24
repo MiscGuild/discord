@@ -174,7 +174,7 @@ class InactivityReasonSelect(ui.Select):
         self.weekly_gexp = weekly_gexp
         self.buttons = buttons
 
-        reasons = ["Exams", "Medical Issues", "Vacation", "Computer Problems", "Other"]
+        reasons = ["Exams", "Medical Issues", "Vacation", "Computer Problems", "Banned on Hypixel", "Other"]
         for reason in reasons:
             self.add_option(label=reason, value=reason)
 
@@ -182,6 +182,15 @@ class InactivityReasonSelect(ui.Select):
         reason = list(interaction.data.values())[0][0]
 
         other_reason = ""
+
+        if reason == "Banned on Hypixel":
+            embed = discord.Embed(title="You cannot use the DNKL system if you are banned from the Hypixel!",
+                                  description="If you are banned, you will be removed from the guild.\n"
+                                              "You may rejoin once your ban is over.",
+                                  color=neg_color)
+            await interaction.response.send_message(embed=embed)
+            return
+
         if reason == "Other":
             await interaction.response.send_message("Please elaborate on the reason for your inactivity.\n" \
                                                     "This information will only be visible to staff members.\n\n" \
@@ -197,7 +206,7 @@ class InactivityReasonSelect(ui.Select):
         date = datetime.strptime(f"{self.day}/{self.month}/{self.year}", "%d/%B/%Y") + timedelta(weeks=int(self.length))
         final_embed = discord.Embed(title=self.ign, url=f'https://plancke.io/hypixel/player/stats/{self.ign}',
                                     color=neutral_color)
-        final_embed.set_thumbnail(url=f'https://crafatar.com/renders/body/{self.uuid}')
+        final_embed.set_thumbnail(url=f"https://visage.surgeplay.com/full/{self.uuid}.png")
         final_embed.add_field(name="IGN:", value=self.ign, inline=False)
         final_embed.add_field(name="Start:", value=f"{self.day} {self.month} {self.year}", inline=False)
         final_embed.add_field(name="End:", value=f"{date.day} {date.strftime('%B')} {date.year}", inline=False)
