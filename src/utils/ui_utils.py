@@ -211,6 +211,7 @@ class InactivityReasonSelect(ui.Select):
         final_embed.add_field(name="Start:", value=f"{self.day} {self.month} {self.year}", inline=False)
         final_embed.add_field(name="End:", value=f"{date.day} {date.strftime('%B')} {date.year}", inline=False)
         final_embed.add_field(name="Reason:", value=reason, inline=False)
+        final_embed.set_author(name="Do-not-kick-list")
 
         staff_approval_embed = final_embed.copy()
         staff_approval_embed.add_field(name="Guild Experience:",
