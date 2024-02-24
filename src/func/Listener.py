@@ -9,7 +9,7 @@ from discord.ui import Button, Select, View
 
 from src.utils.consts import (error_channel_id, invalid_command_embed,
                               member_not_found_embed, missing_permissions_embed, missing_role_embed,
-                              neutral_color, not_owner_embed, pronoun_roles,
+                              neutral_color, not_owner_embed, pronoun_roles, staff_bridge_channel,
                               reaction_roles, registration_channel_id,
                               registration_embed, err_404_embed, bot_missing_perms_embed, tickets_embed)
 from src.utils.discord_utils import create_ticket
@@ -222,3 +222,13 @@ class Listener:
                                      style=discord.ButtonStyle.blurple, emoji="✉️"))
 
         return image, tickets_embed, TicketView()
+
+    async def on_invitation_message(self):
+        if not self.obj.author.bot:
+            return
+        if self.obj.channel.id != staff_bridge_channel:
+            return
+        if not self.obj.embeds:
+            return
+
+        embed = self.obj.embeds[0]
