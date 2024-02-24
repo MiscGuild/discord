@@ -6,7 +6,6 @@ from typing import Union
 
 import discord
 
-import src.utils.ui_utils as uiutils
 from src.utils.calculation_utils import check_tag
 from src.utils.consts import (active_req, allies, discord_not_linked_embed, guild_handle, neg_color, neutral_color,
                               pos_color, registration_channel_id,
@@ -14,7 +13,6 @@ from src.utils.consts import (active_req, allies, discord_not_linked_embed, guil
                               unknown_ign_embed, join_request_embed)
 from src.utils.discord_utils import (create_ticket, has_tag_perms,
                                      is_linked_discord)
-from src.utils.referral_utils import (validate_reference)
 from src.utils.request_utils import (get_gtag, get_hypixel_player,
                                      get_mojang_profile, get_player_guild)
 
@@ -180,14 +178,6 @@ class Union:
 
         # User is a member
         if guild_name == guild_handle:
-            fields = [
-                ["Who invited you to Miscellaneous on Hypixel?", "Enter NONE if you joined on your own.",
-                 discord.InputTextStyle.short,
-                 "Invited by:"]
-            ]
-            await ctx.response.send_modal(
-                modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, uuid=uuid, title="Player Reference",
-                                           function=validate_reference))
             await ctx.author.add_roles(bot.member_role, reason="Registration - Member")
             guest_ticket = None
 

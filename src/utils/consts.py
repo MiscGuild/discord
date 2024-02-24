@@ -36,6 +36,7 @@ milestones_channel = config["milestones_channel"]
 weekly_lb_channel = config["weekly_gexp_lb"]
 daily_lb_channel = config["daily_gexp_lb"]
 rank_upgrade_channel = config["rank_upgrade_channel"]
+staff_bridge_channel = config["staff_bridge_channel"]
 
 # Other variables
 guild_handle = config["guild_handle"]

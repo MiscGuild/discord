@@ -1,6 +1,6 @@
 import discord
-from discord.ext import commands, bridge
 from discord.commands import option
+from discord.ext import commands, bridge
 
 from src.func.General import General
 from src.func.String import String
