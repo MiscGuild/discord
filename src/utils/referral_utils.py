@@ -9,7 +9,8 @@ from src.utils.db_utils import select_one, insert_new_inviter, add_invitee
 from src.utils.request_utils import get_mojang_profile, get_player_guild, get_guild_by_name, get_name_by_uuid
 
 
-async def validate_reference(invitee_uuid, inviter_ign):
+async def validate_invites(inviter_ign, invitee_ign):
+    invitee_ign, invitee_uuid = await get_mojang_profile(invitee_ign) if invitee_ign else (None, None)
     inviter_ign, inviter_uuid = await get_mojang_profile(inviter_ign) if inviter_ign else (None, None)
     if not inviter_uuid:
         return f"{inviter_ign} is not a valid minecraft username.\nThis reference will not count."
@@ -29,7 +30,7 @@ async def validate_reference(invitee_uuid, inviter_ign):
 
     count = await add_invitee(inviter_uuid, invitee_uuid)
     if not count:
-        return f"{inviter_ign} has already invited you in the past. No duplicate entries!"
+        return f"{inviter_ign} has already invited {invitee_ign} in the past. No duplicate entries!"
     return f"{inviter_ign} has invited {count} members to the guild this week!"
 
 
