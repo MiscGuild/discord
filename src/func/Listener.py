@@ -7,12 +7,14 @@ import discord
 from discord.ext import commands
 from discord.ui import Button, Select, View
 
+from src.utils.calculation_utils import extract_usernames
 from src.utils.consts import (error_channel_id, invalid_command_embed,
                               member_not_found_embed, missing_permissions_embed, missing_role_embed,
                               neutral_color, not_owner_embed, pronoun_roles, staff_bridge_channel,
                               reaction_roles, registration_channel_id,
                               registration_embed, err_404_embed, bot_missing_perms_embed, tickets_embed)
 from src.utils.discord_utils import create_ticket
+from src.utils.referral_utils import validate_invites
 from src.utils.request_utils import get_jpg_file
 
 
@@ -237,3 +239,12 @@ class Listener:
             return
 
         description = embed.description
+
+        inviter, invitee = await extract_usernames(description)
+
+        if not all((inviter, invitee)):
+            return
+
+        return_message = await validate_invites(inviter, invitee)
+
+        await self.obj.channel.send(return_message)
