@@ -235,6 +235,9 @@ class Listener:
 
         embed = self.obj.embeds[0]
 
+        if not embed.description:
+            return
+
         if "invited" not in embed.description.lower():
             return
 
