@@ -69,6 +69,7 @@ class Listener:
 
         # All other errors get sent to the error channel
         else:
+            await ctx.respond(embed=err_404_embed)
             tb = "".join(traceback.format_exception(
                 type(self.obj), self.obj, self.obj.__traceback__))
             if len(tb) <= 1955:
