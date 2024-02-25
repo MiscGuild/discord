@@ -14,6 +14,8 @@ async def validate_invites(inviter_ign, invitee_ign):
     inviter_ign, inviter_uuid = await get_mojang_profile(inviter_ign) if inviter_ign else (None, None)
     if not inviter_uuid:
         return f"{inviter_ign} is not a valid minecraft username.\nThis reference will not count."
+    if not invitee_uuid:
+        return f"Bot broke. \n{invitee_ign} is not a valid minecraft username.\nThis reference will not count."
 
     guild_data = await get_player_guild(inviter_uuid)
     guild_name = "Guildless" if not guild_data else guild_data["name"]
