@@ -41,6 +41,10 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
     # Set perms
     await ticket.set_permissions(bot.guild.get_role(bot.guild.id), send_messages=False,
                                  read_messages=False)
+    await ticket.set_permissions(bot.discord_mod, send_messages=True, read_messages=True,
+                                 add_reactions=True, embed_links=True,
+                                 attach_files=True,
+                                 read_message_history=True, external_emojis=True)
     await ticket.set_permissions(bot.staff, send_messages=True, read_messages=True,
                                  add_reactions=True, embed_links=True,
                                  attach_files=True,
@@ -145,6 +149,7 @@ async def after_cache_ready():
     bot.admin = discord.utils.get(bot.guild.roles, name="Admin")
     bot.staff = discord.utils.get(bot.guild.roles, name="Staff")
     bot.helper = discord.utils.get(bot.guild.roles, name="Helper")
+    bot.discord_mod = discord.utils.get(bot.guild.roles, name="Discord Moderator")
     bot.former_staff = discord.utils.get(bot.guild.roles, name="Former Staff")
     bot.new_member_role = discord.utils.get(bot.guild.roles, name="New Member")
     bot.processing = discord.utils.get(bot.guild.roles, name="Processing")
