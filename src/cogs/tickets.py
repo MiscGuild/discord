@@ -1,12 +1,12 @@
 import discord
-from discord.ext import commands, bridge
 from discord.commands import option
+from discord.ext import commands, bridge
 
-from src.utils.consts import milestone_categories
 from src.func.General import General
 from src.func.Listener import Listener
 from src.func.String import String
 from src.func.Union import Union
+from src.utils.consts import milestone_categories
 
 
 class Tickets(commands.Cog, name="tickets"):
