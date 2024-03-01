@@ -1,8 +1,8 @@
 from __main__ import bot
 
 import discord
-from discord.ext import commands, bridge
 from discord.commands import option
+from discord.ext import commands, bridge
 
 from src.func.General import General
 from src.func.Union import Union
@@ -78,7 +78,6 @@ class Staff(commands.Cog, name="staff"):
     async def rolecheck(self, ctx, send_ping: bool = True):
         """Sync the names and roles of everyone in the discord!"""
         await General.rolecheck(ctx, send_ping)
-
 
 
 def setup(bot):
