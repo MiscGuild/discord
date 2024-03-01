@@ -78,10 +78,10 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                 if bot.member_role in user.roles:
                     self.add_option(label="Register a milestone", emoji="🏆")
                     self.add_option(label="I am going to be inactive", emoji="<:dnkl:877657298703634483>")
-                    self.add_option(label="I want to join the staff team", emoji="🤵")
                     self.add_option(label="I want to join the GvG team", emoji="⚔️")
 
                 # Add default options
+                self.add_option(label="I want to join the staff team", emoji="🤵")
                 self.add_option(label="Report a player", emoji="🗒️")
                 self.add_option(label="Query/Problem", emoji="🤔")
 
