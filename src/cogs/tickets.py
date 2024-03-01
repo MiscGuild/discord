@@ -59,7 +59,7 @@ class Tickets(commands.Cog, name="tickets"):
             await ctx.respond(embed=res)
 
     @bridge.bridge_command()
-    @commands.has_role("Staff")
+    @commands.has_any_role("Staff", "Discord Moderator")
     @option(
         name="member",
         description="The Discord user you would like to remove from the ticket",
