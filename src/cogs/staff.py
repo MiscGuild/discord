@@ -26,7 +26,7 @@ class Staff(commands.Cog, name="staff"):
             await ctx.respond(embed=embed)
 
     @bridge.bridge_command(aliases=["fs"])
-    @commands.has_role("Staff")
+    @commands.has_any_role("Staff", "Discord Moderator")
     @option(
         name="member",
         description="The Discord member who you would like to forcesync",
