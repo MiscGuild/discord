@@ -87,7 +87,7 @@ class Tickets(commands.Cog, name="tickets"):
         await ctx.respond(embed=await String(string=channel_name).rename(ctx))
 
     @bridge.bridge_command()
-    @commands.has_role("Staff")
+    @commands.has_any_role("Staff", "Discord Moderator")
     async def transcript(self, ctx):
         """Create a transcript for a ticket!"""
         res = await General.transcript(ctx)
