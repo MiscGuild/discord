@@ -68,7 +68,7 @@ class Staff(commands.Cog, name="staff"):
         await ctx.respond(embed=information_embed)
 
     @bridge.bridge_command()
-    @commands.has_role("Staff")
+    @commands.has_any_role("Staff", "Discord Moderator")
     @option(
         name="send_ping",
         description="Enter 'False' if you don't want to ping New Members upon completion of rolecheck",
