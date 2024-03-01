@@ -35,7 +35,7 @@ class Tickets(commands.Cog, name="tickets"):
             await ctx.respond(res)
 
     @bridge.bridge_command(aliases=["del"])
-    @commands.has_role("Staff")
+    @commands.has_any_role("Staff", "Discord Moderator")
     async def delete(self, ctx):
         """Delete a ticket!"""
         res = await General.delete(ctx)
