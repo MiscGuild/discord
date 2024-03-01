@@ -143,7 +143,7 @@ class Tickets(commands.Cog, name="tickets"):
         await ctx.respond(embed=embed, view=view)
 
     @bridge.bridge_command(aliases=['UpdateMilestone'])
-    @commands.has_role('Staff')
+    @commands.has_any_role("Staff", "Discord Moderator")
     async def milestoneupdate(self, ctx):
         """Update a milestone that has already been registered"""
         embed, view = await General.update_milestone(ctx)
