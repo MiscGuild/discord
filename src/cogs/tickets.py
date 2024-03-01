@@ -150,7 +150,7 @@ class Tickets(commands.Cog, name="tickets"):
         await ctx.respond(embed=embed, view=view)
 
     @bridge.bridge_command(aliases=["CompileMilestones", "mc", "cm", "CompileMilestone"])
-    @commands.has_role('Staff')
+    @commands.has_any_role("Staff", "Discord Moderator")
     async def milestonecompile(self, ctx):
         """Compiles all milestones into one message and sends it to the milestones channel"""
         await ctx.respond(await General.compile_milestones(ctx))
