@@ -1,8 +1,8 @@
 from __main__ import bot
 
 import discord
-from discord.ext import commands, bridge
 from discord.commands import option
+from discord.ext import commands, bridge
 
 from src.func.General import General
 from src.func.Union import Union
@@ -26,7 +26,7 @@ class Staff(commands.Cog, name="staff"):
             await ctx.respond(embed=embed)
 
     @bridge.bridge_command(aliases=["fs"])
-    @commands.has_role("Staff")
+    @commands.has_any_role("Staff", "Discord Moderator")
     @option(
         name="member",
         description="The Discord member who you would like to forcesync",
@@ -68,7 +68,7 @@ class Staff(commands.Cog, name="staff"):
         await ctx.respond(embed=information_embed)
 
     @bridge.bridge_command()
-    @commands.has_role("Staff")
+    @commands.has_any_role("Staff", "Discord Moderator")
     @option(
         name="send_ping",
         description="Enter 'False' if you don't want to ping New Members upon completion of rolecheck",
@@ -78,7 +78,6 @@ class Staff(commands.Cog, name="staff"):
     async def rolecheck(self, ctx, send_ping: bool = True):
         """Sync the names and roles of everyone in the discord!"""
         await General.rolecheck(ctx, send_ping)
-
 
 
 def setup(bot):

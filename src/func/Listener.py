@@ -137,9 +137,11 @@ class Listener:
         if "custom_id" not in self.obj.data:
             pass
         elif self.obj.data["custom_id"] == "tickets":
+            await self.obj.response.send_message("Creating your ticket...", ephemeral=True)
             ticket = await create_ticket(self.obj.user, f"ticket-{self.obj.user.name}")
-            await self.obj.response.send_message(f"Click the following link to go to your ticket! <#{ticket.id}>",
-                                                 ephemeral=True)
+
+            await self.obj.edit_original_response(
+                content=f"Ticket created!\n**Click the link below to view your ticket.**\n<#{ticket.id}>")
 
         # Reaction roles
         elif self.obj.data["custom_id"] in reaction_roles.keys():

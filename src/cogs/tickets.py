@@ -1,12 +1,12 @@
 import discord
-from discord.ext import commands, bridge
 from discord.commands import option
+from discord.ext import commands, bridge
 
-from src.utils.consts import milestone_categories
 from src.func.General import General
 from src.func.Listener import Listener
 from src.func.String import String
 from src.func.Union import Union
+from src.utils.consts import milestone_categories
 
 
 class Tickets(commands.Cog, name="tickets"):
@@ -35,7 +35,7 @@ class Tickets(commands.Cog, name="tickets"):
             await ctx.respond(res)
 
     @bridge.bridge_command(aliases=["del"])
-    @commands.has_role("Staff")
+    @commands.has_any_role("Staff", "Discord Moderator")
     async def delete(self, ctx):
         """Delete a ticket!"""
         res = await General.delete(ctx)
@@ -43,7 +43,7 @@ class Tickets(commands.Cog, name="tickets"):
             await ctx.respond(res)
 
     @bridge.bridge_command()
-    @commands.has_role("Staff")
+    @commands.has_any_role("Staff", "Discord Moderator")
     @option(
         name="member",
         description="The Discord user you would like to add to the ticket",
@@ -59,7 +59,7 @@ class Tickets(commands.Cog, name="tickets"):
             await ctx.respond(embed=res)
 
     @bridge.bridge_command()
-    @commands.has_role("Staff")
+    @commands.has_any_role("Staff", "Discord Moderator")
     @option(
         name="member",
         description="The Discord user you would like to remove from the ticket",
@@ -75,7 +75,7 @@ class Tickets(commands.Cog, name="tickets"):
             await ctx.respond(embed=res)
 
     @bridge.bridge_command()
-    @commands.has_role("Staff")
+    @commands.has_any_role("Staff", "Discord Moderator")
     @option(
         name="channel_name",
         description="The new name for the channel",
@@ -87,7 +87,7 @@ class Tickets(commands.Cog, name="tickets"):
         await ctx.respond(embed=await String(string=channel_name).rename(ctx))
 
     @bridge.bridge_command()
-    @commands.has_role("Staff")
+    @commands.has_any_role("Staff", "Discord Moderator")
     async def transcript(self, ctx):
         """Create a transcript for a ticket!"""
         res = await General.transcript(ctx)
@@ -130,11 +130,11 @@ class Tickets(commands.Cog, name="tickets"):
         await ctx.respond(await General.new(ctx))
 
     @bridge.bridge_command(aliases=['AddMilestone'])
-    @commands.has_role('Staff')
+    @commands.has_any_role("Staff", "Discord Moderator")
     @option(
         name="gamemode",
         description="The gamemode in which the milestone was achieved",
-        choices= [discord.OptionChoice(v, value=k) for k,v in milestone_categories.items()],
+        choices=[discord.OptionChoice(v, value=k) for k, v in milestone_categories.items()],
         required=False
     )
     async def milestoneadd(self, ctx, gamemode: str = None, *, milestone: str = None):
@@ -143,14 +143,14 @@ class Tickets(commands.Cog, name="tickets"):
         await ctx.respond(embed=embed, view=view)
 
     @bridge.bridge_command(aliases=['UpdateMilestone'])
-    @commands.has_role('Staff')
+    @commands.has_any_role("Staff", "Discord Moderator")
     async def milestoneupdate(self, ctx):
         """Update a milestone that has already been registered"""
         embed, view = await General.update_milestone(ctx)
         await ctx.respond(embed=embed, view=view)
 
     @bridge.bridge_command(aliases=["CompileMilestones", "mc", "cm", "CompileMilestone"])
-    @commands.has_role('Staff')
+    @commands.has_any_role("Staff", "Discord Moderator")
     async def milestonecompile(self, ctx):
         """Compiles all milestones into one message and sends it to the milestones channel"""
         await ctx.respond(await General.compile_milestones(ctx))
