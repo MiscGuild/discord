@@ -74,7 +74,7 @@ async def generate_rank_upgrade(weekly_invites : list):
     # A player gets 7 entries for every valid invite they have made
     total_invitations = 0
     for uuid, invitations in weekly_invites:
-        entries[uuid] = entries[uuid] + (len(invitations)*7) if uuid in entries else (len(invitations)*7)
+        entries[uuid] = entries[uuid] + (len(invitations) * 12) if uuid in entries else (len(invitations) * 12)
         total_invitations += len(invitations)
 
     weighted_entries = [uuid for uuid, weight in entries.items() for _ in range(weight)]
