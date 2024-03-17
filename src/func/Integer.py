@@ -7,7 +7,7 @@ from src.utils.consts import error_color, invalid_guild_embed, guild_handle, log
 from src.utils.db_utils import get_giveaway_status
 from src.utils.discord_utils import name_grabber
 from src.utils.giveaway_utils import roll_giveaway
-from src.utils.request_utils import (get_guild_by_name, get_jpg_file)
+from src.utils.request_utils import (get_guild_by_name)
 from src.utils.ticket_utils.tickets import create_transcript
 
 
@@ -69,10 +69,10 @@ class Integer:
         text = f"**Daily Top: {date}**\n"
         text = await generate_lb_text(member_gexp, text)
 
-        for x in range(5):
-            file = await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
-            if file:
-                break
+        # for x in range(5):
+        #     file = await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
+        #     if file:
+        #         break
         # Return image
         # return file
         return text
