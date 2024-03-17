@@ -153,6 +153,7 @@ class Union:
         return embed
 
     async def register(self, ctx, name):
+        await ctx.defer()
         # Make sure it is only used in registration channel
         if ctx.channel.id != registration_channel_id:
             return "This command can only be used in the registration channel!", None
@@ -183,7 +184,6 @@ class Union:
 
         # User is in an allied guild
         elif guild_name in allies:
-            await ctx.defer()
             await ctx.author.add_roles(bot.guest, bot.ally, reason="Registration - Ally")
 
             # Add guild tag as nick
@@ -194,7 +194,6 @@ class Union:
 
         # User is a guest
         else:
-            await ctx.defer()
             await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
             ticket = await create_ticket(ctx.author, f"ticket-{ign}",
                                          category_name=ticket_categories["registrees"])
