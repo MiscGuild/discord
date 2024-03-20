@@ -38,17 +38,26 @@ async def validate_invites(inviter_ign, invitee_ign):
 
 async def check_invitation_validity(invitations: list):
     guild_data = await get_guild_by_name(guild_handle)
-    members = []
+    members = {}
     for member in guild_data["members"]:
-        members.append(member["uuid"])
+        members[member["uuid"]] = member["joined"]
+
 
     weekly_valid_invites = []
     for invitee_uuid in invitations:
-        if invitee_uuid not in members:
+        if invitee_uuid not in members.keys():
             continue
 
         _, weekly_gexp = await get_player_gexp(invitee_uuid, guild_data)
+
+        # Player earns more than double the member requirement
         if weekly_gexp > (member_req * 2):
+            weekly_valid_invites.append(invitee_uuid)
+            continue
+
+        # Player has joined less than 7 days ago. Their gexp scaled up is double the member requirement.
+        days_since_join = (datetime.now() - datetime.fromtimestamp(members[invitee_uuid] / 1000.0)).days
+        if days_since_join <= 7 and ((weekly_gexp * 2) > ((member_req / 7) * days_since_join)):
             weekly_valid_invites.append(invitee_uuid)
 
     return weekly_valid_invites
