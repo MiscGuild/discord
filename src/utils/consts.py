@@ -325,6 +325,24 @@ dnkl_creation_embed = discord.Embed(title="Do-not-kick-list",
                                         inline = False  
                                     )
 
+rank_upgrade_winner_announcement = '''# RANK UPGRADE
+{date}
+
+**The winner is....**
+## {winner}
+> Total Guild Experience:- `{winner_gexp}`
+> Valid Invites:- `{winner_invites}`
+> Total Entries:- `{winner_entries}`
+
+This rank upgrade must be claimed within a week of this message. If not claimed, it will be voided.
+
+### Here are some statistics for the past week
+- Total unscaled guild experience earned - `{total_gexp}`
+- Total players invited (valid) - `{total_invites}`
+- Total entries - `{total_entries}`
+
+*To know how the winner is picked, go here https://discord.com/channels/522586672148381726/1152480866585554994/1164962591198683146*'''
+
 rainbow_separator = "http://rainbowdivider.com/images/dividers/movrblin02.gif"
 
 

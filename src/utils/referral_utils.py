@@ -4,7 +4,8 @@ from math import exp
 from random import shuffle, choice
 
 from src.utils.calculation_utils import get_player_gexp, get_gexp_sorted
-from src.utils.consts import guild_handle, member_req, active_req, rank_upgrade_channel
+from src.utils.consts import guild_handle, member_req, active_req, rank_upgrade_channel, \
+    rank_upgrade_winner_announcement
 from src.utils.db_utils import select_one, insert_new_inviter, add_invitee
 from src.utils.request_utils import get_mojang_profile, get_player_guild, get_guild_by_name, get_name_by_uuid
 
@@ -38,17 +39,26 @@ async def validate_invites(inviter_ign, invitee_ign):
 
 async def check_invitation_validity(invitations: list):
     guild_data = await get_guild_by_name(guild_handle)
-    members = []
+    members = {}
     for member in guild_data["members"]:
-        members.append(member["uuid"])
+        members[member["uuid"]] = member["joined"]
+
 
     weekly_valid_invites = []
     for invitee_uuid in invitations:
-        if invitee_uuid not in members:
+        if invitee_uuid not in members.keys():
             continue
 
         _, weekly_gexp = await get_player_gexp(invitee_uuid, guild_data)
+
+        # Player earns more than double the member requirement
         if weekly_gexp > (member_req * 2):
+            weekly_valid_invites.append(invitee_uuid)
+            continue
+
+        # Player has joined less than 7 days ago. Their gexp scaled up is double the member requirement.
+        days_since_join = (datetime.now() - datetime.fromtimestamp(members[invitee_uuid] / 1000.0)).days
+        if days_since_join <= 7 and ((weekly_gexp * 2) > ((member_req / 7) * days_since_join)):
             weekly_valid_invites.append(invitee_uuid)
 
     return weekly_valid_invites
@@ -99,20 +109,15 @@ async def generate_rank_upgrade(weekly_invites : list):
             f"-"
             f" {datetime.utcnow().strftime('%d %B %Y')}**")
 
-    announcement = f'''# RANK UPGRADE
-{date}
-
-**The winner is....**
-## {winner}
-> Total Guild Experience:- `{format(winner_gexp, ',d')}`
-> Valid Invites:- `{format(len(winner_invites), ',d') if winner_invites else 0}`
-> Total Entries:- `{format(entries[winner_uuid], ',d') if winner_uuid in entries else 0}`
-
-
-### Here are some statistics for the past week
-- Total unscaled guild experience earned - `{format(total_gexp, ',d')}`
-- Total players invited (valid) - `{format(total_invitations, ',d')}`
-
-*To know how the winner is picked, go here https://discord.com/channels/522586672148381726/1152480866585554994/1164962591198683146*'''
+    announcement = rank_upgrade_winner_announcement.format(
+        date=date,
+        winner=winner,
+        winner_gexp=format(winner_gexp, ',d'),
+        winner_invites=format(len(winner_invites), ',d') if winner_invites else 0,
+        winner_entries=format(entries[winner_uuid], ',d') if winner_uuid in entries else 0,
+        total_gexp=format(total_gexp, ',d'),
+        total_invites=format(total_invitations, ',d'),
+        total_entries=format(sum(entries.values()), ',d')
+    )
 
     await bot.get_channel(rank_upgrade_channel).send(announcement)
