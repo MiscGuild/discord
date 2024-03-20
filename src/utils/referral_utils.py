@@ -4,7 +4,8 @@ from math import exp
 from random import shuffle, choice
 
 from src.utils.calculation_utils import get_player_gexp, get_gexp_sorted
-from src.utils.consts import guild_handle, member_req, active_req, rank_upgrade_channel
+from src.utils.consts import guild_handle, member_req, active_req, rank_upgrade_channel, \
+    rank_upgrade_winner_announcement
 from src.utils.db_utils import select_one, insert_new_inviter, add_invitee
 from src.utils.request_utils import get_mojang_profile, get_player_guild, get_guild_by_name, get_name_by_uuid
 
@@ -108,20 +109,15 @@ async def generate_rank_upgrade(weekly_invites : list):
             f"-"
             f" {datetime.utcnow().strftime('%d %B %Y')}**")
 
-    announcement = f'''# RANK UPGRADE
-{date}
-
-**The winner is....**
-## {winner}
-> Total Guild Experience:- `{format(winner_gexp, ',d')}`
-> Valid Invites:- `{format(len(winner_invites), ',d') if winner_invites else 0}`
-> Total Entries:- `{format(entries[winner_uuid], ',d') if winner_uuid in entries else 0}`
-
-
-### Here are some statistics for the past week
-- Total unscaled guild experience earned - `{format(total_gexp, ',d')}`
-- Total players invited (valid) - `{format(total_invitations, ',d')}`
-
-*To know how the winner is picked, go here https://discord.com/channels/522586672148381726/1152480866585554994/1164962591198683146*'''
+    announcement = rank_upgrade_winner_announcement.format(
+        date=date,
+        winner=winner,
+        winner_gexp=format(winner_gexp, ',d'),
+        winner_invites=format(len(winner_invites), ',d') if winner_invites else 0,
+        winner_entries=format(entries[winner_uuid], ',d') if winner_uuid in entries else 0,
+        total_gexp=format(total_gexp, ',d'),
+        total_invites=format(total_invitations, ',d'),
+        total_entries=format(sum(entries.values()), ',d')
+    )
 
     await bot.get_channel(rank_upgrade_channel).send(announcement)
