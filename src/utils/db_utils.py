@@ -147,3 +147,8 @@ async def update_member(discord_id: int, uuid: str, username: str):
         await bot.db.commit()
     else:
         await insert_new_member(discord_id, uuid, username)
+
+
+async def check_uuid_in_db(uuid: str):
+    discord_id = (await select_one("SELECT discord_id from members WHERE uuid=(?)", (uuid,)))
+    return discord_id[0] if discord_id else 0
