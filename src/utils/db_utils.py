@@ -128,3 +128,8 @@ async def get_invites(inviter_uuid):
 
 async def get_uuid(discord_id: int):
     return (await select_one("SELECT uuid from members WHERE discord_id = (?)", (discord_id,)))[0]
+
+
+async def insert_new_member(discord_id: int, uuid: str):
+    await bot.db.execute("INSERT INTO members VALUES (?, ?)", (discord_id, uuid))
+    await bot.db.commit()
