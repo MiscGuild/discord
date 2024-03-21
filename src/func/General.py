@@ -31,7 +31,7 @@ from src.utils.ticket_utils.tickets import create_transcript, get_ticket_propert
 
 
 class General:
-    async def weeklylb(ctx):
+    async def weeklylb(ctx, is_automatic=False):
         # Get guild data
         guild_data = await get_guild_by_name(guild_handle)
 
@@ -42,7 +42,7 @@ class General:
 
         # text = "&f&lWeekly Top&r%5Cn"
         text = "**Weekly Top**\n"
-        text = await generate_lb_text(member_gexp, text)
+        text = await generate_lb_text(member_gexp, text, is_automatic)
         return text
         # return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
 
