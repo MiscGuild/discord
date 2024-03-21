@@ -11,6 +11,7 @@ from src.utils.consts import (active_req, allies, discord_not_linked_embed, guil
                               pos_color, registration_channel_id,
                               staff_impersonation_embed, ticket_categories,
                               unknown_ign_embed, join_request_embed)
+from src.utils.db_utils import update_member, insert_new_member
 from src.utils.discord_utils import (create_ticket, has_tag_perms,
                                      is_linked_discord)
 from src.utils.request_utils import (get_gtag, get_hypixel_player,
@@ -84,6 +85,7 @@ class Union:
         if not ign:
             return unknown_ign_embed
 
+
         # Initialize vars for storing changes
         roles_to_add = []
         roles_to_remove = [bot.processing]
@@ -99,6 +101,9 @@ class Union:
             return embed.add_field(name="Do the above and then enter the following in chat:",
                                    value=f"`{str(self.user)}`")
 
+        await update_member(discord_id=self.user.id,
+                            uuid=uuid,
+                            username=ign)
         guild_name = "no guild" if not guild_data else guild_data["name"]
         can_tag = await has_tag_perms(self.user)
 
@@ -167,6 +172,9 @@ class Union:
         if ign in bot.staff_names:
             return staff_impersonation_embed, None
 
+        await insert_new_member(discord_id=self.user.id,
+                                uuid=uuid,
+                                username=ign)
         # Fetch player & guild data
         guild_data = await get_player_guild(uuid)
 
@@ -253,7 +261,7 @@ class Union:
         await ctx.author.remove_roles(bot.new_member_role, reason="Register")
         await ctx.author.edit(nick=ign)
 
-        return (embed, guest_ticket) if guild_name != guild_handle else (None, None)
+        return (embed, guest_ticket) if guild_name != guild_handle else (embed, None)
 
     async def add(self, ctx):
         if ctx.channel.category.name not in ticket_categories.values():
