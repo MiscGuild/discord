@@ -915,3 +915,4 @@ class General:
                 continue
             await insert_new_member(member.id, uuid, name)
             await asyncio.sleep(15)
+        await ctx.send("Adding players complete.")
