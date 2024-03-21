@@ -225,7 +225,13 @@ class String:
             return f"{username} has been removed from the do-not-kick-list!"
 
     async def dnklcheck(self):
-        self.string, uuid = await get_mojang_profile(self.string)
+        if self.uuid and self.username:
+            uuid = self.uuid
+            name = self.username
+        else:
+            name, uuid = await get_mojang_profile(self.string)
+            if not name:
+                return unknown_ign_embed
         _, weeklygexp = await get_player_gexp(uuid)
 
         # Player is not in a guild
@@ -234,13 +240,13 @@ class String:
 
         # Player is eligible
         if weeklygexp > dnkl_req:
-            embed = discord.Embed(title=self.string, color=pos_color)
+            embed = discord.Embed(title=name, color=pos_color)
             embed.add_field(name="This player is eligible to apply for the do-not-kick-list.",
                             value=f"They have {weeklygexp}/{dnkl_req} weekly guild experience.", inline=True)
 
         # Player is not eligible
         else:
-            embed = discord.Embed(title=self.string, color=neg_color)
+            embed = discord.Embed(title=name, color=neg_color)
             embed.add_field(name="This player is not eligible to apply for the do-not-kick-list.",
                             value=f"They have {weeklygexp}/{dnkl_req} weekly guild experience to be eligible.",
                             inline=True)
