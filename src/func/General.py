@@ -156,7 +156,7 @@ class General:
                 continue
         # Send ping to new mem
         # ber role in registration channel
-        if not send_ping:
+        if send_ping:
             await bot.get_channel(registration_channel_id).send(bot.new_member_role.mention, embed=registration_embed)
 
         await progress_message.edit(content="Rolecheck complete!")

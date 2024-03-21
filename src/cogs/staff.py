@@ -80,7 +80,7 @@ class Staff(commands.Cog, name="staff"):
         await General.rolecheck(ctx, send_ping)
 
     @bridge.bridge_command()
-    @commands.has_role("new role")
+    @commands.has_role("Guild Master")
     async def add_members(self, ctx):
         await General.add_players(ctx)
 
