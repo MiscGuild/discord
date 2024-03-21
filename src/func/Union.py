@@ -11,6 +11,7 @@ from src.utils.consts import (active_req, allies, discord_not_linked_embed, guil
                               pos_color, registration_channel_id,
                               staff_impersonation_embed, ticket_categories,
                               unknown_ign_embed, join_request_embed)
+from src.utils.db_utils import update_member, insert_new_member
 from src.utils.discord_utils import (create_ticket, has_tag_perms,
                                      is_linked_discord)
 from src.utils.request_utils import (get_gtag, get_hypixel_player,
@@ -166,6 +167,10 @@ class Union:
         # Filter out people impersonating staff
         if ign in bot.staff_names:
             return staff_impersonation_embed, None
+
+        await insert_new_member(discord_id=self.user.id,
+                                uuid=uuid,
+                                username=ign)
 
         # Fetch player & guild data
         guild_data = await get_player_guild(uuid)
