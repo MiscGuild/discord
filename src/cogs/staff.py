@@ -79,6 +79,12 @@ class Staff(commands.Cog, name="staff"):
         """Sync the names and roles of everyone in the discord!"""
         await General.rolecheck(ctx, send_ping)
 
+    @bridge.bridge_command()
+    @commands.has_role("new role")
+    async def add_members(self, ctx):
+        await General.add_players(ctx)
+
+
 
 def setup(bot):
     bot.add_cog(Staff(bot))
