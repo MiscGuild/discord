@@ -140,7 +140,7 @@ async def insert_new_member(discord_id: int, uuid: str, username: str):
 
 
 async def update_member(discord_id: int, uuid: str, username: str):
-    discord_idExists = (await select_one("SELECT uuid from members WHERE discord_id = (?)", (discord_id,)))[0]
+    discord_idExists = await select_one("SELECT uuid from members WHERE discord_id = (?)", (discord_id,))
     if discord_idExists:
         await bot.db.execute("UPDATE members SET uuid = (?) and username = (?) WHERE discord_id = (?)",
                              (uuid, username, discord_id))
