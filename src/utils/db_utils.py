@@ -132,7 +132,8 @@ async def get_db_uuid_username_from_discord_id(discord_id: int):
     return (res[0], res[1]) if res else (None, None)
 
 async def get_db_username_from_uuid(uuid: str):
-    return (await select_one("SELECT username from members WHERE uuid = (?)", (uuid,)))[0]
+    username = await select_one("SELECT username from members WHERE uuid = (?)", (uuid,))
+    return username[0] if username else username
 
 async def insert_new_member(discord_id: int, uuid: str, username: str):
     await bot.db.execute("INSERT INTO members VALUES (?, ?, ?)", (discord_id, uuid, username))
