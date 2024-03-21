@@ -27,9 +27,10 @@ class Guild(commands.Cog, name="guild"):
     async def gmember(self, ctx, name: str = None):
         """View the given user's guild experience over the past week!"""
         if not name:
-            name = await name_grabber(ctx.author)
-
-        res = await String(string=name).gmember(ctx)
+            uuid, username = await get_db_uuid_username_from_discord_id(ctx.author.id)
+            res = await String(uuid=uuid, username=username).gmember(ctx)
+        else:
+            res = await String(string=name).gmember(ctx)
         if isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
         if isinstance(res, str):
