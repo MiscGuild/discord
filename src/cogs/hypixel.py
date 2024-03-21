@@ -96,9 +96,11 @@ class Hypixel(commands.Cog, name="hypixel"):
     async def dnkl_check(self, ctx, name: str = None):
         """Check whether you are eligible for the do-not-kick-list!"""
         if not name:
-            name = await name_grabber(ctx.author)
+            uuid, username = await get_db_uuid_username_from_discord_id(ctx.author.id)
+            res = await String(uuid=uuid, username=username).dnklcheck()
+        else:
+            res = await String(string=name).dnklcheck()
 
-        res = await String(string=name).dnklcheck()
         if isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
         elif isinstance(res, str):
