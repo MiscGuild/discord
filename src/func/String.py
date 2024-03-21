@@ -282,9 +282,13 @@ class String:
         await bot.get_channel(qotd_ans_channel_id).send(rainbow_separator)
 
     async def invites(self):
-        ign, uuid = await get_mojang_profile(self.string)
-        if not ign:
-            return unknown_ign_embed
+        if self.uuid and self.username:
+            uuid = self.uuid
+            name = self.username
+        else:
+            name, uuid = await get_mojang_profile(self.string)
+            if not name:
+                return unknown_ign_embed
 
         guild = await get_player_guild(uuid)
         if ("name" not in guild) or (guild["name"] != guild_handle):
@@ -300,7 +304,7 @@ class String:
             weekly_invites = [await get_name_by_uuid(invitee) for invitee in weekly_invites]
             for invitee in weekly_invites:
                 invites_text += f"**▸** {invitee}\n"
-        embed = discord.Embed(title=f"{ign}'s Invites", color=neutral_color)
+        embed = discord.Embed(title=f"{name}'s Invites", color=neutral_color)
         embed.add_field(name="Weekly Invites", value=None if not invites_text else invites_text, inline=False)
         embed.add_field(name="Total Invites", value=total_invites, inline=True)
         embed.add_field(name="Total Valid Invites", value=total_valid_invites, inline=True)
