@@ -25,8 +25,10 @@ from src.utils.ticket_utils.dnkl import dnkl_application
 
 
 class String:
-    def __init__(self, string: str):
+    def __init__(self, string: str = None, uuid: str = None, username: str = None):
         self.string = string
+        self.uuid = uuid
+        self.username = username
 
     # Command from https://github.com/Rapptz/RoboDanny
     async def source(self):
