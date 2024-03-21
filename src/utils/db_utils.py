@@ -7,6 +7,11 @@ import aiosqlite
 async def connect_db():
     bot.db = await aiosqlite.connect("database.db")
 
+    # Discord Member Table:
+    await bot.db.execute("""CREATE TABLE IF NOT EXISTS members (
+        discord_id integer PRIMARY KEY NOT NULL,
+        uuid text NOT NULL)""")
+
     # DNKL table:
     await bot.db.execute("""CREATE TABLE IF NOT EXISTS dnkl (
         message_id integer NOT NULL,
@@ -119,3 +124,4 @@ async def get_invites(inviter_uuid):
     return (await select_one(
         "SELECT current_invitee_uuids, total_invites, total_valid_invites FROM invites WHERE inviter_uuid = (?)",
         (inviter_uuid,)))
+
