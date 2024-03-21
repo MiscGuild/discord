@@ -127,7 +127,7 @@ async def get_invites(inviter_uuid):
         (inviter_uuid,)))
 
 
-async def get_db_uuid_username(discord_id: int):
+async def get_db_uuid_username_from_discord_id(discord_id: int):
     return (await select_one("SELECT uuid, username from members WHERE discord_id = (?)", (discord_id,)))[0]
 
 
