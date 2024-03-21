@@ -41,7 +41,7 @@ class Integer:
             return "This giveaway hasn't ended yet!\n`To end it, use ,giveawayend`"
         await roll_giveaway(self.integer, reroll_number)
 
-    async def gtop(self, ctx):
+    async def gtop(self, ctx, is_automatic=False):
         # Check no. days requested to prevent errors
         if self.integer > 6:
             return discord.Embed(title="Invalid timestamp!", description="You cannot request data this old!",
@@ -67,7 +67,7 @@ class Integer:
         # Get image data
         # text = f"&f&lDaily Top: {date}&r%5Cn"
         text = f"**Daily Top: {date}**\n"
-        text = await generate_lb_text(member_gexp, text)
+        text = await generate_lb_text(member_gexp, text, is_automatic)
 
         # for x in range(5):
         #     file = await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
