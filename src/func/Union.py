@@ -175,7 +175,6 @@ class Union:
         await insert_new_member(discord_id=self.user.id,
                                 uuid=uuid,
                                 username=ign)
-
         # Fetch player & guild data
         guild_data = await get_player_guild(uuid)
 
@@ -262,7 +261,7 @@ class Union:
         await ctx.author.remove_roles(bot.new_member_role, reason="Register")
         await ctx.author.edit(nick=ign)
 
-        return (embed, guest_ticket) if guild_name != guild_handle else (None, None)
+        return (embed, guest_ticket) if guild_name != guild_handle else (embed, None)
 
     async def add(self, ctx):
         if ctx.channel.category.name not in ticket_categories.values():
