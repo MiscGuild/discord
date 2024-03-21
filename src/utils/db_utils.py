@@ -133,3 +133,12 @@ async def get_uuid(discord_id: int):
 async def insert_new_member(discord_id: int, uuid: str):
     await bot.db.execute("INSERT INTO members VALUES (?, ?)", (discord_id, uuid))
     await bot.db.commit()
+
+
+async def update_member(discord_id: int, uuid: str):
+    discord_idExists = (await select_one("SELECT uuid from members WHERE discord_id = (?)", (discord_id,)))[0]
+    if discord_idExists:
+        await bot.db.execute("UPDATE members SET uuid = (?) WHERE discord_id = (?)", (uuid, discord_id))
+        await bot.db.commit()
+    else:
+        await insert_new_member(discord_id, uuid)
