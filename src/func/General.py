@@ -18,9 +18,9 @@ from src.utils.consts import (accepted_staff_application_embed, active_req,
                               registration_channel_id, registration_embed,
                               staff_application_questions, ticket_categories,
                               resident_req, dnkl_entries_not_found,
-                              positive_responses)
+                              positive_responses, allies)
 from src.utils.db_utils import insert_new_giveaway, select_all, get_db_username_from_uuid, \
-    get_db_uuid_username_from_discord_id
+    get_db_uuid_username_from_discord_id, insert_new_member, select_one
 from src.utils.discord_utils import (create_ticket,
                                      get_ticket_creator, log_event,
                                      name_grabber, has_tag_perms)
@@ -68,14 +68,13 @@ class General:
 
         discord_members = bot.guild.members
 
-        discord_member_uuids = await select_all("SELECT uuid FROM members")
-
+        discord_member_uuids = [x[0] for x in await select_all("SELECT uuid FROM members")]
         # Define arrays for guild and ally uuids and names
-        guild_members = (await get_guild_by_name(guild_handle))['members']
+        guild_members = (await get_guild_by_name(guild_handle))["members"]
         guild_uuids = await get_guild_uuids(guild_handle)
 
         # Allies dict; {uuid: {username, gtag}}
-        allies = {}
+        allies_dict = {}
 
         # Guild dict; {uuid: {username, gexp}}
         guild = {}
@@ -87,18 +86,19 @@ class General:
             for uuid in ally_uuids:
                 if uuid not in discord_member_uuids:
                     continue
-                allies[uuid] = {"username": await get_db_username_from_uuid(uuid), "tag": gtag}
-
+                allies_dict[uuid] = {"username": await get_db_username_from_uuid(uuid), "tag": gtag}
         await progress_message.edit(content=f"Fetching {guild_handle}'s UUIDs and usernames")
 
         for uuid in guild_uuids:
             if uuid not in discord_member_uuids:
                 continue
-            guild[uuid] = {"username": await get_db_username_from_uuid(uuid),
-                           "gexp": sum(guild_members["uuid"]["expHistory"].values())}
+            for player in guild_members:
+                if player["uuid"] == uuid:
+                    guild[uuid] = {"username": await get_db_username_from_uuid(uuid),
+                                   "gexp": sum(player["expHistory"].values())}
 
         await ctx.send("If you see the bot is stuck on a member along with an error message, "
-                       "forcesync member the bot is stuck on.")
+                       "forcesync member the bot is     stuck on.")
         bot.admin_ids = [member.id for member in bot.admin.members]
         for discord_member in discord_members:
             # Do not check admins and bots
@@ -106,7 +106,12 @@ class General:
                 continue
 
             nick = await name_grabber(discord_member)
-            uuid, username = await get_db_uuid_username_from_discord_id(discord_member.id)
+            uuid_username = await get_db_uuid_username_from_discord_id(discord_member.id)
+            if not uuid_username:
+                await discord_member.remove_roles(bot.member_role, bot.ally, bot.guest, bot.active_role)
+                await discord_member.add_roles(bot.new_member_role)
+                continue
+            uuid, username = uuid_username
             has_tag_permission = await has_tag_perms(discord_member)
             await progress_message.edit(content=f"Checking {nick} - {discord_member}")
 
@@ -127,8 +132,8 @@ class General:
                 await discord_member.remove_roles(bot.new_member_role, bot.guest, bot.ally)
                 continue
 
-            elif uuid in allies.keys():
-                gtag = allies[uuid]["tag"]
+            elif uuid in allies_dict.keys():
+                gtag = allies_dict[uuid]["tag"]
                 if not discord_member.nick or nick != username or f"[{gtag}]" not in discord_member.nick:
                     await discord_member.edit(nick=username + f' [{gtag}]')
 
@@ -151,7 +156,7 @@ class General:
                 continue
         # Send ping to new mem
         # ber role in registration channel
-        if send_ping:
+        if not send_ping:
             await bot.get_channel(registration_channel_id).send(bot.new_member_role.mention, embed=registration_embed)
 
         await progress_message.edit(content="Rolecheck complete!")
