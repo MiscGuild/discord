@@ -3,7 +3,7 @@ import re
 from datetime import datetime, timedelta
 
 from src.utils.consts import ChatColor, active_req, member_req, resident_req
-from src.utils.db_utils import check_uuid_in_db
+from src.utils.db_utils import check_uuid_in_db, get_db_username_from_uuid
 from src.utils.request_utils import get_player_guild, get_name_by_uuid
 
 
@@ -126,10 +126,11 @@ async def generate_lb_text(member_gexp: list, text: str, do_ping):
         count += 1
 
         discord_id = await check_uuid_in_db(uuid)
+        username = await get_db_username_from_uuid(uuid=uuid)
         if discord_id and do_ping:
             name = f"<@{discord_id}>"
         else:
-            name = await get_name_by_uuid(uuid)
+            name = await get_name_by_uuid(uuid) if not username else username
 
         # rank, _ = await get_hypixel_player_rank(
         #    await get_hypixel_player(uuid=uuid))  # Ignores value without color formatting
