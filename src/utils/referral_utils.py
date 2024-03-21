@@ -6,7 +6,7 @@ from random import shuffle, choice
 from src.utils.calculation_utils import get_player_gexp, get_gexp_sorted
 from src.utils.consts import guild_handle, member_req, active_req, rank_upgrade_channel, \
     rank_upgrade_winner_announcement
-from src.utils.db_utils import select_one, insert_new_inviter, add_invitee
+from src.utils.db_utils import select_one, insert_new_inviter, add_invitee, check_uuid_in_db
 from src.utils.request_utils import get_mojang_profile, get_player_guild, get_guild_by_name, get_name_by_uuid
 
 
@@ -90,7 +90,12 @@ async def generate_rank_upgrade(weekly_invites : list):
     weighted_entries = [uuid for uuid, weight in entries.items() for _ in range(weight)]
     shuffle(weighted_entries)
     winner_uuid = choice(weighted_entries)
-    winner = await get_name_by_uuid(winner_uuid)
+
+    discord_id = await check_uuid_in_db(winner_uuid)
+    if discord_id:
+        winner = f"<@{discord_id}>"
+    else:
+        winner = await get_name_by_uuid(winner_uuid)
 
     winner_gexp = None
     for uuid, gexp in members:
