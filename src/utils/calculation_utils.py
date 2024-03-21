@@ -3,7 +3,8 @@ import re
 from datetime import datetime, timedelta
 
 from src.utils.consts import ChatColor, active_req, member_req, resident_req
-from src.utils.request_utils import get_player_guild, get_name_by_uuid, get_hypixel_player
+from src.utils.db_utils import check_uuid_in_db
+from src.utils.request_utils import get_player_guild, get_name_by_uuid
 
 
 async def get_player_gexp(uuid: str, guild_data: dict = None):
@@ -118,17 +119,23 @@ async def get_gexp_sorted(guild_data: dict):
     return member_gexp
 
 
-async def generate_lb_text(member_gexp: list, text: str):
+async def generate_lb_text(member_gexp: list, text: str, do_ping):
     # Generate leaderboard text
     count = 0
     for uuid, gexp in member_gexp[:10]:
         count += 1
-        name = await get_name_by_uuid(uuid)
-        rank, _ = await get_hypixel_player_rank(
-            await get_hypixel_player(uuid=uuid))  # Ignores value without color formatting
 
+        discord_id = await check_uuid_in_db(uuid)
+        if discord_id and do_ping:
+            name = f"<@{discord_id}>"
+        else:
+            name = await get_name_by_uuid(uuid)
+
+        # rank, _ = await get_hypixel_player_rank(
+        #    await get_hypixel_player(uuid=uuid))  # Ignores value without color formatting
         # Add new entry to image content
         ##text += f"&6{count}. {rank} {name} &2{format(gexp, ',d')} Guild Experience"
+
         text += f"> {count}. {name} - {format(gexp, ',d')} Guild Experience"
         # Add new line
         if count < 10:
