@@ -106,12 +106,11 @@ class General:
                 continue
 
             nick = await name_grabber(discord_member)
-            uuid_username = await get_db_uuid_username_from_discord_id(discord_member.id)
-            if not uuid_username:
+            uuid, username = await get_db_uuid_username_from_discord_id(discord_member.id)
+            if not uuid and not username:
                 await discord_member.remove_roles(bot.member_role, bot.ally, bot.guest, bot.active_role)
                 await discord_member.add_roles(bot.new_member_role)
                 continue
-            uuid, username = uuid_username
             has_tag_permission = await has_tag_perms(discord_member)
             await progress_message.edit(content=f"Checking {nick} - {discord_member}")
 
