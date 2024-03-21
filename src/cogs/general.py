@@ -1,10 +1,9 @@
 import discord
-from discord.ext import commands, bridge
 from discord.commands import option
+from discord.ext import commands, bridge
 
 from src.func.String import String
 from src.func.Union import Union
-
 
 
 class General(commands.Cog, name="general"):
@@ -54,9 +53,7 @@ class General(commands.Cog, name="general"):
                 await interaction.response.send_message("The QOTD has been sent!")
                 await String(string=self.children[0].value).qotd(ctx)
 
-
         await ctx.send_modal(modal=ModalCreator())
-
 
 
 def setup(bot):
