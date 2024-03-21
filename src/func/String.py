@@ -156,7 +156,13 @@ class String:
             return embed.set_image(url=chart.get_url())
 
     async def info(self):
-        player_data = await get_hypixel_player(name=self.string)
+        if self.uuid and self.username:
+            uuid = self.uuid
+        else:
+            name, uuid = await get_mojang_profile(self.string)
+            if not name:
+                return unknown_ign_embed
+        player_data = await get_hypixel_player(name=uuid)
         # Player doesn't exist
         if not player_data:
             return unknown_ign_embed
