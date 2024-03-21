@@ -125,3 +125,6 @@ async def get_invites(inviter_uuid):
         "SELECT current_invitee_uuids, total_invites, total_valid_invites FROM invites WHERE inviter_uuid = (?)",
         (inviter_uuid,)))
 
+
+async def get_uuid(discord_id: int):
+    return (await select_one("SELECT uuid from members WHERE discord_id = (?)", (discord_id,)))[0]
