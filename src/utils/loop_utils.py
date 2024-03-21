@@ -39,7 +39,7 @@ async def before_giveaway_check():
 @tasks.loop(hours=24)
 async def send_gexp_lb():
     await asyncio.sleep(1)
-    file = await Integer(integer=1).gtop(bot.get_channel(daily_lb_channel))
+    file = await Integer(integer=1).gtop(bot.get_channel(daily_lb_channel), is_automatic=True)
     await bot.get_channel(daily_lb_channel).send(file)
     if datetime.utcnow().weekday() == 0:
         await bot.get_channel(weekly_lb_channel).send(
@@ -47,7 +47,8 @@ async def send_gexp_lb():
             f"**{(datetime.utcnow() - timedelta(days=7)).strftime('%d %b %Y')} "
             f"-"
             f" {datetime.utcnow().strftime('%d %B %Y')}**")
-        await bot.get_channel(weekly_lb_channel).send(await General.weeklylb(bot.get_channel(weekly_lb_channel)))
+        await bot.get_channel(weekly_lb_channel).send(
+            await General.weeklylb(bot.get_channel(weekly_lb_channel), is_automatic=True))
 
 
 @send_gexp_lb.before_loop

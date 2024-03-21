@@ -128,11 +128,12 @@ async def get_invites(inviter_uuid):
 
 
 async def get_db_uuid_username_from_discord_id(discord_id: int):
-    return await select_one("SELECT uuid, username from members WHERE discord_id = (?)", (discord_id,))
-
+    res = await select_one("SELECT uuid, username from members WHERE discord_id = (?)", (discord_id,))
+    return (res[0], res[1]) if res else (None, None)
 
 async def get_db_username_from_uuid(uuid: str):
-    return (await select_one("SELECT username from members WHERE uuid = (?)", (uuid,)))[0]
+    username = await select_one("SELECT username from members WHERE uuid = (?)", (uuid,))
+    return username[0] if username else username
 
 async def insert_new_member(discord_id: int, uuid: str, username: str):
     await bot.db.execute("INSERT INTO members VALUES (?, ?, ?)", (discord_id, uuid, username))
@@ -140,10 +141,15 @@ async def insert_new_member(discord_id: int, uuid: str, username: str):
 
 
 async def update_member(discord_id: int, uuid: str, username: str):
-    discord_idExists = (await select_one("SELECT uuid from members WHERE discord_id = (?)", (discord_id,)))[0]
+    discord_idExists = await select_one("SELECT uuid from members WHERE discord_id = (?)", (discord_id,))
     if discord_idExists:
         await bot.db.execute("UPDATE members SET uuid = (?) and username = (?) WHERE discord_id = (?)",
                              (uuid, username, discord_id))
         await bot.db.commit()
     else:
         await insert_new_member(discord_id, uuid, username)
+
+
+async def check_uuid_in_db(uuid: str):
+    discord_id = (await select_one("SELECT discord_id from members WHERE uuid=(?)", (uuid,)))
+    return discord_id[0] if discord_id else 0
