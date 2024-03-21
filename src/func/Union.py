@@ -85,6 +85,7 @@ class Union:
         if not ign:
             return unknown_ign_embed
 
+
         # Initialize vars for storing changes
         roles_to_add = []
         roles_to_remove = [bot.processing]
@@ -100,6 +101,9 @@ class Union:
             return embed.add_field(name="Do the above and then enter the following in chat:",
                                    value=f"`{str(self.user)}`")
 
+        await update_member(discord_id=self.user.id,
+                            uuid=uuid,
+                            username=ign)
         guild_name = "no guild" if not guild_data else guild_data["name"]
         can_tag = await has_tag_perms(self.user)
 
