@@ -25,8 +25,10 @@ from src.utils.ticket_utils.dnkl import dnkl_application
 
 
 class String:
-    def __init__(self, string: str):
+    def __init__(self, string: str = None, uuid: str = None, username: str = None):
         self.string = string
+        self.uuid = uuid
+        self.username = username
 
     # Command from https://github.com/Rapptz/RoboDanny
     async def source(self):
@@ -64,9 +66,13 @@ class String:
         return f"Following is the source code for {self.string}\n{final_url}"
 
     async def gmember(self, ctx):
-        name, uuid = await get_mojang_profile(self.string)
-        if not name:
-            return unknown_ign_embed
+        if self.uuid and self.username:
+            uuid = self.uuid
+            name = self.username
+        else:
+            name, uuid = await get_mojang_profile(self.string)
+            if not name:
+                return unknown_ign_embed
 
         guild = await get_player_guild(uuid)
 
@@ -150,7 +156,13 @@ class String:
             return embed.set_image(url=chart.get_url())
 
     async def info(self):
-        player_data = await get_hypixel_player(name=self.string)
+        if self.uuid and self.username:
+            uuid = self.uuid
+        else:
+            name, uuid = await get_mojang_profile(self.string)
+            if not name:
+                return unknown_ign_embed
+        player_data = await get_hypixel_player(name=uuid)
         # Player doesn't exist
         if not player_data:
             return unknown_ign_embed
@@ -213,7 +225,13 @@ class String:
             return f"{username} has been removed from the do-not-kick-list!"
 
     async def dnklcheck(self):
-        self.string, uuid = await get_mojang_profile(self.string)
+        if self.uuid and self.username:
+            uuid = self.uuid
+            name = self.username
+        else:
+            name, uuid = await get_mojang_profile(self.string)
+            if not name:
+                return unknown_ign_embed
         _, weeklygexp = await get_player_gexp(uuid)
 
         # Player is not in a guild
@@ -222,13 +240,13 @@ class String:
 
         # Player is eligible
         if weeklygexp > dnkl_req:
-            embed = discord.Embed(title=self.string, color=pos_color)
+            embed = discord.Embed(title=name, color=pos_color)
             embed.add_field(name="This player is eligible to apply for the do-not-kick-list.",
                             value=f"They have {weeklygexp}/{dnkl_req} weekly guild experience.", inline=True)
 
         # Player is not eligible
         else:
-            embed = discord.Embed(title=self.string, color=neg_color)
+            embed = discord.Embed(title=name, color=neg_color)
             embed.add_field(name="This player is not eligible to apply for the do-not-kick-list.",
                             value=f"They have {weeklygexp}/{dnkl_req} weekly guild experience to be eligible.",
                             inline=True)
@@ -253,18 +271,24 @@ class String:
         # 15th May 2022 was the 473rd QOTD day. It is used as a reference point to calculate the day number.
         day_number = 473 + (datetime.utcnow() - datetime.strptime("2022/05/15", "%Y/%m/%d")).days
         embed = discord.Embed(
-            title=f"Day {day_number}: {datetime.utcnow().day} {months[datetime.utcnow().month]} {datetime.utcnow().year}",
-            description=self.string, color=neutral_color)
-        embed.set_footer(text="Put your answers in #qotd-answer")
+            title=f"**{self.string}\n**",
+            description=f"You can respond to this qotd in: <#{qotd_ans_channel_id}>", color=neutral_color)
+        embed.set_author(
+            name=f"Day {day_number}: {datetime.utcnow().day} {months[datetime.utcnow().month]} {datetime.utcnow().year}")
+        embed.set_footer(text="- " + ctx.author.nick if ctx.author.nick else ctx.author.name)
 
         await bot.get_channel(qotd_channel_id).send("<@&923978802818871356>", embed=embed)
         await ctx.send(f"**The QOTD has been sent to <#{qotd_channel_id}>!**")
         await bot.get_channel(qotd_ans_channel_id).send(rainbow_separator)
 
     async def invites(self):
-        ign, uuid = await get_mojang_profile(self.string)
-        if not ign:
-            return unknown_ign_embed
+        if self.uuid and self.username:
+            uuid = self.uuid
+            name = self.username
+        else:
+            name, uuid = await get_mojang_profile(self.string)
+            if not name:
+                return unknown_ign_embed
 
         guild = await get_player_guild(uuid)
         if ("name" not in guild) or (guild["name"] != guild_handle):
@@ -280,7 +304,7 @@ class String:
             weekly_invites = [await get_name_by_uuid(invitee) for invitee in weekly_invites]
             for invitee in weekly_invites:
                 invites_text += f"**▸** {invitee}\n"
-        embed = discord.Embed(title=f"{ign}'s Invites", color=neutral_color)
+        embed = discord.Embed(title=f"{name}'s Invites", color=neutral_color)
         embed.add_field(name="Weekly Invites", value=None if not invites_text else invites_text, inline=False)
         embed.add_field(name="Total Invites", value=total_invites, inline=True)
         embed.add_field(name="Total Valid Invites", value=total_valid_invites, inline=True)

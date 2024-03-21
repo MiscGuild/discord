@@ -7,6 +7,12 @@ import aiosqlite
 async def connect_db():
     bot.db = await aiosqlite.connect("database.db")
 
+    # Discord Member Table:
+    await bot.db.execute("""CREATE TABLE IF NOT EXISTS members (
+        discord_id integer PRIMARY KEY NOT NULL,
+        uuid text NOT NULL, 
+        username text)""")
+
     # DNKL table:
     await bot.db.execute("""CREATE TABLE IF NOT EXISTS dnkl (
         message_id integer NOT NULL,
@@ -119,3 +125,25 @@ async def get_invites(inviter_uuid):
     return (await select_one(
         "SELECT current_invitee_uuids, total_invites, total_valid_invites FROM invites WHERE inviter_uuid = (?)",
         (inviter_uuid,)))
+
+
+async def get_db_uuid_username_from_discord_id(discord_id: int):
+    return await select_one("SELECT uuid, username from members WHERE discord_id = (?)", (discord_id,))
+
+
+async def get_db_username_from_uuid(uuid: str):
+    return (await select_one("SELECT username from members WHERE uuid = (?)", (uuid,)))[0]
+
+async def insert_new_member(discord_id: int, uuid: str, username: str):
+    await bot.db.execute("INSERT INTO members VALUES (?, ?, ?)", (discord_id, uuid, username))
+    await bot.db.commit()
+
+
+async def update_member(discord_id: int, uuid: str, username: str):
+    discord_idExists = (await select_one("SELECT uuid from members WHERE discord_id = (?)", (discord_id,)))[0]
+    if discord_idExists:
+        await bot.db.execute("UPDATE members SET uuid = (?) and username = (?) WHERE discord_id = (?)",
+                             (uuid, username, discord_id))
+        await bot.db.commit()
+    else:
+        await insert_new_member(discord_id, uuid, username)

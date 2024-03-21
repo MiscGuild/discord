@@ -5,7 +5,7 @@ from discord.ext import commands, bridge
 from src.func.General import General
 from src.func.String import String
 from src.func.Union import Union
-from src.utils.discord_utils import name_grabber
+from src.utils.db_utils import get_db_uuid_username_from_discord_id
 
 
 class Hypixel(commands.Cog, name="hypixel"):
@@ -47,8 +47,11 @@ class Hypixel(commands.Cog, name="hypixel"):
     async def info(self, ctx, name: str = None):
         """View Hypixel stats of the given user!"""
         if not name:
-            name = await name_grabber(ctx.author)
-        await ctx.respond(embed=await String(string=name).info())
+            uuid, username = await get_db_uuid_username_from_discord_id(ctx.author.id)
+            res = await String(uuid=uuid, username=username).info()
+        else:
+            res = await String(string=name).info()
+        await ctx.respond(embed=res)
 
     @bridge.bridge_command(aliases=['dnkladd', 'dnkla'])
     @commands.has_any_role("Staff")
@@ -93,9 +96,11 @@ class Hypixel(commands.Cog, name="hypixel"):
     async def dnkl_check(self, ctx, name: str = None):
         """Check whether you are eligible for the do-not-kick-list!"""
         if not name:
-            name = await name_grabber(ctx.author)
+            uuid, username = await get_db_uuid_username_from_discord_id(ctx.author.id)
+            res = await String(uuid=uuid, username=username).dnklcheck()
+        else:
+            res = await String(string=name).dnklcheck()
 
-        res = await String(string=name).dnklcheck()
         if isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
         elif isinstance(res, str):

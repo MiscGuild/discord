@@ -6,7 +6,7 @@ from src.func.General import General
 from src.func.Integer import Integer
 from src.func.String import String
 from src.utils.consts import gvg_info_embed, requirements_embed, resident_embed
-from src.utils.discord_utils import name_grabber
+from src.utils.db_utils import get_db_uuid_username_from_discord_id
 
 
 class Guild(commands.Cog, name="guild"):
@@ -27,9 +27,10 @@ class Guild(commands.Cog, name="guild"):
     async def gmember(self, ctx, name: str = None):
         """View the given user's guild experience over the past week!"""
         if not name:
-            name = await name_grabber(ctx.author)
-
-        res = await String(string=name).gmember(ctx)
+            uuid, username = await get_db_uuid_username_from_discord_id(ctx.author.id)
+            res = await String(uuid=uuid, username=username).gmember(ctx)
+        else:
+            res = await String(string=name).gmember(ctx)
         if isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
         if isinstance(res, str):
@@ -91,8 +92,11 @@ class Guild(commands.Cog, name="guild"):
         """View your invitation stats"""
         await ctx.defer()
         if not name:
-            name = await name_grabber(ctx.author)
-        await ctx.respond(embed=await String(name).invites())
+            uuid, _ = await get_db_uuid_username_from_discord_id(ctx.author.id)
+            res = await String(string=uuid).invites()
+        else:
+            res = await String(string=name).invites()
+        await ctx.respond(embed=res)
 
 def setup(bot):
     bot.add_cog(Guild(bot))
