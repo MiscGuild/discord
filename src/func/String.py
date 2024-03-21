@@ -66,9 +66,13 @@ class String:
         return f"Following is the source code for {self.string}\n{final_url}"
 
     async def gmember(self, ctx):
-        name, uuid = await get_mojang_profile(self.string)
-        if not name:
-            return unknown_ign_embed
+        if self.uuid and self.username:
+            uuid = self.uuid
+            name = self.username
+        else:
+            name, uuid = await get_mojang_profile(self.string)
+            if not name:
+                return unknown_ign_embed
 
         guild = await get_player_guild(uuid)
 
