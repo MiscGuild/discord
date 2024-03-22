@@ -446,7 +446,9 @@ class General:
         # Loop through all guild members with a session to fetch names
         for member in guild_data["members"]:
             uuid = member["uuid"]
-            name = await get_name_by_uuid(uuid)
+            name = await get_db_username_from_uuid(uuid=uuid)
+            if not name:
+                name = await get_name_by_uuid(uuid)
 
             if name in bot.staff_names:
                 continue
