@@ -82,7 +82,6 @@ milestone_categories = {
     "other": "Other"
 }
 
-
 milestone_emojis = {
     "hypixel": "<:hypixel:823036946984730662>",
     "bedwars": "<:BedWars64:823036962150547477>",
@@ -99,7 +98,6 @@ milestone_emojis = {
     "discord": "<:discord:977349801412788266>",
     "other": "❓"
 }
-
 
 # General embeds
 registration_embed = discord.Embed(title=f"Welcome to the {guild_handle} Discord!",
@@ -134,9 +132,9 @@ requirements_embed = discord.Embed(title="Miscellaneous Guild Requirements",
                                                                             inline=False).set_footer(
     text="If you fail to meet these requirements, you will be kicked!")
 
-dnkl_entries_not_found =  discord.Embed(title="No entries!",
-                                        description="There are no users on the do-not-kick-list!",
-                                        color=neg_color)
+dnkl_entries_not_found = discord.Embed(title="No entries!",
+                                       description="There are no users on the do-not-kick-list!",
+                                       color=neg_color)
 
 information_embed = discord.Embed(title="Miscellaneous", url="https://plancke.io/hypixel/guild/name/Miscellaneous",
                                   description="Miscellaneous is an all games Hypixel guild. "
@@ -189,29 +187,29 @@ tickets_embed = discord.Embed(title="Tickets",
                                         The bot will ask you to choose the reason behind the creation of your ticket from a given list. Choose the appropriate reason and then proceed!\n
                                         Once you have created your ticket, staff will respond within 24 hours.""",
                               color=neutral_color).add_field(name="Do-not-kick-list Application",
-                        value="You  must have a valid reason for applying and also meet the DNKL requiremnets.\n"
-                              "Accepted Reasons:\n"
-                              "> Exams\n"
-                              "> Medical Reasons\n"
-                              "> Computer Problems\n"
-                              "> Vacation\n"
-                              "> Other (subject to staff judgment)\n"
-                              "If your account is banned, it may be temporarily kicked until unbanned.",
-                        inline=False).add_field(name="Player Report",
-                        value="When reporting a player, you're expected to explain the situation in maximum detail. Providing the following is considered the bare minimum:\n"
-                              "> Username of the accused\n"
-                              "> Explanantion of the offense\n"
-                              "> Time of offense\n"
-                              "> Proof of offense\n"
-                              "If you wish to report a staff member, please DM the acting guild master with your report.",
-                        inline=False).add_field(name="Milestone",
-                        value="You'll be prompted to present the milestone you've achieved and proof of its occurence. "
-                              "Staff will review your milestone and if accepted, will be include it in the next week's milestone post!",
-                        inline=False).add_field(name="Staff Application",
-                        value="After you're done with your application, the staff team will review your it and make a decision to accept or deny it.",
-                        inline=False).set_thumbnail(
-            url=f"https://images-ext-1.discordapp.net/external/ziYSZZe7dPyKDYLxA1s2jqpKi-kdCvPFpPaz3zft-wo/%3Fwidth%3D671%26height%3D671/https/media.discordapp.net/attachments/523227151240134664/803843877999607818/misc.png")
-
+                                                             value="You  must have a valid reason for applying and also meet the DNKL requiremnets.\n"
+                                                                   "Accepted Reasons:\n"
+                                                                   "> Exams\n"
+                                                                   "> Medical Reasons\n"
+                                                                   "> Computer Problems\n"
+                                                                   "> Vacation\n"
+                                                                   "> Other (subject to staff judgment)\n"
+                                                                   "If your account is banned, it may be temporarily kicked until unbanned.",
+                                                             inline=False).add_field(name="Player Report",
+                                                                                     value="When reporting a player, you're expected to explain the situation in maximum detail. Providing the following is considered the bare minimum:\n"
+                                                                                           "> Username of the accused\n"
+                                                                                           "> Explanantion of the offense\n"
+                                                                                           "> Time of offense\n"
+                                                                                           "> Proof of offense\n"
+                                                                                           "If you wish to report a staff member, please DM the acting guild master with your report.",
+                                                                                     inline=False).add_field(
+    name="Milestone",
+    value="You'll be prompted to present the milestone you've achieved and proof of its occurence. "
+          "Staff will review your milestone and if accepted, will be include it in the next week's milestone post!",
+    inline=False).add_field(name="Staff Application",
+                            value="After you're done with your application, the staff team will review your it and make a decision to accept or deny it.",
+                            inline=False).set_thumbnail(
+    url=f"https://images-ext-1.discordapp.net/external/ziYSZZe7dPyKDYLxA1s2jqpKi-kdCvPFpPaz3zft-wo/%3Fwidth%3D671%26height%3D671/https/media.discordapp.net/attachments/523227151240134664/803843877999607818/misc.png")
 
 resident_embed = discord.Embed(title="How can I get Resident?",
                                description="To be eligible for Resident, you must be satisfy at least one of the following requirements:",
@@ -242,7 +240,9 @@ gvg_info_embed = discord.Embed(title="GvG Information",
     inline=False
 )
 
-positive_responses = ("yes", "yeah", "yup", "yea", "sure", "ok", "okay", "affirmative", "y", "ye", "yea", "yep", "yuppers", "yessir", "yessum", "yessirree", "yessumree", "yessiree", "yessumree")
+positive_responses = (
+    "yes", "yeah", "yup", "yea", "sure", "ok", "okay", "affirmative", "y", "ye", "yea", "yep", "yuppers", "yessir",
+    "yessum", "yessirree", "yessumree", "yessiree", "yessumree")
 
 # Errors
 unknown_ign_msg = "Unknown IGN!"
@@ -294,37 +294,55 @@ unknown_ign_embed = discord.Embed(title="Please enter a valid Minecraft username
 discord_not_linked_embed = discord.Embed(title="This account is not linked to your discord account!",
                                          description="Please follow the following steps to link your Hypixel profile with discord:\nGo to 'Your Profile' > Social Media > DISCORD",
                                          color=error_color)
-join_request_embed =discord.Embed(color=neutral_color).add_field(name="Our requirements are as follows:",
-                                value="__Active__\n"
-                                  f"➤ {format(active_req, ',d')} Weekly Guild Experience\n"
-                                  "__Member__\n"
-                                  f"➤ {format(member_req, ',d')} Weekly Guild Experience\n"
-                                  f"__Resident__\n"
-                                  f"➤ {format(resident_req, ',d')} Weekly Guild Experience\n\n"
-                                  f"You will join the guild as a Member.\n\n",
-                                inline=False).set_footer(
-                                text="Staff should invite you to the guild within 2 hours.\nWhile you wait, you can explore the guild discord!")
+join_request_embed = discord.Embed(color=neutral_color).add_field(name="Our requirements are as follows:",
+                                                                  value="__Active__\n"
+                                                                        f"➤ {format(active_req, ',d')} Weekly Guild Experience\n"
+                                                                        "__Member__\n"
+                                                                        f"➤ {format(member_req, ',d')} Weekly Guild Experience\n"
+                                                                        f"__Resident__\n"
+                                                                        f"➤ {format(resident_req, ',d')} Weekly Guild Experience\n\n"
+                                                                        f"You will join the guild as a Member.\n\n",
+                                                                  inline=False).set_footer(
+    text="Staff should invite you to the guild within 2 hours.\nWhile you wait, you can explore the guild discord!")
 discord_not_linked_embed.set_image(
     url="https://media.discordapp.net/attachments/796061149593731128/953770877395284008/osl_.gif")
 
-dnkl_creation_embed = discord.Embed(title="Do-not-kick-list", 
+dnkl_creation_embed = discord.Embed(title="Do-not-kick-list",
                                     description="In order to create a do-not-kick-list entry, you need to have a valid reason and meet the DNKL requirements.",
                                     color=neutral_color
                                     ).add_field(
-                                        name = "Accepted Reasons",
-                                        value = "- Exams\n"\
-                                                "- Vacation\n"\
-                                                "- Medical reasons\n"\
-                                                "- Computer Problems\n"\
-                                                "- Other (Subject to staff judgement)",
-                                        inline = False
-                                    ).add_field(
-                                        name = "Requirements",
-                                        value = f"- {format(dnkl_req, ',d')} weekly guild experience\n"\
-                                                f"- DNKL period must be less than 3 weeks",
-                                        inline = False  
-                                    )
+    name="Accepted Reasons",
+    value="- Exams\n" \
+          "- Vacation\n" \
+          "- Medical reasons\n" \
+          "- Computer Problems\n" \
+          "- Other (Subject to staff judgement)",
+    inline=False
+).add_field(
+    name="Requirements",
+    value=f"- {format(dnkl_req, ',d')} weekly guild experience\n" \
+          f"- DNKL period must be less than 3 weeks",
+    inline=False
+)
 
+rules_embed = discord.Embed(title="Rules", description='''## In-Game Rules\n:small_blue_diamond: All Hypixel Rules apply.
+:small_blue_diamond: Be respectful of all guild members.
+:small_blue_diamond: Keep chat appropriate at all times.
+:small_blue_diamond: Cheating is prohibited.
+:small_blue_diamond: Refrain from spamming messages in guild chat or guild party chat.\n## Discord Rules\n:smiley: 1. **Be cool, kind, and civil.** Treat all members with respect and express your thoughts in a constructive manner.
+:abc: 2. **Use English only.** Communicate in English, but be considerate of all languages.
+:card_index: 3. **Use an appropriate name and avatar.** Avoid special characters, emoji, obscenities, and impersonation.
+:incoming_envelope: 4. **Do not spam.** Avoid excessive messages, images, formatting, emoji, commands, and @mentions.
+:no_bell: 5. **Do not @mention or direct message Miscellaneous Staff.** Respect their time, they are people too.
+:loudspeaker: 6. **No self-promotion or advertisements.** This includes unsolicited references and links to other social media, servers, communities, and services in chat or direct messages.
+7. **No personal information.** Protect your privacy and the privacy of others.
+:head_bandage: 8. **No harassment, abuse, or bullying**. We have zero-tolerance for harming others.
+:anger_right: 9. **No racist, sexist, anti-LGBTQ+, or otherwise offensive content.** We have zero-tolerance for hate speech.
+:classical_building: 10. **No political or religious topics.** These complex subjects result in controversial and offensive posts.
+:rotating_light: 11. **No piracy, sexual, NSFW, or otherwise suspicious content.** We do not condone illegal or suspicious discussions and activity.
+:thinking: 12. **Rules are subject to common sense.** These rules are not comprehensive and use of loopholes to violate the spirit of these rules is subject to enforcement.
+:scroll: 13. **Discord Terms of Service and Community Guidelines apply.** You must be at least 13 years old to use Discord, and abide by all other terms and guidelines.
+''')
 rank_upgrade_winner_announcement = '''# RANK UPGRADE
 {date}
 
