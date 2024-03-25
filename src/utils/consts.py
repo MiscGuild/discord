@@ -99,7 +99,6 @@ milestone_emojis = {
     "other": "❓"
 }
 
-
 # General embeds
 registration_embed = discord.Embed(title=f"Welcome to the {guild_handle} Discord!",
                                    description="Before you can view the server, please register with your Minecraft username.",
@@ -133,9 +132,9 @@ requirements_embed = discord.Embed(title="Miscellaneous Guild Requirements",
                                                                             inline=False).set_footer(
     text="If you fail to meet these requirements, you will be kicked!")
 
-dnkl_entries_not_found =  discord.Embed(title="No entries!",
-                                        description="There are no users on the do-not-kick-list!",
-                                        color=neg_color)
+dnkl_entries_not_found = discord.Embed(title="No entries!",
+                                       description="There are no users on the do-not-kick-list!",
+                                       color=neg_color)
 
 information_embed = discord.Embed(title="Miscellaneous", url="https://plancke.io/hypixel/guild/name/Miscellaneous",
                                   description="Miscellaneous is an all games Hypixel guild. "
@@ -312,20 +311,38 @@ dnkl_creation_embed = discord.Embed(title="Do-not-kick-list",
                                     description="In order to create a do-not-kick-list entry, you need to have a valid reason and meet the DNKL requirements.",
                                     color=neutral_color
                                     ).add_field(
-                                        name = "Accepted Reasons",
-                                        value = "- Exams\n"\
-                                                "- Vacation\n"\
-                                                "- Medical reasons\n"\
-                                                "- Computer Problems\n"\
-                                                "- Other (Subject to staff judgement)",
-                                        inline = False
-                                    ).add_field(
-                                        name = "Requirements",
-                                        value = f"- {format(dnkl_req, ',d')} weekly guild experience\n"\
-                                                f"- DNKL period must be less than 3 weeks",
-                                        inline = False  
-                                    )
+    name="Accepted Reasons",
+    value="- Exams\n" \
+          "- Vacation\n" \
+          "- Medical reasons\n" \
+          "- Computer Problems\n" \
+          "- Other (Subject to staff judgement)",
+    inline=False
+).add_field(
+    name="Requirements",
+    value=f"- {format(dnkl_req, ',d')} weekly guild experience\n" \
+          f"- DNKL period must be less than 3 weeks",
+    inline=False
+)
 
+rules_embed = discord.Embed(title="Rules", description='''## In-Game Rules\n:small_blue_diamond: All Hypixel Rules apply.
+:small_blue_diamond: Be respectful of all guild members.
+:small_blue_diamond: Keep chat appropriate at all times.
+:small_blue_diamond: Cheating is prohibited.
+:small_blue_diamond: Refrain from spamming messages in guild chat or guild party chat.\n## Discord Rules\n:smiley: 1. **Be cool, kind, and civil.** Treat all members with respect and express your thoughts in a constructive manner.
+:abc: 2. **Use English only.** Communicate in English, but be considerate of all languages.
+:card_index: 3. **Use an appropriate name and avatar.** Avoid special characters, emoji, obscenities, and impersonation.
+:incoming_envelope: 4. **Do not spam.** Avoid excessive messages, images, formatting, emoji, commands, and @mentions.
+:no_bell: 5. **Do not @mention or direct message Miscellaneous Staff.** Respect their time, they are people too.
+:loudspeaker: 6. **No self-promotion or advertisements.** This includes unsolicited references and links to other social media, servers, communities, and services in chat or direct messages.
+7. **No personal information.** Protect your privacy and the privacy of others.
+:head_bandage: 8. **No harassment, abuse, or bullying**. We have zero-tolerance for harming others.
+:anger_right: 9. **No racist, sexist, anti-LGBTQ+, or otherwise offensive content.** We have zero-tolerance for hate speech.
+:classical_building: 10. **No political or religious topics.** These complex subjects result in controversial and offensive posts.
+:rotating_light: 11. **No piracy, sexual, NSFW, or otherwise suspicious content.** We do not condone illegal or suspicious discussions and activity.
+:thinking: 12. **Rules are subject to common sense.** These rules are not comprehensive and use of loopholes to violate the spirit of these rules is subject to enforcement.
+:scroll: 13. **Discord Terms of Service and Community Guidelines apply.** You must be at least 13 years old to use Discord, and abide by all other terms and guidelines.
+''')
 rank_upgrade_winner_announcement = '''# RANK UPGRADE
 {date}
 
