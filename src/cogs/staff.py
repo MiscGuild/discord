@@ -6,7 +6,7 @@ from discord.ext import commands, bridge
 
 from src.func.General import General
 from src.func.Union import Union
-from src.utils.consts import partner_channel_id, information_embed, neutral_color
+from src.utils.consts import partner_channel_id, information_embed, neutral_color, rules_embed
 
 
 class Staff(commands.Cog, name="staff"):
@@ -83,6 +83,11 @@ class Staff(commands.Cog, name="staff"):
     @commands.has_role("Guild Master")
     async def add_members(self, ctx):
         await General.add_players(ctx)
+
+    @bridge.bridge_command()
+    @commands.has_role("Guild Master")
+    async def rules(self, ctx):
+        await ctx.send(embed=rules_embed)
 
 
 
