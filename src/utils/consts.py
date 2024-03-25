@@ -342,8 +342,8 @@ rules_embed = discord.Embed(title="Rules", description='''## In-Game Rules\n:sma
 :rotating_light: 11. **No piracy, sexual, NSFW, or otherwise suspicious content.** We do not condone illegal or suspicious discussions and activity.
 :thinking: 12. **Rules are subject to common sense.** These rules are not comprehensive and use of loopholes to violate the spirit of these rules is subject to enforcement.
 :scroll: 13. **Discord Terms of Service and Community Guidelines apply.** You must be at least 13 years old to use Discord, and abide by all other terms and guidelines.
-''', color=neutral_color).set_author(
-    icon_url="https://media.discordapp.net/attachments/523227151240134664/803843877999607818/misc.png?ex=660cdaf3&is=65fa65f3&hm=beee26fd9f9b9f571893884ce18299d96a8b4a7f0ca7ad2ee4bc16758a0d31a5&=&format=webp&quality=lossless")
+''', color=neutral_color).set_thumbnail(
+    url="https://media.discordapp.net/attachments/523227151240134664/803843877999607818/misc.png?ex=660cdaf3&is=65fa65f3&hm=beee26fd9f9b9f571893884ce18299d96a8b4a7f0ca7ad2ee4bc16758a0d31a5&=&format=webp&quality=lossless")
 rank_upgrade_winner_announcement = '''# RANK UPGRADE
 {date}
 
