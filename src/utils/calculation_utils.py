@@ -206,10 +206,11 @@ async def is_valid_date(date: str):
         return False, None, None, None
 
 
+
 async def extract_usernames(message: str):
     # Define regular expressions for both formats
-    format1_pattern = r"🎉 \*\*(?:\[(.*?)\] )?(.*?)\*\* joined the guild! \*\*They weren't invited by anyone\."
-    format2_pattern = r"🎉 \*\*(?:\[(.*?)\] )?(.*?)\*\* invited(?: \*\*\[(.*?)\] )?(?:\*\*)? (?:\*\*)?(.*?)\*\* to the guild!"
+    format1_pattern = r"🎉 \*\*(.*?)\*\* invited \*\*(.*?)\*\* to the guild!"
+    format2_pattern = r"🎉 \*\*(.*?)\*\* joined the guild! \*\*They weren't invited by anyone\."
 
     # Check if it matches format 1
     match_format1 = re.match(format1_pattern, message)
