@@ -16,7 +16,7 @@ from src.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed,
                               months, neg_color, neutral_color, pos_color,
                               qotd_ans_channel_id, qotd_channel_id,
                               ticket_categories, unknown_ign_embed, rainbow_separator, guild_handle,
-                              missing_permissions_embed)
+                              missing_permissions_embed, member_req)
 from src.utils.db_utils import (delete_dnkl, select_one,
                                 get_invites)
 from src.utils.request_utils import (get_hypixel_player, get_mojang_profile,
@@ -309,5 +309,7 @@ class String:
         embed.add_field(name="Total Invites", value=total_invites, inline=True)
         embed.add_field(name="Total Valid Invites", value=total_valid_invites, inline=True)
         embed.set_footer(text="Total invites and total valid invites do not include this week's invites. They are "
-                              "updated at the end of the week.")
+                              "updated at the end of the week.\nAn invite is considered valid if they earn "
+                              f"2 * {format(member_req, ',d')} at the end of the week. "
+                              "If they joined in the middle of the week, their guild experience will be scaled up.")
         return embed
