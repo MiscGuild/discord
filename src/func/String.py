@@ -16,7 +16,7 @@ from src.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed,
                               months, neg_color, neutral_color, pos_color,
                               qotd_ans_channel_id, qotd_channel_id,
                               ticket_categories, unknown_ign_embed, rainbow_separator, guild_handle,
-                              missing_permissions_embed)
+                              missing_permissions_embed, member_req)
 from src.utils.db_utils import (delete_dnkl, select_one,
                                 get_invites)
 from src.utils.request_utils import (get_hypixel_player, get_mojang_profile,
