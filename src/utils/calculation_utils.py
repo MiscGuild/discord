@@ -215,17 +215,15 @@ async def extract_usernames(message: str):
     # Check if it matches format 1
     match_format1 = re.match(format1_pattern, message)
     if match_format1:
-        username1 = match_format1.group(2)
-        return username1, None
+        username1 = match_format1.group(1)
+        username2 = match_format1.group(2)
+        return username1, username2
 
     # Check if it matches format 2
     match_format2 = re.match(format2_pattern, message)
     if match_format2:
-        username1 = match_format2.group(2)
-        username2 = match_format2.group(4)
-        if username2.startswith('['):  # Check if the second username starts with '[' indicating a rank
-            username2 = username2.split('] ')[1]  # Remove the rank from the second username
-        return username1, username2.strip('**')  # Remove any leading or trailing '**'
+        username1 = match_format2.group(1)
+        return username1, None
 
     # If it doesn't match any format, return None for both usernames
     return None, None
