@@ -309,5 +309,7 @@ class String:
         embed.add_field(name="Total Invites", value=total_invites, inline=True)
         embed.add_field(name="Total Valid Invites", value=total_valid_invites, inline=True)
         embed.set_footer(text="Total invites and total valid invites do not include this week's invites. They are "
-                              "updated at the end of the week.")
+                              "updated at the end of the week.\nAn invite is considered valid if they earn "
+                              f"2 * {format(member_req, ',d')} at the end of the week. "
+                              "If they joined in the middle of the week, their guild experience will be scaled up.")
         return embed
