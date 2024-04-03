@@ -6,6 +6,7 @@ from discord.ext import tasks
 
 from src.utils.consts import (config, log_channel_id, neutral_color, ticket_categories,
                               guild_handle)
+from src.utils.db_utils import check_uuid_in_db
 from src.utils.request_utils import get_mojang_profile
 from src.utils.ticket_utils import *
 from src.utils.ticket_utils.tickets import name_grabber
@@ -137,6 +138,23 @@ async def log_event(title: str, description: str = None):
 
 async def has_tag_perms(user: discord.User):
     return any(role in user.roles for role in bot.tag_allowed_roles)
+
+
+async def update_recruiter_role(uuid: str, invites: int):
+    user_id = await check_uuid_in_db(uuid)
+    if not user_id:
+        return
+    member_ids = [x.id for x in bot.guild.members]
+    if user_id not in member_ids:
+        return
+    user = bot.guild.get_member(user_id)
+    if invites > 5:
+        await user.add_roles(bot.recruiter)
+    else:
+        await user.remove_roles(bot.recruiter)
+    return
+
+
 
 
 @tasks.loop(count=1)
