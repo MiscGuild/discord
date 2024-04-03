@@ -180,6 +180,7 @@ async def after_cache_ready():
     bot.gvg = discord.utils.get(bot.guild.roles, name="GvG Team")
     bot.giveaways_events = discord.utils.get(bot.guild.roles, name="Giveaways/Events")
     bot.veteran = discord.utils.get(bot.guild.roles, name="Veteran")
+    bot.recruiter = discord.utils.get(bot.guild.roles, name="Recruiter")
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff,
                              bot.server_booster, bot.rich_kid, bot.gvg, bot.veteran)
 
