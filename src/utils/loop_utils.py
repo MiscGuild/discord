@@ -8,6 +8,7 @@ from src.func.General import General
 from src.func.Integer import Integer
 from src.utils.consts import weekly_lb_channel, daily_lb_channel
 from src.utils.db_utils import (connect_db, select_all)
+from src.utils.discord_utils import update_recruiter_role
 from src.utils.giveaway_utils import roll_giveaway
 from src.utils.referral_utils import check_invitation_validity, generate_rank_upgrade
 
@@ -70,6 +71,7 @@ async def update_invites():
         valid_invites = await check_invitation_validity(weekly_uuids)
         weekly_invitations.append((inviter_uuid, valid_invites))
         total_valid_invites = total_valid_invites + len(valid_invites)
+        await update_recruiter_role(inviter_uuid, len(valid_invites))
         await bot.db.execute(
             "UPDATE invites SET total_invites = (?), total_valid_invites = (?), current_invitee_uuids = '' WHERE inviter_uuid = (?)",
             (total_invites, total_valid_invites, inviter_uuid))
