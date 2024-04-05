@@ -122,8 +122,7 @@ class General:
                 elif weekly_exp < active_req and bot.active_role in discord_member.roles:  # Doesn't meet active req
                     await discord_member.remove_roles(bot.active_role)
 
-                if (nick != username and bot.active_role not in discord_member.roles) or (
-                        nick != username and not has_tag_permission):
+                if nick != username and not has_tag_permission:
                     await discord_member.edit(nick=username)
 
                 # Edit roles
