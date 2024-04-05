@@ -11,7 +11,7 @@ from src.utils.consts import (active_req, allies, discord_not_linked_embed, guil
                               pos_color, registration_channel_id,
                               staff_impersonation_embed, ticket_categories,
                               unknown_ign_embed, join_request_embed)
-from src.utils.db_utils import update_member, insert_new_member
+from src.utils.db_utils import update_member, insert_new_member, get_db_uuid_username_from_discord_id
 from src.utils.discord_utils import (create_ticket, has_tag_perms,
                                      is_linked_discord)
 from src.utils.request_utils import (get_gtag, get_hypixel_player,
@@ -84,7 +84,6 @@ class Union:
         # Invalid username
         if not ign:
             return unknown_ign_embed
-
 
         # Initialize vars for storing changes
         roles_to_add = []
@@ -288,3 +287,15 @@ class Union:
         embed = discord.Embed(
             title=f"{self.user}'s avatar:", color=neutral_color)
         return embed.set_image(url=self.user.avatar)
+
+    async def whois(self):
+        uuid, username = await get_db_uuid_username_from_discord_id(self.user.id)
+        embed = discord.Embed(
+            title=username,
+            description=f"Discord Username: {self.user.name}\n"
+                        f"Discord Nick: {self.user.nick}",
+            color=neutral_color
+        )
+        embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
+        embed.set_footer(text=f"UUID: {uuid}")
+        return embed
