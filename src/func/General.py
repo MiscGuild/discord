@@ -98,7 +98,7 @@ class General:
                                    "gexp": sum(player["expHistory"].values())}
 
         await ctx.send("If you see the bot is stuck on a member along with an error message, "
-                       "forcesync member the bot is     stuck on.")
+                       "forcesync member the bot is stuck on.")
         bot.admin_ids = [member.id for member in bot.admin.members]
         for discord_member in discord_members:
             # Do not check admins and bots
