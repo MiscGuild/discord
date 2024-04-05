@@ -176,13 +176,13 @@ async def after_cache_ready():
     bot.active_role = discord.utils.get(bot.guild.roles, name="Active")
     bot.ally = discord.utils.get(bot.guild.roles, name="Ally")
     bot.server_booster = discord.utils.get(bot.guild.roles, name="Server Booster")
-    bot.rich_kid = discord.utils.get(bot.guild.roles, name="Rich Kid")
+    bot.rich_kid = discord.utils.get(bot.guild.roles, name="Event Sponsor")
     bot.gvg = discord.utils.get(bot.guild.roles, name="GvG Team")
     bot.giveaways_events = discord.utils.get(bot.guild.roles, name="Giveaways/Events")
     bot.veteran = discord.utils.get(bot.guild.roles, name="Veteran")
     bot.recruiter = discord.utils.get(bot.guild.roles, name="Recruiter")
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff,
-                             bot.server_booster, bot.rich_kid, bot.gvg, bot.veteran)
+                             bot.server_booster, bot.rich_kid, bot.gvg, bot.veteran, bot.recruiter)
 
     from src.utils.discord_utils import name_grabber
     bot.staff_names = [(await get_mojang_profile(await name_grabber(member)))[0] for member in bot.staff.members]
