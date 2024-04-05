@@ -98,7 +98,7 @@ class General:
                                    "gexp": sum(player["expHistory"].values())}
 
         await ctx.send("If you see the bot is stuck on a member along with an error message, "
-                       "forcesync member the bot is     stuck on.")
+                       "forcesync member the bot is stuck on.")
         bot.admin_ids = [member.id for member in bot.admin.members]
         for discord_member in discord_members:
             # Do not check admins and bots
@@ -122,8 +122,7 @@ class General:
                 elif weekly_exp < active_req and bot.active_role in discord_member.roles:  # Doesn't meet active req
                     await discord_member.remove_roles(bot.active_role)
 
-                if (nick != username and bot.active_role not in discord_member.roles) or (
-                        nick != username and not has_tag_permission):
+                if nick != username and not has_tag_permission:
                     await discord_member.edit(nick=username)
 
                 # Edit roles

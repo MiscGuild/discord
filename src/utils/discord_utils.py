@@ -6,6 +6,7 @@ from discord.ext import tasks
 
 from src.utils.consts import (config, log_channel_id, neutral_color, ticket_categories,
                               guild_handle)
+from src.utils.db_utils import check_uuid_in_db
 from src.utils.request_utils import get_mojang_profile
 from src.utils.ticket_utils import *
 from src.utils.ticket_utils.tickets import name_grabber
@@ -139,6 +140,23 @@ async def has_tag_perms(user: discord.User):
     return any(role in user.roles for role in bot.tag_allowed_roles)
 
 
+async def update_recruiter_role(uuid: str, invites: int):
+    user_id = await check_uuid_in_db(uuid)
+    if not user_id:
+        return
+    member_ids = [x.id for x in bot.guild.members]
+    if user_id not in member_ids:
+        return
+    user = bot.guild.get_member(user_id)
+    if invites > 5:
+        await user.add_roles(bot.recruiter)
+    else:
+        await user.remove_roles(bot.recruiter)
+    return
+
+
+
+
 @tasks.loop(count=1)
 async def after_cache_ready():
     # Set owner id(s) and guild
@@ -158,12 +176,13 @@ async def after_cache_ready():
     bot.active_role = discord.utils.get(bot.guild.roles, name="Active")
     bot.ally = discord.utils.get(bot.guild.roles, name="Ally")
     bot.server_booster = discord.utils.get(bot.guild.roles, name="Server Booster")
-    bot.rich_kid = discord.utils.get(bot.guild.roles, name="Rich Kid")
+    bot.rich_kid = discord.utils.get(bot.guild.roles, name="Event Sponsor")
     bot.gvg = discord.utils.get(bot.guild.roles, name="GvG Team")
     bot.giveaways_events = discord.utils.get(bot.guild.roles, name="Giveaways/Events")
     bot.veteran = discord.utils.get(bot.guild.roles, name="Veteran")
+    bot.recruiter = discord.utils.get(bot.guild.roles, name="Recruiter")
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff,
-                             bot.server_booster, bot.rich_kid, bot.gvg, bot.veteran)
+                             bot.server_booster, bot.rich_kid, bot.gvg, bot.veteran, bot.recruiter)
 
     from src.utils.discord_utils import name_grabber
     bot.staff_names = [(await get_mojang_profile(await name_grabber(member)))[0] for member in bot.staff.members]
