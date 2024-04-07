@@ -84,7 +84,7 @@ class Guild(commands.Cog, name="guild"):
     @bridge.bridge_command(aliases=["invite", "inv"])
     @option(
         name="name",
-        description="The username of the player whose guild experience you'd like to view",
+        description="The username of the player whose invites you'd like to view",
         required=False,
         input_type=str
     )
