@@ -19,6 +19,7 @@ from src.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed,
                               missing_permissions_embed, member_req)
 from src.utils.db_utils import (delete_dnkl, select_one,
                                 get_invites)
+from src.utils.referral_utils import check_invitation_validity
 from src.utils.request_utils import (get_hypixel_player, get_mojang_profile,
                                      get_player_guild, get_name_by_uuid)
 from src.utils.ticket_utils.dnkl import dnkl_application
@@ -312,4 +313,46 @@ class String:
                               "updated at the end of the week.\nAn invite is considered valid if they earn "
                               f"2 * {format(member_req, ',d')} at the end of the week. "
                               "If they joined in the middle of the week, their guild experience will be scaled up.")
+        return embed
+
+    async def validate_invites(self):
+        if self.uuid and self.username:
+            uuid = self.uuid
+            name = self.username
+        else:
+            name, uuid = await get_mojang_profile(self.string)
+            if not name:
+                return unknown_ign_embed
+        invites = await get_invites(uuid)
+        if not invites:
+            return discord.Embed(title=f"{name} has no invites.", color=neg_color)
+
+        weekly_invites, total_invites, total_valid_invites = invites
+        if not weekly_invites:
+            return discord.Embed(title=f"{name} has no invites this week.", color=neg_color).set_footer(
+                text=f"Total Invites: {total_invites}\n Total Valid Invites: {total_valid_invites}")
+        weekly_invitations = []
+        valid_invites_text, invalid_invites_text = "", ""
+        weekly_uuids = weekly_invites.split()
+
+        valid_invites = await check_invitation_validity(weekly_uuids)
+
+        weekly_invite_names = [await get_name_by_uuid(invitee) for invitee in weekly_uuids]
+        valid_invite_names = [await get_name_by_uuid(invitee) for invitee in valid_invites]
+
+        invalid_invite_names = list(set(weekly_invite_names) - set(valid_invite_names))
+
+        for invitee in valid_invite_names:
+            valid_invites_text += f"**▸** {invitee}\n"
+        for invitee in invalid_invite_names:
+            invalid_invites_text += f"{invitee}, "
+
+        embed = discord.Embed(title=f"{name}'s Valid Invites this week:",
+                              description=f"{valid_invites_text}",
+                              color=neutral_color)
+        embed.add_field(name="This Week's Statistics:",
+                        value=f"Invites: {len(weekly_invite_names)}\n"
+                              f"Valid Invites: {len(valid_invite_names)}\n"
+                              f"Success Rate: {round(100 * len(valid_invite_names) / len(weekly_invite_names)) if len(weekly_invite_names) else 0}%")
+        embed.set_footer(text=f"Invalid Invites: {invalid_invites_text[:-2]}")
         return embed
