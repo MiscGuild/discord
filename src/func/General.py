@@ -20,7 +20,7 @@ from src.utils.consts import (accepted_staff_application_embed, active_req,
                               resident_req, dnkl_entries_not_found,
                               positive_responses, allies)
 from src.utils.db_utils import insert_new_giveaway, select_all, get_db_username_from_uuid, \
-    get_db_uuid_username_from_discord_id, insert_new_member, select_one
+    get_db_uuid_username_from_discord_id, insert_new_member, select_one, update_member
 from src.utils.discord_utils import (create_ticket,
                                      get_ticket_creator, log_event,
                                      name_grabber, has_tag_perms)
@@ -107,6 +107,11 @@ class General:
 
             nick = await name_grabber(discord_member)
             uuid, username = await get_db_uuid_username_from_discord_id(discord_member.id)
+            if not uuid and username:
+                username, uuid = await get_mojang_profile(username)
+                if username and uuid:
+                    await update_member(discord_member.id, uuid, username)
+
             if not uuid and not username:
                 await discord_member.remove_roles(bot.member_role, bot.ally, bot.guest, bot.active_role)
                 await discord_member.add_roles(bot.new_member_role)
