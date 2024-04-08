@@ -327,7 +327,8 @@ class String:
                         value=f"{round(total_valid_invites * 100 / total_invites if total_invites else 0)}%",
                         inline=True)
         embed.set_footer(text="Total invites and total valid invites do not include this week's invites. They are "
-                              "updated at the end of the week.\nAn invite is considered valid if they earn "
-                              f"{format(2 * member_req, ',d')} at the end of the week. "
+                              "updated at the end of the week."
+                              "\nAn invite is considered valid if they earn "
+                              f"{format(2 * member_req, ',d')} guild experience at the end of the week. "
                               "If they joined in the middle of the week, their guild experience will be scaled up.")
         return embed
