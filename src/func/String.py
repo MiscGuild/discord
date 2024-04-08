@@ -299,18 +299,35 @@ class String:
         invites_text = ""
         if not invites:
             weekly_invites, total_invites, total_valid_invites = None, "0", "0"
+            valid_invites = []
         else:
             weekly_invites, total_invites, total_valid_invites = invites
             weekly_invites = weekly_invites.split()
-            weekly_invites = [await get_name_by_uuid(invitee) for invitee in weekly_invites]
+            valid_invites = await check_invitation_validity(weekly_invites)
+            weekly_invites_dict = {}
             for invitee in weekly_invites:
-                invites_text += f"**▸** {invitee}\n"
+                weekly_invites_dict[invitee] = await get_name_by_uuid(invitee)
+
+            valid_invites = [weekly_invites_dict[invitee] for invitee in valid_invites]
+
+            for invitee in weekly_invites_dict.values():
+                if invitee in valid_invites:
+                    invites_text += f"🟢 {invitee}\n"
+                else:
+                    invites_text += f"🔴 {invitee}\n"
         embed = discord.Embed(title=f"{name}'s Invites", color=neutral_color)
         embed.add_field(name="Weekly Invites", value=None if not invites_text else invites_text, inline=False)
-        embed.add_field(name="Total Invites", value=total_invites, inline=True)
+        embed.add_field(name="This week's statistics", value=f"Total Valid Invites: {len(valid_invites)}\n"
+                                                             f"Total Invites: {len(weekly_invites)}\n"
+                                                             f"Success Rate: {round(len(valid_invites) * 100 / len(weekly_invites)) if len(weekly_invites) else 0}%",
+                        inline=False)
         embed.add_field(name="Total Valid Invites", value=total_valid_invites, inline=True)
+        embed.add_field(name="Total Invites", value=total_invites, inline=True)
+        embed.add_field(name="Total Success Rate",
+                        value=f"{round(total_valid_invites * 100 / total_invites if total_invites else 0)}%",
+                        inline=True)
         embed.set_footer(text="Total invites and total valid invites do not include this week's invites. They are "
                               "updated at the end of the week.\nAn invite is considered valid if they earn "
-                              f"2 * {format(member_req, ',d')} at the end of the week. "
+                              f"{format(2 * member_req, ',d')} at the end of the week. "
                               "If they joined in the middle of the week, their guild experience will be scaled up.")
         return embed
