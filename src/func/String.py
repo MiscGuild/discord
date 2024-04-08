@@ -273,7 +273,7 @@ class String:
         day_number = 473 + (datetime.utcnow() - datetime.strptime("2022/05/15", "%Y/%m/%d")).days
         embed = discord.Embed(
             title=f"**{self.string}\n**",
-            description=f"You can respond to this qotd in: <#{qotd_ans_channel_id}>", color=neutral_color)
+            description=f"Respond in: <#{qotd_ans_channel_id}>", color=neutral_color)
         embed.set_author(
             name=f"Day {day_number}: {datetime.utcnow().day} {months[datetime.utcnow().month]} {datetime.utcnow().year}")
         embed.set_footer(text="- " + ctx.author.nick if ctx.author.nick else ctx.author.name)
