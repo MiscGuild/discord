@@ -98,23 +98,5 @@ class Guild(commands.Cog, name="guild"):
             res = await String(string=name).invites()
         await ctx.respond(embed=res)
 
-    @bridge.bridge_command(aliases=["validate"])
-    @option(
-        name="name",
-        description="The username of the player whose invites you'd like to validate",
-        required=False,
-        input_type=str
-    )
-    async def validate_invites(self, ctx, name: str = None):
-        """View the given user's last week's invitation stats."""
-        await ctx.defer()
-        if not name:
-            uuid, username = await get_db_uuid_username_from_discord_id(ctx.author.id)
-            res = await String(uuid=uuid, username=username).validate_invites()
-        else:
-            res = await String(string=name).validate_invites()
-        await ctx.respond(embed=res)
-
-
 def setup(bot):
     bot.add_cog(Guild(bot))
