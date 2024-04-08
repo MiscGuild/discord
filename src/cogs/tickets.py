@@ -31,7 +31,7 @@ class Tickets(commands.Cog, name="tickets"):
             await ctx.respond(embed=res)
             if guest_ticket:
                 await ctx.followup.send(f"Head on over to <#{guest_ticket.id}>!", ephemeral=True)
-        if isinstance(res, String):
+        elif isinstance(res, str):
             await ctx.respond(res)
 
     @bridge.bridge_command(aliases=["del"])

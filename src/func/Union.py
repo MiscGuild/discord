@@ -160,7 +160,7 @@ class Union:
         await ctx.defer()
         # Make sure it is only used in registration channel
         if ctx.channel.id != registration_channel_id:
-            return "This command can only be used in the registration channel!", None
+            return "This command can only be used in the registration channel!\nThe command you are looking for is `/sync`", None
 
         ign, uuid = await get_mojang_profile(name)
 
