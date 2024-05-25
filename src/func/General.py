@@ -56,8 +56,8 @@ class General:
         # Create embed
         content = ""
         for _set in rows:
-            _, _, username = _set
-            content += f"{username}\n"
+            _, uuid, username = _set
+            content += f"{username} ||{uuid}||\n"
 
         return discord.Embed(title="The people on the do-not-kick-list are as follows:", description=content,
                              color=neutral_color).set_footer(text=f"Total: {len(content.split())}")
