@@ -15,8 +15,8 @@ async def connect_db():
 
     # DNKL table:
     await bot.db.execute("""CREATE TABLE IF NOT EXISTS dnkl (
-        uuid text PRIMARY KEY NOT NULL,
         message_id integer NOT NULL,
+        uuid text NOT NULL,
         username text NOT NULL)""")
 
     # Giveaways table
