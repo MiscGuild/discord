@@ -7,10 +7,18 @@ import aiohttp
 import discord
 
 from src.utils.consts import config, error_channel_id
+from src.utils.db_utils import get_db_username_from_uuid, update_db_username
 
 
 async def get_hyapi_key():
     return random.choice(config["api_keys"])
+
+async def update_usernames(uuid: str, username: str):
+    db_username = await get_db_username_from_uuid(uuid)
+    if db_username is None:
+        return
+    elif db_username != username:
+        await update_db_username(uuid, username)
 
 
 # Base JSON-getter for all JSON based requests. Catches Invalid API Key errors
