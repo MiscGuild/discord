@@ -214,7 +214,7 @@ class String:
         else:
             message_id, _, username = row
             # Delete row
-            await delete_dnkl(username)
+            await delete_dnkl(uuid)
 
             # Delete DNKL message
             try:

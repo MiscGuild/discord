@@ -7,10 +7,19 @@ import aiohttp
 import discord
 
 from src.utils.consts import config, error_channel_id
+from src.utils.db_utils import get_db_username_from_uuid, update_db_username
 
 
 async def get_hyapi_key():
     return random.choice(config["api_keys"])
+
+
+async def update_usernames(uuid: str, username: str):
+    db_username = await get_db_username_from_uuid(uuid)
+    if db_username is None:
+        return
+    elif db_username != username:
+        await update_db_username(uuid, username)
 
 
 # Base JSON-getter for all JSON based requests. Catches Invalid API Key errors
@@ -39,12 +48,12 @@ async def get_mojang_profile(name: str):
 
     # If player and request is valid
     if resp and ("errorMessage" not in resp) and ("name" in resp):
+        await update_usernames(uuid=resp["id"], username=resp["name"])
         return resp["name"], resp["id"]
 
-    api_key = await get_hyapi_key()
-    resp = await get_json_response(f"https://api.hypixel.net/player?key={api_key}&name={name}")
-    if resp and 'player' in resp and resp['player']:
-        return resp['player']['displayname'], resp['player']['uuid']
+    resp = await get_hypixel_player(name=name)
+    if resp:
+        return resp['displayname'], resp['uuid']
 
     # Player does not exist
     return None, None
@@ -61,6 +70,7 @@ async def get_hypixel_player(name: str = None, uuid: str = None):
     if "player" not in resp or not resp["player"]:
         return None
 
+    await update_usernames(uuid=resp["player"]["uuid"], username=resp["player"]["displayname"])
     # Player exists
     return resp["player"]
 
@@ -75,13 +85,12 @@ async def get_name_by_uuid(uuid: str):
             continue
         if "name" not in resp:
             continue
+        await update_usernames(uuid=uuid, username=resp["name"])
         return resp["name"]
-    api_key = await get_hyapi_key()
-    # If the Mojang API fails to return a name, the bot checks using the hypixel API
-    resp = await get_json_response(f"https://api.hypixel.net/player?key={api_key}&uuid={uuid}")
-    if "player" not in resp:
-        return None
-    return resp['player']['displayname']
+    resp = await get_hypixel_player(uuid=uuid)
+    if resp:
+        await update_usernames(uuid=uuid, username=resp['displayname'])
+        return resp['displayname']
 
 
 def session_get_name_by_uuid(session, uuid):

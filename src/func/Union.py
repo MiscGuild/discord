@@ -117,7 +117,7 @@ class Union:
         # User is a member
         if guild_name == guild_handle:
             roles_to_add.append(bot.member_role)
-            roles_to_remove.extend([bot.guest, bot.ally])
+            roles_to_remove.extend([bot.guest, bot.ally, bot.new_member_role, bot.processing])
 
             # Add active role if eligible
             for member in guild_data["members"]:
@@ -129,7 +129,7 @@ class Union:
         elif guild_name in allies:
             if not can_tag:
                 new_nick += f" {await get_gtag(guild_name)}"
-            roles_to_remove.extend([bot.new_member_role, bot.member_role])
+            roles_to_remove.extend([bot.new_member_role, bot.member_role, bot.new_member_role, bot.processing])
             roles_to_add.extend([bot.guest, bot.ally])
 
         # User is a guest

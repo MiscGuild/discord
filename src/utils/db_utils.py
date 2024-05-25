@@ -15,8 +15,8 @@ async def connect_db():
 
     # DNKL table:
     await bot.db.execute("""CREATE TABLE IF NOT EXISTS dnkl (
+        uuid text PRIMARY KEY NOT NULL,
         message_id integer NOT NULL,
-        uuid text NOT NULL,
         username text NOT NULL)""")
 
     # Giveaways table
@@ -76,8 +76,8 @@ async def update_dnkl(message_id: int, uuid: str):
     await bot.db.commit()
 
 
-async def delete_dnkl(username: str):
-    await bot.db.execute("DELETE FROM dnkl WHERE username = (?)", (username,))
+async def delete_dnkl(uuid: str):
+    await bot.db.execute("DELETE FROM dnkl WHERE uuid = (?)", (uuid,))
     await bot.db.commit()
 
 
@@ -153,3 +153,7 @@ async def update_member(discord_id: int, uuid: str, username: str):
 async def check_uuid_in_db(uuid: str):
     discord_id = (await select_one("SELECT discord_id from members WHERE uuid=(?)", (uuid,)))
     return discord_id[0] if discord_id else 0
+
+async def update_db_username(uuid: str, username: str):
+    await bot.db.execute("UPDATE members SET username = ? WHERE uuid = ?", (username, uuid,))
+    await bot.db.commit()
