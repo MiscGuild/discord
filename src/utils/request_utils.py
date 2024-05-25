@@ -99,7 +99,6 @@ def session_get_name_by_uuid(session, uuid):
 
         if resp.status_code != 200:
             return None
-        await update_usernames(uuid=uuid, username=data["name"])
         return data["name"]
 
 
