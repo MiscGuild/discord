@@ -206,8 +206,12 @@ class String:
         dnkl_embed = await dnkl_application(ign, uuid, ctx.channel, ctx.author, weekly_gexp)
 
     async def dnklremove(self):
-        ign, uuid = await get_mojang_profile(self.string)
-        row = await select_one("SELECT * FROM dnkl WHERE username = (?)", (ign,))
+        if self.string:
+            ign, uuid = await get_mojang_profile(self.string)
+        else:
+            ign, uuid = await get_name_by_uuid(self.uuid), self.uuid
+
+        row = await select_one("SELECT * FROM dnkl WHERE uuid = (?)", (uuid,))
 
         if not row:
             return "This player is not on the do-not-kick-list!"

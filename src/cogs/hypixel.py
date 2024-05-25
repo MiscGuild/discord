@@ -74,12 +74,26 @@ class Hypixel(commands.Cog, name="hypixel"):
     @option(
         name="name",
         description="The Minecraft username of the player who you want to remove from the do-not-kick-list",
-        required=True,
+        required=False,
         input_type=str
     )
-    async def dnkl_remove(self, ctx, name: str):
+    @option(
+        name="uuid",
+        description="The UUID of the player who you want to remove from the do-not-kick-list",
+        required=False,
+        input_type=str
+    )
+    async def dnkl_remove(self, ctx, name: str = None, uuid: str = None):
         """Remove a player from the do-not-kick-list"""
-        await ctx.respond(await String(string=name).dnklremove())
+        if not name and not uuid:
+            await ctx.respond("Please provide either the username or the UUID of the player you want to remove.")
+            return
+        if name and not uuid and len(name) > 16:
+            uuid = name
+        if uuid:
+            await ctx.respond(await String(uuid=uuid).dnklremove())
+        else:
+            await ctx.respond(await String(string=name).dnklremove())
 
     @bridge.bridge_command(aliases=['dnkllist', 'dnkll'])
     async def dnkl_list(self, ctx):

@@ -66,6 +66,8 @@ async def get_hypixel_player(name: str = None, uuid: str = None):
     else:
         resp = await get_json_response(f"https://api.hypixel.net/player?key={api_key}&uuid={uuid}")
 
+    if not resp:
+        return None
     # Player doesn't exist
     if "player" not in resp or not resp["player"]:
         return None
