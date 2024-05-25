@@ -6,7 +6,6 @@ import aiosqlite
 
 async def connect_db():
     bot.db = await aiosqlite.connect("database.db")
-
     # Discord Member Table:
     await bot.db.execute("""CREATE TABLE IF NOT EXISTS members (
         discord_id integer PRIMARY KEY NOT NULL,

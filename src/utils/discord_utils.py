@@ -6,7 +6,7 @@ from discord.ext import tasks
 
 from src.utils.consts import (config, log_channel_id, neutral_color, ticket_categories,
                               guild_handle)
-from src.utils.db_utils import check_uuid_in_db
+from src.utils.db_utils import check_uuid_in_db, connect_db
 from src.utils.request_utils import get_mojang_profile
 from src.utils.ticket_utils import *
 from src.utils.ticket_utils.tickets import name_grabber
@@ -162,7 +162,6 @@ async def after_cache_ready():
     # Set owner id(s) and guild
     bot.owner_ids = config["owner_ids"]
     bot.guild = bot.get_guild(config["guild_id"])
-
     # Set roles
     bot.admin = discord.utils.get(bot.guild.roles, name="Admin")
     bot.staff = discord.utils.get(bot.guild.roles, name="Staff")
@@ -184,14 +183,15 @@ async def after_cache_ready():
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff,
                              bot.server_booster, bot.rich_kid, bot.gvg, bot.veteran, bot.recruiter)
 
-    from src.utils.discord_utils import name_grabber
-    bot.staff_names = [(await get_mojang_profile(await name_grabber(member)))[0] for member in bot.staff.members]
+    await connect_db()
 
     from src.utils.loop_utils import check_giveaways, send_gexp_lb, update_invites
     check_giveaways.start()
     send_gexp_lb.start()
     update_invites.start()
 
+    from src.utils.discord_utils import name_grabber
+    bot.staff_names = [(await get_mojang_profile(await name_grabber(member)))[0] for member in bot.staff.members]
 
 @after_cache_ready.before_loop
 async def before_cache_loop():
