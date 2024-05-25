@@ -31,11 +31,6 @@ async def check_giveaways():
             await bot.db.commit()
 
 
-@check_giveaways.before_loop
-async def before_giveaway_check():
-    await bot.wait_until_ready()
-    await connect_db()
-
 
 @tasks.loop(hours=24)
 async def send_gexp_lb():
