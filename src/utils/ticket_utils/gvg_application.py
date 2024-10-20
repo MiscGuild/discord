@@ -51,13 +51,19 @@ async def gvg_application(ticket: discord.TextChannel, interaction: discord.Inte
     player_data = player_data["stats"]
 
     # Set vars for each stat
-    bw_wins = player_data["Bedwars"]["wins_bedwars"]
-    bw_fkdr = round(
-        player_data["Bedwars"]["final_kills_bedwars"] / player_data["Bedwars"]["final_deaths_bedwars"],
-        2)
-    sw_wins = player_data["SkyWars"]["wins"]
-    sw_kdr = round(player_data["SkyWars"]["kills"] / player_data["SkyWars"]["deaths"], 2)
-    duels_wlr = round(player_data["Duels"]["wins"] / player_data["Duels"]["losses"], 2)
+    bw_wins = player_data["Bedwars"]["wins_bedwars"] if "Bedwars" in player_data and "wins_bedwars" in player_data["Bedwars"] else 0
+    final_kills = player_data["Bedwars"]["final_kills_bedwars"] if "Bedwars" in player_data and "final_kills_bedwars" in player_data["Bedwars"] else 0
+    final_deaths = player_data["Bedwars"]["final_deaths_bedwars"] if "Bedwars" in player_data and "final_deaths_bedwars" in player_data["Bedwars"] else 0
+    bw_fkdr = round(final_kills/final_kills, 2) if final_deaths else final_kills
+    
+    sw_wins = player_data["SkyWars"]["wins"] if "SkyWars" in player_data and "wins" in player_data["SkyWars"] else 0
+    sw_kills = player_data["SkyWars"]["kills"] if "SkyWars" in player_data and "kills" in player_data["SkyWars"] else 0
+    sw_deaths = player_data["SkyWars"]["deaths"] if "SkyWars" in player_data and "deaths" in player_data["SkyWars"] else 0
+    sw_kdr = round(sw_kills / sw_deaths, 2) if sw_deaths else sw_kills
+    
+    duels_wins = player_data["Duels"]["wins"] if "Duels" in player_data and "wins" in player_data["Duels"] else 0
+    duels_losses = player_data["Duels"]["losses"] if "Duels" in player_data and "losses" in player_data["Duels"] else 0
+    duels_wlr = round(duels_wins / duels_losses, 2) if duels_losses else duels_wins
     duels_kills = player_data["Duels"]["kills"]
 
     # Define dict for eligibility and set each gamemode boolean
