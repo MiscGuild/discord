@@ -31,7 +31,7 @@ from src.utils.ticket_utils.tickets import create_transcript, get_ticket_propert
 
 
 class General:
-    async def weeklylb(ctx, is_automatic=False):
+    async def weeklylb(ctx, is_automatic=False) -> discord.Embed | str:
         # Get guild data
         guild_data = await get_guild_by_name(guild_handle)
 
@@ -46,7 +46,7 @@ class General:
         return text
         # return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
 
-    async def dnkllist(ctx):
+    async def dnkllist(ctx) -> discord.Embed:
         # Fetch all rows
         rows = await select_all("SELECT * FROM dnkl")
 
@@ -62,7 +62,7 @@ class General:
         return discord.Embed(title="The people on the do-not-kick-list are as follows:", description=content,
                              color=neutral_color).set_footer(text=f"Total: {len(content.split())}")
 
-    async def rolecheck(ctx, send_ping: bool):
+    async def rolecheck(ctx, send_ping: bool) -> None:
         # Define a message for sending progress updates
         progress_message = await ctx.respond("Processing prerequisites...")
 
@@ -164,139 +164,8 @@ class General:
 
         await progress_message.edit(content="Rolecheck complete!")
 
-    #
-    # async def rolecheck(ctx, send_ping: bool):
-    #     # Define a message for sending progress updates
-    #     progress_message = await ctx.respond("Processing prerequisites...")
-    #
-    #     discord_members = bot.guild.members
-    #
-    #     # Define arrays for guild and ally uuids and names
-    #     guild_members = (await get_guild_by_name(guild_handle))['members']
-    #     guild_uuids = await get_guild_uuids(guild_handle)
-    #     guild_usernames, ally_usernames, ally_uuids, ally_divisions = [], [], [], []
-    #
-    #     # Appending UUIDs of members of all ally guilds into one array
-    #     for ally in allies:
-    #         await progress_message.edit(content=f"Fetching ally UUIDs - {ally}")
-    #         ally_uuids.extend(await get_guild_uuids(ally))
-    #         req = await get_player_guild(ally_uuids[-1])
-    #         gtag = " " if not req["tag"] or not req else req["tag"]
-    #         ally_divisions.append([len(ally_uuids), gtag])
-    #         # Ally divisions marks the separation point of one guild
-    #         # from another in the ally_uuids array along with the guild's gtag
-    #
-    #     # Limiting the maximum concurrency
-    #     async def gather_with_concurrency(n, *tasks):
-    #         semaphore = asyncio.Semaphore(n)
-    #
-    #         async def sem_task(task):
-    #             async with semaphore:
-    #                 return await task
-    #
-    #         return await asyncio.gather(*(sem_task(task) for task in tasks))
-    #
-    #     # Get guild and ally names from their respective UUIDs
-    #     await progress_message.edit(content="Retrieving usernames...")
-    #
-    #     for _set in [[guild_uuids, guild_usernames], [ally_uuids, ally_usernames]]:
-    #         draw, dump = _set
-    #         async with aiohttp.ClientSession():
-    #             tasks = await gather_with_concurrency(2,
-    #                                                   *[
-    #                                                       get_name_by_uuid(uuid) for uuid in draw
-    #                                                   ])  # Gathering with a max concurrency of 2
-    #         dump.extend(tasks)
-    #     # Loop through discord members
-    #
-    #     await ctx.send("If you see the bot is stuck on a member along with an error message, "
-    #                    "forcesync member the bot is stuck on.")
-    #     bot.admin_ids = [member.id for member in bot.admin.members]
-    #     for discord_member in discord_members:
-    #         # Do not check admins and bots
-    #         if discord_member.id in bot.admin_ids or discord_member.bot:
-    #             continue
-    #
-    #         username = await name_grabber(discord_member)
-    #         has_tag_permission = await has_tag_perms(discord_member)
-    #         await progress_message.edit(content=f"Checking {username} - {discord_member}")
-    #         # Member of guild
-    #         if username in guild_usernames:
-    #             for guild_member in guild_members:
-    #                 if guild_uuids[guild_usernames.index(username)] == guild_member['uuid']:
-    #                     # Finds a given UUID's corresponding hypixel data
-    #
-    #                     weekly_exp = sum(guild_member["expHistory"].values())
-    #                     if weekly_exp >= active_req:  # Meets active req
-    #                         await discord_member.add_roles(bot.active_role)
-    #                     elif weekly_exp < active_req and bot.active_role in discord_member.roles:  # Doesn't meet active req
-    #                         await discord_member.remove_roles(bot.active_role)
-    #
-    #             if not has_tag_permission:
-    #                 await discord_member.edit(nick=username)
-    #
-    #             # Edit roles
-    #             await discord_member.add_roles(bot.member_role)
-    #             await discord_member.remove_roles(bot.new_member_role, bot.guest, bot.ally)
-    #             continue
-    #
-    #         # Member of an ally guild
-    #         if username in ally_usernames:
-    #             # Get player gtag
-    #             position = ally_usernames.index(username)
-    #             dividers = [x[0] for x in ally_divisions]
-    #             tags = [x[1] for x in ally_divisions]
-    #
-    #             start = 0
-    #             for divider in dividers:
-    #                 if start <= position < divider:
-    #                     gtag = tags[dividers.index(divider)]
-    #                     break
-    #                 start = divider
-    #
-    #             '''
-    #             last_value = 1
-    #             for guild_division in ally_divisions:
-    #                 if last_value > 1:
-    #                     if last_value < position < guild_division[0]:
-    #                         gtag = guild_division[1]
-    #
-    #                 elif position < guild_division[0]:
-    #                     gtag = guild_division[1]
-    #                 last_value = guild_division[0]
-    #             '''
-    #             # Set nick
-    #             if not discord_member.nick or f" [{gtag}]" not in discord_member.nick:
-    #                 await discord_member.edit(nick=username + f' [{gtag}]')
-    #
-    #             # Edit roles
-    #             await discord_member.add_roles(bot.guest, bot.ally)
-    #             await discord_member.remove_roles(bot.new_member_role, bot.member_role, bot.active_role)
-    #             continue
-    #
-    #         # Get player data
-    #         username, uuid = await get_mojang_profile(username)
-    #         if not username:
-    #             # Edit roles and continue loop
-    #             await discord_member.remove_roles(bot.member_role, bot.ally, bot.guest, bot.active_role)
-    #             await discord_member.add_roles(bot.new_member_role)
-    #             continue
-    #
-    #         # Guests
-    #         else:
-    #             if not has_tag_permission:
-    #                 await discord_member.edit(nick=username)
-    #             await discord_member.add_roles(bot.guest)
-    #             await discord_member.remove_roles(bot.new_member_role, bot.member_role, bot.active_role, bot.ally)
-    #             continue
-    #
-    #     # Send ping to new member role in registration channel
-    #     if send_ping:
-    #         await bot.get_channel(registration_channel_id).send(bot.new_member_role.mention, embed=registration_embed)
-    #
-    #     await progress_message.edit(content="Rolecheck complete!")
 
-    async def delete(ctx):
+    async def delete(ctx) -> None | str:
         embed = discord.Embed(title="This ticket will be deleted in 10 seconds!", color=neg_color)
 
         if not ctx.channel.category or ctx.channel.category.name not in ticket_categories.values():
@@ -329,12 +198,12 @@ class General:
                 except:
                     pass
 
-    async def accept(ctx):
+    async def accept(ctx) -> discord.Embed | str:
         if ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
         return accepted_staff_application_embed
 
-    async def transcript(ctx):
+    async def transcript(ctx) -> str | discord.Embed | discord.File:
         if ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
         # Create transcript
@@ -344,14 +213,14 @@ class General:
         # Transcript is valid
         return transcript
 
-    async def new(ctx):
+    async def new(ctx) -> str:
         # Create ticket
         ticket = await create_ticket(ctx.author, f"ticket-{await name_grabber(ctx.author)}")
 
         # Return message with link to ticket
         return f"Click the following link to go to your ticket! <#{ticket.id}>"
 
-    async def partner(ctx, organization_name: str):
+    async def partner(ctx, organization_name: str) -> discord.Embed:
         await ctx.send("In one message, please provide a brief description of the guild/organization being partnered.")
         # Wait for description
         description = (await bot.wait_for("message", check=lambda x: x.author == ctx.author)).content
@@ -367,7 +236,7 @@ class General:
                 url=logo)
         return discord.Embed(title=organization_name, description=description, color=neutral_color)
 
-    async def deny(ctx, channel: discord.TextChannel):
+    async def deny(ctx, channel: discord.TextChannel) -> tuple[discord.Embed, None] | tuple[discord.Embed, discord.File]:
         # Copy real question list and append 0th element for general critiquing
         application_questions = staff_application_questions.copy()
         application_questions[0] = "General critiquing"
@@ -432,7 +301,7 @@ class General:
                 return denial_embed.set_footer(text="You may reapply in 2 weeks.\
                                                \nFollowing is the transcript so that you can refer to it while reapplying."), transcript
 
-    async def inactive(ctx):
+    async def inactive(ctx) -> list[discord.Embed] | discord.Embed:
 
         # Fetch guid data
         guild_data = await get_guild_by_name(guild_handle)
@@ -528,7 +397,7 @@ class General:
 
         return embeds
 
-    async def giveawaycreate(ctx):
+    async def giveawaycreate(ctx) -> str:
         # Define progress message for asking questions
         progress_message = await ctx.send(
             "**Which channel should the giveaway be hosted in?**\n\n`Please respond with a channel shortcut or ID`\n\n**At any time, you can cancel the giveaway by replying with `cancel` to one of the upcoming prompts.**")
@@ -677,7 +546,7 @@ class General:
                 required_roles = [required_roles]
 
             # Function for checking all roles are valid
-            async def check_roles():
+            async def check_roles() -> bool | list[int]:
                 role_ids = []
                 for name in required_roles:
                     role = discord.utils.get(ctx.guild.roles, name=name)
@@ -752,7 +621,7 @@ class General:
         # Return confirmation
         return f"Ok! The giveaway has been set up in <#{destination.id}>!"
 
-    async def giveawaylist(ctx):
+    async def giveawaylist(ctx) -> discord.Embed:
         all_giveaways = await select_all(
             "SELECT prize, channel_id, message_id, number_winners, time_of_finish FROM giveaways")
 
@@ -775,7 +644,7 @@ class General:
 
             return embed
 
-    async def add_milestone(ctx, gamemode, milestone):
+    async def add_milestone(ctx, gamemode: str | None, milestone: str | None) -> tuple[discord.Embed, None] | tuple[discord.Embed, discord.ui.View]:
         member = await get_ticket_creator(ctx.channel)
         name = await name_grabber(member)
         channel = ctx.channel
@@ -800,7 +669,7 @@ class General:
                                                    x: x.channel == channel and x.author == interaction.user)
                 await channel.send(embed=await milestone_ticket_update(ctx, channel, option_emoji, milestone.content))
 
-        async def milestone_ticket_update(ctx, channel, emoji, milestone):
+        async def milestone_ticket_update(ctx, channel, emoji, milestone) -> discord.Embed:
             milestone_string = f"{emoji} {member.mention} {milestone}|"
             channel_description = channel.topic + milestone_string
             await ctx.send(
@@ -829,7 +698,7 @@ class General:
                               color=neutral_color)
         return embed, view
 
-    async def update_milestone(ctx):
+    async def update_milestone(ctx) -> tuple[discord.Embed, discord.ui.View]:
         member = await get_ticket_creator(ctx.channel)
         name = await name_grabber(member)
 
@@ -884,7 +753,7 @@ class General:
                               color=neutral_color)
         return embed, view
 
-    async def compile_milestones(ctx):
+    async def compile_milestones(ctx) -> str:
         day_number = 86 + round((datetime.utcnow() - datetime.strptime("2022/05/15", "%Y/%m/%d")).days / 7)
 
         milestone_message = f"**Weekly Milestones**\nThis is week __{day_number}__ of weekly milestones\n\n"
@@ -907,7 +776,7 @@ class General:
         await bot.get_channel(milestones_channel).send(milestone_message)
         return f"{count} milestones have been compiled and sent in {bot.get_channel(milestones_channel)}"
 
-    async def add_players(ctx):
+    async def add_players(ctx) -> None:
         for member in bot.guild.members:
             if bot.new_member_role in member.roles or member.bot:
                 continue
