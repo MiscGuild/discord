@@ -136,7 +136,7 @@ async def get_db_username_from_uuid(uuid: str):
     return username[0] if username else username
 
 async def insert_new_member(discord_id: int, uuid: str, username: str):
-    await bot.db.execute("INSERT INTO members VALUES (?, ?, ?)", (discord_id, uuid, username))
+    await bot.db.execute("INSERT INTO members VALUES (?, ?, ?, ?)", (discord_id, uuid, username, 1))
     await bot.db.commit()
 
 
