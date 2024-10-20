@@ -775,18 +775,3 @@ class General:
         milestone_message = milestone_message + "\n**Congrats to everyone this week. If you wish to submit a milestone, look over at <#650248396480970782>!**"
         await bot.get_channel(milestones_channel).send(milestone_message)
         return f"{count} milestones have been compiled and sent in {bot.get_channel(milestones_channel)}"
-
-    async def add_players(ctx) -> None:
-        for member in bot.guild.members:
-            if bot.new_member_role in member.roles or member.bot:
-                continue
-            record = await select_one("SELECT * FROM members where discord_id = (?)", (member.id,))
-            if record:
-                continue
-            returned_name = await name_grabber(member)
-            name, uuid = await get_mojang_profile(returned_name)
-            if not (name and uuid):
-                continue
-            await insert_new_member(member.id, uuid, name)
-            await asyncio.sleep(15)
-        await ctx.send("Adding players complete.")
