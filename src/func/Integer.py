@@ -15,7 +15,7 @@ class Integer:
     def __init__(self, integer: int):
         self.integer = integer
 
-    async def giveawayend(self):
+    async def giveawayend(self) -> str:
         # Get giveaway status
         status, = await get_giveaway_status(self.integer)
 
@@ -28,7 +28,7 @@ class Integer:
             return "This giveaway has already ended!\n`To re-roll it use ,giveawayreroll`"
         await roll_giveaway(self.integer)
 
-    async def giveawayreroll(self, reroll_number: int = None):
+    async def giveawayreroll(self, reroll_number: int = None) -> str:
         # Get giveaway status
         status = await get_giveaway_status(self.integer)
 
@@ -41,7 +41,7 @@ class Integer:
             return "This giveaway hasn't ended yet!\n`To end it, use ,giveawayend`"
         await roll_giveaway(self.integer, reroll_number)
 
-    async def gtop(self, ctx, is_automatic=False):
+    async def gtop(self, ctx, is_automatic=False) -> discord.Embed | str:
         # Check no. days requested to prevent errors
         if self.integer > 6:
             return discord.Embed(title="Invalid timestamp!", description="You cannot request data this old!",
@@ -69,15 +69,9 @@ class Integer:
         text = f"**Daily Top: {date}**\n"
         text = await generate_lb_text(member_gexp, text, is_automatic)
 
-        # for x in range(5):
-        #     file = await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
-        #     if file:
-        #         break
-        # Return image
-        # return file
         return text
 
-    async def purge(self, ctx, reason):
+    async def purge(self, ctx, reason: str = None) -> None:
         transcript = await create_transcript(ctx.channel, self.integer)
         await ctx.channel.purge(limit=self.integer)
         await ctx.guild.get_channel(log_channel_id).send(embed=discord.Embed(

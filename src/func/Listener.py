@@ -22,17 +22,17 @@ class Listener:
     def __init__(self, obj):
         self.obj = obj
 
-    async def on_member_join(self):
+    async def on_member_join(self) -> None:
         # Remove user's speaking perms and send info embed
         await self.obj.add_roles(bot.new_member_role)
         await bot.get_channel(registration_channel_id).send(embed=registration_embed)
 
-    async def on_error(self):
+    async def on_error(self) -> None:
         # Grabs the error being handled, formats it and sends it to the error channel
         tb = traceback.format_exc()
         await bot.get_channel(error_channel_id).send(f"Ignoring exception in event {self.obj}:\n```py\n{tb}\n```")
 
-    async def on_command_error(self, ctx):
+    async def on_command_error(self, ctx) -> None | int:
         # Prevents commands with local handlers or cogs with overwrritten on_command_errors being handled here
         if isinstance(self.obj, commands.CommandNotFound):
             return await ctx.send(embed=invalid_command_embed)
@@ -84,7 +84,7 @@ class Listener:
                 print("The below exception could not be sent to the error channel:")
                 print(tb)
 
-    async def on_application_command_error(self, ctx: discord.ApplicationContext):
+    async def on_application_command_error(self, ctx: discord.ApplicationContext) -> None:
         if ctx.command.has_error_handler() or ctx.cog.has_error_handler():
             return
 
@@ -132,7 +132,7 @@ class Listener:
                 print("The below exception could not be sent to the error channel:")
                 print(tb)
 
-    async def on_interaction(self):
+    async def on_interaction(self) -> None:
         self.obj: discord.Interaction
         if "custom_id" not in self.obj.data:
             pass
@@ -175,7 +175,7 @@ class Listener:
                     await self.obj.response.send_message(content=f"Added {label}", ephemeral=True)
         # Ticket creation
 
-    async def reactionroles(ctx):
+    async def reactionroles(ctx) -> tuple[list, list]:
         # Reaction roles
         reaction_roles_embed = discord.Embed(title="To get your desired role, click its respective button!",
                                              description="🪓 __**SkyBlock**__\nGives you the access to the SkyBlock category!\n\n"
@@ -215,7 +215,7 @@ class Listener:
 
         return [reaction_roles_embed, ReactionRolesView()], [pronouns_embed, pronouns_view]
 
-    async def tickets(ctx):
+    async def tickets(ctx) -> tuple[discord.File, discord.Embed, any]:
         image = await get_jpg_file(
             "https://media.discordapp.net/attachments/650248396480970782/873866686049189898/tickets.jpg")
 
@@ -227,7 +227,7 @@ class Listener:
 
         return image, tickets_embed, TicketView()
 
-    async def on_invitation_message(self):
+    async def on_invitation_message(self) -> None:
         if not self.obj.author.bot:
             return
         if self.obj.channel.id != staff_bridge_channel:
