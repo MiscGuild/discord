@@ -10,7 +10,8 @@ async def connect_db():
     await bot.db.execute("""CREATE TABLE IF NOT EXISTS members (
         discord_id integer PRIMARY KEY NOT NULL,
         uuid text NOT NULL, 
-        username text)""")
+        username text,
+        do_pings integer DEFAULT 1)""")
 
     # DNKL table:
     await bot.db.execute("""CREATE TABLE IF NOT EXISTS dnkl (
