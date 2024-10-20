@@ -3,7 +3,7 @@ import re
 from datetime import datetime, timedelta
 
 from src.utils.consts import ChatColor, active_req, member_req, resident_req
-from src.utils.db_utils import check_uuid_in_db, get_db_username_from_uuid
+from src.utils.db_utils import get_discordid_doping_db, get_db_username_from_uuid
 from src.utils.request_utils import get_player_guild, get_name_by_uuid
 
 
@@ -119,15 +119,15 @@ async def get_gexp_sorted(guild_data: dict):
     return member_gexp
 
 
-async def generate_lb_text(member_gexp: list, text: str, do_ping):
+async def generate_lb_text(member_gexp: list, text: str, is_automatic):
     # Generate leaderboard text
     count = 0
     for uuid, gexp in member_gexp[:10]:
         count += 1
 
-        discord_id = await check_uuid_in_db(uuid)
+        discord_id, do_pings = await get_discordid_doping_db(uuid)
         username = await get_db_username_from_uuid(uuid=uuid)
-        if discord_id and do_ping:
+        if discord_id and is_automatic and do_pings:
             name = f"<@{discord_id}>"
         else:
             name = await get_name_by_uuid(uuid) if not username else username

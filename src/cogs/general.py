@@ -36,7 +36,21 @@ class General(commands.Cog, name="general"):
     async def avatar(self, ctx, user: discord.Member = None):
         """See the avatar of a given user!"""
         await ctx.respond(embed=await Union(user=user or ctx.author).avatar())
-
+        
+           
+    @commands.slash_command()
+    @option(
+        name="setting",
+        description="Do you want the bot to ping you in daily and weekly gexp leaderboards?",
+        choices=[discord.OptionChoice("Yes", value=1), discord.OptionChoice("No", value=0)],
+        required=True
+    )
+    async def do_pings(self, ctx, setting: int):
+        """Used to enable/disable pings in automatic daily and weekly leaderboard messages!"""
+        await ctx.respond(embed=await Union(ctx.author).do_pings(setting=setting))
+        
+    
+    
     @commands.slash_command()
     @commands.has_any_role("QOTD Manager", "Staff")
     async def qotd(self, ctx):
