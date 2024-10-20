@@ -157,3 +157,13 @@ async def check_uuid_in_db(uuid: str):
 async def update_db_username(uuid: str, username: str):
     await bot.db.execute("UPDATE members SET username = ? WHERE uuid = ?", (username, uuid,))
     await bot.db.commit()
+
+async def get_discordid_doping_db(uuid: str) -> Tuple[int, bool]:
+    res = await select_one("SELECT discord_id, do_pings from members WHERE uuid = (?)", (uuid,))
+    return (res[0], res[1]) if res else (0, 0)
+
+async def set_do_ping_db(discord_id: int, do_pings: int) -> str:
+    await bot.db.execute("UPDATE members set do_pings = ? WHERE discord_id = ?", (do_pings, discord_id))
+    await bot.db.commit()
+    
+    return (await get_db_uuid_username_from_discord_id(discord_id))[0]
