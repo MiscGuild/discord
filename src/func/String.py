@@ -32,7 +32,7 @@ class String:
         self.username = username
 
     # Command from https://github.com/Rapptz/RoboDanny
-    async def source(self):
+    async def source(self) -> str:
         source_url = "https://github.com/MiscGuild/discord"
         branch = "main"
 
@@ -66,7 +66,7 @@ class String:
         final_url = f"<{source_url}/blob/{branch}/{location}#L{firstlineno}-L{firstlineno + len(lines) - 1}>"
         return f"Following is the source code for {self.string}\n{final_url}"
 
-    async def gmember(self, ctx):
+    async def gmember(self, ctx) -> discord.Embed | str:
         if self.uuid and self.username:
             uuid = self.uuid
             name = self.username
@@ -156,7 +156,7 @@ class String:
                             }
             return embed.set_image(url=chart.get_url())
 
-    async def info(self):
+    async def info(self) -> discord.Embed:
         if self.uuid and self.username:
             uuid = self.uuid
         else:
@@ -195,7 +195,7 @@ class String:
         embed.add_field(name="First • Last login", value=f"`{first_login} • {last_login}`", inline=False)
         return embed.set_image(url=f"https://gen.plancke.io/exp/{ign}.png")
 
-    async def dnkladd(self, ctx):
+    async def dnkladd(self, ctx) -> discord.Embed:
         # start, end, reason
         ign, uuid = await get_mojang_profile(self.string)
         _, weekly_gexp = await get_player_gexp(uuid)
@@ -203,13 +203,13 @@ class String:
             return unknown_ign_embed
         await ctx.respond("Please respond to the following prompts: ")
         # Ask DNKL application questions
-        dnkl_embed = await dnkl_application(ign, uuid, ctx.channel, ctx.author, weekly_gexp)
+        await dnkl_application(ign, uuid, ctx.channel, ctx.author, weekly_gexp)
 
-    async def dnklremove(self):
+    async def dnklremove(self) -> str:
         if self.string:
-            ign, uuid = await get_mojang_profile(self.string)
+            _, uuid = await get_mojang_profile(self.string)
         else:
-            ign, uuid = await get_name_by_uuid(self.uuid), self.uuid
+            _, uuid = await get_name_by_uuid(self.uuid), self.uuid
 
         row = await select_one("SELECT * FROM dnkl WHERE uuid = (?)", (uuid,))
 
@@ -229,7 +229,7 @@ class String:
 
             return f"{username} has been removed from the do-not-kick-list!"
 
-    async def dnklcheck(self):
+    async def dnklcheck(self) -> discord.Embed:
         if self.uuid and self.username:
             uuid = self.uuid
             name = self.username
@@ -260,7 +260,7 @@ class String:
         embed.set_author(name="Do-not-kick-list: Eligibility Check")
         return embed
 
-    async def rename(self, ctx):
+    async def rename(self, ctx) -> int | discord.Embed:
         # Channel is not a ticket
         if ctx.channel.category.name not in ticket_categories.values():
             return await ctx.send("This command can only be used in tickets!")
@@ -272,7 +272,7 @@ class String:
         return discord.Embed(title=f"The channel name was changed from {old_name} to {channel_name}",
                              color=neutral_color)
 
-    async def qotd(self, ctx):
+    async def qotd(self, ctx) -> None:
         # 15th May 2022 was the 473rd QOTD day. It is used as a reference point to calculate the day number.
         day_number = 473 + (datetime.utcnow() - datetime.strptime("2022/05/15", "%Y/%m/%d")).days
         embed = discord.Embed(
@@ -286,7 +286,7 @@ class String:
         await ctx.send(f"**The QOTD has been sent to <#{qotd_channel_id}>!**")
         await bot.get_channel(qotd_ans_channel_id).send(rainbow_separator)
 
-    async def invites(self):
+    async def invites(self) -> discord.Embed:
         if self.uuid and self.username:
             uuid = self.uuid
             name = self.username
