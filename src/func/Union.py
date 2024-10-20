@@ -11,7 +11,7 @@ from src.utils.consts import (active_req, allies, discord_not_linked_embed, guil
                               pos_color, registration_channel_id,
                               staff_impersonation_embed, ticket_categories,
                               unknown_ign_embed, join_request_embed)
-from src.utils.db_utils import update_member, insert_new_member, get_db_uuid_username_from_discord_id
+from src.utils.db_utils import update_member, insert_new_member, get_db_uuid_username_from_discord_id, set_do_ping_db
 from src.utils.discord_utils import (create_ticket, has_tag_perms,
                                      is_linked_discord)
 from src.utils.request_utils import (get_gtag, get_hypixel_player,
@@ -299,3 +299,14 @@ class Union:
         embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
         embed.set_footer(text=f"UUID: {uuid}")
         return embed
+    
+    async def do_pings(self, setting: int) -> discord.Embed:
+        uuid = await set_do_ping_db(self.user.id, setting)
+        embed = discord.Embed(
+            title="Ping Settings Updated!",
+            description=f"You will **{'now' if bool(setting) else 'not'}** be pinged in automatic daily and weekly leaderboard messages!",
+            color=neutral_color
+        )
+        embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
+        return embed
+        
