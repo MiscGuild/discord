@@ -187,7 +187,7 @@ tickets_embed = discord.Embed(title="Tickets",
                                         The bot will ask you to choose the reason behind the creation of your ticket from a given list. Choose the appropriate reason and then proceed!\n
                                         Once you have created your ticket, staff will respond within 24 hours.""",
                               color=neutral_color).add_field(name="Do-not-kick-list Application",
-                                                             value="You  must have a valid reason for applying and also meet the DNKL requiremnets.\n"
+                                                             value="You must have a valid reason for applying and also meet the DNKL requirements.\n"
                                                                    "Accepted Reasons:\n"
                                                                    "> Exams\n"
                                                                    "> Medical Reasons\n"
