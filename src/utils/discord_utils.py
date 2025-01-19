@@ -79,6 +79,7 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                 if bot.member_role in user.roles:
                     self.add_option(label="Register a milestone", emoji="🏆")
                     self.add_option(label="I am going to be inactive", emoji="<:dnkl:877657298703634483>")
+                    self.add_option(label="I won a rank upgrade", emoji="💰")
                     self.add_option(label="I want to join the GvG team", emoji="⚔️")
 
                 # Add default options
@@ -106,6 +107,8 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
                     await milestone(ticket, interaction, ign)
                 if option == "I am going to be inactive":
                     await dnkl(ticket, interaction, ign, uuid)
+                if option == "I won a rank upgrade":
+                    await rank_upgrade(ticket, interaction, ign)
                 if option == "I want to join the staff team":
                     await staff_application(ticket, interaction, ign)
                 if option == "I want to join the GvG team":
