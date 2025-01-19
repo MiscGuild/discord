@@ -272,15 +272,16 @@ class String:
         return discord.Embed(title=f"The channel name was changed from {old_name} to {channel_name}",
                              color=neutral_color)
 
-    async def qotd(self, ctx) -> None:
+    async def qotd(self, ctx, suggester: str) -> None:
         # 15th May 2022 was the 473rd QOTD day. It is used as a reference point to calculate the day number.
         day_number = 473 + (datetime.utcnow() - datetime.strptime("2022/05/15", "%Y/%m/%d")).days
         embed = discord.Embed(
             title=f"**{self.string}\n**",
-            description=f"Respond in: <#{qotd_ans_channel_id}>", color=neutral_color)
+            description=f"Respond in: <#{qotd_ans_channel_id}>\n"
+                        f"-# Requested by {suggester}\n"
+                        f"-# Posted by {ctx.author.nick if ctx.author.nick else ctx.author.name}", color=neutral_color)
         embed.set_author(
             name=f"Day {day_number}: {datetime.utcnow().day} {months[datetime.utcnow().month]} {datetime.utcnow().year}")
-        embed.set_footer(text="- " + ctx.author.nick if ctx.author.nick else ctx.author.name)
 
         await bot.get_channel(qotd_channel_id).send("<@&923978802818871356>", embed=embed)
         await ctx.send(f"**The QOTD has been sent to <#{qotd_channel_id}>!**")
