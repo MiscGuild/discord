@@ -64,10 +64,14 @@ class General(commands.Cog, name="general"):
                                                    placeholder="Enter the question here",
                                                    max_length=256,
                                                    style=discord.InputTextStyle.long))
+                self.add_item(discord.ui.InputText(label="Who suggested this question?",
+                                                   placeholder="Enter their username. If it was you, enter your username.",
+                                                   max_length=256,
+                                                   style=discord.InputTextStyle.short))
 
             async def callback(self, interaction: discord.Interaction):
                 await interaction.response.send_message("The QOTD has been sent!")
-                await String(string=self.children[0].value).qotd(ctx)
+                await String(string=self.children[0].value).qotd(ctx, self.children[1].value)
 
         await ctx.send_modal(modal=ModalCreator())
 
