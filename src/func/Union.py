@@ -11,7 +11,8 @@ from src.utils.consts import (active_req, allies, discord_not_linked_embed, guil
                               pos_color, registration_channel_id,
                               staff_impersonation_embed, ticket_categories,
                               unknown_ign_embed, join_request_embed)
-from src.utils.db_utils import update_member, insert_new_member, get_db_uuid_username_from_discord_id, set_do_ping_db
+from src.utils.db_utils import update_member, insert_new_member, get_db_uuid_username_from_discord_id, set_do_ping_db, \
+    check_uuid_in_db
 from src.utils.discord_utils import (create_ticket, has_tag_perms,
                                      is_linked_discord)
 from src.utils.request_utils import (get_gtag, get_hypixel_player,
@@ -171,9 +172,11 @@ class Union:
         if ign in bot.staff_names:
             return staff_impersonation_embed, None
 
-        await insert_new_member(discord_id=self.user.id,
-                                uuid=uuid,
-                                username=ign)
+        check_already_registered = await check_uuid_in_db(uuid=uuid)
+        if not check_already_registered:
+            await insert_new_member(discord_id=self.user.id,
+                                    uuid=uuid,
+                                    username=ign)
         # Fetch player & guild data
         guild_data = await get_player_guild(uuid)
 
@@ -184,8 +187,29 @@ class Union:
         embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
         embed.add_field(name=ign, value=f"Member of {guild_name}" if guild_name != "Guildless" else "Guildless")
 
+        if check_already_registered:
+            original_owner = check_already_registered
+            await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
+            ticket = await create_ticket(ctx.author, f"ticket-{ign}",
+                                         category_name=ticket_categories["registrees"])
+            await ticket.purge(limit=1000)
+            await ticket.edit(name=f"duplicate-registration-{ign}", topic=f"{ctx.author.id}|",
+                              category=discord.utils.get(ctx.guild.categories,
+                                                         name=ticket_categories["registrees"]))
+            guest_ticket = ticket
+
+            embed = discord.Embed(title="Conflict during registration!",
+                                  description=f"The account associated with {ign} is currently registered to "
+                                              f"<@{original_owner}>\n" +
+                                              f"Member of {guild_name}" if guild_name != "Guildless" else "Guildless",
+                                  color=neg_color)
+            embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
+            embed.set_footer(text="If you no longer have access to the other discord account/"
+                                  "would like to transfer to this discord account, let staff know. "
+                                  "They will forcesync you.")
+            await ticket.send(embed=embed)
         # User is a member
-        if guild_name == guild_handle:
+        elif guild_name == guild_handle:
             await ctx.author.add_roles(bot.member_role, reason="Registration - Member")
             guest_ticket = None
 
@@ -299,7 +323,7 @@ class Union:
         embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
         embed.set_footer(text=f"UUID: {uuid}")
         return embed
-    
+
     async def do_pings(self, setting: int) -> discord.Embed:
         uuid = await set_do_ping_db(self.user.id, setting)
         embed = discord.Embed(
@@ -309,4 +333,3 @@ class Union:
         )
         embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
         return embed
-        
