@@ -207,22 +207,19 @@ async def is_valid_date(date: str):
 
 
 async def extract_usernames(message: str):
+    words = message.split()
+    ign_unfiltered = words[1]
+    invitee_unfiltered = words[-1][:-1]
+
     # Define regular expressions for both formats
-    format1_pattern = r"🎉 \*\*(.*?)\*\* invited \*\*(.*?)\*\* to the guild!"
-    format2_pattern = r"🎉 \*\*(.*?)\*\* joined the guild! \*\*They weren't invited by anyone\."
+    bold = r"\*\*(.*?)\*\*"
 
-    # Check if it matches format 1
-    match_format1 = re.match(format1_pattern, message)
-    if match_format1:
-        username1 = match_format1.group(1).replace("\_", "_")
-        username2 = match_format1.group(2).replace("\_", "_")
-        return username1, username2
+    ign_format = re.match(bold, ign_unfiltered)
+    ign = ign_format.group(1).replace("\_", "_")
 
-    # Check if it matches format 2
-    match_format2 = re.match(format2_pattern, message)
-    if match_format2:
-        username1 = match_format2.group(1)
-        return username1, None
+    invitee_format = re.match(bold, invitee_unfiltered)
+    if not invitee_format:
+        return None, ign
+    inviter = invitee_format.group(1).replace("\_", "_")
 
-    # If it doesn't match any format, return None for both usernames
-    return None, None
+    return inviter, ign
