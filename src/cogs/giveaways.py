@@ -1,6 +1,4 @@
 from discord.ext import commands, bridge
-from discord.commands import option
-
 
 from src.func.General import General
 from src.func.Integer import Integer
@@ -22,7 +20,7 @@ class Giveaways(commands.Cog, name="giveaways"):
 
     @bridge.bridge_command(aliases=["gend", "giveawayfinish", "gfinish"])
     @commands.has_role("Giveaway Creator")
-    @option(
+    @bridge.bridge_option(
         name="message_id",
         description="The message ID of the giveaway you would like to end",
         required=True,
@@ -36,13 +34,13 @@ class Giveaways(commands.Cog, name="giveaways"):
 
     @bridge.bridge_command(aliases=["greroll", "reroll"])
     @commands.has_role("Giveaway Creator")
-    @option(
+    @bridge.bridge_option(
         name="message_id",
         description="The message ID of the giveaway you would like to end",
         required=True,
         input_type=int
     )
-    @option(
+    @bridge.bridge_option(
         name="reroll_number",
         description="Number of winners you would like to generate in the reroll",
         required=False,
