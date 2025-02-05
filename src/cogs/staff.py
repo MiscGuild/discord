@@ -36,10 +36,10 @@ class Staff(commands.Cog, name="staff"):
     @option(
         name="name",
         description="Their Minecraft username",
-        required=True,
+        required=False,
         input_type=str
     )
-    async def forcesync(self, ctx, member: discord.Member, name: str):
+    async def forcesync(self, ctx, member: discord.Member, name: str = None) -> None:
         """Update a user's discord nick, tag and roles for them!"""
         res = await Union(user=ctx.guild.get_member(member.id)).sync(ctx, name, None, True)
         if isinstance(res, discord.Embed):
