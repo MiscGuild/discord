@@ -1,4 +1,5 @@
 import discord
+from discord.commands import option
 from discord.ext import commands, bridge
 
 from src.func.String import String
@@ -38,7 +39,7 @@ class General(commands.Cog, name="general"):
         
            
     @commands.slash_command()
-    @bridge.bridge_option(
+    @option(
         name="setting",
         description="Do you want the bot to ping you in daily and weekly gexp leaderboards?",
         choices=[discord.OptionChoice("Yes", value=1), discord.OptionChoice("No", value=0)],
@@ -75,7 +76,7 @@ class General(commands.Cog, name="general"):
         await ctx.send_modal(modal=ModalCreator())
 
     @commands.slash_command()
-    @bridge.bridge_option(
+    @option(
         name="Member",
         description="The discord user whose minecraft ign you'd like to find",
         required=True,
