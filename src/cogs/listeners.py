@@ -31,5 +31,6 @@ class Listeners(commands.Cog, name="listeners"):
     async def on_message(self, message):
         await Listener(obj=message).on_invitation_message()
 
+
 def setup(bot):
     bot.add_cog(Listeners(bot))

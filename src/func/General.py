@@ -20,7 +20,7 @@ from src.utils.consts import (accepted_staff_application_embed, active_req,
                               resident_req, dnkl_entries_not_found,
                               positive_responses, allies)
 from src.utils.db_utils import insert_new_giveaway, select_all, get_db_username_from_uuid, \
-    get_db_uuid_username_from_discord_id, insert_new_member, select_one, update_member
+    get_db_uuid_username_from_discord_id, update_member
 from src.utils.discord_utils import (create_ticket,
                                      get_ticket_creator, log_event,
                                      name_grabber, has_tag_perms)
@@ -738,6 +738,9 @@ class General:
                                                    x: x.channel == ctx.channel and x.author == interaction.user)
                 new_milestone_message = f"{emoji} {member.mention} {milestone.content}"
                 channel_details[index] = new_milestone_message
+
+                await ctx.send(
+                    "Please give the bot up to 10 minutes to update the milestone. Once it has done it, you'll receive a completion message.")
 
                 await ctx.channel.edit(topic="|".join(channel_details))
                 embed = discord.Embed(title="Milestone Registered!",

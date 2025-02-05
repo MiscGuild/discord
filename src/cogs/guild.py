@@ -1,5 +1,4 @@
 import discord
-from discord.commands import option
 from discord.ext import commands, bridge
 
 from src.func.General import General
@@ -18,7 +17,7 @@ class Guild(commands.Cog, name="guild"):
         self.bot = bot
 
     @bridge.bridge_command(aliases=["gm", "g", "gexp"])
-    @option(
+    @bridge.bridge_option(
         name="name",
         description="The username of the player whose guild experience you'd like to view",
         required=False,
@@ -49,7 +48,7 @@ class Guild(commands.Cog, name="guild"):
             await ctx.respond(embed=res)
 
     @bridge.bridge_command(aliases=['dailylb', 'dlb'])
-    @option(
+    @bridge.bridge_option(
         name="day",
         description="Specify the number of days to go back in time and retrieve the corresponding leaderboard (0-6)",
         required=False,
@@ -82,7 +81,7 @@ class Guild(commands.Cog, name="guild"):
         await ctx.respond(embed=gvg_info_embed)
 
     @bridge.bridge_command(aliases=["invite", "inv"])
-    @option(
+    @bridge.bridge_option(
         name="name",
         description="The username of the player whose invites you'd like to view",
         required=False,

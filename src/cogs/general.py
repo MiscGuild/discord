@@ -16,7 +16,7 @@ class General(commands.Cog, name="general"):
 
     # Command from https://github.com/Rapptz/RoboDanny
     @bridge.bridge_command(name="source", aliases=['src'])
-    @option(
+    @bridge.bridge_option(
         name="command",
         description="The command you would like to see the source code for",
         required=False,
@@ -27,7 +27,7 @@ class General(commands.Cog, name="general"):
         await ctx.respond(await String(string=command).source())
 
     @bridge.bridge_command()
-    @option(
+    @bridge.bridge_option(
         name="user",
         description="User whose avatar you'd like to view",
         required=False,
@@ -75,15 +75,16 @@ class General(commands.Cog, name="general"):
 
         await ctx.send_modal(modal=ModalCreator())
 
-    @commands.slash_command()
-    @option(
+    @bridge.bridge_command()
+    @bridge.bridge_option(
         name="Member",
         description="The discord user whose minecraft ign you'd like to find",
         required=True,
         input_type=discord.Member
     )
-    async def whois(self, ctx, member: discord.Member):
-        await ctx.respond(embed=await Union(member).whois())
+    async def whois(self, ctx, member: discord.Member = None):
+        """Used to find a player's minecraft username and uuid using their discord account."""
+        await ctx.respond(embed=await Union(member or ctx.author).whois())
 
 def setup(bot):
     bot.add_cog(General(bot))

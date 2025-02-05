@@ -1,5 +1,4 @@
 import discord
-from discord.commands import option
 from discord.ext import commands, bridge
 
 from src.func.General import General
@@ -17,13 +16,13 @@ class Hypixel(commands.Cog, name="hypixel"):
         self.bot = bot
 
     @bridge.bridge_command()
-    @option(
+    @bridge.bridge_option(
         name="name",
         description="Your Minecraft Username",
         required=True,
         input_type=str
     )
-    @option(
+    @bridge.bridge_option(
         name="tag",
         description="The Tag you'd like to put beside your username",
         required=False,
@@ -38,7 +37,7 @@ class Hypixel(commands.Cog, name="hypixel"):
             await ctx.respond(res)
 
     @bridge.bridge_command(aliases=['i'])
-    @option(
+    @bridge.bridge_option(
         name="name",
         description="The Minecraft username of the player whose stats you'd like to view",
         required=False,
@@ -55,7 +54,7 @@ class Hypixel(commands.Cog, name="hypixel"):
 
     @bridge.bridge_command(aliases=['dnkladd', 'dnkla'])
     @commands.has_any_role("Staff")
-    @option(
+    @bridge.bridge_option(
         name="name",
         description="The Minecraft username of the player who you want to add to the do-not-kick-list",
         required=True,
@@ -71,13 +70,13 @@ class Hypixel(commands.Cog, name="hypixel"):
 
     @bridge.bridge_command(aliases=['dnklrmv', 'dnklremove', 'dnklremv', 'dnklr'])
     @commands.has_permissions(manage_messages=True)
-    @option(
+    @bridge.bridge_option(
         name="name",
         description="The Minecraft username of the player who you want to remove from the do-not-kick-list",
         required=False,
         input_type=str
     )
-    @option(
+    @bridge.bridge_option(
         name="uuid",
         description="The UUID of the player who you want to remove from the do-not-kick-list",
         required=False,
@@ -101,7 +100,7 @@ class Hypixel(commands.Cog, name="hypixel"):
         await ctx.respond(embed=await General.dnkllist(ctx))
 
     @bridge.bridge_command(aliases=['dnklchk', 'dnklcheck', 'dnklc'])
-    @option(
+    @bridge.bridge_option(
         name="name",
         description="The Minecraft username of the player whose do-not-kick-list eligibility you'd like to check",
         required=False,

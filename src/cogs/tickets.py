@@ -44,7 +44,7 @@ class Tickets(commands.Cog, name="tickets"):
 
     @bridge.bridge_command()
     @commands.has_any_role("Staff", "Discord Moderator")
-    @option(
+    @bridge.bridge_option(
         name="member",
         description="The Discord user you would like to add to the ticket",
         required=True,
@@ -60,7 +60,7 @@ class Tickets(commands.Cog, name="tickets"):
 
     @bridge.bridge_command()
     @commands.has_any_role("Staff", "Discord Moderator")
-    @option(
+    @bridge.bridge_option(
         name="member",
         description="The Discord user you would like to remove from the ticket",
         required=True,
@@ -76,7 +76,7 @@ class Tickets(commands.Cog, name="tickets"):
 
     @bridge.bridge_command()
     @commands.has_any_role("Staff", "Discord Moderator")
-    @option(
+    @bridge.bridge_option(
         name="channel_name",
         description="The new name for the channel",
         required=False,
@@ -110,7 +110,7 @@ class Tickets(commands.Cog, name="tickets"):
 
     @bridge.bridge_command()
     @commands.has_any_role("Admin", "Moderator")
-    @option(
+    @bridge.bridge_option(
         name="channel",
         description="The name of the channel where the staff application is",
         required=True,
@@ -131,7 +131,7 @@ class Tickets(commands.Cog, name="tickets"):
 
     @bridge.bridge_command(aliases=['AddMilestone'])
     @commands.has_any_role("Staff", "Discord Moderator")
-    @option(
+    @bridge.bridge_option(
         name="gamemode",
         description="The gamemode in which the milestone was achieved",
         choices=[discord.OptionChoice(v, value=k) for k, v in milestone_categories.items()],

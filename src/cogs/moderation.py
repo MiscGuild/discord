@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands, bridge
-from discord.commands import option
+
 from src.func.Integer import Integer
 from src.func.Union import Union
 
@@ -15,13 +15,13 @@ class Moderation(commands.Cog, name="moderation"):
 
     @bridge.bridge_command()
     @commands.has_permissions(kick_members=True)
-    @option(
+    @bridge.bridge_option(
         name="member",
         description="The Discord member you would like to mute",
         required=True,
         input_type=discord.Member
     )
-    @option(
+    @bridge.bridge_option(
         name="reason",
         description="The reason behind the mute",
         required=False,
@@ -33,7 +33,7 @@ class Moderation(commands.Cog, name="moderation"):
 
     @bridge.bridge_command()
     @commands.has_permissions(kick_members=True)
-    @option(
+    @bridge.bridge_option(
         name="member",
         description="The Discord member you would like to unmute",
         required=True,
@@ -45,13 +45,13 @@ class Moderation(commands.Cog, name="moderation"):
 
     @bridge.bridge_command()
     @commands.has_permissions(kick_members=True)
-    @option(
+    @bridge.bridge_option(
         name="member",
         description="The Discord member you would like to kick",
         required=True,
         input_type=discord.Member
     )
-    @option(
+    @bridge.bridge_option(
         name="reason",
         description="The reason behind the kick",
         required=False,
@@ -63,13 +63,13 @@ class Moderation(commands.Cog, name="moderation"):
 
     @bridge.bridge_command()
     @commands.has_permissions(ban_members=True)
-    @option(
+    @bridge.bridge_option(
         name="member",
         description="The Discord member you would like to ban",
         required=True,
         input_type=discord.Member
     )
-    @option(
+    @bridge.bridge_option(
         name="reason",
         description="The reason behind the ban",
         required=False,
@@ -81,13 +81,13 @@ class Moderation(commands.Cog, name="moderation"):
 
     @bridge.bridge_command()
     @commands.has_permissions(ban_members=True)
-    @option(
+    @bridge.bridge_option(
         name="member",
         description="The Discord member you would like to softban",
         required=True,
         input_type=discord.Member
     )
-    @option(
+    @bridge.bridge_option(
         name="reason",
         description="The reason behind the softban",
         required=False,
@@ -99,13 +99,13 @@ class Moderation(commands.Cog, name="moderation"):
 
     @bridge.bridge_command()
     @commands.has_permissions(ban_members=True)
-    @option(
+    @bridge.bridge_option(
         name="member",
         description="The Discord member you would like to unban",
         required=True,
         input_type=discord.User
     )
-    @option(
+    @bridge.bridge_option(
         name="reason",
         description="The reason behind the unban",
         required=False,
@@ -117,13 +117,13 @@ class Moderation(commands.Cog, name="moderation"):
 
     @bridge.bridge_command()
     @commands.has_permissions(manage_messages=True)
-    @option(
+    @bridge.bridge_option(
         name="amount",
         description="The number of messages you would like to purge",
         required=True,
         input_type=int
     )
-    @option(
+    @bridge.bridge_option(
         name="reason",
         description="The reason behind the purge",
         required=False,

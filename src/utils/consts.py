@@ -353,7 +353,7 @@ rank_upgrade_winner_announcement = '''# RANK UPGRADE
 > Valid Invites:- `{winner_invites}`
 > Total Entries:- `{winner_entries}`
 
-This rank upgrade must be claimed within a week of this message. If not claimed, it will be voided.
+This rank upgrade must be claimed within a week of this message by creating a ticket. If not claimed, it will be voided.
 
 ### Here are some statistics for the past week
 - Total unscaled guild experience earned - `{total_gexp}`
