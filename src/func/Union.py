@@ -206,7 +206,7 @@ class Union:
             embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
             embed.set_footer(text="If you no longer have access to the other discord account/"
                                   "would like to transfer to this discord account, let staff know. "
-                                  "They will forcesync you.")
+                                  "They will use `/forcesync`.")
             await ticket.send(embed=embed)
         # User is a member
         elif guild_name == guild_handle:
