@@ -16,7 +16,7 @@ from src.utils.db_utils import update_member, insert_new_member, get_db_uuid_use
 from src.utils.discord_utils import (create_ticket, has_tag_perms,
                                      is_linked_discord)
 from src.utils.request_utils import (get_gtag, get_hypixel_player,
-                                     get_mojang_profile, get_player_guild)
+                                     get_mojang_profile, get_player_guild, get_name_by_uuid)
 
 
 class Union:
@@ -81,7 +81,13 @@ class Union:
 
     async def sync(self, ctx, name: str, tag: str = None, is_fs=False):
         await ctx.defer()
-        ign, uuid = await get_mojang_profile(name)
+        if is_fs and not name:
+            uuid, username = await get_db_uuid_username_from_discord_id(self.user.id)
+            ign = await get_name_by_uuid(uuid)
+            if username != ign:
+                await update_member(self.user.id, uuid, ign)
+        else:
+            ign, uuid = await get_mojang_profile(name)
         # Invalid username
         if not ign:
             return unknown_ign_embed
