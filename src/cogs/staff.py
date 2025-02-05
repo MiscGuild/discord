@@ -1,7 +1,6 @@
 from __main__ import bot
 
 import discord
-from discord.commands import option
 from discord.ext import commands, bridge
 
 from src.func.General import General
@@ -27,13 +26,13 @@ class Staff(commands.Cog, name="staff"):
 
     @bridge.bridge_command(aliases=["fs"])
     @commands.has_any_role("Staff", "Discord Moderator")
-    @option(
+    @bridge.bridge_option(
         name="member",
         description="The Discord member who you would like to forcesync",
         required=True,
         input_type=discord.Member
     )
-    @option(
+    @bridge.bridge_option(
         name="name",
         description="Their Minecraft username",
         required=False,
@@ -49,7 +48,7 @@ class Staff(commands.Cog, name="staff"):
 
     @bridge.bridge_command()
     @commands.has_role("Admin")
-    @option(
+    @bridge.bridge_option(
         name="organization_name",
         description="The name of the organization you are partnering with",
         required=True,
@@ -69,7 +68,7 @@ class Staff(commands.Cog, name="staff"):
 
     @bridge.bridge_command()
     @commands.has_any_role("Staff", "Discord Moderator")
-    @option(
+    @bridge.bridge_option(
         name="send_ping",
         description="Enter 'False' if you don't want to ping New Members upon completion of rolecheck",
         required=False,
