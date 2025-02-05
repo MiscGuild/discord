@@ -1,5 +1,4 @@
 import discord
-from discord.commands import option
 from discord.ext import commands, bridge
 
 from src.func.String import String
@@ -16,7 +15,7 @@ class General(commands.Cog, name="general"):
 
     # Command from https://github.com/Rapptz/RoboDanny
     @bridge.bridge_command(name="source", aliases=['src'])
-    @option(
+    @bridge.bridge_option(
         name="command",
         description="The command you would like to see the source code for",
         required=False,
@@ -27,7 +26,7 @@ class General(commands.Cog, name="general"):
         await ctx.respond(await String(string=command).source())
 
     @bridge.bridge_command()
-    @option(
+    @bridge.bridge_option(
         name="user",
         description="User whose avatar you'd like to view",
         required=False,
@@ -39,7 +38,7 @@ class General(commands.Cog, name="general"):
         
            
     @commands.slash_command()
-    @option(
+    @bridge.bridge_option(
         name="setting",
         description="Do you want the bot to ping you in daily and weekly gexp leaderboards?",
         choices=[discord.OptionChoice("Yes", value=1), discord.OptionChoice("No", value=0)],
@@ -76,7 +75,7 @@ class General(commands.Cog, name="general"):
         await ctx.send_modal(modal=ModalCreator())
 
     @commands.slash_command()
-    @option(
+    @bridge.bridge_option(
         name="Member",
         description="The discord user whose minecraft ign you'd like to find",
         required=True,
