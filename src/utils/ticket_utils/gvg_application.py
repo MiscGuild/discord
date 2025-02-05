@@ -39,7 +39,7 @@ async def gvg_deny(channel: discord.TextChannel, author: discord.User, ign: str,
 
 
 async def gvg_application(ticket: discord.TextChannel, interaction: discord.Interaction, ign: str, uuid: str,
-                          user: discord.User):
+                          user: discord.Member):
     await ticket.edit(name=f"gvg-application-{ign}", topic=f"{interaction.user.id}|",
                       category=discord.utils.get(interaction.guild.categories,
                                                  name=ticket_categories["generic"]))
