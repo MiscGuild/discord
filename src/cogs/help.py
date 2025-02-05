@@ -1,7 +1,6 @@
 import discord
 from discord.errors import Forbidden
 from discord.ext import commands, bridge
-from discord.commands import option
 
 from src.utils.consts import config, neutral_color
 
@@ -17,7 +16,6 @@ Have a look at line 51 to 57
 
 
 async def send_embed(ctx, embed):
-
     """
     Function that handles the sending of embeds
     -> Takes context and embed to send
@@ -27,7 +25,6 @@ async def send_embed(ctx, embed):
     If this all fails: https://youtu.be/dQw4w9WgXcQ
     """
 
-    
     try:
         await ctx.respond(embed=embed)
     except Forbidden:
@@ -38,15 +35,17 @@ async def send_embed(ctx, embed):
                 f"Hey, seems like I can't send any message in {ctx.channel.name} on {ctx.guild.name}\n"
                 f"May you inform the server team about this issue? :slight_smile: ", embed=embed)
 
+
 class Help(commands.Cog):
     """
     Shows this help embed!
     """
+
     def __init__(self, bot):
         self.bot = bot
 
     @bridge.bridge_command()
-    @option(
+    @bridge.bridge_option(
         name="module",
         description="The name of the module or command you'd like to view the details of",
         required=False,
@@ -54,7 +53,7 @@ class Help(commands.Cog):
     )
     async def help(self, ctx, module=None):
         """Shows all modules of the Miscellaneous bot"""
-        
+
         prefix = config['prefix'] if not ctx.is_app else '/'
 
         async def predicate(cmd):
@@ -140,6 +139,7 @@ class Help(commands.Cog):
                                 color=discord.Color.orange())
 
         await send_embed(ctx, emb)
+
 
 def setup(bot):
     bot.add_cog(Help(bot))
