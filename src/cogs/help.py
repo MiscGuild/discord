@@ -1,4 +1,5 @@
 import discord
+import discord.ext.commands.context as Context
 from discord.errors import Forbidden
 from discord.ext import commands, bridge
 
@@ -15,7 +16,7 @@ Have a look at line 51 to 57
 """
 
 
-async def send_embed(ctx, embed):
+async def send_embed(ctx: Context, embed):
     """
     Function that handles the sending of embeds
     -> Takes context and embed to send
@@ -51,7 +52,7 @@ class Help(commands.Cog):
         required=False,
         input_type=str
     )
-    async def help(self, ctx, module=None):
+    async def help(self, ctx: Context, module=None):
         """Shows all modules of the Miscellaneous bot"""
 
         prefix = config['prefix'] if not ctx.is_app else '/'
