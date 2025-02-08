@@ -152,7 +152,7 @@ async def generate_lb_text(member_gexp: list, text: str, is_automatic) -> str:
     return text
 
 
-async def get_guild_level(exp) -> float:
+async def get_guild_level(exp) -> float | None:
     EXP_NEEDED = [100000, 150000, 250000, 500000, 750000, 1000000, 1250000, 1500000, 2000000, 2500000, 2500000, 2500000,
                   2500000, 2500000, 3000000]
     # A list of amount of XP required for leveling up in each of the beginning levels (1-15).
@@ -172,6 +172,7 @@ async def get_guild_level(exp) -> float:
         level += 1
         exp -= need
 
+    return None
 
 async def check_tag(tag: str) -> Tuple[bool, str] | Tuple[bool, None]:
     tag = tag.lower()
