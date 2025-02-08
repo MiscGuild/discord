@@ -3,7 +3,7 @@
 import inspect
 import os
 from __main__ import bot
-from datetime import datetime
+from datetime import datetime, UTC
 
 import discord
 from quickchart import QuickChart
@@ -277,14 +277,14 @@ class String:
 
     async def qotd(self, ctx: discord.ApplicationContext, suggester: str) -> None:
         # 15th May 2022 was the 473rd QOTD day. It is used as a reference point to calculate the day number.
-        day_number = 473 + (datetime.utcnow() - datetime.strptime("2022/05/15", "%Y/%m/%d")).days
+        day_number = 473 + (datetime.now(UTC) - datetime.strptime("2022/05/15", "%Y/%m/%d")).days
         embed = discord.Embed(
             title=f"**{self.string}\n**",
             description=f"Respond in: <#{qotd_ans_channel_id}>\n"
                         f"-# Requested by {suggester}\n"
                         f"-# Posted by {ctx.author.nick if ctx.author.nick else ctx.author.name}", color=neutral_color)
         embed.set_author(
-            name=f"Day {day_number}: {datetime.utcnow().day} {months[datetime.utcnow().month]} {datetime.utcnow().year}")
+            name=f"Day {day_number}: {datetime.now(UTC).day} {months[datetime.now(UTC).month]} {datetime.now(UTC).year}")
 
         await bot.get_channel(qotd_channel_id).send("<@&923978802818871356>", embed=embed)
         await bot.get_channel(qotd_ans_channel_id).send(rainbow_separator)
