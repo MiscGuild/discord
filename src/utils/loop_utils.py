@@ -2,12 +2,13 @@ import asyncio
 from __main__ import bot
 from datetime import datetime, timedelta
 
+import pytz
 from discord.ext import tasks
 
 from src.func.General import General
 from src.func.Integer import Integer
 from src.utils.consts import weekly_lb_channel, daily_lb_channel
-from src.utils.db_utils import (connect_db, select_all)
+from src.utils.db_utils import (select_all)
 from src.utils.discord_utils import update_recruiter_role
 from src.utils.giveaway_utils import roll_giveaway
 from src.utils.referral_utils import check_invitation_validity, generate_rank_upgrade
@@ -31,12 +32,35 @@ async def check_giveaways():
             await bot.db.commit()
 
 
+async def scheduler():
+    while True:
+        now = datetime.now(pytz.utc)
 
-@tasks.loop(hours=24)
+        # Define the target timezone (EST)
+        est = pytz.timezone("America/New_York")
+        now_est = now.astimezone(est)
+
+        # Get next 12 AM EST
+        next_run = now_est.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
+        next_run_utc = next_run.astimezone(pytz.utc)
+
+        # update_invites() runs at 11:59 PM to ensure everyone's gexp is at a maximum
+        sleep_time_invites = (next_run_utc - now).total_seconds() - 60
+        await asyncio.sleep(sleep_time_invites)
+        await update_invites()
+
+        # send_gexp_lb() runs at 12:00 AM EST
+        now = datetime.now(pytz.utc)
+        remaining_sleep_time = (next_run_utc - now).total_seconds()
+        await asyncio.sleep(remaining_sleep_time)
+        await send_gexp_lb()
+
+
 async def send_gexp_lb():
-    await asyncio.sleep(1)
     file = await Integer(integer=1).gtop(bot.get_channel(daily_lb_channel), is_automatic=True)
     await bot.get_channel(daily_lb_channel).send(file)
+
+    # If it's Monday (UTC), send weekly leaderboard
     if datetime.utcnow().weekday() == 0:
         await bot.get_channel(weekly_lb_channel).send(
             f"__Week {int(80 + round((datetime.utcnow() - datetime.strptime('14/08/2022', '%d/%m/%Y')).days / 7))}__\n"
@@ -44,16 +68,10 @@ async def send_gexp_lb():
             f"-"
             f" {datetime.utcnow().strftime('%d %B %Y')}**")
         await bot.get_channel(weekly_lb_channel).send(
-            await General.weeklylb(bot.get_channel(weekly_lb_channel), is_automatic=True))
+            await General.weeklylb(bot.get_channel(weekly_lb_channel), is_automatic=True)
+        )
 
 
-@send_gexp_lb.before_loop
-async def before_gexp_lb():
-    await bot.wait_until_ready()
-    await asyncio.sleep(5)
-
-
-@tasks.loop(hours=24)
 async def update_invites():
     if datetime.utcnow().weekday() != 0:
         return
@@ -75,7 +93,8 @@ async def update_invites():
     await generate_rank_upgrade(weekly_invitations)
 
 
-@update_invites.before_loop
-async def before_update_invites():
+async def before_scheduler():
+    """Ensures the bot is ready before starting the scheduler."""
     await bot.wait_until_ready()
     await asyncio.sleep(5)
+    asyncio.create_task(scheduler())  # Start the scheduler loop
