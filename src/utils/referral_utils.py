@@ -2,6 +2,7 @@ from __main__ import bot
 from datetime import datetime, timedelta
 from math import exp
 from random import shuffle, choice
+from typing import List
 
 from src.utils.calculation_utils import get_player_gexp, get_gexp_sorted
 from src.utils.consts import guild_handle, member_req, active_req, rank_upgrade_channel, \
@@ -10,12 +11,13 @@ from src.utils.db_utils import select_one, insert_new_inviter, add_invitee, chec
 from src.utils.request_utils import get_mojang_profile, get_player_guild, get_guild_by_name, get_name_by_uuid
 
 
-async def validate_invites(inviter_ign, invitee_ign):
+async def validate_invites(inviter_ign, invitee_ign) -> str:
     invitee_ign, invitee_uuid = await get_mojang_profile(invitee_ign) if invitee_ign else (None, None)
     inviter_ign, inviter_uuid = await get_mojang_profile(inviter_ign) if inviter_ign else (None, None)
-    if not inviter_uuid:
+
+    if not inviter_uuid or not inviter_ign:
         return f"{inviter_ign} is not a valid minecraft username.\nThis reference will not count."
-    if not invitee_uuid:
+    if not invitee_uuid or not invitee_ign:
         return f"Bot broke. \n{invitee_ign} is not a valid minecraft username.\nThis reference will not count."
 
     guild_data = await get_player_guild(inviter_uuid)
@@ -37,12 +39,11 @@ async def validate_invites(inviter_ign, invitee_ign):
     return f"{inviter_ign} has invited {count} members to the guild this week!"
 
 
-async def check_invitation_validity(invitations: list):
+async def check_invitation_validity(invitations: list) -> List[str]:
     guild_data = await get_guild_by_name(guild_handle)
     members = {}
     for member in guild_data["members"]:
         members[member["uuid"]] = member["joined"]
-
 
     weekly_valid_invites = []
     for invitee_uuid in invitations:
@@ -64,7 +65,7 @@ async def check_invitation_validity(invitations: list):
     return weekly_valid_invites
 
 
-async def get_entries(gexp):
+async def get_entries(gexp) -> int:
     if gexp >= active_req:
         return round(50 * (1 - exp(-gexp / 500000)))
     elif gexp >= member_req:
@@ -72,7 +73,7 @@ async def get_entries(gexp):
     return 0
 
 
-async def generate_rank_upgrade(weekly_invites : list):
+async def generate_rank_upgrade(weekly_invites: list) -> None:
     guild_data = await get_guild_by_name(guild_handle)
     members = await get_gexp_sorted(guild_data)
     entries = {}
