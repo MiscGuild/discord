@@ -9,7 +9,7 @@ from src.utils.consts import (neg_color, neutral_color)
 
 
 class StartYearSelect(ui.Select):
-    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, weekly_gexp: int, buttons: tuple):
+    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, weekly_gexp: int, buttons: tuple) -> None:
         super().__init__(placeholder="Year")
         self.channel = channel
         self.ign = ign
@@ -22,7 +22,7 @@ class StartYearSelect(ui.Select):
             self.add_option(label=str(datetime.now().year + 1))
 
     # Override default callback
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         # Set option var and delete Select so it cannot be used twice
 
         start_year = list(interaction.data.values())[0][0]
@@ -37,7 +37,8 @@ class StartYearSelect(ui.Select):
 
 
 class StartMonthSelect(ui.Select, object):
-    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, year: int, weekly_gexp: int, buttons: tuple):
+    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, year: int, weekly_gexp: int,
+                 buttons: tuple) -> None:
         super().__init__(placeholder="Month")
         self.channel = channel
         self.year = year
@@ -52,7 +53,7 @@ class StartMonthSelect(ui.Select, object):
             self.add_option(label=str(calendar.month_name[x]))
 
     # Override default callback
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         # Set option var and delete Select so it cannot be used twice
         start_month = list(interaction.data.values())[0][0]
 
@@ -69,7 +70,7 @@ class StartMonthSelect(ui.Select, object):
 
 class StartDaySelect(ui.Select):
     def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, month: str, year: int, weekly_gexp: int,
-                 buttons: tuple):
+                 buttons: tuple) -> None:
         super().__init__(placeholder="Day")
         self.channel = channel
         self.ign = ign
@@ -89,7 +90,7 @@ class StartDaySelect(ui.Select):
             self.add_option(label=str(day))
 
     # Override default callback
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         start_day = list(interaction.data.values())[0][0]
         LengthView = discord.ui.View()
         LengthView.add_item(
@@ -105,7 +106,7 @@ class StartDaySelect(ui.Select):
 
 class InactivityLenSelect(ui.Select):
     def __init__(self, author: discord.User, channel: discord.TextChannel, ign: str, uuid: str, day: int, month: str,
-                 year: int, weekly_gexp: int, buttons: tuple):
+                 year: int, weekly_gexp: int, buttons: tuple) -> None:
         super().__init__(placeholder="Length")
         self.author = author
         self.channel = channel
@@ -123,7 +124,7 @@ class InactivityLenSelect(ui.Select):
             self.add_option(label=f"{x} Weeks", value=str(x))
         self.add_option(label=f"More than {x} weeks", value='?')
 
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         length = list(interaction.data.values())[0][0]
         if length == "?":
             embed = discord.Embed(title=f"We do not accept do-not-kick-list applications that are longer than 3 weeks!",
@@ -161,7 +162,7 @@ class InactivityLenSelect(ui.Select):
 
 class InactivityReasonSelect(ui.Select):
     def __init__(self, author: discord.User, channel: discord.TextChannel, ign: str, uuid: str, day: int, month: str,
-                 year: int, length: int, weekly_gexp: int, buttons: tuple):
+                 year: int, length: int, weekly_gexp: int, buttons: tuple) -> None:
         super().__init__(placeholder="Reason")
         self.author = author
         self.channel = channel
@@ -178,7 +179,7 @@ class InactivityReasonSelect(ui.Select):
         for reason in reasons:
             self.add_option(label=reason, value=reason)
 
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         reason = list(interaction.data.values())[0][0]
 
         other_reason = ""
@@ -235,7 +236,7 @@ class InactivityReasonSelect(ui.Select):
 
 class Button_Creator(discord.ui.Button):
     def __init__(self, channel: discord.TextChannel, author: discord.User, ign: str, uuid: str, button: list,
-                 embed: discord.Embed = None, function=None):
+                 embed: discord.Embed = None, function=None) -> None:
         # button = ["LABEL", "CUSTOM_ID", STYLE]
         self.embed = embed
         self.channel = channel
@@ -246,7 +247,7 @@ class Button_Creator(discord.ui.Button):
 
         super().__init__(label=button[0], custom_id=button[1], style=button[2])
 
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         meets_req = await self.function(channel=self.channel, author=self.author, ign=self.ign, uuid=self.uuid,
                                         embed=self.embed,
                                         interaction=interaction)
@@ -270,7 +271,7 @@ class ModalCreator(discord.ui.Modal):
                                                placeholder=field[1],
                                                style=field[2]))
 
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         count = 0
         for field in self.fields:
             self.embed.add_field(name=field[3],
