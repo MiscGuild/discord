@@ -6,6 +6,7 @@ from __main__ import bot
 from datetime import datetime
 
 import discord
+import discord.ext.commands.context as Context
 from quickchart import QuickChart
 
 from src.utils.calculation_utils import (calculate_network_level,
@@ -66,7 +67,7 @@ class String:
         final_url = f"<{source_url}/blob/{branch}/{location}#L{firstlineno}-L{firstlineno + len(lines) - 1}>"
         return f"Following is the source code for {self.string}\n{final_url}"
 
-    async def gmember(self, ctx) -> discord.Embed | str:
+    async def gmember(self, ctx: Context) -> discord.Embed | str | None:
         if self.uuid and self.username:
             uuid = self.uuid
             name = self.username
@@ -156,6 +157,7 @@ class String:
                             }
             return embed.set_image(url=chart.get_url())
 
+
     async def info(self) -> discord.Embed:
         if self.uuid and self.username:
             uuid = self.uuid
@@ -195,7 +197,7 @@ class String:
         embed.add_field(name="First • Last login", value=f"`{first_login} • {last_login}`", inline=False)
         return embed.set_image(url=f"https://gen.plancke.io/exp/{ign}.png")
 
-    async def dnkladd(self, ctx) -> discord.Embed:
+    async def dnkladd(self, ctx: Context) -> discord.Embed | None:
         # start, end, reason
         ign, uuid = await get_mojang_profile(self.string)
         _, weekly_gexp = await get_player_gexp(uuid)
@@ -204,6 +206,7 @@ class String:
         await ctx.respond("Please respond to the following prompts: ")
         # Ask DNKL application questions
         await dnkl_application(ign, uuid, ctx.channel, ctx.author, weekly_gexp)
+
 
     async def dnklremove(self) -> str:
         if self.string:
@@ -228,6 +231,7 @@ class String:
                 return f"{username} has been removed from the do-not-kick-list, however the message was not found."
 
             return f"{username} has been removed from the do-not-kick-list!"
+
 
     async def dnklcheck(self) -> discord.Embed:
         if self.uuid and self.username:
@@ -260,7 +264,7 @@ class String:
         embed.set_author(name="Do-not-kick-list: Eligibility Check")
         return embed
 
-    async def rename(self, ctx) -> int | discord.Embed:
+    async def rename(self, ctx: Context) -> int | discord.Embed:
         # Channel is not a ticket
         if ctx.channel.category.name not in ticket_categories.values():
             return await ctx.send("This command can only be used in tickets!")
@@ -272,7 +276,7 @@ class String:
         return discord.Embed(title=f"The channel name was changed from {old_name} to {channel_name}",
                              color=neutral_color)
 
-    async def qotd(self, ctx, suggester: str) -> None:
+    async def qotd(self, ctx: Context, suggester: str) -> None:
         # 15th May 2022 was the 473rd QOTD day. It is used as a reference point to calculate the day number.
         day_number = 473 + (datetime.utcnow() - datetime.strptime("2022/05/15", "%Y/%m/%d")).days
         embed = discord.Embed(
@@ -302,7 +306,7 @@ class String:
         invites = await get_invites(uuid)
         invites_text = ""
         if not invites:
-            weekly_invites, total_invites, total_valid_invites = None, "0", "0"
+            weekly_invites, total_invites, total_valid_invites = None, 0, "0"
             valid_invites = []
         else:
             weekly_invites, total_invites, total_valid_invites = invites
