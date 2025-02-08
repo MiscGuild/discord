@@ -3,7 +3,7 @@
 import asyncio
 import re
 from __main__ import bot
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 
 import discord
 import discord.ui
@@ -492,7 +492,7 @@ class General:
             if duration == "cancel":
                 return "Giveaway cancelled!"
             try:
-                end_date = datetime.utcnow() + timedelta(seconds=duration)
+                end_date = datetime.now(UTC) + timedelta(seconds=duration)
                 end_date = end_date.strftime("%Y-%m-%d %H:%M:%S.%f")[:-7]
             except (TypeError, ValueError):
                 await ctx.send("Invalid duration! Please try again.", delete_after=3)
