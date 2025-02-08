@@ -1,6 +1,7 @@
 # The following file contains: giveawayend, giveawayreroll, gtop, purge
 
 import discord
+import discord.ext.commands.context as Context
 
 from src.utils.calculation_utils import generate_lb_text
 from src.utils.consts import error_color, invalid_guild_embed, guild_handle, log_channel_id, neutral_color
@@ -71,7 +72,7 @@ class Integer:
 
         return text
 
-    async def purge(self, ctx, reason: str = None) -> None:
+    async def purge(self, ctx: Context, reason: str = None) -> None:
         transcript = await create_transcript(ctx.channel, self.integer)
         await ctx.channel.purge(limit=self.integer)
         await ctx.guild.get_channel(log_channel_id).send(embed=discord.Embed(
