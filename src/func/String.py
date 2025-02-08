@@ -284,7 +284,6 @@ class String:
             name=f"Day {day_number}: {datetime.utcnow().day} {months[datetime.utcnow().month]} {datetime.utcnow().year}")
 
         await bot.get_channel(qotd_channel_id).send("<@&923978802818871356>", embed=embed)
-        await ctx.send(f"**The QOTD has been sent to <#{qotd_channel_id}>!**")
         await bot.get_channel(qotd_ans_channel_id).send(rainbow_separator)
 
     async def invites(self) -> discord.Embed:
