@@ -52,7 +52,7 @@ class Help(commands.Cog):
         required=False,
         input_type=str
     )
-    async def help(self, ctx: Context, module=None):
+    async def help(self, ctx: Context, module=None) -> None:
         """Shows all modules of the Miscellaneous bot"""
 
         prefix = config['prefix'] if not ctx.is_app else '/'
