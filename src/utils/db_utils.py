@@ -97,7 +97,7 @@ async def insert_new_giveaway(msg_id: int, channel_id: int, prize: str, number_w
     await bot.db.commit()
 
 
-async def get_giveaway_status(id: int) -> bool | None:
+async def get_giveaway_status(id: int) -> Tuple[bool] | None:
     return await select_one("SELECT is_active FROM giveaways WHERE message_id = (?)", (id,))
 
 
