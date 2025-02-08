@@ -694,10 +694,10 @@ class General:
             await ctx.send(
                 "Please give the bot up to 10 minutes to add the milestone. Once it has done it, you'll receive a completion message.")
             await channel.edit(topic=str(channel_description))
-            embed = discord.Embed(title="Milestone Registered!",
+            milestone_registration = discord.Embed(title="Milestone Registered!",
                                   description=milestone_string[:-1], color=neutral_color)
 
-            return embed
+            return milestone_registration
 
         if gamemode and milestone:
             if gamemode.lower() in [x for x in milestone_emojis.keys()]:
