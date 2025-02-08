@@ -681,10 +681,11 @@ class General:
                 await interaction.response.send_message(f"**Milestone Category:** {option}"
                                                         f"\n**What is {name}'s milestone?**\n"
                                                         f"{option_emoji}{name}.... (Complete the sentence)")
-                milestone = await bot.wait_for("message",
+                milestone_message = await bot.wait_for("message",
                                                check=lambda
                                                    x: x.channel == channel and x.author == interaction.user)
-                await channel.send(embed=await milestone_ticket_update(ctx, channel, option_emoji, milestone.content))
+                await channel.send(
+                    embed=await milestone_ticket_update(ctx, channel, option_emoji, milestone_message.content))
 
         async def milestone_ticket_update(ctx: discord.ApplicationContext, channel: discord.TextChannel, emoji: str,
                                           milestone: str) -> discord.Embed:
