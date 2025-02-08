@@ -16,7 +16,7 @@ class Giveaways(commands.Cog, name="giveaways"):
     @commands.has_role("Giveaway Creator")
     async def giveawaycreate(self, ctx):
         """Create a giveaway!"""
-        await ctx.respond(await General.giveawaycreate(ctx))
+        await ctx.respond(await General().giveawaycreate(ctx))
 
     @bridge.bridge_command(aliases=["gend", "giveawayfinish", "gfinish"])
     @commands.has_role("Giveaway Creator")
@@ -55,7 +55,7 @@ class Giveaways(commands.Cog, name="giveaways"):
     @bridge.bridge_command(aliases=["glist"])
     async def giveawaylist(self, ctx):
         """View all giveaway from the last 10 days!"""
-        await ctx.respond(embed=await General.giveawaylist(ctx))
+        await ctx.respond(embed=await General().giveawaylist(ctx))
 
 
 def setup(bot):
