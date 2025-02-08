@@ -6,7 +6,6 @@ from __main__ import bot
 from datetime import datetime, timedelta
 
 import discord
-import discord.ext.commands.context as Context
 import discord.ui
 
 from src.func.Union import Union
@@ -68,7 +67,7 @@ class General:
                              color=neutral_color).set_footer(text=f"Total: {len(content.split())}")
 
     @staticmethod
-    async def rolecheck(ctx: Context, send_ping: bool) -> None:
+    async def rolecheck(ctx: discord.ApplicationContext, send_ping: bool) -> None:
         # Define a message for sending progress updates
         progress_message = await ctx.respond("Processing prerequisites...")
 
@@ -171,7 +170,7 @@ class General:
         await progress_message.edit(content="Rolecheck complete!")
 
     @staticmethod
-    async def delete(ctx: Context) -> None | str:
+    async def delete(ctx: discord.ApplicationContext) -> None | str:
         embed = discord.Embed(title="This ticket will be deleted in 10 seconds!", color=neg_color)
 
         if not ctx.channel.category or ctx.channel.category.name not in ticket_categories.values():
@@ -205,13 +204,13 @@ class General:
                     pass
 
     @staticmethod
-    async def accept(ctx: Context) -> discord.Embed | str:
+    async def accept(ctx: discord.ApplicationContext) -> discord.Embed | str:
         if ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
         return accepted_staff_application_embed
 
     @staticmethod
-    async def transcript(ctx: Context) -> str | discord.Embed | discord.File:
+    async def transcript(ctx: discord.ApplicationContext) -> str | discord.Embed | discord.File:
         if ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
         # Create transcript
@@ -222,7 +221,7 @@ class General:
         return transcript
 
     @staticmethod
-    async def new(ctx: Context) -> str:
+    async def new(ctx: discord.ApplicationContext) -> str:
         # Create ticket
         ticket = await create_ticket(ctx.author, f"ticket-{await name_grabber(ctx.author)}")
 
@@ -230,7 +229,7 @@ class General:
         return f"Click the following link to go to your ticket! <#{ticket.id}>"
 
     @staticmethod
-    async def partner(ctx: Context, organization_name: str) -> discord.Embed:
+    async def partner(ctx: discord.ApplicationContext, organization_name: str) -> discord.Embed:
         await ctx.send("In one message, please provide a brief description of the guild/organization being partnered.")
         # Wait for description
         description = (await bot.wait_for("message", check=lambda x: x.author == ctx.author)).content
@@ -247,7 +246,7 @@ class General:
         return discord.Embed(title=organization_name, description=description, color=neutral_color)
 
     @staticmethod
-    async def deny(ctx: Context, channel: discord.TextChannel) -> tuple[discord.Embed, None] | tuple[
+    async def deny(ctx: discord.ApplicationContext, channel: discord.TextChannel) -> tuple[discord.Embed, None] | tuple[
         discord.Embed, discord.File]:
         # Copy real question list and append 0th element for general critiquing
         application_questions = staff_application_questions.copy()
@@ -411,7 +410,7 @@ class General:
         return embeds
 
     @staticmethod
-    async def giveawaycreate(ctx: Context) -> str:
+    async def giveawaycreate(ctx: discord.ApplicationContext) -> str:
         # Define progress message for asking questions
         progress_message = await ctx.send(
             "**Which channel should the giveaway be hosted in?**\n\n`Please respond with a channel shortcut or ID`\n\n**At any time, you can cancel the giveaway by replying with `cancel` to one of the upcoming prompts.**")
@@ -660,7 +659,7 @@ class General:
             return embed
 
     @staticmethod
-    async def add_milestone(ctx: Context, gamemode: str | None, milestone: str | None) -> tuple[
+    async def add_milestone(ctx: discord.ApplicationContext, gamemode: str | None, milestone: str | None) -> tuple[
                                                                                                     discord.Embed, None] | \
                                                                                                 tuple[
                                                                                                     discord.Embed, discord.ui.View]:
@@ -718,7 +717,7 @@ class General:
         return embed, view
 
     @staticmethod
-    async def update_milestone(ctx: Context) -> tuple[discord.Embed, discord.ui.View]:
+    async def update_milestone(ctx: discord.ApplicationContext) -> tuple[discord.Embed, discord.ui.View]:
         member = await get_ticket_creator(ctx.channel)
         name = await name_grabber(member)
 

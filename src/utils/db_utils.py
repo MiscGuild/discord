@@ -1,6 +1,6 @@
 import json
 from __main__ import bot
-from typing import Tuple, Iterable
+from typing import Tuple
 
 import aiosqlite
 
@@ -65,11 +65,11 @@ async def select_one(query: str, values: Tuple = None) -> Tuple | None:
 
 
 # Generic select many rows functions
-async def select_all(query: str, values: Tuple = None) -> Iterable:
+async def select_all(query: str, values: Tuple = None) -> list:
     cursor = await base_query(query, values)
     rows = await cursor.fetchall()
     await cursor.close()
-    return rows
+    return list(rows)
 
 
 ### DNKL
@@ -177,7 +177,7 @@ async def get_discordid_doping_db(uuid: str) -> Tuple[int, bool]:
 async def set_do_ping_db(discord_id: int, do_pings: int) -> str:
     await bot.db.execute("UPDATE members set do_pings = ? WHERE discord_id = ?", (do_pings, discord_id))
     await bot.db.commit()
-    
+
     return (await get_db_uuid_username_from_discord_id(discord_id))[0]
 
 

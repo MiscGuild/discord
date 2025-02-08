@@ -1,5 +1,4 @@
 import discord
-import discord.ext.commands.context as Context
 from discord.ext import commands, bridge
 
 from src.func.General import General
@@ -24,7 +23,7 @@ class Guild(commands.Cog, name="guild"):
         required=False,
         input_type=str
     )
-    async def gmember(self, ctx: Context, name: str = None) -> None:
+    async def gmember(self, ctx: discord.ApplicationContext, name: str = None) -> None:
         """View the given user's guild experience over the past week!"""
         if not name:
             uuid, username = await get_db_uuid_username_from_discord_id(ctx.author.id)
@@ -37,7 +36,7 @@ class Guild(commands.Cog, name="guild"):
             await ctx.respond(res, ephemeral=True)
 
     @bridge.bridge_command(aliases=['weeklylb', 'wlb'])
-    async def weekly_gexp_lb(self, ctx: Context) -> None:
+    async def weekly_gexp_lb(self, ctx: discord.ApplicationContext) -> None:
         """View the weekly guild experience leaderboard!"""
         await ctx.defer()
         res = await General().weeklylb()
@@ -55,7 +54,7 @@ class Guild(commands.Cog, name="guild"):
         required=False,
         input_type=int
     )
-    async def gtop(self, ctx: Context, day: int = 1) -> None:
+    async def gtop(self, ctx: discord.ApplicationContext, day: int = 1) -> None:
         """View the daily guild experience leaderboard!"""
         await ctx.defer()
         res = await Integer(integer=day).gtop(ctx=ctx)
@@ -67,17 +66,17 @@ class Guild(commands.Cog, name="guild"):
             await ctx.respond(embed=res)
 
     @bridge.bridge_command(aliases=["req", "reqs"])
-    async def requirements(self, ctx: Context) -> None:
+    async def requirements(self, ctx: discord.ApplicationContext) -> None:
         """View guild experience requirements!"""
         await ctx.respond(embed=requirements_embed)
 
     @bridge.bridge_command(aliases=["res"])
-    async def resident(self, ctx: Context) -> None:
+    async def resident(self, ctx: discord.ApplicationContext) -> None:
         """See the different ways of obtaining the resident rank!"""
         await ctx.respond(embed=resident_embed)
 
     @bridge.bridge_command()
-    async def gvg(self, ctx: Context):
+    async def gvg(self, ctx: discord.ApplicationContext):
         """View information about GvG team and the requirements!!"""
         await ctx.respond(embed=gvg_info_embed)
 
@@ -88,7 +87,7 @@ class Guild(commands.Cog, name="guild"):
         required=False,
         input_type=str
     )
-    async def invites(self, ctx: Context, name: str = None) -> None:
+    async def invites(self, ctx: discord.ApplicationContext, name: str = None) -> None:
         """View your invitation stats"""
         await ctx.defer()
         if not name:

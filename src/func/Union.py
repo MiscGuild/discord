@@ -5,7 +5,6 @@ from __main__ import bot
 from typing import Union as typingUnion, Tuple
 
 import discord
-import discord.ext.commands.context as Context
 
 from src.utils.calculation_utils import check_tag
 from src.utils.consts import (active_req, allies, discord_not_linked_embed, guild_handle, neg_color, neutral_color,
@@ -80,7 +79,8 @@ class Union:
                              description=f"{self.user} was unbanned by {author}",
                              color=neg_color)
 
-    async def sync(self, ctx: Context, name: str, tag: str = None, is_fs=False) -> discord.Embed | str:
+    async def sync(self, ctx: discord.ApplicationContext, name: str, tag: str = None,
+                   is_fs=False) -> discord.Embed | str:
         await ctx.defer()
         if is_fs and not name:
             uuid, username = await get_db_uuid_username_from_discord_id(self.user.id)
@@ -164,7 +164,8 @@ class Union:
 
         return embed
 
-    async def register(self, ctx: Context, name: str) -> Tuple[discord.Embed, str] | Tuple[str, None] | Tuple[
+    async def register(self, ctx: discord.ApplicationContext, name: str) -> Tuple[discord.Embed, str] | Tuple[
+        str, None] | Tuple[
         discord.Embed, None]:
         await ctx.defer()
         # Make sure it is only used in registration channel
@@ -294,7 +295,7 @@ class Union:
 
         return (embed, guest_ticket) if guild_name != guild_handle else (embed, None)
 
-    async def add(self, ctx: Context) -> discord.Embed | str:
+    async def add(self, ctx: discord.ApplicationContext) -> discord.Embed | str:
         if ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
 
@@ -304,7 +305,7 @@ class Union:
                                           external_emojis=True)
         return discord.Embed(title=f"{self.user.name} has been added to the ticket!", color=pos_color)
 
-    async def remove(self, ctx: Context) -> discord.Embed | str:
+    async def remove(self, ctx: discord.ApplicationContext) -> discord.Embed | str:
         if ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
 

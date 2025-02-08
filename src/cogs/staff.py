@@ -1,7 +1,6 @@
 from __main__ import bot
 
 import discord
-import discord.ext.commands.context as Context
 from discord.ext import commands, bridge
 
 from src.func.General import General
@@ -19,7 +18,7 @@ class Staff(commands.Cog, name="staff"):
 
     @bridge.bridge_command()
     @commands.has_role("Staff")
-    async def inactive(self, ctx: Context) -> None:
+    async def inactive(self, ctx: discord.ApplicationContext) -> None:
         """View all inactive users in the guild!"""
         await ctx.defer()
         for embed in await General().inactive():
@@ -39,7 +38,7 @@ class Staff(commands.Cog, name="staff"):
         required=False,
         input_type=str
     )
-    async def forcesync(self, ctx: Context, member: discord.Member, name: str = None) -> None:
+    async def forcesync(self, ctx: discord.ApplicationContext, member: discord.Member, name: str = None) -> None:
         """Update a user's discord nick, tag and roles for them!"""
         res = await Union(user=ctx.guild.get_member(member.id)).sync(ctx, name, None, True)
         if isinstance(res, discord.Embed):
@@ -55,7 +54,7 @@ class Staff(commands.Cog, name="staff"):
         required=True,
         input_type=str
     )
-    async def partner(self, ctx: Context, *, organization_name: str) -> None:
+    async def partner(self, ctx: discord.ApplicationContext, *, organization_name: str) -> None:
         """Create an embed with information about a partner!"""
         await bot.get_channel(partner_channel_id).send(embed=await General().partner(ctx, organization_name))
         await ctx.respond(embed=discord.Embed(title=f"Miscellaneous has officially partnered with {organization_name}",
@@ -64,7 +63,7 @@ class Staff(commands.Cog, name="staff"):
 
     @bridge.bridge_command()
     @commands.has_role("Admin")
-    async def information(self, ctx: Context) -> None:
+    async def information(self, ctx: discord.ApplicationContext) -> None:
         await ctx.respond(embed=information_embed)
 
     @bridge.bridge_command()
@@ -75,13 +74,13 @@ class Staff(commands.Cog, name="staff"):
         required=False,
         input_type=bool
     )
-    async def rolecheck(self, ctx: Context, send_ping: bool = True) -> None:
+    async def rolecheck(self, ctx: discord.ApplicationContext, send_ping: bool = True) -> None:
         """Sync the names and roles of everyone in the discord!"""
         await General().rolecheck(ctx, send_ping)
 
     @bridge.bridge_command()
     @commands.has_role("Guild Master")
-    async def rules(self, ctx: Context) -> None:
+    async def rules(self, ctx: discord.ApplicationContext) -> None:
         await ctx.send(embed=rules_embed)
 
 

@@ -28,7 +28,7 @@ async def is_linked_discord(player_data: dict, user: discord.User) -> bool:
     player_discord = player_data["socialMedia"]["links"]["DISCORD"]
 
     return (player_discord == str(user)[:-2]) or (
-                player_discord == (str(user.id) + "#0000") or (player_discord == str(user)))
+            player_discord == (str(user.id) + "#0000") or (player_discord == str(user)))
 
 
 async def get_ticket_creator(channel: discord.TextChannel) -> discord.Member:

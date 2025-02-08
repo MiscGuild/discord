@@ -146,7 +146,7 @@ async def generate_lb_text(member_gexp: list, text: str, is_automatic) -> str:
             text += "\n"
 
     # Replace characters for the URL
-    #text = text.replace("+", "%2B").replace("&", "%26").replace(" ", "%20").replace(",", "%2C")
+    # text = text.replace("+", "%2B").replace("&", "%26").replace(" ", "%20").replace(",", "%2C")
 
     # Return image
     return text

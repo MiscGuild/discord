@@ -2,7 +2,6 @@ import random
 from __main__ import bot
 
 import discord
-import discord.ext.commands.context as Context
 
 from src.utils.calculation_utils import get_player_gexp
 from src.utils.consts import neutral_color
@@ -12,7 +11,7 @@ from src.utils.discord_utils import name_grabber
 from src.utils.request_utils import get_mojang_profile
 
 
-async def roll_giveaway(message_id: int, reroll_target: int = None) -> Context:
+async def roll_giveaway(message_id: int, reroll_target: int = None) -> discord.ApplicationContext | discord.Message:
     # Fetch data
     channel_id, prize, number_winners, time_of_finish, req_gexp, all_roles_required, req_roles, sponsors = await select_one(
         "SELECT channel_id, prize, number_winners, time_of_finish, required_gexp, all_roles_required, required_roles, sponsors FROM giveaways WHERE message_id = (?)",

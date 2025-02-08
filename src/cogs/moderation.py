@@ -1,5 +1,4 @@
 import discord
-import discord.ext.commands.context as Context
 from discord.ext import commands, bridge
 
 from src.func.Integer import Integer
@@ -28,7 +27,7 @@ class Moderation(commands.Cog, name="moderation"):
         required=False,
         input_type=str
     )
-    async def mute(self, ctx: Context, member: discord.Member, *, reason: str = None) -> None:
+    async def mute(self, ctx: discord.ApplicationContext, member: discord.Member, *, reason: str = None) -> None:
         """Mute the mentioned user indefinitely!"""
         await ctx.respond(embed=await Union(user=member).mute(ctx.author, ctx.guild.roles, reason))
 
@@ -40,7 +39,7 @@ class Moderation(commands.Cog, name="moderation"):
         required=True,
         input_type=discord.Member
     )
-    async def unmute(self, ctx: Context, member: discord.Member) -> None:
+    async def unmute(self, ctx: discord.ApplicationContext, member: discord.Member) -> None:
         """Unmute the mentioned user!"""
         await ctx.respond(embed=await Union(user=member).unmute(ctx.guild.roles))
 
@@ -58,7 +57,7 @@ class Moderation(commands.Cog, name="moderation"):
         required=False,
         input_type=str
     )
-    async def kick(self, ctx: Context, member: discord.Member, *, reason: str = None) -> None:
+    async def kick(self, ctx: discord.ApplicationContext, member: discord.Member, *, reason: str = None) -> None:
         """Kick the mentioned user!"""
         await ctx.respond(embed=await Union(user=member).kick(ctx.author, reason))
 
@@ -76,7 +75,7 @@ class Moderation(commands.Cog, name="moderation"):
         required=False,
         input_type=str
     )
-    async def ban(self, ctx: Context, member: discord.Member, *, reason: str = None) -> None:
+    async def ban(self, ctx: discord.ApplicationContext, member: discord.Member, *, reason: str = None) -> None:
         """Ban the mentioned user!"""
         await ctx.respond(embed=await Union(user=member).ban(ctx.guild, ctx.author, reason))
 
@@ -94,7 +93,7 @@ class Moderation(commands.Cog, name="moderation"):
         required=False,
         input_type=str
     )
-    async def softban(self, ctx: Context, member: discord.Member, *, reason: str = None) -> None:
+    async def softban(self, ctx: discord.ApplicationContext, member: discord.Member, *, reason: str = None) -> None:
         """Softban the mentioned user!"""
         await ctx.respond(embed=await Union(user=member).softban(ctx.guild, ctx.author, reason))
 
@@ -112,7 +111,7 @@ class Moderation(commands.Cog, name="moderation"):
         required=False,
         input_type=str
     )
-    async def unban(self, ctx: Context, user: discord.User, *, reason: str = None) -> None:
+    async def unban(self, ctx: discord.ApplicationContext, user: discord.User, *, reason: str = None) -> None:
         """Unban the mentioned user!"""
         await ctx.respond(embed=await Union(user=user).unban(ctx.guild, ctx.author, reason))
 
@@ -130,7 +129,7 @@ class Moderation(commands.Cog, name="moderation"):
         required=False,
         input_type=str
     )
-    async def purge(self, ctx: Context, amount: int, *, reason: str = None) -> None:
+    async def purge(self, ctx: discord.ApplicationContext, amount: int, *, reason: str = None) -> None:
         """Clears the given number of messages!"""
         await Integer(integer=amount).purge(ctx, reason)
 

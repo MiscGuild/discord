@@ -6,7 +6,6 @@ from __main__ import bot
 from datetime import datetime
 
 import discord
-import discord.ext.commands.context as Context
 from quickchart import QuickChart
 
 from src.utils.calculation_utils import (calculate_network_level,
@@ -67,7 +66,7 @@ class String:
         final_url = f"<{source_url}/blob/{branch}/{location}#L{firstlineno}-L{firstlineno + len(lines) - 1}>"
         return f"Following is the source code for {self.string}\n{final_url}"
 
-    async def gmember(self, ctx: Context) -> discord.Embed | str | None:
+    async def gmember(self, ctx: discord.ApplicationContext) -> discord.Embed | str | None:
         if self.uuid and self.username:
             uuid = self.uuid
             name = self.username
@@ -197,7 +196,7 @@ class String:
         embed.add_field(name="First • Last login", value=f"`{first_login} • {last_login}`", inline=False)
         return embed.set_image(url=f"https://gen.plancke.io/exp/{ign}.png")
 
-    async def dnkladd(self, ctx: Context) -> discord.Embed | None:
+    async def dnkladd(self, ctx: discord.ApplicationContext) -> discord.Embed | None:
         # start, end, reason
         ign, uuid = await get_mojang_profile(self.string)
         _, weekly_gexp = await get_player_gexp(uuid)
@@ -264,7 +263,7 @@ class String:
         embed.set_author(name="Do-not-kick-list: Eligibility Check")
         return embed
 
-    async def rename(self, ctx: Context) -> int | discord.Embed:
+    async def rename(self, ctx: discord.ApplicationContext) -> int | discord.Embed | discord.Message:
         # Channel is not a ticket
         if ctx.channel.category.name not in ticket_categories.values():
             return await ctx.send("This command can only be used in tickets!")
@@ -276,7 +275,7 @@ class String:
         return discord.Embed(title=f"The channel name was changed from {old_name} to {channel_name}",
                              color=neutral_color)
 
-    async def qotd(self, ctx: Context, suggester: str) -> None:
+    async def qotd(self, ctx: discord.ApplicationContext, suggester: str) -> None:
         # 15th May 2022 was the 473rd QOTD day. It is used as a reference point to calculate the day number.
         day_number = 473 + (datetime.utcnow() - datetime.strptime("2022/05/15", "%Y/%m/%d")).days
         embed = discord.Embed(
@@ -330,7 +329,7 @@ class String:
                                                              f"Success Rate: {round(len(valid_invites) * 100 / len(weekly_invites)) if len(weekly_invites) else 0}%",
                         inline=False)
         embed.add_field(name="Total Valid Invites", value=total_valid_invites, inline=True)
-        embed.add_field(name="Total Invites", value=total_invites, inline=True)
+        embed.add_field(name="Total Invites", value=str(total_invites), inline=True)
         embed.add_field(name="Total Success Rate",
                         value=f"{round(total_valid_invites * 100 / total_invites if total_invites else 0)}%",
                         inline=True)

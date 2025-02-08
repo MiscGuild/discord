@@ -1,5 +1,4 @@
 import discord
-import discord.ext.commands.context as Context
 from discord.commands import option
 from discord.ext import commands, bridge
 
@@ -23,7 +22,7 @@ class General(commands.Cog, name="general"):
         required=False,
         input_type=str
     )
-    async def source(self, ctx: Context, *, command: str = None) -> None:
+    async def source(self, ctx: discord.ApplicationContext, *, command: str = None) -> None:
         """View the source code for the bot or a specific command"""
         await ctx.respond(await String(string=command).source())
 
@@ -34,7 +33,7 @@ class General(commands.Cog, name="general"):
         required=False,
         input_type=discord.Member
     )
-    async def avatar(self, ctx: Context, user: discord.Member = None) -> None:
+    async def avatar(self, ctx: discord.ApplicationContext, user: discord.Member = None) -> None:
         """See the avatar of a given user!"""
         await ctx.respond(embed=await Union(user=user or ctx.author).avatar())
 
@@ -45,13 +44,13 @@ class General(commands.Cog, name="general"):
         choices=[discord.OptionChoice("Yes", value=1), discord.OptionChoice("No", value=0)],
         required=True
     )
-    async def do_pings(self, ctx: Context, setting: int) -> None:
+    async def do_pings(self, ctx: discord.ApplicationContext, setting: int) -> None:
         """Used to enable/disable pings in automatic daily and weekly leaderboard messages!"""
         await ctx.respond(embed=await Union(ctx.author).do_pings(setting=setting))
 
     @commands.slash_command()
     @commands.has_any_role("QOTD Manager", "Staff")
-    async def qotd(self, ctx: Context) -> None:
+    async def qotd(self, ctx: discord.ApplicationContext) -> None:
         """Used by QOTD Managers to register a QOTD"""
 
         class ModalCreator(discord.ui.Modal):
@@ -80,7 +79,7 @@ class General(commands.Cog, name="general"):
         required=True,
         input_type=discord.Member
     )
-    async def whois(self, ctx: Context, member: discord.Member = None) -> None:
+    async def whois(self, ctx: discord.ApplicationContext, member: discord.Member = None) -> None:
         """Used to find a player's minecraft username and uuid using their discord account."""
         await ctx.respond(embed=await Union(member or ctx.author).whois())
 
