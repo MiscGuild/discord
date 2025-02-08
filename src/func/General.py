@@ -340,6 +340,8 @@ class General:
                 skipped_users.append(uuid)
                 continue
 
+            name = name.replace("_", "\\_")
+
             # Gather data
             guild_rank = member["rank"] if uuid not in dnkl_uuids else "DNKL"
             weekly_exp = sum(member["expHistory"].values())
