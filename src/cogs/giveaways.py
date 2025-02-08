@@ -1,3 +1,4 @@
+import discord.ext.commands.context as Context
 from discord.ext import commands, bridge
 
 from src.func.General import General
@@ -14,7 +15,7 @@ class Giveaways(commands.Cog, name="giveaways"):
 
     @bridge.bridge_command(aliases=["gcreate"])
     @commands.has_role("Giveaway Creator")
-    async def giveawaycreate(self, ctx) -> None:
+    async def giveawaycreate(self, ctx: Context) -> None:
         """Create a giveaway!"""
         await ctx.respond(await General().giveawaycreate(ctx))
 
@@ -26,7 +27,7 @@ class Giveaways(commands.Cog, name="giveaways"):
         required=True,
         input_type=int
     )
-    async def giveawayend(self, ctx, message_id: int) -> None:
+    async def giveawayend(self, ctx: Context, message_id: int) -> None:
         """Ends the giveaway with the given message ID!"""
         res = await Integer(integer=message_id).giveawayend()
         if res:
@@ -46,14 +47,14 @@ class Giveaways(commands.Cog, name="giveaways"):
         required=False,
         input_type=int
     )
-    async def giveawayreroll(self, ctx, message_id: int, reroll_number: int = None) -> None:
-        """Rerolls the giveaway with the given message ID!"""
+    async def giveawayreroll(self, ctx: Context, message_id: int, reroll_number: int = None) -> None:
+        """Re-rolls the giveaway with the given message ID!"""
         res = await Integer(integer=message_id).giveawayreroll(reroll_number)
         if res:
             await ctx.respond(res)
 
     @bridge.bridge_command(aliases=["glist"])
-    async def giveawaylist(self, ctx) -> None:
+    async def giveawaylist(self, ctx: Context) -> None:
         """View all giveaway from the last 10 days!"""
         await ctx.respond(embed=await General().giveawaylist(ctx))
 
