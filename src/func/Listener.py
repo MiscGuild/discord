@@ -4,6 +4,7 @@ import traceback
 from __main__ import bot
 
 import discord
+import discord.ext.commands.context as Context
 from discord.ext import commands
 from discord.ui import Button, Select, View
 
@@ -32,12 +33,12 @@ class Listener:
         tb = traceback.format_exc()
         await bot.get_channel(error_channel_id).send(f"Ignoring exception in event {self.obj}:\n```py\n{tb}\n```")
 
-    async def on_command_error(self, ctx) -> None | int:
+    async def on_command_error(self, ctx: Context) -> None | int:
         # Prevents commands with local handlers or cogs with overwrritten on_command_errors being handled here
         if isinstance(self.obj, commands.CommandNotFound):
             return await ctx.send(embed=invalid_command_embed)
         elif ctx.command.has_error_handler() or ctx.cog.has_error_handler():
-            return
+            return None
 
         # Checks for the original exception raised and send to CommandInvokeError
         self.obj = getattr(self.obj, "original", self.obj)
@@ -173,9 +174,8 @@ class Listener:
                 else:
                     await self.obj.user.add_roles(role)
                     await self.obj.response.send_message(content=f"Added {label}", ephemeral=True)
-        # Ticket creation
 
-    async def reactionroles(ctx) -> tuple[list, list]:
+    async def reactionroles(ctx: Context) -> tuple[list, list]:
         # Reaction roles
         reaction_roles_embed = discord.Embed(title="To get your desired role, click its respective button!",
                                              description="🪓 __**SkyBlock**__\nGives you the access to the SkyBlock category!\n\n"
