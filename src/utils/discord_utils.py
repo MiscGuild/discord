@@ -25,16 +25,18 @@ async def is_linked_discord(player_data: dict, user: discord.User) -> bool:
         return False
     if "DISCORD" not in player_data["socialMedia"]["links"]:
         return False
-    discord = player_data["socialMedia"]["links"]["DISCORD"]
+    player_discord = player_data["socialMedia"]["links"]["DISCORD"]
 
-    return (discord == str(user)[:-2]) or (discord == (str(user.id) + "#0000") or (discord == str(user)))
+    return (player_discord == str(user)[:-2]) or (
+                player_discord == (str(user.id) + "#0000") or (player_discord == str(user)))
 
 
-async def get_ticket_creator(channel: discord.TextChannel):
+async def get_ticket_creator(channel: discord.TextChannel) -> discord.Member:
     return bot.guild.get_member(int(channel.topic.split("|")[0]))
 
 
-async def create_ticket(user: discord.Member, ticket_name: str, category_name: str = ticket_categories["generic"]):
+async def create_ticket(user: discord.Member, ticket_name: str,
+                        category_name: str = ticket_categories["generic"]) -> discord.TextChannel:
     # Create ticket
     ticket: discord.TextChannel = await bot.guild.create_text_channel(ticket_name,
                                                                       category=discord.utils.get(bot.guild.categories,
@@ -134,16 +136,16 @@ async def create_ticket(user: discord.Member, ticket_name: str, category_name: s
     return ticket
 
 
-async def log_event(title: str, description: str = None):
+async def log_event(title: str, description: str = None) -> None:
     embed = discord.Embed(title=title, description=description, color=neutral_color)
     await bot.get_channel(log_channel_id).send(embed=embed)
 
 
-async def has_tag_perms(user: discord.User):
-    return any(role in user.roles for role in bot.tag_allowed_roles)
+async def has_tag_perms(member: discord.Member) -> bool:
+    return any(role in member.roles for role in bot.tag_allowed_roles)
 
 
-async def update_recruiter_role(uuid: str, invites: int):
+async def update_recruiter_role(uuid: str, invites: int) -> None:
     user_id = await check_uuid_in_db(uuid)
     if not user_id:
         return
@@ -158,10 +160,8 @@ async def update_recruiter_role(uuid: str, invites: int):
     return
 
 
-
-
 @tasks.loop(count=1)
-async def after_cache_ready():
+async def after_cache_ready() -> None:
     # Set owner id(s) and guild
     bot.owner_ids = config["owner_ids"]
     bot.guild = bot.get_guild(config["guild_id"])
@@ -192,11 +192,11 @@ async def after_cache_ready():
     check_giveaways.start()
     await before_scheduler()
 
-    from src.utils.discord_utils import name_grabber
     bot.staff_names = [(await get_mojang_profile(await name_grabber(member)))[0] for member in bot.staff.members]
 
+
 @after_cache_ready.before_loop
-async def before_cache_loop():
+async def before_cache_loop() -> None:
     print("Waiting for cache...")
     await bot.wait_until_ready()
     print("Cache filled")
