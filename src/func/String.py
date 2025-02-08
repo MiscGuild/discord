@@ -319,9 +319,9 @@ class String:
 
             for invitee in weekly_invites_dict.values():
                 if invitee in valid_invites:
-                    invites_text += f"🟢 {invitee}\n"
+                    invites_text += f"🟢 {invitee.replace("_", "\\_")}\n"
                 else:
-                    invites_text += f"🔴 {invitee}\n"
+                    invites_text += f"🔴 {invitee.replace("_", "\\_")}\n"
         embed = discord.Embed(title=f"{name}'s Invites", color=neutral_color)
         embed.add_field(name="Weekly Invites", value=None if not invites_text else invites_text, inline=False)
         embed.add_field(name="This week's statistics", value=f"Total Valid Invites: {len(valid_invites)}\n"
