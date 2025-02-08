@@ -156,7 +156,7 @@ information_embed = discord.Embed(title="Miscellaneous", url="https://plancke.io
                                                                        "Cubelify - https://cubelify.com/ / https://discord.gg/cubelify",
                                                                  inline=False).add_field(
     name="Useful Resources",
-    value="Guild Thread: http://bit.ly/MiscThread\n"
+    value="Guild Thread: https://bit.ly/MiscThread\n"
           "Discord: https://discord.gg/bHFWukp",
     inline=False).add_field(name="Requirements",
                             value="__**Active**__\n"
