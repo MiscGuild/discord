@@ -1,3 +1,4 @@
+import discord.ext.commands.context as Context
 from discord.ext import commands, bridge
 
 from src.func.Listener import Listener
@@ -13,14 +14,14 @@ class Menus(commands.Cog, command_attrs=dict(hidden=True), name="menus"):
 
     @bridge.bridge_command()
     @commands.is_owner()
-    async def reactionroles(self, ctx):
+    async def reactionroles(self, ctx: Context) -> None:
         """Send the reaction roles embeds!"""
         for embed, view in await Listener.reactionroles(ctx):
             await ctx.send(embed=embed, view=view)
 
     @commands.command()
     @commands.is_owner()
-    async def tickets(self, ctx):
+    async def tickets(self, ctx: Context) -> None:
         """Send a ticket help embed!"""
         image, embed, view = await Listener.tickets(ctx)
         await ctx.send(file=image, embed=embed, view=view)
