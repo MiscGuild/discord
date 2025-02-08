@@ -43,7 +43,7 @@ async def connect_db():
     # Guild Members table
     await bot.db.execute("""CREATE TABLE IF NOT EXISTS guild_member_data(
         uuid text NOT NULL,
-        gexp_history text""")
+        gexp_history text)""")
 
     # Commit any changes
     await bot.db.commit()
