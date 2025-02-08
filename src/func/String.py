@@ -226,7 +226,7 @@ class String:
             try:
                 msg = await bot.get_channel(dnkl_channel_id).fetch_message(message_id)
                 await msg.delete()
-            except Exception:
+            except discord.errors.NotFound:
                 return f"{username} has been removed from the do-not-kick-list, however the message was not found."
 
             return f"{username} has been removed from the do-not-kick-list!"
