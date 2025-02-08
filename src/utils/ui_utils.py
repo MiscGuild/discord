@@ -4,8 +4,10 @@ from datetime import datetime, timedelta
 
 import discord
 import discord.ui as ui
+from discord.ui import Button, Select, View
 
-from src.utils.consts import (neg_color, neutral_color)
+from src.utils.consts import (neg_color, neutral_color, pronoun_roles, reaction_roles, tickets_embed)
+from src.utils.request_utils import get_jpg_file
 
 
 class StartYearSelect(ui.Select):
@@ -122,7 +124,7 @@ class InactivityLenSelect(ui.Select):
         self.add_option(label=f"1 Week", value=str(1))
         for x in range(2, 4):
             self.add_option(label=f"{x} Weeks", value=str(x))
-        self.add_option(label=f"More than {x} weeks", value='?')
+        self.add_option(label=f"More than {3} weeks", value='?')
 
     async def callback(self, interaction: discord.Interaction) -> None:
         length = list(interaction.data.values())[0][0]
@@ -193,8 +195,8 @@ class InactivityReasonSelect(ui.Select):
             return
 
         if reason == "Other":
-            await interaction.response.send_message("Please elaborate on the reason for your inactivity.\n" \
-                                                    "This information will only be visible to staff members.\n\n" \
+            await interaction.response.send_message("Please elaborate on the reason for your inactivity.\n"
+                                                    "This information will only be visible to staff members.\n\n"
                                                     "*Kindly type the reason as a single message.*")
             other_reason = await bot.wait_for("message", check=lambda
                 x: x.channel == self.channel and x.author == self.author)
@@ -282,3 +284,57 @@ class ModalCreator(discord.ui.Modal):
             count += 1
 
         await interaction.response.send_message(embeds=[self.embed])
+
+
+async def reactionroles() -> tuple[list, list]:
+    # Reaction roles
+    reaction_roles_embed = discord.Embed(title="To get your desired role, click its respective button!",
+                                         description="🪓 __**SkyBlock**__\nGives you the access to the SkyBlock category!\n\n"
+                                                     "🕹 __**Minigames**__\nAllows you to play some Discord minigames!\n\n"
+                                                     "❓  __**QOTD Ping**__\nThe staff team will mention this role when there's a new question of the day!\n\n"
+                                                     "🎉 __**Giveaways/Events**__\nReact so you don't miss any giveaway or event\n\n"
+                                                     "📖 __**Storytime Pings**__\nGet pinged whenever a storytime happens",
+                                         color=neutral_color)
+
+    class ReactionRoleButton(Button):
+        def __init__(self, label: str, emoji: str):
+            super().__init__(label=label, custom_id=label, emoji=emoji)
+
+    class ReactionRolesView(View):
+        def __init__(self):
+            super().__init__()
+
+            # Add all buttons
+            for k, v, in reaction_roles.items():
+                self.add_item(ReactionRoleButton(k, v))
+
+    # Pronouns
+    pronouns_embed = discord.Embed(title="Please select your pronouns",
+                                   description="".join(
+                                       [k + v + "\n" for k, v in pronoun_roles.items()]),
+                                   color=neutral_color)
+
+    class PronounsSelect(Select):
+        def __init__(self):
+            options = [discord.SelectOption(
+                label=k, emoji=v) for k, v in pronoun_roles.items()]
+            super().__init__(placeholder="Select your pronouns (Max 1)",
+                             min_values=0, max_values=1, options=options, custom_id="pronouns")
+
+    pronouns_view = View(timeout=10.0)
+    pronouns_view.add_item(PronounsSelect())
+
+    return [reaction_roles_embed, ReactionRolesView()], [pronouns_embed, pronouns_view]
+
+
+async def tickets() -> tuple[discord.File, discord.Embed, any]:
+    image = await get_jpg_file(
+        "https://media.discordapp.net/attachments/650248396480970782/873866686049189898/tickets.jpg")
+
+    class TicketView(View):
+        def __init__(self):
+            super().__init__()
+            self.add_item(Button(label="Create Ticket", custom_id="tickets",
+                                 style=discord.ButtonStyle.blurple, emoji="✉️"))
+
+    return image, tickets_embed, TicketView()
