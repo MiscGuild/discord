@@ -267,7 +267,6 @@ class General:
         denial_embed = discord.Embed(title="Your staff application has been denied!",
                                      description="The reasons have been listed below", color=error_color)
 
-        # Loop for getting question feedback
         while True:
             while True:
                 await ctx.send(
@@ -275,12 +274,10 @@ class General:
                     "\nIf you would like to critique something in general, reply with `0`")
                 question = await bot.wait_for("message",
                                               check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
-                # Try-except for checking if the given number is valid
                 try:
                     question = application_questions[int(question.content)]
                     break
-                # Catch KeyError if number is invalid
-                except:
+                except KeyError:
                     await ctx.send("Please respond with a valid question number.")
 
             await ctx.send(f"`{question}`\n**What was the issue that you found with {nick}'s reply?**")
