@@ -209,11 +209,11 @@ async def extract_usernames(message: str) -> Tuple[str, str] | Tuple[None, str]:
     bold = r"\*\*(.*?)\*\*"
 
     ign_format = re.match(bold, ign_unfiltered)
-    ign = ign_format.group(1).replace("\_", "_")
+    ign = ign_format.group(1).replace("\\_", "_")
 
     invitee_format = re.match(bold, invitee_unfiltered)
     if not invitee_format:
         return None, ign
-    inviter = invitee_format.group(1).replace("\_", "_")
+    inviter = invitee_format.group(1).replace("\\_", "_")
 
     return inviter, ign
