@@ -777,7 +777,7 @@ class General:
 
     @staticmethod
     async def compile_milestones() -> str:
-        day_number = 86 + round((datetime.utcnow() - datetime.strptime("2022/05/15", "%Y/%m/%d")).days / 7)
+        day_number = 86 + round((datetime.now(UTC) - datetime.strptime("2022/05/15", "%Y/%m/%d")).days / 7)
 
         milestone_message = f"**Weekly Milestones**\nThis is week __{day_number}__ of weekly milestones\n\n"
         count = 0
