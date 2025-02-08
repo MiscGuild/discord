@@ -1,5 +1,5 @@
 from __main__ import bot
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from math import exp
 from random import shuffle, choice
 from typing import List
@@ -58,7 +58,7 @@ async def check_invitation_validity(invitations: list) -> List[str]:
             continue
 
         # Player has joined less than 7 days ago. Their gexp scaled up is double the member requirement.
-        days_since_join = (datetime.now() - datetime.fromtimestamp(members[invitee_uuid] / 1000.0)).days
+        days_since_join = (datetime.now(UTC) - datetime.fromtimestamp(members[invitee_uuid] / 1000.0)).days
         if days_since_join <= 7 and ((weekly_gexp * 2) > ((member_req / 7) * days_since_join)):
             weekly_valid_invites.append(invitee_uuid)
 
@@ -110,10 +110,10 @@ async def generate_rank_upgrade(weekly_invites: list) -> None:
             winner_invites = invites
             break
 
-    date = (f"__Week {int(0 + round((datetime.utcnow() - datetime.strptime('16/09/2023', '%d/%m/%Y')).days / 7))}__\n"
-            f"**{(datetime.utcnow() - timedelta(days=7)).strftime('%d %b %Y')} "
+    date = (f"__Week {int(0 + round((datetime.now(UTC) - datetime.strptime('16/09/2023', '%d/%m/%Y')).days / 7))}__\n"
+            f"**{(datetime.now(UTC) - timedelta(days=7)).strftime('%d %b %Y')} "
             f"-"
-            f" {datetime.utcnow().strftime('%d %B %Y')}**")
+            f" {datetime.now(UTC).strftime('%d %B %Y')}**")
 
     announcement = rank_upgrade_winner_announcement.format(
         date=date,
