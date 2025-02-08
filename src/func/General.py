@@ -494,7 +494,7 @@ class General:
             try:
                 end_date = datetime.utcnow() + timedelta(seconds=duration)
                 end_date = end_date.strftime("%Y-%m-%d %H:%M:%S.%f")[:-7]
-            except Exception:
+            except (TypeError, ValueError):
                 await ctx.send("Invalid duration! Please try again.", delete_after=3)
                 continue
             break
