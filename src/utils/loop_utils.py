@@ -15,7 +15,7 @@ from src.utils.referral_utils import check_invitation_validity, generate_rank_up
 
 
 @tasks.loop(minutes=1)
-async def check_giveaways():
+async def check_giveaways() -> None:
     # Get all giveaway data
     all_giveaways = await select_all("SELECT message_id, time_of_finish, is_active FROM giveaways")
 
@@ -32,7 +32,7 @@ async def check_giveaways():
             await bot.db.commit()
 
 
-async def scheduler():
+async def scheduler() -> None:
     while True:
         now = datetime.now(pytz.utc)
 
@@ -56,7 +56,7 @@ async def scheduler():
         await send_gexp_lb()
 
 
-async def send_gexp_lb():
+async def send_gexp_lb() -> None:
     file = await Integer(integer=1).gtop(bot.get_channel(daily_lb_channel), is_automatic=True)
     await bot.get_channel(daily_lb_channel).send(file)
 
@@ -72,7 +72,7 @@ async def send_gexp_lb():
         )
 
 
-async def update_invites():
+async def update_invites() -> None:
     if datetime.utcnow().weekday() != 0:
         return
     invites_data = await select_all("SELECT * FROM invites")
@@ -93,7 +93,7 @@ async def update_invites():
     await generate_rank_upgrade(weekly_invitations)
 
 
-async def before_scheduler():
+async def before_scheduler() -> None:
     """Ensures the bot is ready before starting the scheduler."""
     await bot.wait_until_ready()
     await asyncio.sleep(5)
