@@ -763,10 +763,9 @@ class General:
                     "Please give the bot up to 10 minutes to update the milestone. Once it has done it, you'll receive a completion message.")
 
                 await ctx.channel.edit(topic="|".join(channel_details))
-                embed = discord.Embed(title="Milestone Registered!",
-                                      description=new_milestone_message, color=neutral_color)
 
-                await ctx.send(embed=embed)
+                await ctx.send(embed=discord.Embed(title="Milestone Registered!",
+                                                   description=new_milestone_message, color=neutral_color))
 
         # Create view and embed, send to ticket
         view = discord.ui.View()
