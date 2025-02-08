@@ -21,7 +21,7 @@ class Staff(commands.Cog, name="staff"):
     async def inactive(self, ctx):
         """View all inactive users in the guild!"""
         await ctx.defer()
-        for embed in await General.inactive(ctx):
+        for embed in await General().inactive(ctx):
             await ctx.respond(embed=embed)
 
     @bridge.bridge_command(aliases=["fs"])
@@ -56,7 +56,7 @@ class Staff(commands.Cog, name="staff"):
     )
     async def partner(self, ctx, *, organization_name: str):
         """Create an embed with information about a partner!"""
-        await bot.get_channel(partner_channel_id).send(embed=await General.partner(ctx, organization_name))
+        await bot.get_channel(partner_channel_id).send(embed=await General().partner(ctx, organization_name))
         await ctx.respond(embed=discord.Embed(title=f"Miscellaneous has officially partnered with {organization_name}",
                                               color=neutral_color).set_footer(
             text="The partner embed has been sent to the partners channel!"))
@@ -76,7 +76,7 @@ class Staff(commands.Cog, name="staff"):
     )
     async def rolecheck(self, ctx, send_ping: bool = True):
         """Sync the names and roles of everyone in the discord!"""
-        await General.rolecheck(ctx, send_ping)
+        await General().rolecheck(ctx, send_ping)
 
     @bridge.bridge_command()
     @commands.has_role("Guild Master")
