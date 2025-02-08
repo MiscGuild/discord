@@ -1,6 +1,6 @@
 import asyncio
 from __main__ import bot
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 
 import pytz
 from discord.ext import tasks
@@ -23,11 +23,11 @@ async def check_giveaways() -> None:
         time_of_finish = datetime.strptime(time_of_finish, "%Y-%m-%d %H:%M:%S")
 
         # Giveaway needs to be ended
-        if is_active and time_of_finish < datetime.utcnow():
+        if is_active and time_of_finish < datetime.now(UTC):
             await roll_giveaway(message_id)
 
         # Giveaway ended more than 10 days ago, delete it
-        elif not is_active and datetime.utcnow() > time_of_finish + timedelta(days=10):
+        elif not is_active and datetime.now(UTC) > time_of_finish + timedelta(days=10):
             await bot.db.execute("DELETE FROM Giveaways WHERE message_id = (?)", (message_id,))
             await bot.db.commit()
 
@@ -61,19 +61,19 @@ async def send_gexp_lb() -> None:
     await bot.get_channel(daily_lb_channel).send(file)
 
     # If it's Monday (UTC), send weekly leaderboard
-    if datetime.utcnow().weekday() == 0:
+    if datetime.now(UTC).weekday() == 0:
         await bot.get_channel(weekly_lb_channel).send(
-            f"__Week {int(80 + round((datetime.utcnow() - datetime.strptime('14/08/2022', '%d/%m/%Y')).days / 7))}__\n"
-            f"**{(datetime.utcnow() - timedelta(days=7)).strftime('%d %b %Y')} "
+            f"__Week {int(80 + round((datetime.now(UTC) - datetime.strptime('14/08/2022', '%d/%m/%Y')).days / 7))}__\n"
+            f"**{(datetime.now(UTC) - timedelta(days=7)).strftime('%d %b %Y')} "
             f"-"
-            f" {datetime.utcnow().strftime('%d %B %Y')}**")
+            f" {datetime.now(UTC).strftime('%d %B %Y')}**")
         await bot.get_channel(weekly_lb_channel).send(
             await General().weeklylb(is_automatic=True)
         )
 
 
 async def update_invites() -> None:
-    if datetime.utcnow().weekday() != 0:
+    if datetime.now(UTC).weekday() != 0:
         return
     invites_data = await select_all("SELECT * FROM invites")
     weekly_invitations = []
