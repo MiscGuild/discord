@@ -1,3 +1,4 @@
+import json
 from __main__ import bot
 from typing import Tuple
 
@@ -32,11 +33,17 @@ async def connect_db():
         sponsors text NOT NULL,
         is_active boolean NOT NULL)""")
 
+    # Invites table
     await bot.db.execute("""CREATE TABLE IF NOT EXISTS invites(
         inviter_uuid text NOT NULL,
         current_invitee_uuids text,
         total_invites integer,
         total_valid_invites integer)""")
+
+    # Guild Members table
+    await bot.db.execute("""CREATE TABLE IF NOT EXISTS guild_member_data(
+        uuid text NOT NULL,
+        gexp_history text""")
 
     # Commit any changes
     await bot.db.commit()
@@ -131,9 +138,11 @@ async def get_db_uuid_username_from_discord_id(discord_id: int):
     res = await select_one("SELECT uuid, username from members WHERE discord_id = (?)", (discord_id,))
     return (res[0], res[1]) if res else (None, None)
 
+
 async def get_db_username_from_uuid(uuid: str):
     username = await select_one("SELECT username from members WHERE uuid = (?)", (uuid,))
     return username[0] if username else username
+
 
 async def insert_new_member(discord_id: int, uuid: str, username: str):
     await bot.db.execute("INSERT INTO members VALUES (?, ?, ?, ?)", (discord_id, uuid, username, 1))
@@ -154,16 +163,35 @@ async def check_uuid_in_db(uuid: str):
     discord_id = (await select_one("SELECT discord_id from members WHERE uuid=(?)", (uuid,)))
     return discord_id[0] if discord_id else 0
 
+
 async def update_db_username(uuid: str, username: str):
     await bot.db.execute("UPDATE members SET username = ? WHERE uuid = ?", (username, uuid,))
     await bot.db.commit()
 
+
 async def get_discordid_doping_db(uuid: str) -> Tuple[int, bool]:
     res = await select_one("SELECT discord_id, do_pings from members WHERE uuid = (?)", (uuid,))
     return (res[0], res[1]) if res else (0, 0)
+
 
 async def set_do_ping_db(discord_id: int, do_pings: int) -> str:
     await bot.db.execute("UPDATE members set do_pings = ? WHERE discord_id = ?", (do_pings, discord_id))
     await bot.db.commit()
     
     return (await get_db_uuid_username_from_discord_id(discord_id))[0]
+
+
+async def get_member_gexp_history(uuid: str):
+    history = await select_one("SELECT gexp_history from guild_member_data WHERE uuid = (?)", (uuid,))
+    return json.loads(history[0]) if history else {}
+
+
+async def set_member_gexp_history(uuid: str, gexp_history: dict):
+    current_history: dict = await get_member_gexp_history(uuid)
+    current_history.update(gexp_history)
+
+    await bot.db.execute("UPDATE guild_member_data set gexp_history = ? where uuid = ?",
+                         (json.dumps(current_history), uuid))
+    await bot.db.commit()
+
+    return current_history
