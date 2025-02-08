@@ -56,7 +56,7 @@ class Giveaways(commands.Cog, name="giveaways"):
     @bridge.bridge_command(aliases=["glist"])
     async def giveawaylist(self, ctx: Context) -> None:
         """View all giveaway from the last 10 days!"""
-        await ctx.respond(embed=await General().giveawaylist(ctx))
+        await ctx.respond(embed=await General().giveawaylist())
 
 
 def setup(bot):

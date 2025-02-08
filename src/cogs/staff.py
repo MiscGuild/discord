@@ -22,7 +22,7 @@ class Staff(commands.Cog, name="staff"):
     async def inactive(self, ctx: Context) -> None:
         """View all inactive users in the guild!"""
         await ctx.defer()
-        for embed in await General().inactive(ctx):
+        for embed in await General().inactive():
             await ctx.respond(embed=embed)
 
     @bridge.bridge_command(aliases=["fs"])

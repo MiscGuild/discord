@@ -154,7 +154,7 @@ class Tickets(commands.Cog, name="tickets"):
     @commands.has_any_role("Staff", "Discord Moderator")
     async def milestonecompile(self, ctx: Context) -> None:
         """Compiles all milestones into one message and sends it to the milestones channel"""
-        await ctx.respond(await General().compile_milestones(ctx))
+        await ctx.respond(await General().compile_milestones())
 
     @commands.Cog.listener()
     async def on_interaction(self, res) -> None:

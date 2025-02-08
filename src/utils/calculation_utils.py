@@ -42,6 +42,7 @@ async def get_color_by_gexp(rank: str, weekly_gexp: int):
         # return 0x64ffff, "rgba(100, 255, 255,0.3)", "rgba(100, 255, 255,0.3)"
 
     # Member is inactive
+
     return 0xff6464, "rgba(255, 100, 100,0.3)", "rgba(255, 100, 100,0.3)"
 
 

@@ -68,7 +68,7 @@ async def send_gexp_lb():
             f"-"
             f" {datetime.utcnow().strftime('%d %B %Y')}**")
         await bot.get_channel(weekly_lb_channel).send(
-            await General().weeklylb(bot.get_channel(weekly_lb_channel), is_automatic=True)
+            await General().weeklylb(is_automatic=True)
         )
 
 

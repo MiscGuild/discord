@@ -40,7 +40,7 @@ class Guild(commands.Cog, name="guild"):
     async def weekly_gexp_lb(self, ctx: Context) -> None:
         """View the weekly guild experience leaderboard!"""
         await ctx.defer()
-        res = await General().weeklylb(ctx)
+        res = await General().weeklylb()
         if isinstance(res, str):
             await ctx.respond(res)
         if isinstance(res, discord.File):
