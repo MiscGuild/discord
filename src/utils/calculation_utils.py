@@ -217,3 +217,10 @@ async def extract_usernames(message: str) -> Tuple[str, str] | Tuple[None, str]:
     inviter = invitee_format.group(1).replace("\\_", "_")
 
     return inviter, ign
+
+
+async def get_guild_gexp_data(guild_data: dict) -> dict:
+    members = {}
+    for member in guild_data["members"]:
+        members[member["uuid"]] = member["expHistory"]
+    return members
