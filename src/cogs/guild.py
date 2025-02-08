@@ -98,5 +98,6 @@ class Guild(commands.Cog, name="guild"):
             res = await String(string=name).invites()
         await ctx.respond(embed=res)
 
+
 def setup(bot):
     bot.add_cog(Guild(bot))
