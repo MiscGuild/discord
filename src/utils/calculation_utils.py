@@ -1,13 +1,14 @@
 import math
 import re
 from datetime import datetime, timedelta
+from typing import Tuple, List
 
 from src.utils.consts import ChatColor, active_req, member_req, resident_req
 from src.utils.db_utils import get_discordid_doping_db, get_db_username_from_uuid
 from src.utils.request_utils import get_player_guild, get_name_by_uuid
 
 
-async def get_player_gexp(uuid: str, guild_data: dict = None):
+async def get_player_gexp(uuid: str, guild_data: dict = None) -> Tuple[dict, int] | Tuple[None, None]:
     if not guild_data:
         guild_data = await get_player_guild(uuid)
 
@@ -21,7 +22,7 @@ async def get_player_gexp(uuid: str, guild_data: dict = None):
     return None, None
 
 
-async def get_color_by_gexp(rank: str, weekly_gexp: int):
+async def get_color_by_gexp(rank: str, weekly_gexp: int) -> Tuple[int, str, str]:
     if rank == "Resident":
         # Member meets res reqs
         if weekly_gexp > resident_req:
@@ -46,7 +47,7 @@ async def get_color_by_gexp(rank: str, weekly_gexp: int):
     return 0xff6464, "rgba(255, 100, 100,0.3)", "rgba(255, 100, 100,0.3)"
 
 
-async def get_hypixel_player_rank(player_data: dict):
+async def get_hypixel_player_rank(player_data: dict) -> Tuple[str, str] | Tuple[None, None]:
     if not player_data:
         return None, None
 
@@ -103,11 +104,11 @@ async def get_hypixel_player_rank(player_data: dict):
     return "&7", ""
 
 
-async def calculate_network_level(total_exp: int):
+async def calculate_network_level(total_exp: int) -> float:
     return round((math.sqrt((2 * total_exp) + 30625) / 50) - 2.5, 2)
 
 
-async def get_gexp_sorted(guild_data: dict):
+async def get_gexp_sorted(guild_data: dict) -> List[Tuple[str, int]]:
     member_gexp = {}
 
     # Loop through all guild members' gexp, adding it to dict
@@ -120,7 +121,7 @@ async def get_gexp_sorted(guild_data: dict):
     return member_gexp
 
 
-async def generate_lb_text(member_gexp: list, text: str, is_automatic):
+async def generate_lb_text(member_gexp: list, text: str, is_automatic) -> str:
     # Generate leaderboard text
     count = 0
     for uuid, gexp in member_gexp[:10]:
@@ -151,7 +152,7 @@ async def generate_lb_text(member_gexp: list, text: str, is_automatic):
     return text
 
 
-async def get_guild_level(exp):
+async def get_guild_level(exp) -> float:
     EXP_NEEDED = [100000, 150000, 250000, 500000, 750000, 1000000, 1250000, 1500000, 2000000, 2500000, 2500000, 2500000,
                   2500000, 2500000, 3000000]
     # A list of amount of XP required for leveling up in each of the beginning levels (1-15).
@@ -159,28 +160,20 @@ async def get_guild_level(exp):
     level = 0
 
     for i in range(1000):
-        # Increment by one from zero to the level cap.
         need = 0
         if i >= len(EXP_NEEDED):
             need = EXP_NEEDED[len(EXP_NEEDED) - 1]
         else:
             need = EXP_NEEDED[i]
-        # Determine the current amount of XP required to level up,
-        # in regards to the "i" variable.
 
         if (exp - need) < 0:
             return round(((level + (exp / need)) * 100) / 100, 2)
-        # If the remaining exp < the total amount of XP required for the next level,
-        # return their level using this formula.
 
         level += 1
         exp -= need
-        # Otherwise, increase their level by one,
-        # and subtract the required amount of XP to level up,
-        # from the total amount of XP that the guild had.
 
 
-async def check_tag(tag: str):
+async def check_tag(tag: str) -> Tuple[bool, str] | Tuple[bool, None]:
     tag = tag.lower()
     with open(r"src/utils/badwords.txt", "r") as f:
         badwords = f.read()
@@ -195,7 +188,7 @@ async def check_tag(tag: str):
     return True, None
 
 
-async def is_valid_date(date: str):
+async def is_valid_date(date: str) -> Tuple[bool, int, int, int] | Tuple[bool, None, None, None]:
     # Return False if parsing fails
     try:
         parsed = datetime.strptime(date, "%Y/%m/%d")
@@ -207,7 +200,7 @@ async def is_valid_date(date: str):
         return False, None, None, None
 
 
-async def extract_usernames(message: str):
+async def extract_usernames(message: str) -> Tuple[str, str] | Tuple[None, str]:
     words = message.split()
     ign_unfiltered = words[1]
     invitee_unfiltered = words[-1][:-1]
