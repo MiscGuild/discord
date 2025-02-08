@@ -522,7 +522,7 @@ class General:
                     try:
                         required_gexp = int(
                             required_gexp[:-1]) * unit_multiplier[required_gexp[-1]]
-                    except Exception:
+                    except (ValueError, KeyError):
                         await ctx.send("Invalid gexp requirement! Please try again.", delete_after=3)
                         continue
 
