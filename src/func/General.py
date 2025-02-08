@@ -477,6 +477,7 @@ class General:
         await progress_message.edit(
             content=f"Neat! There will be {number_winners} winner(s).\n\n**How long should the giveaway last?**\n\n`Please enter a duration. Use a 's' for seconds, 'm' for minutes and 'd' for days`")
 
+        end_date = None
         while True:
             # Wait for answer and check for cancellation
             duration = await bot.wait_for("message",
