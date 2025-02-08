@@ -244,11 +244,11 @@ class Union:
             guest_ticket = ticket
 
             class Join_Misc_Buttons(discord.ui.Button):
-                def __init__(self, button: list):
+                def __init__(self, button_fields: list):
                     """
                     2 buttons for 2 registration actions. `custom_id` is needed for persistent views.
                     """
-                    super().__init__(label=button[0], custom_id=button[1], style=button[2])
+                    super().__init__(label=button_fields[0], custom_id=button_fields[1], style=button_fields[2])
 
                 async def callback(self, interaction: discord.Interaction):
                     # if bot.staff not in interaction.user.roles and ticket.id != interaction.channel_id: return
