@@ -38,7 +38,7 @@ class Tickets(commands.Cog, name="tickets"):
     @commands.has_any_role("Staff", "Discord Moderator")
     async def delete(self, ctx):
         """Delete a ticket!"""
-        res = await General.delete(ctx)
+        res = await General().delete(ctx)
         if res:
             await ctx.respond(res)
 
@@ -90,7 +90,7 @@ class Tickets(commands.Cog, name="tickets"):
     @commands.has_any_role("Staff", "Discord Moderator")
     async def transcript(self, ctx):
         """Create a transcript for a ticket!"""
-        res = await General.transcript(ctx)
+        res = await General().transcript(ctx)
         if isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
         elif isinstance(res, discord.File):
@@ -102,7 +102,7 @@ class Tickets(commands.Cog, name="tickets"):
     @commands.has_role("Admin")
     async def accept(self, ctx):
         """Accept a staff application!"""
-        res = await General.accept(ctx)
+        res = await General().accept(ctx)
         if isinstance(res, str):
             await ctx.respond(res)
         if isinstance(res, discord.Embed):
@@ -119,7 +119,7 @@ class Tickets(commands.Cog, name="tickets"):
     async def deny(self, ctx, channel: discord.TextChannel):
         """Deny a staff application!"""
         # Get result and send file if it is returned
-        embed, file = await General.deny(ctx, channel)
+        embed, file = await General().deny(ctx, channel)
         await channel.send(embed=embed)
         if file:
             return await channel.send(file=file)
@@ -127,7 +127,7 @@ class Tickets(commands.Cog, name="tickets"):
     @bridge.bridge_command()
     async def new(self, ctx):
         """Create a new ticket!"""
-        await ctx.respond(await General.new(ctx))
+        await ctx.respond(await General().new(ctx))
 
     @bridge.bridge_command(aliases=['AddMilestone'])
     @commands.has_any_role("Staff", "Discord Moderator")
@@ -139,21 +139,21 @@ class Tickets(commands.Cog, name="tickets"):
     )
     async def milestoneadd(self, ctx, gamemode: str = None, *, milestone: str = None):
         """Register a milestone"""
-        embed, view = await General.add_milestone(ctx, gamemode, milestone)
+        embed, view = await General().add_milestone(ctx, gamemode, milestone)
         await ctx.respond(embed=embed, view=view)
 
     @bridge.bridge_command(aliases=['UpdateMilestone'])
     @commands.has_any_role("Staff", "Discord Moderator")
     async def milestoneupdate(self, ctx):
         """Update a milestone that has already been registered"""
-        embed, view = await General.update_milestone(ctx)
+        embed, view = await General().update_milestone(ctx)
         await ctx.respond(embed=embed, view=view)
 
     @bridge.bridge_command(aliases=["CompileMilestones", "mc", "cm", "CompileMilestone"])
     @commands.has_any_role("Staff", "Discord Moderator")
     async def milestonecompile(self, ctx):
         """Compiles all milestones into one message and sends it to the milestones channel"""
-        await ctx.respond(await General.compile_milestones(ctx))
+        await ctx.respond(await General().compile_milestones(ctx))
 
     @commands.Cog.listener()
     async def on_interaction(self, res):
