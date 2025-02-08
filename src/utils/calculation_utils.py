@@ -160,7 +160,6 @@ async def get_guild_level(exp) -> float | None:
     level = 0
 
     for i in range(1000):
-        need = 0
         if i >= len(EXP_NEEDED):
             need = EXP_NEEDED[len(EXP_NEEDED) - 1]
         else:
