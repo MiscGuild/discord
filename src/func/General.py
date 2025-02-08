@@ -687,7 +687,8 @@ class General:
                                                    x: x.channel == channel and x.author == interaction.user)
                 await channel.send(embed=await milestone_ticket_update(ctx, channel, option_emoji, milestone.content))
 
-        async def milestone_ticket_update(ctx, channel, emoji, milestone) -> discord.Embed:
+        async def milestone_ticket_update(ctx: discord.ApplicationContext, channel: discord.TextChannel, emoji: str,
+                                          milestone: str) -> discord.Embed:
             milestone_string = f"{emoji} {member.mention} {milestone}|"
             channel_description = channel.topic + milestone_string
             await ctx.send(
