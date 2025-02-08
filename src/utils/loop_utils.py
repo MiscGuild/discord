@@ -111,8 +111,6 @@ async def update_gexp() -> None:
         return
 
     gexp_data = await get_guild_gexp_data(guild_data)
-    if not gexp_data:
-        return
 
     for uuid, exp_history in gexp_data.items():
         await set_member_gexp_history(uuid, exp_history)
