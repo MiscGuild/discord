@@ -648,7 +648,7 @@ class General:
     async def add_milestone(self, ctx: Context, gamemode: str | None, milestone: str | None) -> tuple[
                                                                                                     discord.Embed, None] | \
                                                                                                 tuple[
-                                                                                              discord.Embed, discord.ui.View]:
+                                                                                                    discord.Embed, discord.ui.View]:
         member = await get_ticket_creator(ctx.channel)
         name = await name_grabber(member)
         channel = ctx.channel
