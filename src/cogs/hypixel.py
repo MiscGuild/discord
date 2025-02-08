@@ -98,7 +98,7 @@ class Hypixel(commands.Cog, name="hypixel"):
     @bridge.bridge_command(aliases=['dnkllist', 'dnkll'])
     async def dnkl_list(self, ctx: Context) -> None:
         """View all users on the do-not-kick-list!"""
-        await ctx.respond(embed=await General().dnkllist(ctx))
+        await ctx.respond(embed=await General().dnkllist())
 
     @bridge.bridge_command(aliases=['dnklchk', 'dnklcheck', 'dnklc'])
     @bridge.bridge_option(

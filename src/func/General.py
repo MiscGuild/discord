@@ -47,7 +47,8 @@ class General:
         return text
         # return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
 
-    async def dnkllist(self, ctx: Context) -> discord.Embed:
+    @staticmethod
+    async def dnkllist() -> discord.Embed:
         # Fetch all rows
         rows = await select_all("SELECT * FROM dnkl")
 
