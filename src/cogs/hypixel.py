@@ -1,4 +1,5 @@
 import discord
+import discord.ext.commands.context as Context
 from discord.ext import commands, bridge
 
 from src.func.General import General
@@ -28,7 +29,7 @@ class Hypixel(commands.Cog, name="hypixel"):
         required=False,
         input_type=str
     )
-    async def sync(self, ctx, name, tag: str = None):
+    async def sync(self, ctx: Context, name, tag: str = None):
         """Update your discord nick, tag and roles!"""
         res = await Union(user=ctx.author).sync(ctx, name, tag)
         if isinstance(res, discord.Embed):
@@ -43,7 +44,7 @@ class Hypixel(commands.Cog, name="hypixel"):
         required=False,
         input_type=str
     )
-    async def info(self, ctx, name: str = None):
+    async def info(self, ctx: Context, name: str = None):
         """View Hypixel stats of the given user!"""
         if not name:
             uuid, username = await get_db_uuid_username_from_discord_id(ctx.author.id)
@@ -60,7 +61,7 @@ class Hypixel(commands.Cog, name="hypixel"):
         required=True,
         input_type=str
     )
-    async def dnkl_add(self, ctx, name: str):
+    async def dnkl_add(self, ctx: Context, name: str):
         """Add a user to the do-not-kick-list!"""
         res = await String(string=name).dnkladd(ctx)
         if isinstance(res, str):
@@ -82,7 +83,7 @@ class Hypixel(commands.Cog, name="hypixel"):
         required=False,
         input_type=str
     )
-    async def dnkl_remove(self, ctx, name: str = None, uuid: str = None):
+    async def dnkl_remove(self, ctx: Context, name: str = None, uuid: str = None):
         """Remove a player from the do-not-kick-list"""
         if not name and not uuid:
             await ctx.respond("Please provide either the username or the UUID of the player you want to remove.")
@@ -106,7 +107,7 @@ class Hypixel(commands.Cog, name="hypixel"):
         required=False,
         input_type=str
     )
-    async def dnkl_check(self, ctx, name: str = None):
+    async def dnkl_check(self, ctx: Context, name: str = None):
         """Check whether you are eligible for the do-not-kick-list!"""
         if not name:
             uuid, username = await get_db_uuid_username_from_discord_id(ctx.author.id)
