@@ -4,12 +4,14 @@ from datetime import datetime, timedelta
 
 import discord
 import discord.ui as ui
+from discord.ui import Button, Select, View
 
-from src.utils.consts import (neg_color, neutral_color)
+from src.utils.consts import (neg_color, neutral_color, pronoun_roles, reaction_roles, tickets_embed)
+from src.utils.request_utils import get_jpg_file
 
 
 class StartYearSelect(ui.Select):
-    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, weekly_gexp: int, buttons: tuple):
+    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, weekly_gexp: int, buttons: tuple) -> None:
         super().__init__(placeholder="Year")
         self.channel = channel
         self.ign = ign
@@ -22,7 +24,7 @@ class StartYearSelect(ui.Select):
             self.add_option(label=str(datetime.now().year + 1))
 
     # Override default callback
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         # Set option var and delete Select so it cannot be used twice
 
         start_year = list(interaction.data.values())[0][0]
@@ -37,7 +39,8 @@ class StartYearSelect(ui.Select):
 
 
 class StartMonthSelect(ui.Select, object):
-    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, year: int, weekly_gexp: int, buttons: tuple):
+    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, year: int, weekly_gexp: int,
+                 buttons: tuple) -> None:
         super().__init__(placeholder="Month")
         self.channel = channel
         self.year = year
@@ -52,7 +55,7 @@ class StartMonthSelect(ui.Select, object):
             self.add_option(label=str(calendar.month_name[x]))
 
     # Override default callback
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         # Set option var and delete Select so it cannot be used twice
         start_month = list(interaction.data.values())[0][0]
 
@@ -69,7 +72,7 @@ class StartMonthSelect(ui.Select, object):
 
 class StartDaySelect(ui.Select):
     def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, month: str, year: int, weekly_gexp: int,
-                 buttons: tuple):
+                 buttons: tuple) -> None:
         super().__init__(placeholder="Day")
         self.channel = channel
         self.ign = ign
@@ -89,7 +92,7 @@ class StartDaySelect(ui.Select):
             self.add_option(label=str(day))
 
     # Override default callback
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         start_day = list(interaction.data.values())[0][0]
         LengthView = discord.ui.View()
         LengthView.add_item(
@@ -105,7 +108,7 @@ class StartDaySelect(ui.Select):
 
 class InactivityLenSelect(ui.Select):
     def __init__(self, author: discord.User, channel: discord.TextChannel, ign: str, uuid: str, day: int, month: str,
-                 year: int, weekly_gexp: int, buttons: tuple):
+                 year: int, weekly_gexp: int, buttons: tuple) -> None:
         super().__init__(placeholder="Length")
         self.author = author
         self.channel = channel
@@ -121,9 +124,9 @@ class InactivityLenSelect(ui.Select):
         self.add_option(label=f"1 Week", value=str(1))
         for x in range(2, 4):
             self.add_option(label=f"{x} Weeks", value=str(x))
-        self.add_option(label=f"More than {x} weeks", value='?')
+        self.add_option(label=f"More than {3} weeks", value='?')
 
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         length = list(interaction.data.values())[0][0]
         if length == "?":
             embed = discord.Embed(title=f"We do not accept do-not-kick-list applications that are longer than 3 weeks!",
@@ -161,7 +164,7 @@ class InactivityLenSelect(ui.Select):
 
 class InactivityReasonSelect(ui.Select):
     def __init__(self, author: discord.User, channel: discord.TextChannel, ign: str, uuid: str, day: int, month: str,
-                 year: int, length: int, weekly_gexp: int, buttons: tuple):
+                 year: int, length: int, weekly_gexp: int, buttons: tuple) -> None:
         super().__init__(placeholder="Reason")
         self.author = author
         self.channel = channel
@@ -178,7 +181,7 @@ class InactivityReasonSelect(ui.Select):
         for reason in reasons:
             self.add_option(label=reason, value=reason)
 
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         reason = list(interaction.data.values())[0][0]
 
         other_reason = ""
@@ -192,8 +195,8 @@ class InactivityReasonSelect(ui.Select):
             return
 
         if reason == "Other":
-            await interaction.response.send_message("Please elaborate on the reason for your inactivity.\n" \
-                                                    "This information will only be visible to staff members.\n\n" \
+            await interaction.response.send_message("Please elaborate on the reason for your inactivity.\n"
+                                                    "This information will only be visible to staff members.\n\n"
                                                     "*Kindly type the reason as a single message.*")
             other_reason = await bot.wait_for("message", check=lambda
                 x: x.channel == self.channel and x.author == self.author)
@@ -235,7 +238,7 @@ class InactivityReasonSelect(ui.Select):
 
 class Button_Creator(discord.ui.Button):
     def __init__(self, channel: discord.TextChannel, author: discord.User, ign: str, uuid: str, button: list,
-                 embed: discord.Embed = None, function=None):
+                 embed: discord.Embed = None, function=None) -> None:
         # button = ["LABEL", "CUSTOM_ID", STYLE]
         self.embed = embed
         self.channel = channel
@@ -246,7 +249,7 @@ class Button_Creator(discord.ui.Button):
 
         super().__init__(label=button[0], custom_id=button[1], style=button[2])
 
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         meets_req = await self.function(channel=self.channel, author=self.author, ign=self.ign, uuid=self.uuid,
                                         embed=self.embed,
                                         interaction=interaction)
@@ -270,7 +273,7 @@ class ModalCreator(discord.ui.Modal):
                                                placeholder=field[1],
                                                style=field[2]))
 
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         count = 0
         for field in self.fields:
             self.embed.add_field(name=field[3],
@@ -281,3 +284,57 @@ class ModalCreator(discord.ui.Modal):
             count += 1
 
         await interaction.response.send_message(embeds=[self.embed])
+
+
+async def reactionroles() -> tuple[list, list]:
+    # Reaction roles
+    reaction_roles_embed = discord.Embed(title="To get your desired role, click its respective button!",
+                                         description="🪓 __**SkyBlock**__\nGives you the access to the SkyBlock category!\n\n"
+                                                     "🕹 __**Minigames**__\nAllows you to play some Discord minigames!\n\n"
+                                                     "❓  __**QOTD Ping**__\nThe staff team will mention this role when there's a new question of the day!\n\n"
+                                                     "🎉 __**Giveaways/Events**__\nReact so you don't miss any giveaway or event\n\n"
+                                                     "📖 __**Storytime Pings**__\nGet pinged whenever a storytime happens",
+                                         color=neutral_color)
+
+    class ReactionRoleButton(Button):
+        def __init__(self, label: str, emoji: str):
+            super().__init__(label=label, custom_id=label, emoji=emoji)
+
+    class ReactionRolesView(View):
+        def __init__(self):
+            super().__init__()
+
+            # Add all buttons
+            for k, v, in reaction_roles.items():
+                self.add_item(ReactionRoleButton(k, v))
+
+    # Pronouns
+    pronouns_embed = discord.Embed(title="Please select your pronouns",
+                                   description="".join(
+                                       [k + v + "\n" for k, v in pronoun_roles.items()]),
+                                   color=neutral_color)
+
+    class PronounsSelect(Select):
+        def __init__(self):
+            options = [discord.SelectOption(
+                label=k, emoji=v) for k, v in pronoun_roles.items()]
+            super().__init__(placeholder="Select your pronouns (Max 1)",
+                             min_values=0, max_values=1, options=options, custom_id="pronouns")
+
+    pronouns_view = View(timeout=10.0)
+    pronouns_view.add_item(PronounsSelect())
+
+    return [reaction_roles_embed, ReactionRolesView()], [pronouns_embed, pronouns_view]
+
+
+async def tickets() -> tuple[discord.File, discord.Embed, any]:
+    image = await get_jpg_file(
+        "https://media.discordapp.net/attachments/650248396480970782/873866686049189898/tickets.jpg")
+
+    class TicketView(View):
+        def __init__(self):
+            super().__init__()
+            self.add_item(Button(label="Create Ticket", custom_id="tickets",
+                                 style=discord.ButtonStyle.blurple, emoji="✉️"))
+
+    return image, tickets_embed, TicketView()

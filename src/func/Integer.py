@@ -41,8 +41,7 @@ class Integer:
             return "This giveaway hasn't ended yet!\n`To end it, use ,giveawayend`"
         await roll_giveaway(self.integer, reroll_number)
 
-    async def gtop(self, ctx, is_automatic=False) -> discord.Embed | str:
-        # Check no. days requested to prevent errors
+    async def gtop(self, is_automatic=False) -> discord.Embed | str:
         if self.integer > 6:
             return discord.Embed(title="Invalid timestamp!", description="You cannot request data this old!",
                                  color=error_color)
@@ -71,7 +70,7 @@ class Integer:
 
         return text
 
-    async def purge(self, ctx, reason: str = None) -> None:
+    async def purge(self, ctx: discord.ApplicationContext, reason: str = None) -> None:
         transcript = await create_transcript(ctx.channel, self.integer)
         await ctx.channel.purge(limit=self.integer)
         await ctx.guild.get_channel(log_channel_id).send(embed=discord.Embed(

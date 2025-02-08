@@ -156,7 +156,7 @@ information_embed = discord.Embed(title="Miscellaneous", url="https://plancke.io
                                                                        "Cubelify - https://cubelify.com/ / https://discord.gg/cubelify",
                                                                  inline=False).add_field(
     name="Useful Resources",
-    value="Guild Thread: http://bit.ly/MiscThread\n"
+    value="Guild Thread: https://bit.ly/MiscThread\n"
           "Discord: https://discord.gg/bHFWukp",
     inline=False).add_field(name="Requirements",
                             value="__**Active**__\n"
@@ -362,7 +362,7 @@ This rank upgrade must be claimed within a week of this message by creating a ti
 
 *To know how the winner is picked, go here https://discord.com/channels/522586672148381726/1152480866585554994/1164962591198683146*'''
 
-rainbow_separator = "http://rainbowdivider.com/images/dividers/movrblin02.gif"
+rainbow_separator = "https://rainbowdivider.com/images/dividers/movrblin02.gif"
 
 
 class ChatColor(Enum):

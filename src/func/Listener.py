@@ -5,17 +5,15 @@ from __main__ import bot
 
 import discord
 from discord.ext import commands
-from discord.ui import Button, Select, View
 
 from src.utils.calculation_utils import extract_usernames
 from src.utils.consts import (error_channel_id, invalid_command_embed,
                               member_not_found_embed, missing_permissions_embed, missing_role_embed,
-                              neutral_color, not_owner_embed, pronoun_roles, staff_bridge_channel,
+                              not_owner_embed, pronoun_roles, staff_bridge_channel,
                               reaction_roles, registration_channel_id,
-                              registration_embed, err_404_embed, bot_missing_perms_embed, tickets_embed)
+                              registration_embed, err_404_embed, bot_missing_perms_embed)
 from src.utils.discord_utils import create_ticket
 from src.utils.referral_utils import validate_invites
-from src.utils.request_utils import get_jpg_file
 
 
 class Listener:
@@ -32,12 +30,12 @@ class Listener:
         tb = traceback.format_exc()
         await bot.get_channel(error_channel_id).send(f"Ignoring exception in event {self.obj}:\n```py\n{tb}\n```")
 
-    async def on_command_error(self, ctx) -> None | int:
-        # Prevents commands with local handlers or cogs with overwrritten on_command_errors being handled here
+    async def on_command_error(self, ctx: discord.ApplicationContext) -> None | discord.Message:
+        # Prevents commands with local handlers or cogs with overwritten on_command_errors being handled here
         if isinstance(self.obj, commands.CommandNotFound):
             return await ctx.send(embed=invalid_command_embed)
         elif ctx.command.has_error_handler() or ctx.cog.has_error_handler():
-            return
+            return None
 
         # Checks for the original exception raised and send to CommandInvokeError
         self.obj = getattr(self.obj, "original", self.obj)
@@ -173,59 +171,8 @@ class Listener:
                 else:
                     await self.obj.user.add_roles(role)
                     await self.obj.response.send_message(content=f"Added {label}", ephemeral=True)
-        # Ticket creation
 
-    async def reactionroles(ctx) -> tuple[list, list]:
-        # Reaction roles
-        reaction_roles_embed = discord.Embed(title="To get your desired role, click its respective button!",
-                                             description="🪓 __**SkyBlock**__\nGives you the access to the SkyBlock category!\n\n"
-                                                         "🕹 __**Minigames**__\nAllows you to play some Discord minigames!\n\n"
-                                                         "❓  __**QOTD Ping**__\nThe staff team will mention this role when there's a new question of the day!\n\n"
-                                                         "🎉 __**Giveaways/Events**__\nReact so you don't miss any giveaway or event\n\n"
-                                                         "📖 __**Storytime Pings**__\nGet pinged whenever a storytime happens",
-                                             color=neutral_color)
 
-        class ReactionRoleButton(Button):
-            def __init__(self, label: str, emoji: str):
-                super().__init__(label=label, custom_id=label, emoji=emoji)
-
-        class ReactionRolesView(View):
-            def __init__(self):
-                super().__init__()
-
-                # Add all buttons
-                for k, v, in reaction_roles.items():
-                    self.add_item(ReactionRoleButton(k, v))
-
-        # Pronouns
-        pronouns_embed = discord.Embed(title="Please select your pronouns",
-                                       description="".join(
-                                           [k + v + "\n" for k, v in pronoun_roles.items()]),
-                                       color=neutral_color)
-
-        class PronounsSelect(Select):
-            def __init__(self):
-                options = [discord.SelectOption(
-                    label=k, emoji=v) for k, v in pronoun_roles.items()]
-                super().__init__(placeholder="Select your pronouns (Max 1)",
-                                 min_values=0, max_values=1, options=options, custom_id="pronouns")
-
-        pronouns_view = View(timeout=10.0)
-        pronouns_view.add_item(PronounsSelect())
-
-        return [reaction_roles_embed, ReactionRolesView()], [pronouns_embed, pronouns_view]
-
-    async def tickets(ctx) -> tuple[discord.File, discord.Embed, any]:
-        image = await get_jpg_file(
-            "https://media.discordapp.net/attachments/650248396480970782/873866686049189898/tickets.jpg")
-
-        class TicketView(View):
-            def __init__(self):
-                super().__init__()
-                self.add_item(Button(label="Create Ticket", custom_id="tickets",
-                                     style=discord.ButtonStyle.blurple, emoji="✉️"))
-
-        return image, tickets_embed, TicketView()
 
     async def on_invitation_message(self) -> None:
         if not self.obj.author.bot:

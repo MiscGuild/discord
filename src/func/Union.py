@@ -2,7 +2,7 @@
 
 import asyncio
 from __main__ import bot
-from typing import Union
+from typing import Union as typingUnion, Tuple
 
 import discord
 
@@ -20,10 +20,10 @@ from src.utils.request_utils import (get_gtag, get_hypixel_player,
 
 
 class Union:
-    def __init__(self, user: Union[discord.Member, discord.User]):
+    def __init__(self, user: typingUnion[discord.Member, discord.User]):
         self.user = user
 
-    async def mute(self, author, guild_roles, reason: str = None):
+    async def mute(self, author, guild_roles, reason: str = None) -> discord.Embed:
         # Default reason is responsible moderator
         if not reason:
             reason = f"Responsible moderator: {author}"
@@ -31,14 +31,14 @@ class Union:
         await self.user.add_roles(discord.utils.get(guild_roles, name="Muted"))
         return discord.Embed(title="Muted!", description=f"{self.user} was muted by {author}!", color=neg_color)
 
-    async def unmute(self, guild_roles):
+    async def unmute(self, guild_roles) -> discord.Embed:
         await self.user.remove_roles(discord.utils.get(guild_roles, name="Muted"))
         embed = discord.Embed(title="Unmuted!",
                               description=f"{self.user} has been unmuted!",
                               color=neutral_color)
         return embed
 
-    async def kick(self, author, reason: str = None):
+    async def kick(self, author: discord.User, reason: str = None) -> discord.Embed:
         # Default reason is responsible moderator
         if not reason:
             reason = f"Responsible moderator: {author}"
@@ -48,7 +48,7 @@ class Union:
                              description=f"{self.user} was kicked by {author}",
                              color=neg_color)
 
-    async def ban(self, guild, author, reason: str = None):
+    async def ban(self, guild: discord.Guild, author: discord.User, reason: str = None) -> discord.Embed:
         # Default reason is responsible moderator
         if not reason:
             reason = f"Responsible moderator: {author}"
@@ -58,7 +58,7 @@ class Union:
                              description=f"{self.user} was banned by {author}",
                              color=neg_color)
 
-    async def softban(self, guild, author, reason: str = None):
+    async def softban(self, guild: discord.Guild, author: discord.User, reason: str = None) -> discord.Embed:
         # Default reason is responsible moderator
         if not reason:
             reason = f"Responsible moderator: {author}"
@@ -69,7 +69,7 @@ class Union:
                              description=f"{self.user} was softbanned by {author}",
                              color=neg_color)
 
-    async def unban(self, guild, author, reason: str = None):
+    async def unban(self, guild: discord.Guild, author: discord.User, reason: str = None) -> discord.Embed:
         # Default reason is responsible moderator
         if not reason:
             reason = f"Responsible moderator: {author}"
@@ -79,7 +79,8 @@ class Union:
                              description=f"{self.user} was unbanned by {author}",
                              color=neg_color)
 
-    async def sync(self, ctx, name: str, tag: str = None, is_fs=False):
+    async def sync(self, ctx: discord.ApplicationContext, name: str, tag: str = None,
+                   is_fs=False) -> discord.Embed | str:
         await ctx.defer()
         if is_fs and not name:
             uuid, username = await get_db_uuid_username_from_discord_id(self.user.id)
@@ -163,7 +164,9 @@ class Union:
 
         return embed
 
-    async def register(self, ctx, name):
+    async def register(self, ctx: discord.ApplicationContext, name: str) -> Tuple[discord.Embed, str] | Tuple[
+        str, None] | Tuple[
+        discord.Embed, None]:
         await ctx.defer()
         # Make sure it is only used in registration channel
         if ctx.channel.id != registration_channel_id:
@@ -241,11 +244,11 @@ class Union:
             guest_ticket = ticket
 
             class Join_Misc_Buttons(discord.ui.Button):
-                def __init__(self, button: list):
+                def __init__(self, button_fields: list):
                     """
                     2 buttons for 2 registration actions. `custom_id` is needed for persistent views.
                     """
-                    super().__init__(label=button[0], custom_id=button[1], style=button[2])
+                    super().__init__(label=button_fields[0], custom_id=button_fields[1], style=button_fields[2])
 
                 async def callback(self, interaction: discord.Interaction):
                     # if bot.staff not in interaction.user.roles and ticket.id != interaction.channel_id: return
@@ -292,7 +295,7 @@ class Union:
 
         return (embed, guest_ticket) if guild_name != guild_handle else (embed, None)
 
-    async def add(self, ctx):
+    async def add(self, ctx: discord.ApplicationContext) -> discord.Embed | str:
         if ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
 
@@ -302,7 +305,7 @@ class Union:
                                           external_emojis=True)
         return discord.Embed(title=f"{self.user.name} has been added to the ticket!", color=pos_color)
 
-    async def remove(self, ctx):
+    async def remove(self, ctx: discord.ApplicationContext) -> discord.Embed | str:
         if ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
 
@@ -313,12 +316,12 @@ class Union:
                                           read_message_history=False, external_emojis=False)
         return discord.Embed(title=f"{self.user.name} has been removed from the ticket!", color=pos_color)
 
-    async def avatar(self):
+    async def avatar(self) -> discord.Embed:
         embed = discord.Embed(
             title=f"{self.user}'s avatar:", color=neutral_color)
         return embed.set_image(url=self.user.avatar)
 
-    async def whois(self):
+    async def whois(self) -> discord.Embed:
         uuid, username = await get_db_uuid_username_from_discord_id(self.user.id)
         embed = discord.Embed(
             title=username,

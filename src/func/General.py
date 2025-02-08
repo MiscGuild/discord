@@ -3,7 +3,7 @@
 import asyncio
 import re
 from __main__ import bot
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 
 import discord
 import discord.ui
@@ -31,7 +31,9 @@ from src.utils.ticket_utils.tickets import create_transcript, get_ticket_propert
 
 
 class General:
-    async def weeklylb(ctx, is_automatic=False) -> discord.Embed | str:
+
+    @staticmethod
+    async def weeklylb(is_automatic=False) -> discord.Embed | str:
         # Get guild data
         guild_data = await get_guild_by_name(guild_handle)
 
@@ -46,7 +48,9 @@ class General:
         return text
         # return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
 
-    async def dnkllist(ctx) -> discord.Embed:
+
+    @staticmethod
+    async def dnkllist() -> discord.Embed:
         # Fetch all rows
         rows = await select_all("SELECT * FROM dnkl")
 
@@ -62,7 +66,8 @@ class General:
         return discord.Embed(title="The people on the do-not-kick-list are as follows:", description=content,
                              color=neutral_color).set_footer(text=f"Total: {len(content.split())}")
 
-    async def rolecheck(ctx, send_ping: bool) -> None:
+    @staticmethod
+    async def rolecheck(ctx: discord.ApplicationContext, send_ping: bool) -> None:
         # Define a message for sending progress updates
         progress_message = await ctx.respond("Processing prerequisites...")
 
@@ -164,8 +169,8 @@ class General:
 
         await progress_message.edit(content="Rolecheck complete!")
 
-
-    async def delete(ctx) -> None | str:
+    @staticmethod
+    async def delete(ctx: discord.ApplicationContext) -> None | str:
         embed = discord.Embed(title="This ticket will be deleted in 10 seconds!", color=neg_color)
 
         if not ctx.channel.category or ctx.channel.category.name not in ticket_categories.values():
@@ -195,15 +200,18 @@ class General:
                 try:
                     await (await bot.fetch_user(ticket_details[0])).send(
                         embed=ticket_deleted_embed.set_footer(text=ctx.channel.name), file=transcript)
-                except:
-                    pass
+                except PermissionError:
+                    await bot.get_channel(log_channel_id).send(
+                        f"Failed to send transcript to {await bot.fetch_user(ticket_details[0])}!")
 
-    async def accept(ctx) -> discord.Embed | str:
+    @staticmethod
+    async def accept(ctx: discord.ApplicationContext) -> discord.Embed | str:
         if ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
         return accepted_staff_application_embed
 
-    async def transcript(ctx) -> str | discord.Embed | discord.File:
+    @staticmethod
+    async def transcript(ctx: discord.ApplicationContext) -> str | discord.Embed | discord.File:
         if ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
         # Create transcript
@@ -213,14 +221,16 @@ class General:
         # Transcript is valid
         return transcript
 
-    async def new(ctx) -> str:
+    @staticmethod
+    async def new(ctx: discord.ApplicationContext) -> str:
         # Create ticket
         ticket = await create_ticket(ctx.author, f"ticket-{await name_grabber(ctx.author)}")
 
         # Return message with link to ticket
         return f"Click the following link to go to your ticket! <#{ticket.id}>"
 
-    async def partner(ctx, organization_name: str) -> discord.Embed:
+    @staticmethod
+    async def partner(ctx: discord.ApplicationContext, organization_name: str) -> discord.Embed:
         await ctx.send("In one message, please provide a brief description of the guild/organization being partnered.")
         # Wait for description
         description = (await bot.wait_for("message", check=lambda x: x.author == ctx.author)).content
@@ -236,7 +246,9 @@ class General:
                 url=logo)
         return discord.Embed(title=organization_name, description=description, color=neutral_color)
 
-    async def deny(ctx, channel: discord.TextChannel) -> tuple[discord.Embed, None] | tuple[discord.Embed, discord.File]:
+    @staticmethod
+    async def deny(ctx: discord.ApplicationContext, channel: discord.TextChannel) -> tuple[discord.Embed, None] | tuple[
+        discord.Embed, discord.File]:
         # Copy real question list and append 0th element for general critiquing
         application_questions = staff_application_questions.copy()
         application_questions[0] = "General critiquing"
@@ -255,7 +267,6 @@ class General:
         denial_embed = discord.Embed(title="Your staff application has been denied!",
                                      description="The reasons have been listed below", color=error_color)
 
-        # Loop for getting question feedback
         while True:
             while True:
                 await ctx.send(
@@ -263,12 +274,10 @@ class General:
                     "\nIf you would like to critique something in general, reply with `0`")
                 question = await bot.wait_for("message",
                                               check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
-                # Try-except for checking if the given number is valid
                 try:
                     question = application_questions[int(question.content)]
                     break
-                # Catch KeyError if number is invalid
-                except:
+                except KeyError:
                     await ctx.send("Please respond with a valid question number.")
 
             await ctx.send(f"`{question}`\n**What was the issue that you found with {nick}'s reply?**")
@@ -301,7 +310,8 @@ class General:
                 return denial_embed.set_footer(text="You may reapply in 2 weeks.\
                                                \nFollowing is the transcript so that you can refer to it while reapplying."), transcript
 
-    async def inactive(ctx) -> list[discord.Embed] | discord.Embed:
+    @staticmethod
+    async def inactive() -> list[discord.Embed] | discord.Embed:
 
         # Fetch guid data
         guild_data = await get_guild_by_name(guild_handle)
@@ -329,6 +339,8 @@ class General:
             if not name:
                 skipped_users.append(uuid)
                 continue
+
+            name = name.replace("_", "\\_")
 
             # Gather data
             guild_rank = member["rank"] if uuid not in dnkl_uuids else "DNKL"
@@ -397,7 +409,8 @@ class General:
 
         return embeds
 
-    async def giveawaycreate(ctx) -> str:
+    @staticmethod
+    async def giveawaycreate(ctx: discord.ApplicationContext) -> str:
         # Define progress message for asking questions
         progress_message = await ctx.send(
             "**Which channel should the giveaway be hosted in?**\n\n`Please respond with a channel shortcut or ID`\n\n**At any time, you can cancel the giveaway by replying with `cancel` to one of the upcoming prompts.**")
@@ -466,6 +479,7 @@ class General:
         await progress_message.edit(
             content=f"Neat! There will be {number_winners} winner(s).\n\n**How long should the giveaway last?**\n\n`Please enter a duration. Use a 's' for seconds, 'm' for minutes and 'd' for days`")
 
+        end_date = None
         while True:
             # Wait for answer and check for cancellation
             duration = await bot.wait_for("message",
@@ -481,9 +495,9 @@ class General:
             if duration == "cancel":
                 return "Giveaway cancelled!"
             try:
-                end_date = datetime.utcnow() + timedelta(seconds=duration)
+                end_date = datetime.now(UTC) + timedelta(seconds=duration)
                 end_date = end_date.strftime("%Y-%m-%d %H:%M:%S.%f")[:-7]
-            except Exception:
+            except (TypeError, ValueError):
                 await ctx.send("Invalid duration! Please try again.", delete_after=3)
                 continue
             break
@@ -511,7 +525,7 @@ class General:
                     try:
                         required_gexp = int(
                             required_gexp[:-1]) * unit_multiplier[required_gexp[-1]]
-                    except Exception:
+                    except (ValueError, KeyError):
                         await ctx.send("Invalid gexp requirement! Please try again.", delete_after=3)
                         continue
 
@@ -621,7 +635,8 @@ class General:
         # Return confirmation
         return f"Ok! The giveaway has been set up in <#{destination.id}>!"
 
-    async def giveawaylist(ctx) -> discord.Embed:
+    @staticmethod
+    async def giveawaylist() -> discord.Embed:
         all_giveaways = await select_all(
             "SELECT prize, channel_id, message_id, number_winners, time_of_finish FROM giveaways")
 
@@ -644,7 +659,11 @@ class General:
 
             return embed
 
-    async def add_milestone(ctx, gamemode: str | None, milestone: str | None) -> tuple[discord.Embed, None] | tuple[discord.Embed, discord.ui.View]:
+    @staticmethod
+    async def add_milestone(ctx: discord.ApplicationContext, gamemode: str | None, milestone: str | None) -> tuple[
+                                                                                                    discord.Embed, None] | \
+                                                                                                tuple[
+                                                                                                    discord.Embed, discord.ui.View]:
         member = await get_ticket_creator(ctx.channel)
         name = await name_grabber(member)
         channel = ctx.channel
@@ -664,21 +683,23 @@ class General:
                 await interaction.response.send_message(f"**Milestone Category:** {option}"
                                                         f"\n**What is {name}'s milestone?**\n"
                                                         f"{option_emoji}{name}.... (Complete the sentence)")
-                milestone = await bot.wait_for("message",
+                milestone_message = await bot.wait_for("message",
                                                check=lambda
                                                    x: x.channel == channel and x.author == interaction.user)
-                await channel.send(embed=await milestone_ticket_update(ctx, channel, option_emoji, milestone.content))
+                await channel.send(
+                    embed=await milestone_ticket_update(ctx, channel, option_emoji, milestone_message.content))
 
-        async def milestone_ticket_update(ctx, channel, emoji, milestone) -> discord.Embed:
+        async def milestone_ticket_update(ctx: discord.ApplicationContext, channel: discord.TextChannel, emoji: str,
+                                          milestone: str) -> discord.Embed:
             milestone_string = f"{emoji} {member.mention} {milestone}|"
             channel_description = channel.topic + milestone_string
             await ctx.send(
                 "Please give the bot up to 10 minutes to add the milestone. Once it has done it, you'll receive a completion message.")
             await channel.edit(topic=str(channel_description))
-            embed = discord.Embed(title="Milestone Registered!",
+            milestone_registration = discord.Embed(title="Milestone Registered!",
                                   description=milestone_string[:-1], color=neutral_color)
 
-            return embed
+            return milestone_registration
 
         if gamemode and milestone:
             if gamemode.lower() in [x for x in milestone_emojis.keys()]:
@@ -698,7 +719,8 @@ class General:
                               color=neutral_color)
         return embed, view
 
-    async def update_milestone(ctx) -> tuple[discord.Embed, discord.ui.View]:
+    @staticmethod
+    async def update_milestone(ctx: discord.ApplicationContext) -> tuple[discord.Embed, discord.ui.View]:
         member = await get_ticket_creator(ctx.channel)
         name = await name_grabber(member)
 
@@ -743,10 +765,9 @@ class General:
                     "Please give the bot up to 10 minutes to update the milestone. Once it has done it, you'll receive a completion message.")
 
                 await ctx.channel.edit(topic="|".join(channel_details))
-                embed = discord.Embed(title="Milestone Registered!",
-                                      description=new_milestone_message, color=neutral_color)
 
-                await ctx.send(embed=embed)
+                await ctx.send(embed=discord.Embed(title="Milestone Registered!",
+                                                   description=new_milestone_message, color=neutral_color))
 
         # Create view and embed, send to ticket
         view = discord.ui.View()
@@ -756,8 +777,9 @@ class General:
                               color=neutral_color)
         return embed, view
 
-    async def compile_milestones(ctx) -> str:
-        day_number = 86 + round((datetime.utcnow() - datetime.strptime("2022/05/15", "%Y/%m/%d")).days / 7)
+    @staticmethod
+    async def compile_milestones() -> str:
+        day_number = 86 + round((datetime.now(UTC) - datetime.strptime("2022/05/15", "%Y/%m/%d")).days / 7)
 
         milestone_message = f"**Weekly Milestones**\nThis is week __{day_number}__ of weekly milestones\n\n"
         count = 0

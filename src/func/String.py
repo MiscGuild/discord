@@ -3,7 +3,7 @@
 import inspect
 import os
 from __main__ import bot
-from datetime import datetime
+from datetime import datetime, UTC
 
 import discord
 from quickchart import QuickChart
@@ -66,7 +66,7 @@ class String:
         final_url = f"<{source_url}/blob/{branch}/{location}#L{firstlineno}-L{firstlineno + len(lines) - 1}>"
         return f"Following is the source code for {self.string}\n{final_url}"
 
-    async def gmember(self, ctx) -> discord.Embed | str:
+    async def gmember(self, ctx: discord.ApplicationContext) -> discord.Embed | str | None:
         if self.uuid and self.username:
             uuid = self.uuid
             name = self.username
@@ -156,6 +156,7 @@ class String:
                             }
             return embed.set_image(url=chart.get_url())
 
+
     async def info(self) -> discord.Embed:
         if self.uuid and self.username:
             uuid = self.uuid
@@ -195,7 +196,7 @@ class String:
         embed.add_field(name="First • Last login", value=f"`{first_login} • {last_login}`", inline=False)
         return embed.set_image(url=f"https://gen.plancke.io/exp/{ign}.png")
 
-    async def dnkladd(self, ctx) -> discord.Embed:
+    async def dnkladd(self, ctx: discord.ApplicationContext) -> discord.Embed | None:
         # start, end, reason
         ign, uuid = await get_mojang_profile(self.string)
         _, weekly_gexp = await get_player_gexp(uuid)
@@ -204,6 +205,7 @@ class String:
         await ctx.respond("Please respond to the following prompts: ")
         # Ask DNKL application questions
         await dnkl_application(ign, uuid, ctx.channel, ctx.author, weekly_gexp)
+
 
     async def dnklremove(self) -> str:
         if self.string:
@@ -224,10 +226,11 @@ class String:
             try:
                 msg = await bot.get_channel(dnkl_channel_id).fetch_message(message_id)
                 await msg.delete()
-            except Exception:
+            except discord.errors.NotFound:
                 return f"{username} has been removed from the do-not-kick-list, however the message was not found."
 
             return f"{username} has been removed from the do-not-kick-list!"
+
 
     async def dnklcheck(self) -> discord.Embed:
         if self.uuid and self.username:
@@ -260,7 +263,7 @@ class String:
         embed.set_author(name="Do-not-kick-list: Eligibility Check")
         return embed
 
-    async def rename(self, ctx) -> int | discord.Embed:
+    async def rename(self, ctx: discord.ApplicationContext) -> int | discord.Embed | discord.Message:
         # Channel is not a ticket
         if ctx.channel.category.name not in ticket_categories.values():
             return await ctx.send("This command can only be used in tickets!")
@@ -272,19 +275,18 @@ class String:
         return discord.Embed(title=f"The channel name was changed from {old_name} to {channel_name}",
                              color=neutral_color)
 
-    async def qotd(self, ctx, suggester: str) -> None:
+    async def qotd(self, ctx: discord.ApplicationContext, suggester: str) -> None:
         # 15th May 2022 was the 473rd QOTD day. It is used as a reference point to calculate the day number.
-        day_number = 473 + (datetime.utcnow() - datetime.strptime("2022/05/15", "%Y/%m/%d")).days
+        day_number = 473 + (datetime.now(UTC) - datetime.strptime("2022/05/15", "%Y/%m/%d")).days
         embed = discord.Embed(
             title=f"**{self.string}\n**",
             description=f"Respond in: <#{qotd_ans_channel_id}>\n"
                         f"-# Requested by {suggester}\n"
                         f"-# Posted by {ctx.author.nick if ctx.author.nick else ctx.author.name}", color=neutral_color)
         embed.set_author(
-            name=f"Day {day_number}: {datetime.utcnow().day} {months[datetime.utcnow().month]} {datetime.utcnow().year}")
+            name=f"Day {day_number}: {datetime.now(UTC).day} {months[datetime.now(UTC).month]} {datetime.now(UTC).year}")
 
         await bot.get_channel(qotd_channel_id).send("<@&923978802818871356>", embed=embed)
-        await ctx.send(f"**The QOTD has been sent to <#{qotd_channel_id}>!**")
         await bot.get_channel(qotd_ans_channel_id).send(rainbow_separator)
 
     async def invites(self) -> discord.Embed:
@@ -303,7 +305,7 @@ class String:
         invites = await get_invites(uuid)
         invites_text = ""
         if not invites:
-            weekly_invites, total_invites, total_valid_invites = None, "0", "0"
+            weekly_invites, total_invites, total_valid_invites = None, 0, "0"
             valid_invites = []
         else:
             weekly_invites, total_invites, total_valid_invites = invites
@@ -317,9 +319,9 @@ class String:
 
             for invitee in weekly_invites_dict.values():
                 if invitee in valid_invites:
-                    invites_text += f"🟢 {invitee}\n"
+                    invites_text += f"🟢 {invitee.replace("_", "\\_")}\n"
                 else:
-                    invites_text += f"🔴 {invitee}\n"
+                    invites_text += f"🔴 {invitee.replace("_", "\\_")}\n"
         embed = discord.Embed(title=f"{name}'s Invites", color=neutral_color)
         embed.add_field(name="Weekly Invites", value=None if not invites_text else invites_text, inline=False)
         embed.add_field(name="This week's statistics", value=f"Total Valid Invites: {len(valid_invites)}\n"
@@ -327,7 +329,7 @@ class String:
                                                              f"Success Rate: {round(len(valid_invites) * 100 / len(weekly_invites)) if len(weekly_invites) else 0}%",
                         inline=False)
         embed.add_field(name="Total Valid Invites", value=total_valid_invites, inline=True)
-        embed.add_field(name="Total Invites", value=total_invites, inline=True)
+        embed.add_field(name="Total Invites", value=str(total_invites), inline=True)
         embed.add_field(name="Total Success Rate",
                         value=f"{round(total_valid_invites * 100 / total_invites if total_invites else 0)}%",
                         inline=True)

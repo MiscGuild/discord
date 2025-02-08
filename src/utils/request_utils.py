@@ -2,19 +2,21 @@ import random
 import re
 from __main__ import bot
 from io import BytesIO
+from typing import Tuple, List
 
 import aiohttp
 import discord
+import requests
 
 from src.utils.consts import config, error_channel_id
 from src.utils.db_utils import get_db_username_from_uuid, update_db_username
 
 
-async def get_hyapi_key():
+async def get_hyapi_key() -> str:
     return random.choice(config["api_keys"])
 
 
-async def update_usernames(uuid: str, username: str):
+async def update_usernames(uuid: str, username: str) -> None:
     db_username = await get_db_username_from_uuid(uuid)
     if db_username is None:
         return
@@ -23,7 +25,7 @@ async def update_usernames(uuid: str, username: str):
 
 
 # Base JSON-getter for all JSON based requests. Catches Invalid API Key errors
-async def get_json_response(url: str):
+async def get_json_response(url: str) -> dict | None:
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
             if resp.status != 200:
@@ -43,7 +45,7 @@ async def get_json_response(url: str):
     return resp
 
 
-async def get_mojang_profile(name: str):
+async def get_mojang_profile(name: str) -> Tuple[str, str] | Tuple[None, None]:
     resp = await get_json_response(f"https://api.mojang.com/users/profiles/minecraft/{name}")
 
     # If player and request is valid
@@ -59,7 +61,7 @@ async def get_mojang_profile(name: str):
     return None, None
 
 
-async def get_hypixel_player(name: str = None, uuid: str = None):
+async def get_hypixel_player(name: str = None, uuid: str = None) -> dict | None:
     api_key = await get_hyapi_key()
     if name:
         resp = await get_json_response(f"https://api.hypixel.net/player?key={api_key}&name={name}")
@@ -77,7 +79,7 @@ async def get_hypixel_player(name: str = None, uuid: str = None):
     return resp["player"]
 
 
-async def get_name_by_uuid(uuid: str):
+async def get_name_by_uuid(uuid: str) -> str | None:
     i = 0
     while i < 5:
         i += 1
@@ -95,7 +97,7 @@ async def get_name_by_uuid(uuid: str):
         return resp['displayname']
 
 
-def session_get_name_by_uuid(session, uuid):
+def session_get_name_by_uuid(session: requests.Session, uuid: str) -> str | None:
     with session.get(f"https://sessionserver.mojang.com/session/minecraft/profile/{uuid}") as resp:
         data = resp.json()
 
@@ -104,7 +106,7 @@ def session_get_name_by_uuid(session, uuid):
         return data["name"]
 
 
-async def get_player_guild(uuid):
+async def get_player_guild(uuid: str) -> dict | None:
     api_key = await get_hyapi_key()
     resp = await get_json_response(f"https://api.hypixel.net/guild?key={api_key}&player={uuid}")
 
@@ -116,7 +118,7 @@ async def get_player_guild(uuid):
     return resp["guild"]
 
 
-async def get_guild_by_name(name):
+async def get_guild_by_name(name: str) -> dict | None:
     api_key = await get_hyapi_key()
     resp = await get_json_response(f"https://api.hypixel.net/guild?key={api_key}&name={name}")
 
@@ -131,26 +133,26 @@ async def get_guild_by_name(name):
     return resp["guild"]
 
 
-async def get_guild_uuids(guild_name: str):
+async def get_guild_uuids(guild_name: str) -> List[str] | None:
     resp = await get_guild_by_name(guild_name)
     if not resp:
         return None
     return [member["uuid"] for member in resp["members"]]
 
 
-async def get_gtag(name):
+async def get_gtag(name: str) -> str:
     api_key = await get_hyapi_key()
     resp = await get_json_response(f"https://api.hypixel.net/guild?key={api_key}&name={name}")
 
     if len(resp["guild"]) < 2:
-        return (" ")
+        return " "
     if not resp["guild"]["tag"]:
-        return (" ")
+        return " "
     gtag = resp["guild"]["tag"]
-    return (f"[{gtag}]")
+    return f"[{gtag}]"
 
 
-async def get_jpg_file(url: str):
+async def get_jpg_file(url: str) -> discord.File | None:
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
             if resp.status != 200:
@@ -160,7 +162,7 @@ async def get_jpg_file(url: str):
     return discord.File(resp, "image.jpg")
 
 
-async def get_rank(uuid):
+async def get_rank(uuid: str) -> str | None:
     player = await get_hypixel_player(uuid=uuid)
     if player is None:
         return None

@@ -24,7 +24,7 @@ class Tickets(commands.Cog, name="tickets"):
         required=True,
         input_type=str
     )
-    async def register(self, ctx, name: str):
+    async def register(self, ctx: discord.ApplicationContext, name: str) -> None:
         """Register with your IGN to sync your roles!"""
         res, guest_ticket = await Union(user=ctx.author).register(ctx, name)
         if isinstance(res, discord.Embed):
@@ -36,9 +36,9 @@ class Tickets(commands.Cog, name="tickets"):
 
     @bridge.bridge_command(aliases=["del"])
     @commands.has_any_role("Staff", "Discord Moderator")
-    async def delete(self, ctx):
+    async def delete(self, ctx: discord.ApplicationContext) -> None:
         """Delete a ticket!"""
-        res = await General.delete(ctx)
+        res = await General().delete(ctx)
         if res:
             await ctx.respond(res)
 
@@ -50,7 +50,7 @@ class Tickets(commands.Cog, name="tickets"):
         required=True,
         input_type=discord.Member
     )
-    async def add(self, ctx, member: discord.Member):
+    async def add(self, ctx: discord.ApplicationContext, member: discord.Member) -> None:
         """Add a user to a ticket!"""
         res = await Union(user=member).add(ctx)
         if isinstance(res, str):
@@ -66,7 +66,7 @@ class Tickets(commands.Cog, name="tickets"):
         required=True,
         input_type=discord.Member
     )
-    async def remove(self, ctx, member: discord.Member):
+    async def remove(self, ctx: discord.ApplicationContext, member: discord.Member) -> None:
         """Remove a user from a ticket!"""
         res = await Union(user=member).remove(ctx)
         if isinstance(res, str):
@@ -82,15 +82,15 @@ class Tickets(commands.Cog, name="tickets"):
         required=False,
         input_type=str
     )
-    async def rename(self, ctx, *, channel_name: str):
+    async def rename(self, ctx: discord.ApplicationContext, *, channel_name: str) -> None:
         """Rename a ticket!"""
         await ctx.respond(embed=await String(string=channel_name).rename(ctx))
 
     @bridge.bridge_command()
     @commands.has_any_role("Staff", "Discord Moderator")
-    async def transcript(self, ctx):
+    async def transcript(self, ctx: discord.ApplicationContext) -> None:
         """Create a transcript for a ticket!"""
-        res = await General.transcript(ctx)
+        res = await General().transcript(ctx)
         if isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
         elif isinstance(res, discord.File):
@@ -100,9 +100,9 @@ class Tickets(commands.Cog, name="tickets"):
 
     @bridge.bridge_command()
     @commands.has_role("Admin")
-    async def accept(self, ctx):
+    async def accept(self, ctx: discord.ApplicationContext) -> None:
         """Accept a staff application!"""
-        res = await General.accept(ctx)
+        res = await General().accept(ctx)
         if isinstance(res, str):
             await ctx.respond(res)
         if isinstance(res, discord.Embed):
@@ -116,18 +116,18 @@ class Tickets(commands.Cog, name="tickets"):
         required=True,
         input_type=discord.TextChannel
     )
-    async def deny(self, ctx, channel: discord.TextChannel):
+    async def deny(self, ctx: discord.ApplicationContext, channel: discord.TextChannel) -> discord.Message | None:
         """Deny a staff application!"""
         # Get result and send file if it is returned
-        embed, file = await General.deny(ctx, channel)
+        embed, file = await General().deny(ctx, channel)
         await channel.send(embed=embed)
         if file:
             return await channel.send(file=file)
 
     @bridge.bridge_command()
-    async def new(self, ctx):
+    async def new(self, ctx: discord.ApplicationContext):
         """Create a new ticket!"""
-        await ctx.respond(await General.new(ctx))
+        await ctx.respond(await General().new(ctx))
 
     @bridge.bridge_command(aliases=['AddMilestone'])
     @commands.has_any_role("Staff", "Discord Moderator")
@@ -137,26 +137,27 @@ class Tickets(commands.Cog, name="tickets"):
         choices=[discord.OptionChoice(v, value=k) for k, v in milestone_categories.items()],
         required=False
     )
-    async def milestoneadd(self, ctx, gamemode: str = None, *, milestone: str = None):
+    async def milestoneadd(self, ctx: discord.ApplicationContext, gamemode: str = None, *,
+                           milestone: str = None) -> None:
         """Register a milestone"""
-        embed, view = await General.add_milestone(ctx, gamemode, milestone)
+        embed, view = await General().add_milestone(ctx, gamemode, milestone)
         await ctx.respond(embed=embed, view=view)
 
     @bridge.bridge_command(aliases=['UpdateMilestone'])
     @commands.has_any_role("Staff", "Discord Moderator")
-    async def milestoneupdate(self, ctx):
+    async def milestoneupdate(self, ctx: discord.ApplicationContext) -> None:
         """Update a milestone that has already been registered"""
-        embed, view = await General.update_milestone(ctx)
+        embed, view = await General().update_milestone(ctx)
         await ctx.respond(embed=embed, view=view)
 
     @bridge.bridge_command(aliases=["CompileMilestones", "mc", "cm", "CompileMilestone"])
     @commands.has_any_role("Staff", "Discord Moderator")
-    async def milestonecompile(self, ctx):
+    async def milestonecompile(self, ctx: discord.ApplicationContext) -> None:
         """Compiles all milestones into one message and sends it to the milestones channel"""
-        await ctx.respond(await General.compile_milestones(ctx))
+        await ctx.respond(await General().compile_milestones())
 
     @commands.Cog.listener()
-    async def on_interaction(self, res):
+    async def on_interaction(self, res) -> None:
         await Listener(obj=res).on_interaction()
 
 
