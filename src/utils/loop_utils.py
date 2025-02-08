@@ -57,7 +57,7 @@ async def scheduler() -> None:
 
 
 async def send_gexp_lb() -> None:
-    file = await Integer(integer=1).gtop(bot.get_channel(daily_lb_channel), is_automatic=True)
+    file = await Integer(integer=1).gtop(is_automatic=True)
     await bot.get_channel(daily_lb_channel).send(file)
 
     # If it's Monday (UTC), send weekly leaderboard

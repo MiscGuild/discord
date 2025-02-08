@@ -41,8 +41,7 @@ class Integer:
             return "This giveaway hasn't ended yet!\n`To end it, use ,giveawayend`"
         await roll_giveaway(self.integer, reroll_number)
 
-    async def gtop(self, ctx: discord.ApplicationContext, is_automatic=False) -> discord.Embed | str:
-        # Check no. days requested to prevent errors
+    async def gtop(self, is_automatic=False) -> discord.Embed | str:
         if self.integer > 6:
             return discord.Embed(title="Invalid timestamp!", description="You cannot request data this old!",
                                  color=error_color)

@@ -57,7 +57,7 @@ class Guild(commands.Cog, name="guild"):
     async def gtop(self, ctx: discord.ApplicationContext, day: int = 1) -> None:
         """View the daily guild experience leaderboard!"""
         await ctx.defer()
-        res = await Integer(integer=day).gtop(ctx=ctx)
+        res = await Integer(integer=day).gtop()
         if isinstance(res, str):
             await ctx.respond(res)
         elif isinstance(res, discord.File):
