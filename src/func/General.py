@@ -200,8 +200,9 @@ class General:
                 try:
                     await (await bot.fetch_user(ticket_details[0])).send(
                         embed=ticket_deleted_embed.set_footer(text=ctx.channel.name), file=transcript)
-                except:
-                    pass
+                except PermissionError:
+                    await bot.get_channel(log_channel_id).send(
+                        f"Failed to send transcript to {await bot.fetch_user(ticket_details[0])}!")
 
     @staticmethod
     async def accept(ctx: discord.ApplicationContext) -> discord.Embed | str:
