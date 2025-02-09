@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands, bridge
 
 from src.func.General import General
+from src.func.String import String
 from src.func.Union import Union
 from src.utils.consts import partner_channel_id, information_embed, neutral_color, rules_embed
 
@@ -83,6 +84,22 @@ class Staff(commands.Cog, name="staff"):
     async def rules(self, ctx: discord.ApplicationContext) -> None:
         await ctx.send(embed=rules_embed)
 
+    @bridge.bridge_command()
+    @commands.has_role("Staff")
+    @bridge.bridge_option(
+        name="Username",
+        description="The username of the player you would like to give the Elite Member role",
+        required=True,
+        input_type=str
+    )
+    @bridge.bridge_command(
+        name="Reason",
+        description="Why do they deserve the Elite Member role?",
+        required=True,
+        input_type=str
+    )
+    async def elite_member(self, ctx: discord.ApplicationContext, uuid: str, reason: str) -> None:
+        await ctx.send(embed=await String(string=reason, uuid=uuid).elite_member())
 
 def setup(bot):
     bot.add_cog(Staff(bot))
