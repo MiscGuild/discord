@@ -98,8 +98,8 @@ class Staff(commands.Cog, name="staff"):
         required=True,
         input_type=str
     )
-    async def elite_member(self, ctx: discord.ApplicationContext, uuid: str, reason: str) -> None:
-        await ctx.send(embed=await String(string=reason, uuid=uuid).elite_member())
+    async def elite_member(self, ctx: discord.ApplicationContext, username: str, reason: str) -> None:
+        await ctx.send(embed=await String(string=reason, username=username).elite_member())
 
 def setup(bot):
     bot.add_cog(Staff(bot))
