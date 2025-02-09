@@ -137,7 +137,7 @@ class Tickets(commands.Cog, name="tickets"):
             await ctx.respond("Use `/milestone add`, `/milestone update`, or `/milestone compile`.")
 
     # Subcommand: `/milestone add`
-    @milestone.command(name="add", aliases=['AddMilestone'], description="Register a milestone")
+    @milestone.command(name="add", aliases=['a'], description="Register a milestone")
     @commands.has_any_role("Staff", "Discord Moderator")
     @bridge.bridge_option(
         name="gamemode",
@@ -151,14 +151,14 @@ class Tickets(commands.Cog, name="tickets"):
         await ctx.respond(embed=embed, view=view)
 
     # Subcommand: `/milestone update`
-    @milestone.command(name="update", aliases=['UpdateMilestone'], description="Update an existing milestone")
+    @milestone.command(name="update", aliases=['u'], description="Update an existing milestone")
     @commands.has_any_role("Staff", "Discord Moderator")
     async def milestone_update(self, ctx: bridge.BridgeContext) -> None:
         embed, view = await General().update_milestone(ctx)
         await ctx.respond(embed=embed, view=view)
 
     # Subcommand: `/milestone compile`
-    @milestone.command(name="compile", aliases=["CompileMilestones", "mc", "cm", "CompileMilestone"],
+    @milestone.command(name="compile", aliases=["c"],
                        description="Compiles all milestones into one message")
     @commands.has_any_role("Staff", "Discord Moderator")
     async def milestone_compile(self, ctx: bridge.BridgeContext) -> None:
