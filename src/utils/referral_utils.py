@@ -1,5 +1,5 @@
 from __main__ import bot
-from datetime import datetime, timedelta, UTC
+from datetime import datetime, timedelta, UTC, timezone
 from math import exp
 from random import shuffle, choice
 from typing import List
@@ -58,7 +58,8 @@ async def check_invitation_validity(invitations: list) -> List[str]:
             continue
 
         # Player has joined less than 7 days ago. Their gexp scaled up is double the member requirement.
-        days_since_join = (datetime.now(UTC) - datetime.fromtimestamp(members[invitee_uuid] / 1000.0)).days
+        days_since_join = (datetime.now(timezone.utc) - datetime.fromtimestamp(members[invitee_uuid] / 1000.0,
+                                                                               tz=timezone.utc)).days
         if days_since_join <= 7 and ((weekly_gexp * 2) > ((member_req / 7) * days_since_join)):
             weekly_valid_invites.append(invitee_uuid)
 
