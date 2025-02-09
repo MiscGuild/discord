@@ -18,7 +18,7 @@ class Giveaways(commands.Cog, name="giveaways"):
         if ctx.invoked_subcommand is None:  # Ensures this runs only if no subcommand is called
             await ctx.respond("Use `/giveaway create`, `/giveaway end `, or `/giveaway reroll` or `/giveaway end`.")
 
-    @giveaway.command(name="create", aliases=["gcreate"])
+    @giveaway.command(name="create", aliases=["c"])
     @commands.has_role("Giveaway Creator")
     async def giveaway_create(self, ctx: discord.ApplicationContext) -> None:
         """Create a giveaway!"""
@@ -26,7 +26,7 @@ class Giveaways(commands.Cog, name="giveaways"):
             "Please provide the required information to create the giveaway by responding to the following prompts!")
         await General().giveawaycreate(ctx)
 
-    @giveaway.command(name="end", aliases=["gend", "giveawayfinish", "gfinish"])
+    @giveaway.command(name="end", aliases=["e", "f", "finish"])
     @commands.has_role("Giveaway Creator")
     @bridge.bridge_option(
         name="message_id",
@@ -40,7 +40,7 @@ class Giveaways(commands.Cog, name="giveaways"):
         if res:
             await ctx.respond(res)
 
-    @giveaway.command(name="reroll", aliases=["greroll"])
+    @giveaway.command(name="reroll", aliases=["r"])
     @commands.has_role("Giveaway Creator")
     @bridge.bridge_option(
         name="message_id",
@@ -61,7 +61,7 @@ class Giveaways(commands.Cog, name="giveaways"):
         if res:
             await ctx.respond(res)
 
-    @giveaway.command(name="list", aliases=["glist"])
+    @giveaway.command(name="list", aliases=["l"])
     async def giveaway_list(self, ctx: discord.ApplicationContext) -> None:
         """View all giveaways from the last 10 days!"""
         await ctx.respond(embed=await General().giveawaylist())
