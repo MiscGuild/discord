@@ -53,7 +53,7 @@ async def scheduler() -> None:
 
         # send_gexp_lb() runs at 12:00 AM EST
         now = datetime.now(pytz.utc)
-        remaining_sleep_time = (next_run_utc - now).total_seconds()
+        remaining_sleep_time = (next_run_utc - now).total_seconds() + 360
         await asyncio.sleep(remaining_sleep_time)
         await send_gexp_lb()
         await update_gexp()
@@ -63,7 +63,6 @@ async def before_scheduler() -> None:
     """Ensures the bot is ready before starting the scheduler."""
     await bot.wait_until_ready()
     await asyncio.sleep(5)
-    await update_gexp()
     asyncio.create_task(scheduler())  # Start the scheduler loop
 
 
