@@ -349,3 +349,12 @@ class String:
                               f"{format(2 * member_req, ',d')} guild experience at the end of the week. "
                               "If they joined in the middle of the week, their guild experience will be scaled up.")
         return embed
+
+    async def elite_member(self) -> discord.Embed:
+        username = self.username
+        reason = self.string
+        name, uuid = await get_mojang_profile(username)
+        if not name:
+            return unknown_ign_embed
+
+        return discord.Embed()
