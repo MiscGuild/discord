@@ -3,7 +3,7 @@
 import inspect
 import os
 from __main__ import bot
-from datetime import datetime, UTC, timezone
+from datetime import datetime, timezone
 
 import discord
 from quickchart import QuickChart
@@ -293,7 +293,7 @@ class String:
                         f"-# Requested by {suggester}\n"
                         f"-# Posted by {ctx.author.nick if ctx.author.nick else ctx.author.name}", color=neutral_color)
         embed.set_author(
-            name=f"Day {day_number}: {datetime.now(UTC).day} {months[datetime.now(UTC).month]} {datetime.now(UTC).year}")
+            name=f"Day {day_number}: {datetime.now(timezone.utc).day} {months[datetime.now(timezone.utc).month]} {datetime.now(timezone.utc).year}")
 
         await bot.get_channel(qotd_channel_id).send("<@&923978802818871356>", embed=embed)
         await bot.get_channel(qotd_ans_channel_id).send(rainbow_separator)
