@@ -45,6 +45,11 @@ async def connect_db():
         uuid text NOT NULL,
         gexp_history text)""")
 
+    await bot.db.execute("""CREATE TABLE IF NOT EXISTS elite_members(
+        uuid text NOT NULL,
+        reason text NOT NULL,
+        expiry text)""")
+
     # Commit any changes
     await bot.db.commit()
 
@@ -206,3 +211,12 @@ async def set_member_gexp_history(uuid: str, gexp_history: dict) -> dict:
     await bot.db.commit()
 
     return limited_history
+
+
+async def get_elite_member(uuid: str) -> Tuple[str, str] | None:
+    return await select_one("SELECT reason, expiry from elite_members WHERE uuid = (?)", (uuid,))
+
+
+async def insert_elite_member(uuid: str, reason: str, expiry: str = None) -> None:
+    await bot.db.execute("INSERT INTO elite_members VALUES (?, ?, ?)", (uuid, reason, expiry))
+    await bot.db.commit()
