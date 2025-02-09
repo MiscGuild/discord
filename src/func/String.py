@@ -18,7 +18,7 @@ from src.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed,
                               ticket_categories, unknown_ign_embed, rainbow_separator, guild_handle,
                               missing_permissions_embed, member_req)
 from src.utils.db_utils import (delete_dnkl, select_one,
-                                get_invites)
+                                get_invites, get_member_gexp_history)
 from src.utils.referral_utils import check_invitation_validity
 from src.utils.request_utils import (get_hypixel_player, get_mojang_profile,
                                      get_player_guild, get_name_by_uuid)
@@ -109,6 +109,15 @@ class String:
             }
 
             # Fetch remaining data
+            historical_gexp_data = await get_member_gexp_history(uuid)
+            monthly_gexp = None
+            yearly_gexp = None
+
+            if historical_gexp_data:
+                monthly_gexp = sum(
+                    dict(sorted(historical_gexp_data.items(), key=lambda x: x[0], reverse=True)).values())
+                yearly_gexp = sum(historical_gexp_data.values())
+
             join_date = str(datetime.fromtimestamp(int(str(member["joined"])[:-3])))[:10]
             rank = member["rank"]
             quest_participation = member["questParticipation"] if "questParticipation" in member else 0
@@ -119,19 +128,23 @@ class String:
                 date = week_dict.get(i, "None")
                 gexp_history_text = gexp_history_text + f"**▸** {date} **{format(gexp_vals[i], ',d')}**\n"
 
-            # Get graph color
             color, graph_color, graph_border = await get_color_by_gexp(rank, weekly_gexp)
+
+            general_information_text = f"`✚` **Rank**: `{rank}`\n"
+            general_information_text += "`✚` **Joined**: `{join_date}`\n"
+            general_information_text += f"`✚` **Quests Completed**: `{quest_participation}`\n"
+            general_information_text += f"`✚` **Overall Guild Experience**: `{format(weekly_gexp, ',d')}`\n\n{gexp_history_text}"
+
+            if monthly_gexp:
+                general_information_text += f"`✚` **Monthly Guild Experience**: `{format(monthly_gexp, ',d')}`\n"
+            if yearly_gexp:
+                general_information_text += f"`✚` **Yearly Guild Experience**: `{format(yearly_gexp, ',d')}`\n"
 
             # Create embed
             embed = discord.Embed(title=name, url=f"https://plancke.io/hypixel/player/stats/{name}", color=color)
             embed.set_author(name=f"{gname} {gtag}", url=f"https://plancke.io/hypixel/guild/player/{name}")
             embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
-            embed.add_field(name="General Information:", value=f"`✚` **Rank**: `{rank}`\n"
-                                                               f"`✚` **Joined**: `{join_date}`\n"
-                                                               f"`✚` **Quests Completed**: `{quest_participation}`\n"
-                                                               f"`✚` **Overall Guild Experience**: `{format(weekly_gexp, ',d')}`\n\n{gexp_history_text}",
-                            inline=False)
-
+            embed.add_field(name="General Information:", value=general_information_text, inline=False)
             # Create chart
             dates.reverse()
             gexp_vals.reverse()
@@ -155,7 +168,6 @@ class String:
                             }
                             }
             return embed.set_image(url=chart.get_url())
-
 
     async def info(self) -> discord.Embed:
         if self.uuid and self.username:
@@ -206,7 +218,6 @@ class String:
         # Ask DNKL application questions
         await dnkl_application(ign, uuid, ctx.channel, ctx.author, weekly_gexp)
 
-
     async def dnklremove(self) -> str:
         if self.string:
             _, uuid = await get_mojang_profile(self.string)
@@ -230,7 +241,6 @@ class String:
                 return f"{username} has been removed from the do-not-kick-list, however the message was not found."
 
             return f"{username} has been removed from the do-not-kick-list!"
-
 
     async def dnklcheck(self) -> discord.Embed:
         if self.uuid and self.username:
