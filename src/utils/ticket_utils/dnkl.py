@@ -86,7 +86,7 @@ async def dnkl_approve(channel: discord.TextChannel, author: discord.User, ign: 
         current_message = await bot.get_channel(dnkl_channel_id).fetch_message(
             current_message)
         await current_message.delete()
-    except Exception:
+    except discord.NotFound:
         pass
 
     await update_dnkl(msg.id, uuid)
