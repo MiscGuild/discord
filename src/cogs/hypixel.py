@@ -52,38 +52,43 @@ class Hypixel(commands.Cog, name="hypixel"):
             res = await String(string=name).info()
         await ctx.respond(embed=res)
 
-    @bridge.bridge_command(aliases=['dnkladd', 'dnkla'])
+    @bridge.bridge_group(name="dnkl", description="Manage dnkl-related things", invoke_without_command=True)
+    async def dnkl(self, ctx: bridge.BridgeContext):
+        if ctx.invoked_subcommand is None:  # Ensures this runs only if no subcommand is called
+            await ctx.respond("Use `/dnkl add`, `/dnkl remove`, or `/dnkl list`, or `/dnkl check`.")
+
+    @dnkl.command(name="add", aliases=['a'])
     @commands.has_any_role("Staff")
     @bridge.bridge_option(
         name="name",
-        description="The Minecraft username of the player who you want to add to the do-not-kick-list",
+        description="The Minecraft username of the player you want to add to the do-not-kick list",
         required=True,
         input_type=str
     )
     async def dnkl_add(self, ctx: discord.ApplicationContext, name: str) -> None:
-        """Add a user to the do-not-kick-list!"""
+        """Add a user to the do-not-kick list!"""
         res = await String(string=name).dnkladd(ctx)
         if isinstance(res, str):
             await ctx.respond(res)
         elif isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
 
-    @bridge.bridge_command(aliases=['dnklrmv', 'dnklremove', 'dnklremv', 'dnklr'])
+    @dnkl.command(name="remove", aliases=['rmv', 'r'])
     @commands.has_permissions(manage_messages=True)
     @bridge.bridge_option(
         name="name",
-        description="The Minecraft username of the player who you want to remove from the do-not-kick-list",
+        description="The Minecraft username of the player you want to remove from the do-not-kick list",
         required=False,
         input_type=str
     )
     @bridge.bridge_option(
         name="uuid",
-        description="The UUID of the player who you want to remove from the do-not-kick-list",
+        description="The UUID of the player you want to remove from the do-not-kick list",
         required=False,
         input_type=str
     )
     async def dnkl_remove(self, ctx: discord.ApplicationContext, name: str = None, uuid: str = None) -> None:
-        """Remove a player from the do-not-kick-list"""
+        """Remove a player from the do-not-kick list"""
         if not name and not uuid:
             await ctx.respond("Please provide either the username or the UUID of the player you want to remove.")
             return
@@ -94,12 +99,12 @@ class Hypixel(commands.Cog, name="hypixel"):
         else:
             await ctx.respond(await String(string=name).dnklremove())
 
-    @bridge.bridge_command(aliases=['dnkllist', 'dnkll'])
+    @dnkl.command(name="list", aliases=['l'])
     async def dnkl_list(self, ctx: discord.ApplicationContext) -> None:
-        """View all users on the do-not-kick-list!"""
+        """View all users on the do-not-kick list!"""
         await ctx.respond(embed=await General().dnkllist())
 
-    @bridge.bridge_command(aliases=['dnklchk', 'dnklcheck', 'dnklc'])
+    @dnkl.command(name="check", aliases=['chk', 'c'])
     @bridge.bridge_option(
         name="name",
         description="The Minecraft username of the player whose do-not-kick-list eligibility you'd like to check",
@@ -107,7 +112,7 @@ class Hypixel(commands.Cog, name="hypixel"):
         input_type=str
     )
     async def dnkl_check(self, ctx: discord.ApplicationContext, name: str = None) -> None:
-        """Check whether you are eligible for the do-not-kick-list!"""
+        """Check whether a player is on the do-not-kick list!"""
         if not name:
             uuid, username = await get_db_uuid_username_from_discord_id(ctx.author.id)
             res = await String(uuid=uuid, username=username).dnklcheck()
@@ -118,7 +123,6 @@ class Hypixel(commands.Cog, name="hypixel"):
             await ctx.respond(embed=res)
         elif isinstance(res, str):
             await ctx.respond(res)
-
 
 def setup(bot):
     bot.add_cog(Hypixel(bot))
