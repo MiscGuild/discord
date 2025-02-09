@@ -67,8 +67,8 @@ class General(commands.Cog, name="general"):
                                                    style=discord.InputTextStyle.short))
 
             async def callback(self, interaction: discord.Interaction):
-                await interaction.response.send_message("The QOTD has been sent!")
                 await String(string=self.children[0].value).qotd(ctx, self.children[1].value)
+                await interaction.response.send_message("The QOTD has been sent!")
 
         await ctx.send_modal(modal=ModalCreator())
 

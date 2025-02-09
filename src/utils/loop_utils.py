@@ -7,11 +7,13 @@ from discord.ext import tasks
 
 from src.func.General import General
 from src.func.Integer import Integer
-from src.utils.consts import weekly_lb_channel, daily_lb_channel
-from src.utils.db_utils import (select_all)
+from src.utils.calculation_utils import get_guild_gexp_data
+from src.utils.consts import weekly_lb_channel, daily_lb_channel, guild_handle
+from src.utils.db_utils import (select_all, set_member_gexp_history)
 from src.utils.discord_utils import update_recruiter_role
 from src.utils.giveaway_utils import roll_giveaway
 from src.utils.referral_utils import check_invitation_validity, generate_rank_upgrade
+from src.utils.request_utils import get_guild_by_name
 
 
 @tasks.loop(minutes=1)
@@ -51,9 +53,18 @@ async def scheduler() -> None:
 
         # send_gexp_lb() runs at 12:00 AM EST
         now = datetime.now(pytz.utc)
-        remaining_sleep_time = (next_run_utc - now).total_seconds()
+        remaining_sleep_time = (next_run_utc - now).total_seconds() + 360
         await asyncio.sleep(remaining_sleep_time)
         await send_gexp_lb()
+        await update_gexp()
+
+
+async def before_scheduler() -> None:
+    """Ensures the bot is ready before starting the scheduler."""
+    await bot.wait_until_ready()
+    await asyncio.sleep(5)
+    asyncio.create_task(scheduler())  # Start the scheduler loop
+
 
 
 async def send_gexp_lb() -> None:
@@ -93,8 +104,12 @@ async def update_invites() -> None:
     await generate_rank_upgrade(weekly_invitations)
 
 
-async def before_scheduler() -> None:
-    """Ensures the bot is ready before starting the scheduler."""
-    await bot.wait_until_ready()
-    await asyncio.sleep(5)
-    asyncio.create_task(scheduler())  # Start the scheduler loop
+async def update_gexp() -> None:
+    guild_data = await get_guild_by_name(guild_handle)
+    if not guild_data:
+        return
+
+    gexp_data = await get_guild_gexp_data(guild_data)
+
+    for uuid, exp_history in gexp_data.items():
+        await set_member_gexp_history(uuid, exp_history)

@@ -183,11 +183,15 @@ async def set_do_ping_db(discord_id: int, do_pings: int) -> str:
 
 async def get_member_gexp_history(uuid: str) -> dict:
     history = await select_one("SELECT gexp_history from guild_member_data WHERE uuid = (?)", (uuid,))
-    return json.loads(history[0]) if history else {}
+    return json.loads(history[0]) if history else None
 
 
 async def set_member_gexp_history(uuid: str, gexp_history: dict) -> dict:
     current_history: dict = await get_member_gexp_history(uuid)
+    if not current_history:
+        await bot.db.execute("INSERT INTO guild_member_data VALUES (?, ?)", (uuid, json.dumps(gexp_history)))
+        await bot.db.commit()
+        return gexp_history
     current_history.update(gexp_history)
 
     await bot.db.execute("UPDATE guild_member_data set gexp_history = ? where uuid = ?",
