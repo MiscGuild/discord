@@ -28,7 +28,7 @@ class Guild(commands.Cog, name="guild"):
         elif isinstance(res, str):
             await ctx.respond(res, ephemeral=True)
 
-    @g.command(name="member", aliases=["gm", "gexp"])
+    @g.command(name="member", aliases=["m", "gexp"])
     @bridge.bridge_option(
         name="name",
         description="The username of the player whose guild experience you'd like to view",
@@ -73,7 +73,7 @@ class Guild(commands.Cog, name="guild"):
         elif isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
 
-    @g.command(name="daily", aliases=["gtop", "dailylb", "dlb"])
+    @g.command(name="daily", aliases=["top", "lb"])
     @bridge.bridge_option(
         name="day",
         description="Specify the number of days to go back in time and retrieve the corresponding leaderboard (0-6)",
