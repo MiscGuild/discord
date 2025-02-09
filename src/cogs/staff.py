@@ -6,7 +6,7 @@ from discord.ext import commands, bridge
 from src.func.General import General
 from src.func.String import String
 from src.func.Union import Union
-from src.utils.consts import partner_channel_id, information_embed, neutral_color, rules_embed
+from src.utils.consts import partner_channel_id, information_embed, neutral_color, rules_embed, elite_member_reasons
 
 
 class Staff(commands.Cog, name="staff"):
@@ -96,7 +96,7 @@ class Staff(commands.Cog, name="staff"):
         name="Reason",
         description="Why do they deserve the Elite Member role?",
         required=True,
-        input_type=str
+        choices=[discord.OptionChoice(x, value=x) for x in elite_member_reasons],
     )
     async def elite_member(self, ctx: discord.ApplicationContext, username: str, reason: str) -> None:
         await ctx.send(embed=await String(string=reason, username=username).elite_member())
