@@ -7,6 +7,7 @@ import discord.ui as ui
 from discord.ui import Button, Select, View
 
 from src.utils.consts import (neg_color, neutral_color, pronoun_roles, reaction_roles, tickets_embed)
+from src.utils.db_utils import get_member_gexp_history
 from src.utils.request_utils import get_jpg_file
 
 
@@ -206,6 +207,15 @@ class InactivityReasonSelect(ui.Select):
             await interaction.response.send_message(
                 "**Application submitted successfully!\nPlease await staff approval.**")
 
+        historical_gexp_data = await get_member_gexp_history(self.uuid)
+        monthly_gexp = 0
+        yearly_gexp = 0
+
+        if historical_gexp_data:
+            monthly_gexp = sum(
+                dict(sorted(historical_gexp_data.items(), key=lambda x: x[0], reverse=True)).values())
+            yearly_gexp = sum(historical_gexp_data.values())
+
         date = datetime.strptime(f"{self.day}/{self.month}/{self.year}", "%d/%B/%Y") + timedelta(weeks=int(self.length))
         final_embed = discord.Embed(title=self.ign, url=f'https://plancke.io/hypixel/player/stats/{self.ign}',
                                     color=neutral_color)
@@ -217,8 +227,19 @@ class InactivityReasonSelect(ui.Select):
         final_embed.set_author(name="Do-not-kick-list")
 
         staff_approval_embed = final_embed.copy()
-        staff_approval_embed.add_field(name="Guild Experience:",
-                                       value=f"{format(self.weekly_gexp, ',d')} Weekly Guild Experience", inline=False)
+
+        staff_approval_embed.add_field(
+            name="Guild Experience Summary:",
+            value=f"```"
+                  f"{'Category':<10} | {'GEXP':>12}\n"
+                  f"{'-' * 25}\n"
+                  f"{'Weekly':<10} | {format(self.weekly_gexp, ',d'):>12}\n"
+                  f"{'Monthly':<10} | {format(monthly_gexp, ',d'):>12}\n"
+                  f"{'Yearly':<10} | {format(yearly_gexp, ',d'):>12}\n"
+                  f"```",
+            inline=False
+        )
+
         if other_reason:
             staff_approval_embed.set_footer(text="Other Elaboration: \n" + other_reason)
 
