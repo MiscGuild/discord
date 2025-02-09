@@ -131,9 +131,10 @@ class Tickets(commands.Cog, name="tickets"):
 
         # Main command group: `/milestone`
 
-    @bridge.bridge_group(name="milestone", description="Manage milestones")
+    @bridge.bridge_group(name="milestone", description="Manage milestones", invoke_without_command=True)
     async def milestone(self, ctx: bridge.BridgeContext):
-        await ctx.respond("Use `/milestone add`, `/milestone update`, or `/milestone compile`.")
+        if ctx.invoked_subcommand is None:  # Ensures this runs only if no subcommand is called
+            await ctx.respond("Use `/milestone add`, `/milestone update`, or `/milestone compile`.")
 
     # Subcommand: `/milestone add`
     @milestone.command(name="add", aliases=['AddMilestone'], description="Register a milestone")
@@ -161,7 +162,9 @@ class Tickets(commands.Cog, name="tickets"):
                        description="Compiles all milestones into one message")
     @commands.has_any_role("Staff", "Discord Moderator")
     async def milestone_compile(self, ctx: bridge.BridgeContext) -> None:
+        await ctx.defer()
         await ctx.respond(await General().compile_milestones())
+
     @commands.Cog.listener()
     async def on_interaction(self, res) -> None:
         await Listener(obj=res).on_interaction()
