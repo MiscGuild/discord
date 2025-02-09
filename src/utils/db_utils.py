@@ -42,13 +42,14 @@ async def connect_db():
 
     # Guild Members table
     await bot.db.execute("""CREATE TABLE IF NOT EXISTS guild_member_data(
-        uuid text NOT NULL,
+        uuid text PRIMARY KEY NOT NULL,
         gexp_history text)""")
 
     await bot.db.execute("""CREATE TABLE IF NOT EXISTS elite_members(
         uuid text NOT NULL,
         reason text NOT NULL,
-        expiry text)""")
+        expiry text,
+        FOREIGN KEY (uuid) REFERENCES guild_member_data(uuid) ON DELETE CASCADE)""")
 
     # Commit any changes
     await bot.db.commit()
@@ -185,6 +186,14 @@ async def set_do_ping_db(discord_id: int, do_pings: int) -> str:
 
     return (await get_db_uuid_username_from_discord_id(discord_id))[0]
 
+
+async def get_all_guild_members() -> list:
+    return await select_all("SELECT uuid from guild_member_data")
+
+
+async def remove_guild_member(uuid: str) -> None:
+    await bot.db.execute("DELETE FROM guild_member_data WHERE uuid = ?", (uuid,))
+    await bot.db.commit()
 
 async def get_member_gexp_history(uuid: str) -> dict:
     history = await select_one("SELECT gexp_history from guild_member_data WHERE uuid = (?)", (uuid,))
