@@ -110,8 +110,8 @@ class String:
 
             # Fetch remaining data
             historical_gexp_data = await get_member_gexp_history(uuid)
-            monthly_gexp = None
-            yearly_gexp = None
+            monthly_gexp = 0
+            yearly_gexp = 0
 
             if historical_gexp_data:
                 monthly_gexp = sum(
@@ -134,11 +134,8 @@ class String:
             general_information_text += f"`✚` **Joined**: `{join_date}`\n"
             general_information_text += f"`✚` **Quests Completed**: `{quest_participation}`\n"
             general_information_text += f"`✚` **Weekly Guild Experience**: `{format(weekly_gexp, ',d')}`\n"
-
-            if monthly_gexp:
-                general_information_text += f"`✚` **Monthly Guild Experience**: `{format(monthly_gexp, ',d')}`\n"
-            if yearly_gexp:
-                general_information_text += f"`✚` **Yearly Guild Experience**: `{format(yearly_gexp, ',d')}`\n"
+            general_information_text += f"`✚` **Monthly Guild Experience**: `{format(monthly_gexp, ',d')}`\n"
+            general_information_text += f"`✚` **Yearly Guild Experience**: `{format(yearly_gexp, ',d')}`\n"
 
             general_information_text += f"\n{gexp_history_text}"
             # Create embed
