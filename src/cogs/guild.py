@@ -16,7 +16,19 @@ class Guild(commands.Cog, name="guild"):
     def __init__(self, bot):
         self.bot = bot
 
-    @bridge.bridge_command(aliases=["gm", "g", "gexp"])
+    @bridge.bridge_group(name="g", description="Invoke guild related commands!", invoke_without_command=True)
+    async def g(self, ctx: bridge.BridgeContext, name: str = None) -> None:
+        if not name:
+            uuid, username = await get_db_uuid_username_from_discord_id(ctx.author.id)
+            res = await String(uuid=uuid, username=username).gmember(ctx)
+        else:
+            res = await String(string=name).gmember(ctx)
+        if isinstance(res, discord.Embed):
+            await ctx.respond(embed=res)
+        elif isinstance(res, str):
+            await ctx.respond(res, ephemeral=True)
+
+    @g.command(name="member", aliases=["m", "gexp"])
     @bridge.bridge_option(
         name="name",
         description="The username of the player whose guild experience you'd like to view",
@@ -32,22 +44,36 @@ class Guild(commands.Cog, name="guild"):
             res = await String(string=name).gmember(ctx)
         if isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
-        if isinstance(res, str):
+        elif isinstance(res, str):
             await ctx.respond(res, ephemeral=True)
 
-    @bridge.bridge_command(aliases=['weeklylb', 'wlb'])
+    #
+    # @bridge.bridge_command(name="gm", aliases=["gexp"])
+    # async def gm(self, ctx: discord.ApplicationContext, name: str = None):
+    #     """View the given user's guild experience over the past week!"""
+    #     if not name:
+    #         uuid, username = await get_db_uuid_username_from_discord_id(ctx.author.id)
+    #         res = await String(uuid=uuid, username=username).gmember(ctx)
+    #     else:
+    #         res = await String(string=name).gmember(ctx)
+    #     if isinstance(res, discord.Embed):
+    #         await ctx.respond(embed=res)
+    #     elif isinstance(res, str):
+    #         await ctx.respond(res, ephemeral=True)
+
+    @g.command(name="weekly", aliases=["weekly_gexp_lb", "weeklylb", "wlb"])
     async def weekly_gexp_lb(self, ctx: discord.ApplicationContext) -> None:
         """View the weekly guild experience leaderboard!"""
         await ctx.defer()
         res = await General().weeklylb()
         if isinstance(res, str):
             await ctx.respond(res)
-        if isinstance(res, discord.File):
+        elif isinstance(res, discord.File):
             await ctx.respond(file=res)
-        if isinstance(res, discord.Embed):
+        elif isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
 
-    @bridge.bridge_command(aliases=['dailylb', 'dlb'])
+    @g.command(name="daily", aliases=["top", "lb"])
     @bridge.bridge_option(
         name="day",
         description="Specify the number of days to go back in time and retrieve the corresponding leaderboard (0-6)",

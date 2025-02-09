@@ -129,7 +129,15 @@ class Tickets(commands.Cog, name="tickets"):
         """Create a new ticket!"""
         await ctx.respond(await General().new(ctx))
 
-    @bridge.bridge_command(aliases=['AddMilestone'])
+        # Main command group: `/milestone`
+
+    @bridge.bridge_group(name="milestone", description="Manage milestones", invoke_without_command=True)
+    async def milestone(self, ctx: bridge.BridgeContext):
+        if ctx.invoked_subcommand is None:  # Ensures this runs only if no subcommand is called
+            await ctx.respond("Use `/milestone add`, `/milestone update`, or `/milestone compile`.")
+
+    # Subcommand: `/milestone add`
+    @milestone.command(name="add", aliases=['a'], description="Register a milestone")
     @commands.has_any_role("Staff", "Discord Moderator")
     @bridge.bridge_option(
         name="gamemode",
@@ -137,23 +145,24 @@ class Tickets(commands.Cog, name="tickets"):
         choices=[discord.OptionChoice(v, value=k) for k, v in milestone_categories.items()],
         required=False
     )
-    async def milestoneadd(self, ctx: discord.ApplicationContext, gamemode: str = None, *,
-                           milestone: str = None) -> None:
-        """Register a milestone"""
+    async def milestone_add(self, ctx: bridge.BridgeContext, gamemode: str = None, *,
+                            milestone: str = None) -> None:
         embed, view = await General().add_milestone(ctx, gamemode, milestone)
         await ctx.respond(embed=embed, view=view)
 
-    @bridge.bridge_command(aliases=['UpdateMilestone'])
+    # Subcommand: `/milestone update`
+    @milestone.command(name="update", aliases=['u'], description="Update an existing milestone")
     @commands.has_any_role("Staff", "Discord Moderator")
-    async def milestoneupdate(self, ctx: discord.ApplicationContext) -> None:
-        """Update a milestone that has already been registered"""
+    async def milestone_update(self, ctx: bridge.BridgeContext) -> None:
         embed, view = await General().update_milestone(ctx)
         await ctx.respond(embed=embed, view=view)
 
-    @bridge.bridge_command(aliases=["CompileMilestones", "mc", "cm", "CompileMilestone"])
+    # Subcommand: `/milestone compile`
+    @milestone.command(name="compile", aliases=["c"],
+                       description="Compiles all milestones into one message")
     @commands.has_any_role("Staff", "Discord Moderator")
-    async def milestonecompile(self, ctx: discord.ApplicationContext) -> None:
-        """Compiles all milestones into one message and sends it to the milestones channel"""
+    async def milestone_compile(self, ctx: bridge.BridgeContext) -> None:
+        await ctx.defer()
         await ctx.respond(await General().compile_milestones())
 
     @commands.Cog.listener()

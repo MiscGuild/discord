@@ -1,5 +1,5 @@
 from __main__ import bot
-from datetime import datetime, timedelta, UTC, timezone
+from datetime import datetime, timedelta, timezone
 from math import exp
 from random import shuffle, choice
 from typing import List
@@ -111,10 +111,11 @@ async def generate_rank_upgrade(weekly_invites: list) -> None:
             winner_invites = invites
             break
 
-    date = (f"__Week {int(0 + round((datetime.now(UTC) - datetime.strptime('16/09/2023', '%d/%m/%Y')).days / 7))}__\n"
-            f"**{(datetime.now(UTC) - timedelta(days=7)).strftime('%d %b %Y')} "
+    date = (
+        f"__Week {int(0 + round((datetime.now(timezone.utc) - datetime.strptime('16/09/2023', '%d/%m/%Y')).days / 7))}__\n"
+        f"**{(datetime.now(timezone.utc) - timedelta(days=7)).strftime('%d %b %Y')} "
             f"-"
-            f" {datetime.now(UTC).strftime('%d %B %Y')}**")
+        f" {datetime.now(timezone.utc).strftime('%d %B %Y')}**")
 
     announcement = rank_upgrade_winner_announcement.format(
         date=date,
