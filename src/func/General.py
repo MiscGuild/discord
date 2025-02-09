@@ -3,7 +3,7 @@
 import asyncio
 import re
 from __main__ import bot
-from datetime import datetime, timedelta, UTC
+from datetime import datetime, timedelta, UTC, timezone
 
 import discord
 import discord.ui
@@ -47,7 +47,6 @@ class General:
         text = await generate_lb_text(member_gexp, text, is_automatic)
         return text
         # return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
-
 
     @staticmethod
     async def dnkllist() -> discord.Embed:
@@ -661,9 +660,9 @@ class General:
 
     @staticmethod
     async def add_milestone(ctx: discord.ApplicationContext, gamemode: str | None, milestone: str | None) -> tuple[
-                                                                                                    discord.Embed, None] | \
-                                                                                                tuple[
-                                                                                                    discord.Embed, discord.ui.View]:
+                                                                                                                 discord.Embed, None] | \
+                                                                                                             tuple[
+                                                                                                                 discord.Embed, discord.ui.View]:
         member = await get_ticket_creator(ctx.channel)
         name = await name_grabber(member)
         channel = ctx.channel
@@ -684,8 +683,8 @@ class General:
                                                         f"\n**What is {name}'s milestone?**\n"
                                                         f"{option_emoji}{name}.... (Complete the sentence)")
                 milestone_message = await bot.wait_for("message",
-                                               check=lambda
-                                                   x: x.channel == channel and x.author == interaction.user)
+                                                       check=lambda
+                                                           x: x.channel == channel and x.author == interaction.user)
                 await channel.send(
                     embed=await milestone_ticket_update(ctx, channel, option_emoji, milestone_message.content))
 
@@ -697,7 +696,7 @@ class General:
                 "Please give the bot up to 10 minutes to add the milestone. Once it has done it, you'll receive a completion message.")
             await channel.edit(topic=str(channel_description))
             milestone_registration = discord.Embed(title="Milestone Registered!",
-                                  description=milestone_string[:-1], color=neutral_color)
+                                                   description=milestone_string[:-1], color=neutral_color)
 
             return milestone_registration
 
@@ -779,7 +778,8 @@ class General:
 
     @staticmethod
     async def compile_milestones() -> str:
-        day_number = 86 + round((datetime.now(UTC) - datetime.strptime("2022/05/15", "%Y/%m/%d")).days / 7)
+        day_number = 86 + round((datetime.now(timezone.utc) - datetime.strptime("2022/05/15", "%Y/%m/%d").replace(
+            tzinfo=timezone.utc)).days / 7)
 
         milestone_message = f"**Weekly Milestones**\nThis is week __{day_number}__ of weekly milestones\n\n"
         count = 0
