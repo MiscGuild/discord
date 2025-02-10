@@ -335,7 +335,7 @@ class String:
         embed = discord.Embed(title=f"{name}'s Invites", color=neutral_color)
         embed.add_field(name="Weekly Invites", value=None if not invites_text else invites_text, inline=False)
         embed.add_field(name="This week's statistics", value=f"Total Valid Invites: {len(valid_invites)}\n"
-                                                             f"Total Invites: {len(weekly_invites) if len(weekly_invites) else 0}\n"
+                                                             f"Total Invites: {len(weekly_invites) if weekly_invites else 0}\n"
                                                              f"Success Rate: {round(len(valid_invites) * 100 / len(weekly_invites)) if len(weekly_invites) else 0}%",
                         inline=False)
         embed.add_field(name="Total Valid Invites", value=total_valid_invites, inline=True)
