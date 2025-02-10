@@ -111,11 +111,17 @@ async def generate_rank_upgrade(weekly_invites: list) -> None:
             winner_invites = invites
             break
 
+    start_date = datetime.strptime('16/09/2023', '%d/%m/%Y').replace(tzinfo=timezone.utc)
+
+    current_date = datetime.now(timezone.utc)
+
+    week_number = int(round((current_date - start_date).days / 7))
+
     date = (
-        f"__Week {int(0 + round((datetime.now(timezone.utc) - datetime.strptime('16/09/2023', '%d/%m/%Y')).days / 7))}__\n"
-        f"**{(datetime.now(timezone.utc) - timedelta(days=7)).strftime('%d %b %Y')} "
-            f"-"
-        f" {datetime.now(timezone.utc).strftime('%d %B %Y')}**")
+        f"__Week {week_number}__\n"
+        f"**{(current_date - timedelta(days=7)).strftime('%d %b %Y')} "
+        f"- {current_date.strftime('%d %B %Y')}**"
+    )
 
     announcement = rank_upgrade_winner_announcement.format(
         date=date,
