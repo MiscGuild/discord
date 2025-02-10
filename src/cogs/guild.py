@@ -4,6 +4,7 @@ from discord.ext import commands, bridge
 from src.func.General import General
 from src.func.Integer import Integer
 from src.func.String import String
+from src.utils.calculation_utils import check_if_mention
 from src.utils.consts import gvg_info_embed, requirements_embed, resident_embed
 from src.utils.db_utils import get_db_uuid_username_from_discord_id
 
@@ -17,9 +18,14 @@ class Guild(commands.Cog, name="guild"):
         self.bot = bot
 
     @bridge.bridge_group(name="g", description="Invoke guild related commands!", invoke_without_command=True)
-    async def g(self, ctx: bridge.BridgeContext, name: str = None) -> None:
-        if not name:
+    async def g(self, ctx: bridge.BridgeContext, name: str | discord.Member = None) -> None:
+        """Invoke guild related commands!"""
+        member_id = await check_if_mention(name)
+        if not name and not member_id:
             uuid, username = await get_db_uuid_username_from_discord_id(ctx.author.id)
+            res = await String(uuid=uuid, username=username).gmember(ctx)
+        elif member_id:
+            uuid, username = await get_db_uuid_username_from_discord_id(member_id)
             res = await String(uuid=uuid, username=username).gmember(ctx)
         else:
             res = await String(string=name).gmember(ctx)
@@ -35,10 +41,20 @@ class Guild(commands.Cog, name="guild"):
         required=False,
         input_type=str
     )
-    async def gmember(self, ctx: discord.ApplicationContext, name: str = None) -> None:
+    @bridge.bridge_option(
+        name="member",
+        description="The discord member whose guild experience you'd like to view",
+        required=False,
+        input_type=discord.Member
+    )
+    async def gmember(self, ctx: discord.ApplicationContext, name: str = None,
+                      discord_member: discord.Member = None) -> None:
         """View the given user's guild experience over the past week!"""
-        if not name:
+        if not name and not discord_member:
             uuid, username = await get_db_uuid_username_from_discord_id(ctx.author.id)
+            res = await String(uuid=uuid, username=username).gmember(ctx)
+        elif discord_member:
+            uuid, username = await get_db_uuid_username_from_discord_id(discord_member.id)
             res = await String(uuid=uuid, username=username).gmember(ctx)
         else:
             res = await String(string=name).gmember(ctx)
