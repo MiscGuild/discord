@@ -46,6 +46,8 @@ async def scheduler() -> None:
         next_run = now_est.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
         next_run_utc = next_run.astimezone(pytz.utc)
 
+        await update_gexp()
+
         # update_invites() runs at 11:59 PM to ensure everyone's gexp is at a maximum
         sleep_time_invites = (next_run_utc - now).total_seconds() - 60
         await asyncio.sleep(sleep_time_invites)
@@ -56,7 +58,6 @@ async def scheduler() -> None:
         remaining_sleep_time = (next_run_utc - now).total_seconds() + 360
         await asyncio.sleep(remaining_sleep_time)
         await send_gexp_lb()
-        await update_gexp()
 
 
 async def before_scheduler() -> None:
