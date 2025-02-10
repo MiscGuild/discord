@@ -192,7 +192,7 @@ async def get_all_guild_members() -> list:
 
 
 async def remove_guild_member(uuid: str) -> None:
-    await bot.db.execute("DELETE FROM guild_member_data WHERE uuid = ?", (uuid,))
+    await bot.db.execute("DELETE FROM guild_member_data WHERE uuid = (?)", (uuid,))
     await bot.db.commit()
 
 async def get_member_gexp_history(uuid: str) -> dict:
