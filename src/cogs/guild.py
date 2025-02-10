@@ -47,19 +47,6 @@ class Guild(commands.Cog, name="guild"):
         elif isinstance(res, str):
             await ctx.respond(res, ephemeral=True)
 
-    #
-    # @bridge.bridge_command(name="gm", aliases=["gexp"])
-    # async def gm(self, ctx: discord.ApplicationContext, name: str = None):
-    #     """View the given user's guild experience over the past week!"""
-    #     if not name:
-    #         uuid, username = await get_db_uuid_username_from_discord_id(ctx.author.id)
-    #         res = await String(uuid=uuid, username=username).gmember(ctx)
-    #     else:
-    #         res = await String(string=name).gmember(ctx)
-    #     if isinstance(res, discord.Embed):
-    #         await ctx.respond(embed=res)
-    #     elif isinstance(res, str):
-    #         await ctx.respond(res, ephemeral=True)
 
     @g.command(name="weekly", aliases=["weekly_gexp_lb", "weeklylb", "wlb"])
     async def weekly_gexp_lb(self, ctx: discord.ApplicationContext) -> None:
