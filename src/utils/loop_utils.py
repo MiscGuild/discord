@@ -73,11 +73,17 @@ async def send_gexp_lb() -> None:
 
     # If it's Monday (UTC), send weekly leaderboard
     if datetime.now(timezone.utc).weekday() == 0:
-        await bot.get_channel(weekly_lb_channel).send(
-            f"__Week {int(80 + round((datetime.now(timezone.utc) - datetime.strptime('14/08/2022', '%d/%m/%Y')).days / 7))}__\n"
-            f"**{(datetime.now(timezone.utc) - timedelta(days=7)).strftime('%d %b %Y')} "
-            f"-"
-            f" {datetime.now(timezone.utc).strftime('%d %B %Y')}**")
+        start_date = datetime.strptime('14/08/2022', '%d/%m/%Y').replace(tzinfo=timezone.utc)
+        current_date = datetime.now(timezone.utc)
+        week_number = int(80 + round((current_date - start_date).days / 7))
+
+        week_message = (
+            f"__Week {week_number}__\n"
+            f"**{(current_date - timedelta(days=7)).strftime('%d %b %Y')} "
+            f"- {current_date.strftime('%d %B %Y')}**"
+        )
+
+        await bot.get_channel(weekly_lb_channel).send(week_message)
         await bot.get_channel(weekly_lb_channel).send(
             await General().weeklylb(is_automatic=True)
         )
