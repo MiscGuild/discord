@@ -123,6 +123,7 @@ async def update_gexp() -> None:
 
     all_members_in_db = await get_all_guild_members()
 
-    for member in all_members_in_db:
-        if member not in gexp_data:
-            await remove_guild_member(member)
+    for uuid in all_members_in_db:
+        uuid = uuid[0]
+        if uuid not in gexp_data:
+            await remove_guild_member(uuid)
