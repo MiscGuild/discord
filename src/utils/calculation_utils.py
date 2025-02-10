@@ -224,3 +224,9 @@ async def get_guild_gexp_data(guild_data: dict) -> dict:
     for member in guild_data["members"]:
         members[member["uuid"]] = member["expHistory"]
     return members
+
+
+async def check_if_mention(message: str) -> int | None:
+    if not message:
+        return None
+    return int(message[2:-1]) if message.startswith("<@") and message.endswith(">") else None
