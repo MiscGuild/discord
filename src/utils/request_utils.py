@@ -1,8 +1,10 @@
+import asyncio
 import random
 import re
 from __main__ import bot
+from functools import wraps
 from io import BytesIO
-from typing import Tuple, List
+from typing import Tuple, List, Callable, Any
 
 import aiohttp
 import discord
@@ -10,6 +12,30 @@ import requests
 
 from src.utils.consts import config, error_channel_id
 from src.utils.db_utils import get_db_username_from_uuid, update_db_username
+
+
+def async_retry(max_attempts: int = 5, delay: float = 0.5):
+    """Decorator to retry an async function on failure."""
+
+    def decorator(func: Callable[..., Any]):
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            for attempt in range(1, max_attempts + 1):
+                try:
+                    result = await func(*args, **kwargs)
+                    if result:
+                        return result
+                except Exception as e:
+                    pass
+                if attempt < max_attempts:
+                    await asyncio.sleep(delay)
+
+            return None
+
+        return wrapper
+
+    return decorator
+
 
 
 async def get_hyapi_key() -> str:
@@ -45,7 +71,7 @@ async def get_json_response(url: str) -> dict | None:
     return resp
 
 
-async def get_mojang_profile(name: str) -> Tuple[str, str] | Tuple[None, None]:
+async def get_mojang_profile_from_name(name: str) -> Tuple[str, str] | Tuple[None, None]:
     resp = await get_json_response(f"https://api.mojang.com/users/profiles/minecraft/{name}")
 
     # If player and request is valid
@@ -79,8 +105,8 @@ async def get_hypixel_player(name: str = None, uuid: str = None) -> dict | None:
     return resp["player"]
 
 
+@async_retry()
 async def get_name_by_uuid(uuid: str) -> str | None:
-    i = 0
     while i < 5:
         i += 1
         resp = await get_json_response(f"https://sessionserver.mojang.com/session/minecraft/profile/{uuid}")
