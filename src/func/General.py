@@ -25,7 +25,7 @@ from src.utils.discord_utils import (create_ticket,
                                      get_ticket_creator, log_event,
                                      name_grabber, has_tag_perms)
 from src.utils.request_utils import (get_guild_by_name, get_guild_uuids,
-                                     get_mojang_profile_from_name, get_name_by_uuid,
+                                     get_name_by_uuid, get_uuid_by_name,
                                      get_player_guild)
 from src.utils.ticket_utils.tickets import create_transcript, get_ticket_properties
 
@@ -112,7 +112,7 @@ class General:
             nick = await name_grabber(discord_member)
             uuid, username = await get_db_uuid_username_from_discord_id(discord_member.id)
             if not uuid and username:
-                username, uuid = await get_mojang_profile_from_name(username)
+                username, uuid = await get_uuid_by_name(username)
                 if username and uuid:
                     await update_member(discord_member.id, uuid, username)
 
@@ -178,7 +178,7 @@ class General:
         elif ctx.channel.category.name == ticket_categories["registrees"]:
             member = await get_ticket_creator(ctx.channel)
             if member:
-                ign, uuid = await get_mojang_profile_from_name(await name_grabber(member))
+                ign, uuid = await get_uuid_by_name(await name_grabber(member))
                 await Union(user=member).sync(ctx, ign, None, True)
                 embed.set_footer(text=f"{ign}'s roles have been updated automatically!")
 
