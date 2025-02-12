@@ -16,7 +16,7 @@ from src.utils.db_utils import update_member, insert_new_member, get_db_uuid_use
 from src.utils.discord_utils import (create_ticket, has_tag_perms,
                                      is_linked_discord)
 from src.utils.request_utils import (get_gtag, get_hypixel_player,
-                                     get_mojang_profile, get_player_guild, get_name_by_uuid)
+                                     get_mojang_profile_from_name, get_player_guild, get_name_by_uuid)
 
 
 class Union:
@@ -88,7 +88,7 @@ class Union:
             if username != ign:
                 await update_member(self.user.id, uuid, ign)
         else:
-            ign, uuid = await get_mojang_profile(name)
+            ign, uuid = await get_mojang_profile_from_name(name)
         # Invalid username
         if not ign:
             return unknown_ign_embed
@@ -172,7 +172,7 @@ class Union:
         if ctx.channel.id != registration_channel_id:
             return "This command can only be used in the registration channel!\nThe command you are looking for is `/sync`", None
 
-        ign, uuid = await get_mojang_profile(name)
+        ign, uuid = await get_mojang_profile_from_name(name)
 
         if not ign:
             return unknown_ign_embed, None
