@@ -211,14 +211,9 @@ async def get_uuid_from_discord_id(discord_id: int) -> str:
     return res[0] if res else None
 
 
-async def get_db_username_from_uuid(uuid: str) -> str | None:
-    username = await select_one("SELECT username from members WHERE uuid = (?)", (uuid,))
-    if username:
-        return username[0]
-
-    username = await select_one("SELECT username from guild_member_data WHERE uuid = (?)", (uuid,))
-
-    return username[0] if username else None
+async def get_discord_id_from_uuid(uuid: str) -> int | None:
+    res = await select_one("SELECT discord_id from members WHERE uuid = (?)", (uuid,))
+    return int(res[0]) if res else None
 
 
 async def insert_new_member(discord_id: int, uuid: str, username: str) -> None:
