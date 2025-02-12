@@ -59,7 +59,8 @@ class General:
         # Create embed
         content = ""
         for _set in rows:
-            _, uuid, username = _set
+            _, uuid = _set
+            username = await get_name_by_uuid(uuid)
             content += f"{username} ||{uuid}||\n"
 
         return discord.Embed(title="The people on the do-not-kick-list are as follows:", description=content,
