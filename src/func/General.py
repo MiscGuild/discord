@@ -99,7 +99,7 @@ class General:
                 continue
             for player in guild_members:
                 if player["uuid"] == uuid:
-                    guild[uuid] = {"username": await get_db_username_from_uuid(uuid),
+                    guild[uuid] = {"username": (await get_db_uuid_username(uuid=uuid))[0],
                                    "gexp": sum(player["expHistory"].values())}
 
         await ctx.send("If you see the bot is stuck on a member along with an error message, "
