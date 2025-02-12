@@ -71,7 +71,7 @@ async def get_json_response(url: str) -> dict | None:
     return resp
 
 
-@async_retry()
+@async_retry(max_attempts=3, delay=0)
 async def get_mojang_profile_from_name(name: str) -> Tuple[str, str] | Tuple[None, None]:
     url = f"https://api.mojang.com/users/profiles/minecraft/{name}"
     resp = await get_json_response(url)
