@@ -120,7 +120,7 @@ class Guild(commands.Cog, name="guild"):
         """View your invitation stats"""
         await ctx.defer()
         if not name:
-            uuid, username = await get_db_uuid_username_from_discord_id(ctx.author.id)
+            username, uuid = await get_db_uuid_username(discord_id=ctx.author.id)
             res = await String(uuid=uuid, username=username).invites()
         else:
             res = await String(string=name).invites()
