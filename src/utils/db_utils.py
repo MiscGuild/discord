@@ -21,7 +21,7 @@ async def connect_db():
         FOREIGN KEY (uuid) REFERENCES users(uuid) ON DELETE CASCADE);""")
 
     # DNKL table:
-    await bot.db.execute("""CREATE TABLE dnkl (
+    await bot.db.execute("""CREATE TABLE IF NOT EXISTS dnkl (
     message_id INTEGER PRIMARY KEY NOT NULL,
     uuid TEXT NOT NULL,
     FOREIGN KEY (uuid) REFERENCES users(uuid) ON DELETE CASCADE
