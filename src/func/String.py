@@ -20,8 +20,8 @@ from src.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed,
 from src.utils.db_utils import (delete_dnkl, select_one,
                                 get_invites, get_member_gexp_history)
 from src.utils.referral_utils import check_invitation_validity
-from src.utils.request_utils import (get_hypixel_player, get_mojang_profile_from_name,
-                                     get_player_guild, get_name_by_uuid)
+from src.utils.request_utils import (get_hypixel_player,
+                                     get_player_guild, get_name_by_uuid, get_uuid_by_name)
 from src.utils.ticket_utils.dnkl import dnkl_application
 
 
@@ -71,7 +71,7 @@ class String:
             uuid = self.uuid
             name = self.username
         else:
-            name, uuid = await get_mojang_profile_from_name(self.string)
+            name, uuid = await get_uuid_by_name(self.string)
             if not name:
                 return unknown_ign_embed
 
@@ -171,7 +171,7 @@ class String:
         if self.uuid and self.username:
             uuid = self.uuid
         else:
-            name, uuid = await get_mojang_profile_from_name(self.string)
+            name, uuid = await get_uuid_by_name(self.string)
             if not name:
                 return unknown_ign_embed
         player_data = await get_hypixel_player(name=uuid)
@@ -208,7 +208,7 @@ class String:
 
     async def dnkladd(self, ctx: discord.ApplicationContext) -> discord.Embed | None:
         # start, end, reason
-        ign, uuid = await get_mojang_profile_from_name(self.string)
+        ign, uuid = await get_uuid_by_name(self.string)
         _, weekly_gexp = await get_player_gexp(uuid)
         if not ign:
             return unknown_ign_embed
@@ -218,7 +218,7 @@ class String:
 
     async def dnklremove(self) -> str:
         if self.string:
-            _, uuid = await get_mojang_profile_from_name(self.string)
+            _, uuid = await get_uuid_by_name(self.string)
         else:
             _, uuid = await get_name_by_uuid(self.uuid), self.uuid
 
@@ -245,7 +245,7 @@ class String:
             uuid = self.uuid
             name = self.username
         else:
-            name, uuid = await get_mojang_profile_from_name(self.string)
+            name, uuid = await get_uuid_by_name(self.string)
             if not name:
                 return unknown_ign_embed
         _, weeklygexp = await get_player_gexp(uuid)
@@ -303,7 +303,7 @@ class String:
             uuid = self.uuid
             name = self.username
         else:
-            name, uuid = await get_mojang_profile_from_name(self.string)
+            name, uuid = await get_uuid_by_name(self.string)
             if not name:
                 return unknown_ign_embed
 
@@ -353,7 +353,7 @@ class String:
     async def elite_member(self) -> discord.Embed:
         username = self.username
         reason = self.string
-        name, uuid = await get_mojang_profile_from_name(username)
+        name, uuid = await get_uuid_by_name(username)
         if not name:
             return unknown_ign_embed
 
