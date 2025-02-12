@@ -54,7 +54,7 @@ class Guild(commands.Cog, name="guild"):
             username, uuid = await get_db_uuid_username(discord_id=ctx.author.id)
             res = await String(uuid=uuid, username=username).gmember(ctx)
         elif discord_member:
-            uuid, username = await get_db_uuid_username_from_discord_id(discord_member.id)
+            username, uuid = await get_db_uuid_username(discord_id=discord_member.id)
             res = await String(uuid=uuid, username=username).gmember(ctx)
         else:
             res = await String(string=name).gmember(ctx)
