@@ -180,7 +180,7 @@ class Union:
         if ign in bot.staff_names:
             return staff_impersonation_embed, None
 
-        check_already_registered = await check_uuid_in_db(uuid=uuid)
+        username, uuid, check_already_registered = await get_db_uuid_username(uuid=uuid, get_discord_id=True)
         if not check_already_registered:
             await insert_new_member(discord_id=self.user.id,
                                     uuid=uuid,
