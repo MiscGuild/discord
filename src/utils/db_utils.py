@@ -195,17 +195,11 @@ async def get_db_uuid_username(discord_id: int = None, username: str = None, uui
     if username:
         username, uuid = await get_uuid_from_username(username)
         if not uuid:
-            return None, None
+            return username, None
         if get_discord_id:
             discord_id = await get_discord_id_from_uuid(uuid)
             return username, uuid, discord_id
-    if uuid:
-        username, uuid = await get_username_from_uuid(uuid)
-        if not username:
-            return None, None
-        if get_discord_id:
-            discord_id = await get_discord_id_from_uuid(uuid)
-            return username, uuid, discord_id
+        return username, uuid
 
     return None, None
 
