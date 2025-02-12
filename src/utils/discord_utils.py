@@ -6,7 +6,7 @@ from discord.ext import tasks
 
 from src.utils.consts import (config, log_channel_id, neutral_color, ticket_categories,
                               guild_handle)
-from src.utils.db_utils import check_uuid_in_db, connect_db
+from src.utils.db_utils import connect_db, get_db_uuid_username
 from src.utils.request_utils import get_uuid_by_name
 from src.utils.ticket_utils import *
 from src.utils.ticket_utils.tickets import name_grabber
@@ -146,7 +146,7 @@ async def has_tag_perms(member: discord.Member) -> bool:
 
 
 async def update_recruiter_role(uuid: str, invites: int) -> None:
-    user_id = await check_uuid_in_db(uuid)
+    _, _, user_id = await get_db_uuid_username(uuid=uuid, get_discord_id=True)
     if not user_id:
         return
     member_ids = [x.id for x in bot.guild.members]
