@@ -75,8 +75,17 @@ async def get_json_response(url: str) -> dict | None:
 async def get_mojang_profile_from_name(name: str) -> Tuple[str, str] | Tuple[None, None]:
     url = f"https://api.mojang.com/users/profiles/minecraft/{name}"
     resp = await get_json_response(url)
+    if not resp:
+        return None, None
 
-    return resp["name"], resp["id"] if resp and "name" in resp else None
+    if "error" in resp:
+        return None, None
+
+    if "id" not in resp:
+        return None, None
+
+    return resp["name"], resp["id"]
+
 
 
 async def get_uuid_by_name(name: str) -> Tuple[str, str] | Tuple[None, None]:
