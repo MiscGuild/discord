@@ -129,6 +129,7 @@ async def generate_lb_text(member_gexp: list, text: str, is_automatic) -> str:
 
         discord_id, do_pings = await get_discordid_doping_db(uuid)
         username = await get_db_username_from_uuid(uuid=uuid)
+        username, uuid = await get_db_uuid_username(uuid=uuid)
         if discord_id and is_automatic and do_pings:
             name = f"<@{discord_id}>"
         else:
