@@ -321,7 +321,7 @@ class Union:
         return embed.set_image(url=self.user.avatar)
 
     async def whois(self) -> discord.Embed:
-        uuid, username = await get_db_uuid_username_from_discord_id(self.user.id)
+        username, uuid = await get_db_uuid_username(discord_id=self.user.id)
         embed = discord.Embed(
             title=username,
             description=f"Discord Username: {self.user.name}\n"
