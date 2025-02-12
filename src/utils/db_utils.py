@@ -217,8 +217,9 @@ async def get_discord_id_from_uuid(uuid: str) -> int | None:
 
 
 async def insert_new_member(discord_id: int, uuid: str, username: str) -> None:
-    await bot.db.execute("INSERT INTO members VALUES (?, ?, ?, ?)", (discord_id, uuid, username, 1))
+    await bot.db.execute("INSERT INTO members VALUES (?, ?, ?)", (discord_id, uuid, 1))
     await bot.db.commit()
+    await check_and_update_username(uuid, username)
 
 
 async def update_member(discord_id: int, uuid: str, username: str) -> None:
