@@ -7,7 +7,7 @@ from discord.ext import tasks
 from src.utils.consts import (config, log_channel_id, neutral_color, ticket_categories,
                               guild_handle)
 from src.utils.db_utils import check_uuid_in_db, connect_db
-from src.utils.request_utils import get_mojang_profile_from_name
+from src.utils.request_utils import get_uuid_by_name
 from src.utils.ticket_utils import *
 from src.utils.ticket_utils.tickets import name_grabber
 
@@ -94,7 +94,7 @@ async def create_ticket(user: discord.Member, ticket_name: str,
 
             # Override default callback
             async def callback(self, interaction: discord.Interaction):
-                ign, uuid = await get_mojang_profile_from_name(await name_grabber(interaction.user))
+                ign, uuid = await get_uuid_by_name(await name_grabber(interaction.user))
                 # Set option var and delete Select so it cannot be used twice
                 option = list(interaction.data.values())[0][0]
                 await ticket.purge(
@@ -192,7 +192,7 @@ async def after_cache_ready() -> None:
     check_giveaways.start()
     await before_scheduler()
 
-    bot.staff_names = [(await get_mojang_profile_from_name(await name_grabber(member)))[0] for member in
+    bot.staff_names = [(await get_uuid_by_name(await name_grabber(member)))[0] for member in
                        bot.staff.members]
 
 
