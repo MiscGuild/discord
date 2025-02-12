@@ -6,7 +6,7 @@ from src.func.Integer import Integer
 from src.func.String import String
 from src.utils.calculation_utils import check_if_mention
 from src.utils.consts import gvg_info_embed, requirements_embed, resident_embed
-from src.utils.db_utils import get_db_uuid_username_from_discord_id
+from src.utils.db_utils import get_db_uuid_username
 
 
 class Guild(commands.Cog, name="guild"):
