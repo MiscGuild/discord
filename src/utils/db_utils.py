@@ -148,7 +148,12 @@ async def get_db_uuid_username_from_discord_id(discord_id: int) -> Tuple[str, st
 
 async def get_db_username_from_uuid(uuid: str) -> str | None:
     username = await select_one("SELECT username from members WHERE uuid = (?)", (uuid,))
-    return username[0] if username else username
+    if username:
+        return username[0]
+
+    username = await select_one("SELECT username from guild_member_data WHERE uuid = (?)", (uuid,))
+
+    return username[0] if username else None
 
 
 async def insert_new_member(discord_id: int, uuid: str, username: str) -> None:
