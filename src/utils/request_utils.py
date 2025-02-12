@@ -47,7 +47,7 @@ async def update_usernames(uuid: str, username: str) -> None:
     if db_username is None:
         return
     elif db_username != username:
-        await update_db_username(uuid, username)
+        await check_and_update_username(uuid, username)
 
 
 # Base JSON-getter for all JSON based requests. Catches Invalid API Key errors
