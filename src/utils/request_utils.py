@@ -79,18 +79,18 @@ async def get_mojang_profile_from_name(name: str) -> Tuple[str, str] | Tuple[Non
     return resp["name"], resp["id"] if resp and "name" in resp else None
 
 
-async def get_uuid_by_name(name: str) -> str | None:
+async def get_uuid_by_name(name: str) -> Tuple[str, str] | Tuple[None, None]:
     username, uuid = await get_mojang_profile_from_name(name)
     if username and uuid:
         await update_usernames(uuid=uuid, username=username)
-        return uuid
+        return username, uuid
 
     resp = await get_hypixel_player(name=name)
     if resp and "uuid" in resp:
         await update_usernames(uuid=resp["uuid"], username=resp["displayname"])
-        return resp["uuid"]
+        return resp["displayname"], resp["uuid"]
 
-    return None
+    return None, None
 
 
 @async_retry()
