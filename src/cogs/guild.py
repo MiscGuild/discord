@@ -51,7 +51,7 @@ class Guild(commands.Cog, name="guild"):
                       discord_member: discord.Member = None) -> None:
         """View the given user's guild experience over the past week!"""
         if not name and not discord_member:
-            uuid, username = await get_db_uuid_username_from_discord_id(ctx.author.id)
+            username, uuid = await get_db_uuid_username(discord_id=ctx.author.id)
             res = await String(uuid=uuid, username=username).gmember(ctx)
         elif discord_member:
             uuid, username = await get_db_uuid_username_from_discord_id(discord_member.id)
