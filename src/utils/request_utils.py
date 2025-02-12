@@ -119,10 +119,11 @@ async def get_mojang_profile_from_uuid(uuid: str) -> Tuple[str, str] | Tuple[Non
     return resp["name"], uuid
 
 
-async def get_name_by_uuid(uuid: str) -> str | None:
-    username, uuid = await get_db_uuid_username(uuid=uuid)
-    if username:
-        return username
+async def get_name_by_uuid(uuid: str, is_sync: bool = False) -> str | None:
+    if not is_sync:
+        username, uuid = await get_db_uuid_username(uuid=uuid)
+        if username:
+            return username
 
     username, uuid = await get_mojang_profile_from_uuid(uuid)
 
