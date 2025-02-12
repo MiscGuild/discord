@@ -175,7 +175,20 @@ async def get_invites(inviter_uuid) -> Tuple[str, int, int] | None:
 async def get_db_uuid_username(discord_id: int = None, username: str = None, uuid: str = None,
                                get_discord_id: bool = False) -> Tuple[
                                                                     str, str] | Tuple[str, str, int] | Tuple[
-                                                                    None, None]:
+    None, None] | Tuple[None, str] | Tuple[str, None] | Tuple[None, str, int]:
+    if uuid:
+        username, uuid = await get_username_from_uuid(uuid)
+        if not username and not get_discord_id:
+            return None, uuid
+
+        if get_discord_id:
+            discord_id = await get_discord_id_from_uuid(uuid)
+            if not username:
+                return None, uuid, discord_id
+
+            return username, uuid, discord_id
+
+        return username, uuid
     if discord_id:
         uuid = await get_uuid_from_discord_id(discord_id)
         return await get_username_from_uuid(uuid)
