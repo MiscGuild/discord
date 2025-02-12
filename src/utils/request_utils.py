@@ -127,8 +127,8 @@ async def get_hypixel_player(name: str = None, uuid: str = None) -> dict | None:
     if "player" not in resp or not resp["player"]:
         return None
 
-    await update_usernames(uuid=resp["player"]["uuid"], username=resp["player"]["displayname"])
     # Player exists
+    await update_usernames(uuid=resp["player"]["uuid"], username=resp["player"]["displayname"])
     return resp["player"]
 
 
