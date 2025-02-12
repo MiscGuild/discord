@@ -11,7 +11,7 @@ import discord
 import requests
 
 from src.utils.consts import config, error_channel_id
-from src.utils.db_utils import get_db_username_from_uuid, update_db_username
+from src.utils.db_utils import get_db_uuid_username, check_and_update_username
 
 
 def async_retry(max_attempts: int = 5, delay: float = 0.5):
@@ -43,7 +43,7 @@ async def get_hyapi_key() -> str:
 
 
 async def update_usernames(uuid: str, username: str) -> None:
-    db_username = await get_db_username_from_uuid(uuid)
+    db_username, uuid = await get_db_uuid_username(uuid=uuid)
     if db_username is None:
         return
     elif db_username != username:
