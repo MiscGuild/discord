@@ -19,13 +19,13 @@ from src.utils.consts import (accepted_staff_application_embed, active_req,
                               staff_application_questions, ticket_categories,
                               resident_req, dnkl_entries_not_found,
                               positive_responses, allies)
-from src.utils.db_utils import insert_new_giveaway, select_all, get_db_username_from_uuid, \
-    get_db_uuid_username_from_discord_id, update_member
+from src.utils.db_utils import insert_new_giveaway, select_all, \
+    get_db_uuid_username, update_member
 from src.utils.discord_utils import (create_ticket,
                                      get_ticket_creator, log_event,
                                      name_grabber, has_tag_perms)
 from src.utils.request_utils import (get_guild_by_name, get_guild_uuids,
-                                     get_mojang_profile, get_name_by_uuid,
+                                     get_name_by_uuid, get_uuid_by_name,
                                      get_player_guild)
 from src.utils.ticket_utils.tickets import create_transcript, get_ticket_properties
 
@@ -59,7 +59,8 @@ class General:
         # Create embed
         content = ""
         for _set in rows:
-            _, uuid, username = _set
+            _, uuid = _set
+            username = await get_name_by_uuid(uuid)
             content += f"{username} ||{uuid}||\n"
 
         return discord.Embed(title="The people on the do-not-kick-list are as follows:", description=content,
@@ -90,7 +91,7 @@ class General:
             for uuid in ally_uuids:
                 if uuid not in discord_member_uuids:
                     continue
-                allies_dict[uuid] = {"username": await get_db_username_from_uuid(uuid), "tag": gtag}
+                allies_dict[uuid] = {"username": (await get_db_uuid_username(uuid=uuid))[0], "tag": gtag}
         await progress_message.edit(content=f"Fetching {guild_handle}'s UUIDs and usernames")
 
         for uuid in guild_uuids:
@@ -98,7 +99,7 @@ class General:
                 continue
             for player in guild_members:
                 if player["uuid"] == uuid:
-                    guild[uuid] = {"username": await get_db_username_from_uuid(uuid),
+                    guild[uuid] = {"username": (await get_db_uuid_username(uuid=uuid))[0],
                                    "gexp": sum(player["expHistory"].values())}
 
         await ctx.send("If you see the bot is stuck on a member along with an error message, "
@@ -110,9 +111,9 @@ class General:
                 continue
 
             nick = await name_grabber(discord_member)
-            uuid, username = await get_db_uuid_username_from_discord_id(discord_member.id)
+            username, uuid = await get_db_uuid_username(discord_id=discord_member.id)
             if not uuid and username:
-                username, uuid = await get_mojang_profile(username)
+                username, uuid = await get_uuid_by_name(username)
                 if username and uuid:
                     await update_member(discord_member.id, uuid, username)
 
@@ -178,7 +179,7 @@ class General:
         elif ctx.channel.category.name == ticket_categories["registrees"]:
             member = await get_ticket_creator(ctx.channel)
             if member:
-                ign, uuid = await get_mojang_profile(await name_grabber(member))
+                ign, uuid = await get_uuid_by_name(await name_grabber(member))
                 await Union(user=member).sync(ctx, ign, None, True)
                 embed.set_footer(text=f"{ign}'s roles have been updated automatically!")
 
@@ -328,9 +329,8 @@ class General:
         # Loop through all guild members with a session to fetch names
         for member in guild_data["members"]:
             uuid = member["uuid"]
-            name = await get_db_username_from_uuid(uuid=uuid)
-            if not name:
-                name = await get_name_by_uuid(uuid)
+
+            name = await get_name_by_uuid(uuid=uuid)
 
             if name in bot.staff_names:
                 continue

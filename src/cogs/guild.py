@@ -6,7 +6,7 @@ from src.func.Integer import Integer
 from src.func.String import String
 from src.utils.calculation_utils import check_if_mention
 from src.utils.consts import gvg_info_embed, requirements_embed, resident_embed
-from src.utils.db_utils import get_db_uuid_username_from_discord_id
+from src.utils.db_utils import get_db_uuid_username
 
 
 class Guild(commands.Cog, name="guild"):
@@ -22,10 +22,10 @@ class Guild(commands.Cog, name="guild"):
         """Invoke guild related commands!"""
         member_id = await check_if_mention(name)
         if not name and not member_id:
-            uuid, username = await get_db_uuid_username_from_discord_id(ctx.author.id)
+            username, uuid = await get_db_uuid_username(discord_id=ctx.author.id)
             res = await String(uuid=uuid, username=username).gmember(ctx)
         elif member_id:
-            uuid, username = await get_db_uuid_username_from_discord_id(member_id)
+            username, uuid = await get_db_uuid_username(discord_id=member_id)
             res = await String(uuid=uuid, username=username).gmember(ctx)
         else:
             res = await String(string=name).gmember(ctx)
@@ -51,10 +51,10 @@ class Guild(commands.Cog, name="guild"):
                       discord_member: discord.Member = None) -> None:
         """View the given user's guild experience over the past week!"""
         if not name and not discord_member:
-            uuid, username = await get_db_uuid_username_from_discord_id(ctx.author.id)
+            username, uuid = await get_db_uuid_username(discord_id=ctx.author.id)
             res = await String(uuid=uuid, username=username).gmember(ctx)
         elif discord_member:
-            uuid, username = await get_db_uuid_username_from_discord_id(discord_member.id)
+            username, uuid = await get_db_uuid_username(discord_id=discord_member.id)
             res = await String(uuid=uuid, username=username).gmember(ctx)
         else:
             res = await String(string=name).gmember(ctx)
@@ -120,7 +120,7 @@ class Guild(commands.Cog, name="guild"):
         """View your invitation stats"""
         await ctx.defer()
         if not name:
-            uuid, username = await get_db_uuid_username_from_discord_id(ctx.author.id)
+            username, uuid = await get_db_uuid_username(discord_id=ctx.author.id)
             res = await String(uuid=uuid, username=username).invites()
         else:
             res = await String(string=name).invites()

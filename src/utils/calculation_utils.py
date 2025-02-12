@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Tuple, List
 
 from src.utils.consts import ChatColor, active_req, member_req, resident_req
-from src.utils.db_utils import get_discordid_doping_db, get_db_username_from_uuid
+from src.utils.db_utils import get_do_ping, get_db_uuid_username
 from src.utils.request_utils import get_player_guild, get_name_by_uuid
 
 
@@ -127,8 +127,8 @@ async def generate_lb_text(member_gexp: list, text: str, is_automatic) -> str:
     for uuid, gexp in member_gexp[:10]:
         count += 1
 
-        discord_id, do_pings = await get_discordid_doping_db(uuid)
-        username = await get_db_username_from_uuid(uuid=uuid)
+        discord_id, do_pings = await get_do_ping(uuid)
+        username, uuid = await get_db_uuid_username(uuid=uuid)
         if discord_id and is_automatic and do_pings:
             name = f"<@{discord_id}>"
         else:

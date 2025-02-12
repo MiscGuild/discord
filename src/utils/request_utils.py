@@ -1,15 +1,41 @@
+import asyncio
 import random
 import re
 from __main__ import bot
+from functools import wraps
 from io import BytesIO
-from typing import Tuple, List
+from typing import Tuple, List, Callable, Any
 
 import aiohttp
 import discord
 import requests
 
 from src.utils.consts import config, error_channel_id
-from src.utils.db_utils import get_db_username_from_uuid, update_db_username
+from src.utils.db_utils import get_db_uuid_username, check_and_update_username
+
+
+def async_retry(max_attempts: int = 5, delay: float = 0.5):
+    """Decorator to retry an async function on failure."""
+
+    def decorator(func: Callable[..., Any]):
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            for attempt in range(1, max_attempts + 1):
+                try:
+                    result = await func(*args, **kwargs)
+                    if result:
+                        return result
+                except Exception as e:
+                    pass
+                if attempt < max_attempts:
+                    await asyncio.sleep(delay)
+
+            return None
+
+        return wrapper
+
+    return decorator
+
 
 
 async def get_hyapi_key() -> str:
@@ -17,11 +43,11 @@ async def get_hyapi_key() -> str:
 
 
 async def update_usernames(uuid: str, username: str) -> None:
-    db_username = await get_db_username_from_uuid(uuid)
+    db_username, uuid = await get_db_uuid_username(uuid=uuid)
     if db_username is None:
         return
     elif db_username != username:
-        await update_db_username(uuid, username)
+        await check_and_update_username(uuid, username)
 
 
 # Base JSON-getter for all JSON based requests. Catches Invalid API Key errors
@@ -45,20 +71,71 @@ async def get_json_response(url: str) -> dict | None:
     return resp
 
 
-async def get_mojang_profile(name: str) -> Tuple[str, str] | Tuple[None, None]:
-    resp = await get_json_response(f"https://api.mojang.com/users/profiles/minecraft/{name}")
+@async_retry(max_attempts=3, delay=0)
+async def get_mojang_profile_from_name(name: str) -> Tuple[str, str] | Tuple[None, None]:
+    url = f"https://api.mojang.com/users/profiles/minecraft/{name}"
+    resp = await get_json_response(url)
+    if not resp:
+        return None, None
 
-    # If player and request is valid
-    if resp and ("errorMessage" not in resp) and ("name" in resp):
-        await update_usernames(uuid=resp["id"], username=resp["name"])
-        return resp["name"], resp["id"]
+    if "error" in resp:
+        return None, None
+
+    if "id" not in resp:
+        return None, None
+
+    return resp["name"], resp["id"]
+
+
+
+async def get_uuid_by_name(name: str) -> Tuple[str, str] | Tuple[None, None]:
+    username, uuid = await get_mojang_profile_from_name(name)
+    if username and uuid:
+        await update_usernames(uuid=uuid, username=username)
+        return username, uuid
 
     resp = await get_hypixel_player(name=name)
-    if resp:
-        return resp['displayname'], resp['uuid']
+    if resp and "uuid" in resp:
+        await update_usernames(uuid=resp["uuid"], username=resp["displayname"])
+        return resp["displayname"], resp["uuid"]
 
-    # Player does not exist
     return None, None
+
+
+@async_retry(max_attempts=3, delay=0)
+async def get_mojang_profile_from_uuid(uuid: str) -> Tuple[str, str] | Tuple[None, str]:
+    url = f"https://sessionserver.mojang.com/session/minecraft/profile/{uuid}"
+    resp = await get_json_response(url)
+
+    if not resp:
+        return None, uuid
+
+    if "error" in resp:
+        return None, uuid
+
+    if "name" not in resp:
+        return None, uuid
+
+    return resp["name"], uuid
+
+
+async def get_name_by_uuid(uuid: str) -> str | None:
+    username, uuid = await get_db_uuid_username(uuid=uuid)
+    if username:
+        return username
+
+    username, uuid = await get_mojang_profile_from_uuid(uuid)
+
+    if username and uuid:
+        await update_usernames(uuid=uuid, username=username)
+        return username
+
+    resp = await get_hypixel_player(uuid=uuid)
+    if resp and "displayname" in resp:
+        await update_usernames(uuid=uuid, username=resp["displayname"])
+        return resp["displayname"]
+
+    return None
 
 
 async def get_hypixel_player(name: str = None, uuid: str = None) -> dict | None:
@@ -74,27 +151,9 @@ async def get_hypixel_player(name: str = None, uuid: str = None) -> dict | None:
     if "player" not in resp or not resp["player"]:
         return None
 
-    await update_usernames(uuid=resp["player"]["uuid"], username=resp["player"]["displayname"])
     # Player exists
+    await update_usernames(uuid=resp["player"]["uuid"], username=resp["player"]["displayname"])
     return resp["player"]
-
-
-async def get_name_by_uuid(uuid: str) -> str | None:
-    i = 0
-    while i < 5:
-        i += 1
-        resp = await get_json_response(f"https://sessionserver.mojang.com/session/minecraft/profile/{uuid}")
-        # Player does not exist
-        if not resp:
-            continue
-        if "name" not in resp:
-            continue
-        await update_usernames(uuid=uuid, username=resp["name"])
-        return resp["name"]
-    resp = await get_hypixel_player(uuid=uuid)
-    if resp:
-        await update_usernames(uuid=uuid, username=resp['displayname'])
-        return resp['displayname']
 
 
 def session_get_name_by_uuid(session: requests.Session, uuid: str) -> str | None:

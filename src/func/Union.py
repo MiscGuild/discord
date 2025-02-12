@@ -11,12 +11,11 @@ from src.utils.consts import (active_req, allies, discord_not_linked_embed, guil
                               pos_color, registration_channel_id,
                               staff_impersonation_embed, ticket_categories,
                               unknown_ign_embed, join_request_embed)
-from src.utils.db_utils import update_member, insert_new_member, get_db_uuid_username_from_discord_id, set_do_ping_db, \
-    check_uuid_in_db
+from src.utils.db_utils import update_member, insert_new_member, get_db_uuid_username, set_do_ping_db
 from src.utils.discord_utils import (create_ticket, has_tag_perms,
                                      is_linked_discord)
 from src.utils.request_utils import (get_gtag, get_hypixel_player,
-                                     get_mojang_profile, get_player_guild, get_name_by_uuid)
+                                     get_player_guild, get_name_by_uuid, get_uuid_by_name)
 
 
 class Union:
@@ -83,12 +82,12 @@ class Union:
                    is_fs=False) -> discord.Embed | str:
         await ctx.defer()
         if is_fs and not name:
-            uuid, username = await get_db_uuid_username_from_discord_id(self.user.id)
+            username, uuid = await get_db_uuid_username(discord_id=self.user.id)
             ign = await get_name_by_uuid(uuid)
             if username != ign:
                 await update_member(self.user.id, uuid, ign)
         else:
-            ign, uuid = await get_mojang_profile(name)
+            ign, uuid = await get_uuid_by_name(name)
         # Invalid username
         if not ign:
             return unknown_ign_embed
@@ -172,7 +171,7 @@ class Union:
         if ctx.channel.id != registration_channel_id:
             return "This command can only be used in the registration channel!\nThe command you are looking for is `/sync`", None
 
-        ign, uuid = await get_mojang_profile(name)
+        ign, uuid = await get_uuid_by_name(name)
 
         if not ign:
             return unknown_ign_embed, None
@@ -181,7 +180,7 @@ class Union:
         if ign in bot.staff_names:
             return staff_impersonation_embed, None
 
-        check_already_registered = await check_uuid_in_db(uuid=uuid)
+        username, uuid, check_already_registered = await get_db_uuid_username(uuid=uuid, get_discord_id=True)
         if not check_already_registered:
             await insert_new_member(discord_id=self.user.id,
                                     uuid=uuid,
@@ -322,7 +321,7 @@ class Union:
         return embed.set_image(url=self.user.avatar)
 
     async def whois(self) -> discord.Embed:
-        uuid, username = await get_db_uuid_username_from_discord_id(self.user.id)
+        username, uuid = await get_db_uuid_username(discord_id=self.user.id)
         embed = discord.Embed(
             title=username,
             description=f"Discord Username: {self.user.name}\n"

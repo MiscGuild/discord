@@ -4,7 +4,7 @@ from discord.ext import commands, bridge
 from src.func.General import General
 from src.func.String import String
 from src.func.Union import Union
-from src.utils.db_utils import get_db_uuid_username_from_discord_id
+from src.utils.db_utils import get_db_uuid_username
 
 
 class Hypixel(commands.Cog, name="hypixel"):
@@ -46,7 +46,7 @@ class Hypixel(commands.Cog, name="hypixel"):
     async def info(self, ctx: discord.ApplicationContext, name: str = None) -> None:
         """View Hypixel stats of the given user!"""
         if not name:
-            uuid, username = await get_db_uuid_username_from_discord_id(ctx.author.id)
+            uuid, username = await get_db_uuid_username(discord_id=ctx.author.id)
             res = await String(uuid=uuid, username=username).info()
         else:
             res = await String(string=name).info()
@@ -114,7 +114,7 @@ class Hypixel(commands.Cog, name="hypixel"):
     async def dnkl_check(self, ctx: discord.ApplicationContext, name: str = None) -> None:
         """Check whether a player is on the do-not-kick list!"""
         if not name:
-            uuid, username = await get_db_uuid_username_from_discord_id(ctx.author.id)
+            username, uuid = await get_db_uuid_username(discord_id=ctx.author.id)
             res = await String(uuid=uuid, username=username).dnklcheck()
         else:
             res = await String(string=name).dnklcheck()

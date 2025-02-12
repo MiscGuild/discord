@@ -8,7 +8,7 @@ from src.utils.consts import neutral_color
 from src.utils.db_utils import (select_one,
                                 set_giveaway_inactive)
 from src.utils.discord_utils import name_grabber
-from src.utils.request_utils import get_mojang_profile
+from src.utils.request_utils import get_uuid_by_name
 
 
 async def roll_giveaway(message_id: int, reroll_target: int = None) -> discord.ApplicationContext | discord.Message:
@@ -64,7 +64,7 @@ async def roll_giveaway(message_id: int, reroll_target: int = None) -> discord.A
 
             # Gexp requirements
             if req_gexp != 0:
-                _, uuid = await get_mojang_profile(await name_grabber(winner))
+                _, uuid = await get_uuid_by_name(await name_grabber(winner))
                 _, weekly_exp = await get_player_gexp(uuid)
 
                 # Player meets gexp req
