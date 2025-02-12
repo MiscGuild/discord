@@ -19,8 +19,8 @@ from src.utils.consts import (accepted_staff_application_embed, active_req,
                               staff_application_questions, ticket_categories,
                               resident_req, dnkl_entries_not_found,
                               positive_responses, allies)
-from src.utils.db_utils import insert_new_giveaway, select_all, get_db_username_from_uuid, \
-    get_db_uuid_username_from_discord_id, update_member
+from src.utils.db_utils import insert_new_giveaway, select_all, \
+    get_db_uuid_username, update_member
 from src.utils.discord_utils import (create_ticket,
                                      get_ticket_creator, log_event,
                                      name_grabber, has_tag_perms)
