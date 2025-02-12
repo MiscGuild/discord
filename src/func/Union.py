@@ -11,8 +11,7 @@ from src.utils.consts import (active_req, allies, discord_not_linked_embed, guil
                               pos_color, registration_channel_id,
                               staff_impersonation_embed, ticket_categories,
                               unknown_ign_embed, join_request_embed)
-from src.utils.db_utils import update_member, insert_new_member, get_db_uuid_username_from_discord_id, set_do_ping_db, \
-    check_uuid_in_db
+from src.utils.db_utils import update_member, insert_new_member, get_db_uuid_username, set_do_ping_db
 from src.utils.discord_utils import (create_ticket, has_tag_perms,
                                      is_linked_discord)
 from src.utils.request_utils import (get_gtag, get_hypixel_player,
@@ -83,7 +82,7 @@ class Union:
                    is_fs=False) -> discord.Embed | str:
         await ctx.defer()
         if is_fs and not name:
-            uuid, username = await get_db_uuid_username_from_discord_id(self.user.id)
+            username, uuid = await get_db_uuid_username(discord_id=self.user.id)
             ign = await get_name_by_uuid(uuid)
             if username != ign:
                 await update_member(self.user.id, uuid, ign)
