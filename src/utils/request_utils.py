@@ -110,7 +110,7 @@ async def get_mojang_profile_from_uuid(uuid: str) -> Tuple[str, str] | Tuple[Non
 
 
 async def get_name_by_uuid(uuid: str) -> str | None:
-    username = await get_db_username_from_uuid(uuid)
+    username, uuid = await get_db_uuid_username(uuid=uuid)
     if username:
         return username
 
