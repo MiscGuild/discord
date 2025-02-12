@@ -91,7 +91,7 @@ class General:
             for uuid in ally_uuids:
                 if uuid not in discord_member_uuids:
                     continue
-                allies_dict[uuid] = {"username": await get_db_username_from_uuid(uuid), "tag": gtag}
+                allies_dict[uuid] = {"username": (await get_db_uuid_username(uuid=uuid))[0], "tag": gtag}
         await progress_message.edit(content=f"Fetching {guild_handle}'s UUIDs and usernames")
 
         for uuid in guild_uuids:
