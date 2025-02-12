@@ -111,7 +111,7 @@ class General:
                 continue
 
             nick = await name_grabber(discord_member)
-            uuid, username = await get_db_uuid_username_from_discord_id(discord_member.id)
+            username, uuid = await get_db_uuid_username(discord_id=discord_member.id)
             if not uuid and username:
                 username, uuid = await get_uuid_by_name(username)
                 if username and uuid:
