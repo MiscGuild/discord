@@ -234,15 +234,6 @@ async def update_member(discord_id: int, uuid: str, username: str) -> None:
         await insert_new_member(discord_id, uuid, username)
 
 
-async def check_uuid_in_db(uuid: str) -> int:
-    discord_id = (await select_one("SELECT discord_id from members WHERE uuid=(?)", (uuid,)))
-    return discord_id[0] if discord_id else 0
-
-
-async def update_db_username(uuid: str, username: str) -> None:
-    await bot.db.execute("UPDATE members SET username = ? WHERE uuid = ?", (username, uuid,))
-    await bot.db.commit()
-
 
 async def get_discordid_doping_db(uuid: str) -> Tuple[int, bool]:
     res = await select_one("SELECT discord_id, do_pings from members WHERE uuid = (?)", (uuid,))
