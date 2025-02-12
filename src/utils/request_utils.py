@@ -101,6 +101,10 @@ async def get_mojang_profile_from_uuid(uuid: str) -> Tuple[str, str] | Tuple[Non
 
 
 async def get_name_by_uuid(uuid: str) -> str | None:
+    username = await get_db_username_from_uuid(uuid)
+    if username:
+        return username
+
     username, uuid = await get_mojang_profile_from_uuid(uuid)
     if username and uuid:
         await update_usernames(uuid=uuid, username=username)
