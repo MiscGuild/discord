@@ -234,8 +234,7 @@ async def update_member(discord_id: int, uuid: str, username: str) -> None:
         await insert_new_member(discord_id, uuid, username)
 
 
-
-async def get_discordid_doping_db(uuid: str) -> Tuple[int, bool]:
+async def get_do_ping(uuid: str) -> Tuple[int, bool]:
     res = await select_one("SELECT discord_id, do_pings from members WHERE uuid = (?)", (uuid,))
     return (res[0], res[1]) if res else (0, 0)
 
