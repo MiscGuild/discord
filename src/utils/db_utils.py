@@ -211,9 +211,11 @@ async def get_username_from_uuid(uuid: str) -> Tuple[str, str] | Tuple[None, str
     return None, uuid
 
 
-async def get_uuid_from_username(username: str) -> Tuple[str, str] | None:
+async def get_uuid_from_username(username: str) -> Tuple[str, str] | Tuple[str, None]:
     res = await select_one("SELECT uuid from users WHERE username = (?)", (username,))
-    return username, res[0] if res else None
+    if res:
+        return username, res[0]
+    return username, None
 
 
 async def get_uuid_from_discord_id(discord_id: int) -> str:
