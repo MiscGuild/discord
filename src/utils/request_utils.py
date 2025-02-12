@@ -87,6 +87,13 @@ async def get_mojang_profile_from_name(name: str) -> Tuple[str, str] | Tuple[Non
     return None, None
 
 
+@async_retry()
+async def get_mojang_profile_from_uuid(uuid: str) -> Tuple[str, str] | Tuple[None, None]:
+    url = f"https://sessionserver.mojang.com/session/minecraft/profile/{uuid}"
+    resp = await get_json_response(url)
+    return resp["name"], uuid if resp and "name" in resp else None
+
+
 async def get_hypixel_player(name: str = None, uuid: str = None) -> dict | None:
     api_key = await get_hyapi_key()
     if name:
@@ -105,22 +112,18 @@ async def get_hypixel_player(name: str = None, uuid: str = None) -> dict | None:
     return resp["player"]
 
 
-@async_retry()
 async def get_name_by_uuid(uuid: str) -> str | None:
-    while i < 5:
-        i += 1
-        resp = await get_json_response(f"https://sessionserver.mojang.com/session/minecraft/profile/{uuid}")
-        # Player does not exist
-        if not resp:
-            continue
-        if "name" not in resp:
-            continue
-        await update_usernames(uuid=uuid, username=resp["name"])
-        return resp["name"]
+    username, uuid = await get_mojang_profile_from_uuid(uuid)
+    if username and uuid:
+        await update_usernames(uuid=uuid, username=username)
+        return username
+
     resp = await get_hypixel_player(uuid=uuid)
-    if resp:
-        await update_usernames(uuid=uuid, username=resp['displayname'])
-        return resp['displayname']
+    if resp and "displayname" in resp:
+        await update_usernames(uuid=uuid, username=resp["displayname"])
+        return resp["displayname"]
+
+    return None
 
 
 def session_get_name_by_uuid(session: requests.Session, uuid: str) -> str | None:
