@@ -172,16 +172,29 @@ async def get_invites(inviter_uuid) -> Tuple[str, int, int] | None:
         (inviter_uuid,)))
 
 
-async def get_db_uuid_username(discord_id: int = None, username: str = None, uuid: str = None) -> Tuple[
-                                                                                                      str, str] | None:
+async def get_db_uuid_username(discord_id: int = None, username: str = None, uuid: str = None,
+                               get_discord_id: bool = False) -> Tuple[
+                                                                    str, str] | Tuple[str, str, int] | Tuple[
+                                                                    None, None]:
     if discord_id:
         uuid = await get_uuid_from_discord_id(discord_id)
         return await get_username_from_uuid(uuid)
     if username:
-        return await get_uuid_from_username(username)
+        username, uuid = await get_uuid_from_username(username)
+        if not uuid:
+            return None, None
+        if get_discord_id:
+            discord_id = await get_discord_id_from_uuid(uuid)
+            return username, uuid, discord_id
     if uuid:
-        return await get_username_from_uuid(uuid)
+        username, uuid = await get_username_from_uuid(uuid)
+        if not username:
+            return None, None
+        if get_discord_id:
+            discord_id = await get_discord_id_from_uuid(uuid)
+            return username, uuid, discord_id
 
+    return None, None
 
 async def get_username_from_uuid(uuid: str) -> Tuple[str, str] | None:
     res = await select_one("SELECT username from users WHERE uuid = (?)", (uuid,))
