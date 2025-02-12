@@ -90,10 +90,26 @@ async def select_all(query: str, values: Tuple = None) -> list:
     return list(rows)
 
 
+async def check_and_update_username(uuid: str, username: str = None) -> None:
+    cursor = await bot.db.execute(
+        "UPDATE users SET username = (?) WHERE uuid = (?) AND (username IS NOT (?) OR username IS NULL)",
+        (username, uuid, username)
+    )
+
+    if cursor.rowcount == 0:
+        await bot.db.execute(
+            "INSERT INTO users (uuid, username) VALUES (?, ?)",
+            (uuid, username)
+        )
+
+    await bot.db.commit()
+
+
 ### DNKL
 async def insert_new_dnkl(message_id: int, uuid: str, username: str) -> None:
-    await bot.db.execute("INSERT INTO dnkl VALUES (?, ?, ?)", (message_id, uuid, username,))
+    await bot.db.execute("INSERT INTO dnkl VALUES (?, ?)", (message_id, uuid))
     await bot.db.commit()
+    await check_and_update_username(uuid, username)
 
 
 async def update_dnkl(message_id: int, uuid: str) -> None:
@@ -129,6 +145,9 @@ async def insert_new_inviter(inviter_uuid: str, invitee_uuid: str) -> None:
                          (inviter_uuid, invitee_uuid))
     await bot.db.commit()
 
+    await check_and_update_username(inviter_uuid)
+    await check_and_update_username(invitee_uuid)
+
 
 async def add_invitee(inviter_uuid, invitee_uuid) -> int | None:
     invitees = (await select_one("SELECT current_invitee_uuids FROM invites WHERE inviter_uuid = (?)",
@@ -143,6 +162,7 @@ async def add_invitee(inviter_uuid, invitee_uuid) -> int | None:
                          (invitees, inviter_uuid))
     await bot.db.commit()
 
+    await check_and_update_username(invitee_uuid)
     return count
 
 
@@ -152,9 +172,30 @@ async def get_invites(inviter_uuid) -> Tuple[str, int, int] | None:
         (inviter_uuid,)))
 
 
-async def get_db_uuid_username_from_discord_id(discord_id: int) -> Tuple[str, str]:
-    res = await select_one("SELECT uuid, username from members WHERE discord_id = (?)", (discord_id,))
-    return (res[0], res[1]) if res else (None, None)
+async def get_db_uuid_username(discord_id: int = None, username: str = None, uuid: str = None) -> Tuple[
+                                                                                                      str, str] | None:
+    if discord_id:
+        uuid = await get_uuid_from_discord_id(discord_id)
+        return await get_username_from_uuid(uuid)
+    if username:
+        return await get_uuid_from_username(username)
+    if uuid:
+        return await get_username_from_uuid(uuid)
+
+
+async def get_username_from_uuid(uuid: str) -> Tuple[str, str] | None:
+    res = await select_one("SELECT username from users WHERE uuid = (?)", (uuid,))
+    return res[0], uuid if res else None
+
+
+async def get_uuid_from_username(username: str) -> Tuple[str, str] | None:
+    res = await select_one("SELECT uuid from users WHERE username = (?)", (username,))
+    return username, res[0] if res else None
+
+
+async def get_uuid_from_discord_id(discord_id: int) -> str:
+    res = await select_one("SELECT uuid from members WHERE discord_id = (?)", (discord_id,))
+    return res[0] if res else None
 
 
 async def get_db_username_from_uuid(uuid: str) -> str | None:
@@ -201,7 +242,7 @@ async def set_do_ping_db(discord_id: int, do_pings: int) -> str:
     await bot.db.execute("UPDATE members set do_pings = ? WHERE discord_id = ?", (do_pings, discord_id))
     await bot.db.commit()
 
-    return (await get_db_uuid_username_from_discord_id(discord_id))[0]
+    return (await get_db_uuid_username(discord_id=discord_id))[0]
 
 
 async def get_all_guild_members() -> list:
