@@ -19,7 +19,7 @@ class Hypixel(commands.Cog, name="hypixel"):
     @bridge.bridge_option(
         name="name",
         description="Your Minecraft Username",
-        required=True,
+        required=False,
         input_type=str
     )
     @bridge.bridge_option(
@@ -28,7 +28,7 @@ class Hypixel(commands.Cog, name="hypixel"):
         required=False,
         input_type=str
     )
-    async def sync(self, ctx: discord.ApplicationContext, name, tag: str = None) -> None:
+    async def sync(self, ctx: discord.ApplicationContext, name: str = None, tag: str = None) -> None:
         """Update your discord nick, tag and roles!"""
         res = await Union(user=ctx.author).sync(ctx, name, tag)
         if isinstance(res, discord.Embed):
