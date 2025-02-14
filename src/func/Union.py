@@ -83,11 +83,17 @@ class Union:
         await ctx.defer()
         if is_fs and not name:
             username, uuid = await get_db_uuid_username(discord_id=self.user.id)
-            ign = await get_name_by_uuid(uuid)
+            ign = await get_name_by_uuid(uuid, is_sync=True)
+            if username != ign:
+                await update_member(self.user.id, uuid, ign)
+        elif not name:
+            username, uuid = await get_db_uuid_username(discord_id=self.user.id)
+            ign = await get_name_by_uuid(uuid, is_sync=True)
             if username != ign:
                 await update_member(self.user.id, uuid, ign)
         else:
             ign, uuid = await get_uuid_by_name(name)
+
         # Invalid username
         if not ign:
             return unknown_ign_embed

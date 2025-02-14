@@ -92,8 +92,8 @@ async def select_all(query: str, values: Tuple = None) -> list:
 
 async def check_and_update_username(uuid: str, username: str = None) -> None:
     cursor = await bot.db.execute(
-        "UPDATE users SET username = (?) WHERE uuid = (?) AND (username IS NOT (?) OR username IS NULL)",
-        (username, uuid, username)
+        "INSERT OR REPLACE INTO users (uuid, username) VALUES (?, ?)",
+        (uuid, username)
     )
 
     if cursor.rowcount == 0:
@@ -175,7 +175,8 @@ async def get_invites(inviter_uuid) -> Tuple[str, int, int] | None:
 async def get_db_uuid_username(discord_id: int = None, username: str = None, uuid: str = None,
                                get_discord_id: bool = False) -> Tuple[
                                                                     str, str] | Tuple[str, str, int] | Tuple[
-    None, None] | Tuple[None, str] | Tuple[str, None] | Tuple[None, str, int]:
+    None, None] | Tuple[None, str] | Tuple[str, None] | \
+                                                                Tuple[None, str, int]:
     if uuid:
         username, uuid = await get_username_from_uuid(uuid)
         if not username and not get_discord_id:
