@@ -90,7 +90,7 @@ async def select_all(query: str, values: Tuple = None) -> list:
     return list(rows)
 
 
-async def check_and_update_username(uuid: str, username: str = None) -> None:
+async def check_and_update_username(uuid: str, username: str) -> None:
     cursor = await bot.db.execute(
         "INSERT OR REPLACE INTO users (uuid, username) VALUES (?, ?)",
         (uuid, username)
@@ -145,8 +145,6 @@ async def insert_new_inviter(inviter_uuid: str, invitee_uuid: str) -> None:
                          (inviter_uuid, invitee_uuid))
     await bot.db.commit()
 
-    await check_and_update_username(inviter_uuid)
-    await check_and_update_username(invitee_uuid)
 
 
 async def add_invitee(inviter_uuid, invitee_uuid) -> int | None:
@@ -162,7 +160,6 @@ async def add_invitee(inviter_uuid, invitee_uuid) -> int | None:
                          (invitees, inviter_uuid))
     await bot.db.commit()
 
-    await check_and_update_username(invitee_uuid)
     return count
 
 
