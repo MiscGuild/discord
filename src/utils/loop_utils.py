@@ -55,7 +55,7 @@ async def scheduler() -> None:
 
         # send_gexp_lb() runs at 12:00 AM EST
         now = datetime.now(pytz.utc)
-        remaining_sleep_time = (next_run_utc - now).total_seconds() + 360
+        remaining_sleep_time = (next_run_utc - now).total_seconds() + 300
         await asyncio.sleep(remaining_sleep_time)
         await send_gexp_lb()
 
