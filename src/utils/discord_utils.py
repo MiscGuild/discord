@@ -162,6 +162,8 @@ async def update_recruiter_role(uuid: str, invites: int) -> None:
 
 @tasks.loop(count=1)
 async def after_cache_ready() -> None:
+    await connect_db()
+
     # Set owner id(s) and guild
     bot.owner_ids = config["owner_ids"]
     bot.guild = bot.get_guild(config["guild_id"])
