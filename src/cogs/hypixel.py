@@ -4,7 +4,7 @@ from discord.ext import commands, bridge
 from src.func.General import General
 from src.func.String import String
 from src.func.Union import Union
-from src.utils.db_utils import get_db_uuid_username
+from src.utils.db_utils import get_dnkl_list, get_db_uuid_username
 
 
 class Hypixel(commands.Cog, name="hypixel"):
@@ -73,31 +73,30 @@ class Hypixel(commands.Cog, name="hypixel"):
         elif isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
 
+    async def get_dnkl_autocomplete(self, ctx: discord.AutocompleteContext):
+        dnkl_list = await get_dnkl_list()
+        return [discord.OptionChoice(name, value) for name, value in dnkl_list]
+
     @dnkl.command(name="remove", aliases=['rmv', 'r'])
     @commands.has_permissions(manage_messages=True)
     @bridge.bridge_option(
-        name="name",
-        description="The Minecraft username of the player you want to remove from the do-not-kick list",
-        required=False,
-        input_type=str
+        name="player",
+        description="The player you would like to remove from the do-not-kick list",
+        autocomplete=get_dnkl_autocomplete,  # Use autocomplete function
+        required=False
     )
-    @bridge.bridge_option(
-        name="uuid",
-        description="The UUID of the player you want to remove from the do-not-kick list",
-        required=False,
-        input_type=str
-    )
-    async def dnkl_remove(self, ctx: discord.ApplicationContext, name: str = None, uuid: str = None) -> None:
+    async def dnkl_remove(self, ctx: discord.ApplicationContext, player: str) -> None:
         """Remove a player from the do-not-kick list"""
-        if not name and not uuid:
-            await ctx.respond("Please provide either the username or the UUID of the player you want to remove.")
-            return
-        if name and not uuid and len(name) > 16:
-            uuid = name
-        if uuid:
-            await ctx.respond(await String(uuid=uuid).dnklremove())
-        else:
-            await ctx.respond(await String(string=name).dnklremove())
+        await ctx.respond(await String(uuid=player).dnklremove())
+        # if not name and not uuid:
+        #     await ctx.respond("Please provide either the username or the UUID of the player you want to remove.")
+        #     return
+        # if name and not uuid and len(name) > 16:
+        #     uuid = name
+        # if uuid:
+        #     await ctx.respond(await String(uuid=uuid).dnklremove())
+        # else:
+        #     await ctx.respond(await String(string=name).dnklremove())
 
     @dnkl.command(name="list", aliases=['l'])
     async def dnkl_list(self, ctx: discord.ApplicationContext) -> None:
@@ -123,6 +122,7 @@ class Hypixel(commands.Cog, name="hypixel"):
             await ctx.respond(embed=res)
         elif isinstance(res, str):
             await ctx.respond(res)
+
 
 def setup(bot):
     bot.add_cog(Hypixel(bot))
