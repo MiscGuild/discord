@@ -188,7 +188,6 @@ async def after_cache_ready() -> None:
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff,
                              bot.server_booster, bot.rich_kid, bot.gvg, bot.veteran, bot.recruiter)
 
-    await connect_db()
 
     from src.utils.loop_utils import check_giveaways, before_scheduler
     check_giveaways.start()
