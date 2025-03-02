@@ -162,6 +162,8 @@ async def update_recruiter_role(uuid: str, invites: int) -> None:
 
 @tasks.loop(count=1)
 async def after_cache_ready() -> None:
+    await connect_db()
+
     # Set owner id(s) and guild
     bot.owner_ids = config["owner_ids"]
     bot.guild = bot.get_guild(config["guild_id"])
@@ -186,7 +188,6 @@ async def after_cache_ready() -> None:
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff,
                              bot.server_booster, bot.rich_kid, bot.gvg, bot.veteran, bot.recruiter)
 
-    await connect_db()
 
     from src.utils.loop_utils import check_giveaways, before_scheduler
     check_giveaways.start()

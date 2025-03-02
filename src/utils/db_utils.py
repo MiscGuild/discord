@@ -299,3 +299,15 @@ async def get_elite_member(uuid: str) -> Tuple[str, str] | None:
 async def insert_elite_member(uuid: str, reason: str, expiry: str = None) -> None:
     await bot.db.execute("INSERT INTO elite_members VALUES (?, ?, ?)", (uuid, reason, expiry))
     await bot.db.commit()
+
+
+async def get_dnkl_list() -> list:
+    # Fetch all rows
+    rows = await select_all("SELECT * FROM dnkl")
+    if not rows:
+        return []
+    players = []
+    for row in rows:
+        username, uuid = await get_db_uuid_username(uuid=row[1])
+        players.append((username, uuid))
+    return players

@@ -218,16 +218,16 @@ class String:
 
     async def dnklremove(self) -> str:
         if self.string:
-            _, uuid = await get_uuid_by_name(self.string)
+            username, uuid = await get_uuid_by_name(self.string)
         else:
-            _, uuid = await get_name_by_uuid(self.uuid), self.uuid
+            username, uuid = await get_name_by_uuid(self.uuid), self.uuid
 
         row = await select_one("SELECT * FROM dnkl WHERE uuid = (?)", (uuid,))
 
         if not row:
             return "This player is not on the do-not-kick-list!"
         else:
-            message_id, _, username = row
+            message_id, _ = row
             # Delete row
             await delete_dnkl(uuid)
 
