@@ -7,7 +7,7 @@ async def rank_upgrade(ticket: discord.TextChannel, interaction: discord.Interac
     await ticket.edit(name=f"rank-upgrade-{ign}", topic=f"{interaction.user.id}|",
                       category=discord.utils.get(interaction.guild.categories,
                                                  name=ticket_categories[
-                                                     "other"]))
+                                                     "generic"]))
     await ticket.send(embed=discord.Embed(title=f"{ign} claims to have won a rank upgrade.",
                                           description="Please provide a link to a message saying you won a rank upgrade.",
                                           color=neutral_color).set_footer(
