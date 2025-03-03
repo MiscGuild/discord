@@ -133,9 +133,9 @@ class String:
             general_information_text = f"`✚` **Rank**: `{rank}`\n"
             general_information_text += f"`✚` **Joined**: `{join_date}`\n"
             general_information_text += f"`✚` **Quests Completed**: `{quest_participation}`\n"
-            general_information_text += f"`✚` **Weekly Guild Experience**: `{format(weekly_gexp, ',d')}`\n"
-            general_information_text += f"`✚` **Monthly Guild Experience**: `{format(monthly_gexp, ',d')}`\n"
             general_information_text += f"`✚` **Yearly Guild Experience**: `{format(yearly_gexp, ',d')}`\n"
+            general_information_text += f"`✚` **Monthly Guild Experience**: `{format(monthly_gexp, ',d')}`\n\n"
+            general_information_text += f"`✚` **Weekly Guild Experience**: `{format(weekly_gexp, ',d')}`\n"
 
             general_information_text += f"\n{gexp_history_text}"
             # Create embed
