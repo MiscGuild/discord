@@ -87,7 +87,7 @@ async def create_ticket(user: discord.Member, ticket_name: str,
                 # Add default options
                 self.add_option(label="I want to join the staff team", emoji="🤵")
                 self.add_option(label="Report a player", emoji="🗒️")
-                self.add_option(label="Query/Problem", emoji="🤔")
+                self.add_option(label="I have a question", emoji="🤔")
 
                 # Add "Other" option last
                 self.add_option(label="Other", emoji="❓")
@@ -103,7 +103,7 @@ async def create_ticket(user: discord.Member, ticket_name: str,
                 # Logic for handling ticket types
                 if option == "Report a player":
                     await player_report(ticket, interaction, ign, uuid)
-                if option == "Query/Problem":
+                if option == "I have a question":
                     await query(ticket, interaction, ign)
                 if option == "Register a milestone":
                     await milestone(ticket, interaction, ign)
