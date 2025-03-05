@@ -23,5 +23,6 @@ __all__ = [
     'player_report',
     'query',
     'staff_application',
-    'rank_upgrade'
+    'rank_upgrade',
+    'problem'
 ]
