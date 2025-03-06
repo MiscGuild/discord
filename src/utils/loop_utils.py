@@ -67,7 +67,6 @@ async def before_scheduler() -> None:
     asyncio.create_task(scheduler())  # Start the scheduler loop
 
 
-
 async def send_gexp_lb() -> None:
     file = await Integer(integer=1).gtop(is_automatic=True)
     await bot.get_channel(daily_lb_channel).send(file)

@@ -124,5 +124,6 @@ class Hypixel(commands.Cog, name="hypixel"):
         elif isinstance(res, str):
             await ctx.respond(res)
 
+
 def setup(bot):
     bot.add_cog(Hypixel(bot))

@@ -63,7 +63,6 @@ class Guild(commands.Cog, name="guild"):
         elif isinstance(res, str):
             await ctx.respond(res, ephemeral=True)
 
-
     @g.command(name="weekly", aliases=["weekly_gexp_lb", "weeklylb", "wlb"])
     async def weekly_gexp_lb(self, ctx: discord.ApplicationContext) -> None:
         """View the weekly guild experience leaderboard!"""

@@ -146,7 +146,6 @@ async def insert_new_inviter(inviter_uuid: str, invitee_uuid: str) -> None:
     await bot.db.commit()
 
 
-
 async def add_invitee(inviter_uuid, invitee_uuid) -> int | None:
     invitees = (await select_one("SELECT current_invitee_uuids FROM invites WHERE inviter_uuid = (?)",
                                  (inviter_uuid,)))[0].split(" ")

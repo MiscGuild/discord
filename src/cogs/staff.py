@@ -101,5 +101,6 @@ class Staff(commands.Cog, name="staff"):
     async def elite_member(self, ctx: discord.ApplicationContext, username: str, reason: str) -> None:
         await ctx.send(embed=await String(string=reason, username=username).elite_member())
 
+
 def setup(bot):
     bot.add_cog(Staff(bot))
