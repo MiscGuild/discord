@@ -172,8 +172,6 @@ class Listener:
                     await self.obj.user.add_roles(role)
                     await self.obj.response.send_message(content=f"Added {label}", ephemeral=True)
 
-
-
     async def on_invitation_message(self) -> None:
         if not self.obj.author.bot:
             return

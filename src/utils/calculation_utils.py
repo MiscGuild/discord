@@ -173,6 +173,7 @@ async def get_guild_level(exp) -> float | None:
 
     return None
 
+
 async def check_tag(tag: str) -> Tuple[bool, str] | Tuple[bool, None]:
     tag = tag.lower()
     with open(r"src/utils/badwords.txt", "r") as f:

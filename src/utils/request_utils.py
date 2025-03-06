@@ -37,7 +37,6 @@ def async_retry(max_attempts: int = 5, delay: float = 0.5):
     return decorator
 
 
-
 async def get_hyapi_key() -> str:
     return random.choice(config["api_keys"])
 
@@ -85,7 +84,6 @@ async def get_mojang_profile_from_name(name: str) -> Tuple[str, str] | Tuple[Non
         return None, None
 
     return resp["name"], resp["id"]
-
 
 
 async def get_uuid_by_name(name: str) -> Tuple[str, str] | Tuple[None, None]:
