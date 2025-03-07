@@ -1,6 +1,7 @@
 # The following file contains: weeklylb, dnkllist, rolecheck, staffreview, delete, accept, transcript, new, partner, deny, inactive, giveawaycreate, giveawaylist
 
 import asyncio
+import io
 import re
 from __main__ import bot
 from datetime import datetime, timedelta, timezone
@@ -185,21 +186,23 @@ class General:
 
         # Send deletion warning and gather transcript
         await ctx.respond(embed=embed)
-        transcript = await create_transcript(ctx.channel)
+        single_use_transcript = await create_transcript(ctx.channel)
+        transcript_bytes = single_use_transcript.fp.read()
+        transcript_for_user = discord.File(io.BytesIO(transcript_bytes), filename="transcript.txt")
+        transcript_for_logs = discord.File(io.BytesIO(transcript_bytes), filename="transcript.txt")
 
-        # Sleep and delete channel
         await asyncio.sleep(10)
         await discord.TextChannel.delete(ctx.channel)
 
-        if transcript:
+        if transcript_bytes:
             # Log outcome
             await log_event(f"{ctx.channel.name} was deleted by {ctx.author}")
             ticket_details = await get_ticket_properties(ctx.channel)
             if ticket_details:
-                await bot.get_channel(log_channel_id).send(file=transcript)
+                await bot.get_channel(log_channel_id).send(file=transcript_for_logs)
                 try:
                     await (await bot.fetch_user(ticket_details[0])).send(
-                        embed=ticket_deleted_embed.set_footer(text=ctx.channel.name), file=transcript)
+                        embed=ticket_deleted_embed.set_footer(text=ctx.channel.name), file=transcript_for_user)
                 except PermissionError:
                     await bot.get_channel(log_channel_id).send(
                         f"Failed to send transcript to {await bot.fetch_user(ticket_details[0])}!")

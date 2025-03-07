@@ -5,7 +5,7 @@ attrs==22.1.0
 certifi==2022.12.7
 chardet==5.0.0
 charset-normalizer==2.1.1
-chat-exporter==2.5.1
+chat-exporter==2.8.2
 DateTime==4.7
 emoji==2.2.0
 grapheme==0.6.0

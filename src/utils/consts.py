@@ -55,7 +55,7 @@ reaction_roles = {
     "Minigames": "🕹",
     "QOTD Ping": "❓",
     "Giveaways/Events": "🎉",
-    "Storytimes": "📖",
+    "Geoguessr": "🌏",
 }
 
 pronoun_roles = {
