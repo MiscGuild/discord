@@ -314,7 +314,7 @@ async def reactionroles() -> tuple[list, list]:
                                                      "🕹 __**Minigames**__\nAllows you to play some Discord minigames!\n\n"
                                                      "❓  __**QOTD Ping**__\nThe staff team will mention this role when there's a new question of the day!\n\n"
                                                      "🎉 __**Giveaways/Events**__\nReact so you don't miss any giveaway or event\n\n"
-                                                     "📖 __**Storytime Pings**__\nGet pinged whenever a storytime happens",
+                                                     "🌏 __**Geoguessr Pings**__\nGet pinged whenever we decide to play Geoguessr!\n\n",
                                          color=neutral_color)
 
     class ReactionRoleButton(Button):
