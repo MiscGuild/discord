@@ -49,21 +49,6 @@ pos_color = 0x00A86B
 neutral_color = 0x8369ff
 error_color = 0xDE3163
 
-# Pronoun roles
-reaction_roles = {
-    "Skyblock": "🪓",
-    "Minigames": "🕹",
-    "QOTD Ping": "❓",
-    "Giveaways/Events": "🎉",
-    "Geoguessr": "🌏",
-}
-
-pronoun_roles = {
-    "He/Him": "👨",
-    "She/Her": "👩",
-    "They/Them": "🏳️‍🌈",
-    "Other": "❓",
-}
 
 milestone_categories = {
     "hypixel": "Hypixel",

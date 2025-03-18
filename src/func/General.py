@@ -188,8 +188,8 @@ class General:
         await ctx.respond(embed=embed)
         single_use_transcript = await create_transcript(ctx.channel)
         transcript_bytes = single_use_transcript.fp.read()
-        transcript_for_user = discord.File(io.BytesIO(transcript_bytes), filename="transcript.txt")
-        transcript_for_logs = discord.File(io.BytesIO(transcript_bytes), filename="transcript.txt")
+        transcript_for_user = discord.File(io.BytesIO(transcript_bytes), filename=ctx.channel.name + "-transcript.txt")
+        transcript_for_logs = discord.File(io.BytesIO(transcript_bytes), filename=ctx.channel.name + "-transcript.txt")
 
         await asyncio.sleep(10)
         await discord.TextChannel.delete(ctx.channel)
