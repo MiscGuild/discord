@@ -141,16 +141,6 @@ class Listener:
             await self.obj.edit_original_response(
                 content=f"Ticket created!\n**Click the link below to view your ticket.**\n<#{ticket.id}>")
 
-        # Reaction roles
-        elif self.obj.data["custom_id"] in reaction_roles.keys():
-            role = discord.utils.get(
-                self.obj.guild.roles, name=self.obj.data["custom_id"])
-            if role in self.obj.user.roles:
-                await self.obj.user.remove_roles(role)
-                await self.obj.response.send_message(f"Removed {role.name} role from you.", ephemeral=True)
-            else:
-                await self.obj.user.add_roles(role)
-                await self.obj.response.send_message(f"Added {role.name} role to you.", ephemeral=True)
 
 
     async def on_invitation_message(self) -> None:
