@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 import discord
 import discord.ui as ui
-from discord.ui import Button, Select, View
+from discord.ui import Button, View
 
 from src.utils.consts import (neg_color, neutral_color, pronoun_roles, reaction_roles, tickets_embed)
 from src.utils.db_utils import get_member_gexp_history
@@ -306,46 +306,6 @@ class ModalCreator(discord.ui.Modal):
 
         await interaction.response.send_message(embeds=[self.embed])
 
-
-async def reactionroles() -> tuple[list, list]:
-    # Reaction roles
-    reaction_roles_embed = discord.Embed(title="To get your desired role, click its respective button!",
-                                         description="🪓 __**SkyBlock**__\nGives you the access to the SkyBlock category!\n\n"
-                                                     "🕹 __**Minigames**__\nAllows you to play some Discord minigames!\n\n"
-                                                     "❓  __**QOTD Ping**__\nThe staff team will mention this role when there's a new question of the day!\n\n"
-                                                     "🎉 __**Giveaways/Events**__\nReact so you don't miss any giveaway or event\n\n"
-                                                     "🌏 __**Geoguessr Pings**__\nGet pinged whenever we decide to play Geoguessr!\n\n",
-                                         color=neutral_color)
-
-    class ReactionRoleButton(Button):
-        def __init__(self, label: str, emoji: str):
-            super().__init__(label=label, custom_id=label, emoji=emoji)
-
-    class ReactionRolesView(View):
-        def __init__(self):
-            super().__init__()
-
-            # Add all buttons
-            for k, v, in reaction_roles.items():
-                self.add_item(ReactionRoleButton(k, v))
-
-    # Pronouns
-    pronouns_embed = discord.Embed(title="Please select your pronouns",
-                                   description="".join(
-                                       [k + v + "\n" for k, v in pronoun_roles.items()]),
-                                   color=neutral_color)
-
-    class PronounsSelect(Select):
-        def __init__(self):
-            options = [discord.SelectOption(
-                label=k, emoji=v) for k, v in pronoun_roles.items()]
-            super().__init__(placeholder="Select your pronouns (Max 1)",
-                             min_values=0, max_values=1, options=options, custom_id="pronouns")
-
-    pronouns_view = View(timeout=10.0)
-    pronouns_view.add_item(PronounsSelect())
-
-    return [reaction_roles_embed, ReactionRolesView()], [pronouns_embed, pronouns_view]
 
 
 async def tickets() -> tuple[discord.File, discord.Embed, any]:
