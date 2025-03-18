@@ -203,7 +203,9 @@ async def get_db_uuid_username(discord_id: int = None, username: str = None, uui
     return None, None
 
 
-async def get_username_from_uuid(uuid: str) -> Tuple[str, str] | Tuple[None, str]:
+async def get_username_from_uuid(uuid: str) -> Tuple[str, str] | Tuple[None, str] | Tuple[None, None]:
+    if uuid == "0":
+        return None, None
     res = await select_one("SELECT username from users WHERE uuid = (?)", (uuid,))
     if res:
         return res[0], uuid
@@ -220,7 +222,7 @@ async def get_uuid_from_username(username: str) -> Tuple[str, str] | Tuple[str, 
     return username, None
 
 
-async def get_uuid_from_discord_id(discord_id: int) -> str:
+async def get_uuid_from_discord_id(discord_id: int) -> str | None:
     res = await select_one("SELECT uuid from members WHERE discord_id = (?)", (discord_id,))
     if res:
         uuid = res[0]
