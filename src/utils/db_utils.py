@@ -15,7 +15,7 @@ async def connect_db():
     # Discord Member Table:
     await bot.db.execute("""CREATE TABLE IF NOT EXISTS members (
         discord_id integer PRIMARY KEY NOT NULL,
-        uuid text, 
+        uuid text NOT NULL, 
         username text,
         do_pings integer DEFAULT 1,
         FOREIGN KEY (uuid) REFERENCES users(uuid) ON DELETE CASCADE);""")
@@ -238,7 +238,7 @@ async def update_member(discord_id: int, uuid: str, username: str) -> None:
     if existing_uuid_record:
         existing_discord_id = existing_uuid_record[0]
         if discord_id != existing_discord_id:
-            await bot.db.execute("UPDATE members SET uuid = NULL WHERE uuid = ?", (uuid,))
+            await bot.db.execute("UPDATE members SET uuid = '0' WHERE uuid = ?", (uuid,))
             await bot.db.commit()
             discord_record = None
 
