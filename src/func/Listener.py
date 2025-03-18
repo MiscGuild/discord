@@ -9,8 +9,8 @@ from discord.ext import commands
 from src.utils.calculation_utils import extract_usernames
 from src.utils.consts import (error_channel_id, invalid_command_embed,
                               member_not_found_embed, missing_permissions_embed, missing_role_embed,
-                              not_owner_embed, pronoun_roles, staff_bridge_channel,
-                              reaction_roles, registration_channel_id,
+                              not_owner_embed, staff_bridge_channel,
+                              registration_channel_id,
                               registration_embed, err_404_embed, bot_missing_perms_embed)
 from src.utils.discord_utils import create_ticket
 from src.utils.referral_utils import validate_invites
@@ -140,8 +140,6 @@ class Listener:
 
             await self.obj.edit_original_response(
                 content=f"Ticket created!\n**Click the link below to view your ticket.**\n<#{ticket.id}>")
-
-
 
     async def on_invitation_message(self) -> None:
         if not self.obj.author.bot:
