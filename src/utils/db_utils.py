@@ -15,7 +15,7 @@ async def connect_db():
     # Discord Member Table:
     await bot.db.execute("""CREATE TABLE IF NOT EXISTS members (
         discord_id integer PRIMARY KEY NOT NULL,
-        uuid text NOT NULL, 
+        uuid text, 
         username text,
         do_pings integer DEFAULT 1,
         FOREIGN KEY (uuid) REFERENCES users(uuid) ON DELETE CASCADE);""")
@@ -232,12 +232,19 @@ async def insert_new_member(discord_id: int, uuid: str, username: str) -> None:
 
 
 async def update_member(discord_id: int, uuid: str, username: str) -> None:
-    discord_idExists = await select_one("SELECT uuid from members WHERE discord_id = (?)", (discord_id,))
-    if discord_idExists:
-        await bot.db.execute("UPDATE members SET uuid = ? WHERE discord_id = ?",
-                             (uuid, discord_id))
-        await bot.db.commit()
+    discord_record = await select_one("SELECT uuid FROM members WHERE discord_id = ?", (discord_id,))
+    existing_uuid_record = await select_one("SELECT discord_id FROM members WHERE uuid = ?", (uuid,))
 
+    if existing_uuid_record:
+        existing_discord_id = existing_uuid_record[0]
+        if discord_id != existing_discord_id:
+            await bot.db.execute("UPDATE members SET uuid = NULL WHERE uuid = ?", (uuid,))
+            await bot.db.commit()
+            discord_record = None  # Ensure insert happens later
+
+    if discord_record:
+        await bot.db.execute("UPDATE members SET uuid = ? WHERE discord_id = ?", (uuid, discord_id))
+        await bot.db.commit()
         await check_and_update_username(uuid, username)
     else:
         await insert_new_member(discord_id, uuid, username)
