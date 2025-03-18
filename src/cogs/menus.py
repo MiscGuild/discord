@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-from src.utils.ui_utils import reactionroles, tickets
+from src.utils.ui_utils import tickets
 
 
 class Menus(commands.Cog, command_attrs=dict(hidden=True), name="menus"):
