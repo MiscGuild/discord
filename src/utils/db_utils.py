@@ -253,7 +253,7 @@ async def update_member(discord_id: int, uuid: str, username: str) -> None:
         if discord_id != existing_discord_id:
             await bot.db.execute("UPDATE members SET uuid = '0' WHERE uuid = ?", (uuid,))
             await bot.db.commit()
-            discord_record = None
+            discord_record = await select_one("SELECT uuid FROM members WHERE discord_id = ?", (discord_id,))
 
     if discord_record:
         await bot.db.execute("UPDATE members SET uuid = ? WHERE discord_id = ?", (uuid, discord_id))
