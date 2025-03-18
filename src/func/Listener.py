@@ -152,25 +152,6 @@ class Listener:
                 await self.obj.user.add_roles(role)
                 await self.obj.response.send_message(f"Added {role.name} role to you.", ephemeral=True)
 
-        # Pronouns
-        elif self.obj.data["custom_id"] == "pronouns":
-            label = self.obj.data["values"][0] if self.obj.data["values"] else None
-            await self.obj.user.remove_roles(
-                *[discord.utils.get(self.obj.guild.roles, name=k) for k in pronoun_roles.keys()])
-
-            # User selected none, remove all roles
-            if not label:
-                await self.obj.response.send_message(content=f"Removed all pronoun roles!")
-            else:
-                # Fetch role
-                role = discord.utils.get(self.obj.guild.roles, name=label)
-                # Remove single role if user already has it
-                if role in self.obj.user.roles:
-                    await self.obj.response.send_message(content=f"Removed {label}", ephemeral=True)
-                # Add the clicked role and remove all others
-                else:
-                    await self.obj.user.add_roles(role)
-                    await self.obj.response.send_message(content=f"Added {label}", ephemeral=True)
 
     async def on_invitation_message(self) -> None:
         if not self.obj.author.bot:
