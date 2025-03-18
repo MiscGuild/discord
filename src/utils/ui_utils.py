@@ -6,7 +6,7 @@ import discord
 import discord.ui as ui
 from discord.ui import Button, View
 
-from src.utils.consts import (neg_color, neutral_color, pronoun_roles, reaction_roles, tickets_embed)
+from src.utils.consts import (neg_color, neutral_color, tickets_embed)
 from src.utils.db_utils import get_member_gexp_history
 from src.utils.request_utils import get_jpg_file
 
