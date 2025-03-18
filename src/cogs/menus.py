@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands, bridge
+from discord.ext import commands
 
 from src.utils.ui_utils import reactionroles, tickets
 
@@ -11,13 +11,6 @@ class Menus(commands.Cog, command_attrs=dict(hidden=True), name="menus"):
 
     def __init__(self, bot):
         self.bot = bot
-
-    @bridge.bridge_command()
-    @commands.is_owner()
-    async def reactionroles(self, ctx: discord.ApplicationContext) -> None:
-        """Send the reaction roles embeds!"""
-        for embed, view in await reactionroles():
-            await ctx.send(embed=embed, view=view)
 
     @commands.command()
     @commands.is_owner()
