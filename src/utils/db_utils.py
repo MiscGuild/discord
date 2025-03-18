@@ -173,6 +173,8 @@ async def get_db_uuid_username(discord_id: int = None, username: str = None, uui
                                                                     str, str] | Tuple[str, str, int] | Tuple[
     None, None] | Tuple[None, str] | Tuple[str, None] | \
                                                                 Tuple[None, str, int]:
+    if uuid and uuid == "0":
+        return None, None
     if uuid:
         username, uuid = await get_username_from_uuid(uuid)
         if not username and not get_discord_id:
@@ -201,7 +203,9 @@ async def get_db_uuid_username(discord_id: int = None, username: str = None, uui
     return None, None
 
 
-async def get_username_from_uuid(uuid: str) -> Tuple[str, str] | Tuple[None, str]:
+async def get_username_from_uuid(uuid: str) -> Tuple[str, str] | Tuple[None, str] | Tuple[None, None]:
+    if uuid == "0":
+        return None, None
     res = await select_one("SELECT username from users WHERE uuid = (?)", (uuid,))
     if res:
         return res[0], uuid
@@ -211,16 +215,25 @@ async def get_username_from_uuid(uuid: str) -> Tuple[str, str] | Tuple[None, str
 async def get_uuid_from_username(username: str) -> Tuple[str, str] | Tuple[str, None]:
     res = await select_one("SELECT uuid from users WHERE username = (?)", (username,))
     if res:
+        uuid = res[0]
+        if uuid == "0":
+            return username, None
         return username, res[0]
     return username, None
 
 
-async def get_uuid_from_discord_id(discord_id: int) -> str:
+async def get_uuid_from_discord_id(discord_id: int) -> str | None:
     res = await select_one("SELECT uuid from members WHERE discord_id = (?)", (discord_id,))
-    return res[0] if res else None
+    if res:
+        uuid = res[0]
+        if uuid == "0":
+            return None
+        return uuid
 
 
 async def get_discord_id_from_uuid(uuid: str) -> int | None:
+    if uuid == "0":
+        return None
     res = await select_one("SELECT discord_id from members WHERE uuid = (?)", (uuid,))
     return int(res[0]) if res else None
 
@@ -232,12 +245,19 @@ async def insert_new_member(discord_id: int, uuid: str, username: str) -> None:
 
 
 async def update_member(discord_id: int, uuid: str, username: str) -> None:
-    discord_idExists = await select_one("SELECT uuid from members WHERE discord_id = (?)", (discord_id,))
-    if discord_idExists:
-        await bot.db.execute("UPDATE members SET uuid = ? WHERE discord_id = ?",
-                             (uuid, discord_id))
-        await bot.db.commit()
+    discord_record = await select_one("SELECT uuid FROM members WHERE discord_id = ?", (discord_id,))
+    existing_uuid_record = await select_one("SELECT discord_id FROM members WHERE uuid = ?", (uuid,))
 
+    if existing_uuid_record and existing_uuid_record[0] != "0":
+        existing_discord_id = existing_uuid_record[0]
+        if discord_id != existing_discord_id:
+            await bot.db.execute("UPDATE members SET uuid = '0' WHERE uuid = ?", (uuid,))
+            await bot.db.commit()
+            discord_record = None
+
+    if discord_record:
+        await bot.db.execute("UPDATE members SET uuid = ? WHERE discord_id = ?", (uuid, discord_id))
+        await bot.db.commit()
         await check_and_update_username(uuid, username)
     else:
         await insert_new_member(discord_id, uuid, username)
