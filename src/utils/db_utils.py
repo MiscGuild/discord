@@ -173,6 +173,8 @@ async def get_db_uuid_username(discord_id: int = None, username: str = None, uui
                                                                     str, str] | Tuple[str, str, int] | Tuple[
     None, None] | Tuple[None, str] | Tuple[str, None] | \
                                                                 Tuple[None, str, int]:
+    if uuid and uuid == "0":
+        return None, None
     if uuid:
         username, uuid = await get_username_from_uuid(uuid)
         if not username and not get_discord_id:
