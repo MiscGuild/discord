@@ -213,16 +213,25 @@ async def get_username_from_uuid(uuid: str) -> Tuple[str, str] | Tuple[None, str
 async def get_uuid_from_username(username: str) -> Tuple[str, str] | Tuple[str, None]:
     res = await select_one("SELECT uuid from users WHERE username = (?)", (username,))
     if res:
+        uuid = res[0]
+        if uuid == "0":
+            return username, None
         return username, res[0]
     return username, None
 
 
 async def get_uuid_from_discord_id(discord_id: int) -> str:
     res = await select_one("SELECT uuid from members WHERE discord_id = (?)", (discord_id,))
-    return res[0] if res else None
+    if res:
+        uuid = res[0]
+        if uuid == "0":
+            return None
+        return uuid
 
 
 async def get_discord_id_from_uuid(uuid: str) -> int | None:
+    if uuid == "0":
+        return None
     res = await select_one("SELECT discord_id from members WHERE uuid = (?)", (uuid,))
     return int(res[0]) if res else None
 
@@ -237,7 +246,7 @@ async def update_member(discord_id: int, uuid: str, username: str) -> None:
     discord_record = await select_one("SELECT uuid FROM members WHERE discord_id = ?", (discord_id,))
     existing_uuid_record = await select_one("SELECT discord_id FROM members WHERE uuid = ?", (uuid,))
 
-    if existing_uuid_record:
+    if existing_uuid_record and existing_uuid_record[0] != "0":
         existing_discord_id = existing_uuid_record[0]
         if discord_id != existing_discord_id:
             await bot.db.execute("UPDATE members SET uuid = '0' WHERE uuid = ?", (uuid,))
