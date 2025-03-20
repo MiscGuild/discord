@@ -187,43 +187,30 @@ information_requirements_embed = discord.Embed(title="", color=0x4f5058).add_fie
                                                                             value=f"•  {format(dnkl_req, ',d')} Weekly Guild Experience",
                                                                             inline=False)
 
-tickets_embed = discord.Embed(title="Tickets",
-                              description="""Tickets can be created for any of the following reasons:
-                                        > Player Report
-                                        > Problems/Queries
-                                        > Milestone
-                                        > Do-not-kick-list Application
-                                        > Staff Application
-                                        > GvG Team Application
-                                        > Event (When applicable)
-                                        > Other
-                                        Once you have created a ticket by clicking the button, you will be linked to your ticket\n
-                                        The bot will ask you to choose the reason behind the creation of your ticket from a given list. Choose the appropriate reason and then proceed!\n
-                                        Once you have created your ticket, staff will respond within 24 hours.""",
-                              color=neutral_color).add_field(name="Do-not-kick-list Application",
-                                                             value="You must have a valid reason for applying and also meet the DNKL requirements.\n"
-                                                                   "Accepted Reasons:\n"
-                                                                   "> Exams\n"
-                                                                   "> Medical Reasons\n"
-                                                                   "> Computer Problems\n"
-                                                                   "> Vacation\n"
-                                                                   "> Other (subject to staff judgment)\n"
-                                                                   "If your account is banned, it may be temporarily kicked until unbanned.",
-                                                             inline=False).add_field(name="Player Report",
-                                                                                     value="When reporting a player, you're expected to explain the situation in maximum detail. Providing the following is considered the bare minimum:\n"
-                                                                                           "> Username of the accused\n"
-                                                                                           "> Explanantion of the offense\n"
-                                                                                           "> Time of offense\n"
-                                                                                           "> Proof of offense\n"
-                                                                                           "If you wish to report a staff member, please DM the acting guild master with your report.",
-                                                                                     inline=False).add_field(
-    name="Milestone",
-    value="You'll be prompted to present the milestone you've achieved and proof of its occurence. "
-          "Staff will review your milestone and if accepted, will be include it in the next week's milestone post!",
-    inline=False).add_field(name="Staff Application",
-                            value="After you're done with your application, the staff team will review your it and make a decision to accept or deny it.",
-                            inline=False).set_thumbnail(
-    url=f"https://images-ext-1.discordapp.net/external/ziYSZZe7dPyKDYLxA1s2jqpKi-kdCvPFpPaz3zft-wo/%3Fwidth%3D671%26height%3D671/https/media.discordapp.net/attachments/523227151240134664/803843877999607818/misc.png")
+tickets_messages = ["""# Tickets
+Tickets can be created for one of the following reasons:
+
+## Ticket Categories for Members 
+- :trophy: I want to register a milestone
+- <:dnkl:877657298703634483> I am going to be inactive
+- :moneybag: I won a rank upgrade
+- :person_in_tuxedo: I want to join the staff team
+- :crossed_swords: I want to join the GvG team
+## Ticket Categories for Guests
+- <:Misc:540990817872117780> I want to join Miscellaneous
+- :crossed_swords: I want to organize a GvG with Miscellaneous
+- :handshake: My guild wishes to ally Miscellaneous
+
+## Ticket Categories for Everyone
+- :notepad_spiral: I want to report a player
+- :thinking: I have a question
+- :x: I have a problem
+- :question: Other""", """## How to create a ticket?
+1. Create a ticket using `,new` or by clicking the button below.
+2. Once your ticket has been created, the bot will link you to your ticket. 
+3. Inside your ticket, the bot will ask you why you made the ticket. Choose your reason from the dropdown list provided.
+4. Once you have picked your reason, you might need to answer a few of the bot's followup prompts.  
+Staff will respond within 24 hours."""]
 
 resident_embed = discord.Embed(title="How can I get Resident?",
                                description="To be eligible for Resident, you must be satisfy at least one of the following requirements:",
@@ -339,15 +326,21 @@ dnkl_creation_embed = discord.Embed(title="Do-not-kick-list",
     inline=False
 )
 
-rules_embed = discord.Embed(title="Rules", description='''## In-Game Rules\n:small_blue_diamond: All Hypixel Rules apply.
-:small_blue_diamond: Be respectful of all guild members.
-:small_blue_diamond: Keep chat appropriate at all times.
-:small_blue_diamond: Cheating is prohibited.
-:small_blue_diamond: Refrain from spamming messages in guild chat or guild party chat.\n## Discord Rules\n:smiley: 1. **Be cool, kind, and civil.** Treat all members with respect and express your thoughts in a constructive manner.
+rules_messages = ["""# Rules
+
+## In-Game Rules
+:small_blue_diamond: All Hypixel rules must be followed.
+:small_blue_diamond: Treat all guild members with respect.
+:small_blue_diamond: Keep chat respectful and appropriate at all times.
+:small_blue_diamond: Refrain from spamming messages in guild chat or guild party chat.
+:small_blue_diamond: Use the bridge bot responsibly to prevent any risk of it being banned or muted.""", """
+
+## Discord Rules
+:smiley: 1. **Be cool, kind, and civil.** Treat all members with respect and express your thoughts in a constructive manner.
 :abc: 2. **Use English only.** Communicate in English, but be considerate of all languages.
 :card_index: 3. **Use an appropriate name and avatar.** Avoid special characters, emoji, obscenities, and impersonation.
 :incoming_envelope: 4. **Do not spam.** Avoid excessive messages, images, formatting, emoji, commands, and @mentions.
-:no_bell: 5. **Do not @mention or direct message Miscellaneous Staff.** Respect their time, they are people too.
+:no_bell: 5. **Do not @mention or direct message Miscellaneous Staff unnecessarily.** Respect their time, they are people too.
 :loudspeaker: 6. **No self-promotion or advertisements.** This includes unsolicited references and links to other social media, servers, communities, and services in chat or direct messages.
 7. **No personal information.** Protect your privacy and the privacy of others.
 :head_bandage: 8. **No harassment, abuse, or bullying**. We have zero-tolerance for harming others.
@@ -355,9 +348,8 @@ rules_embed = discord.Embed(title="Rules", description='''## In-Game Rules\n:sma
 :classical_building: 10. **No political or religious topics.** These complex subjects result in controversial and offensive posts.
 :rotating_light: 11. **No piracy, sexual, NSFW, or otherwise suspicious content.** We do not condone illegal or suspicious discussions and activity.
 :thinking: 12. **Rules are subject to common sense.** These rules are not comprehensive and use of loopholes to violate the spirit of these rules is subject to enforcement.
-:scroll: 13. **Discord Terms of Service and Community Guidelines apply.** You must be at least 13 years old to use Discord, and abide by all other terms and guidelines.
-''', color=neutral_color).set_thumbnail(
-    url="https://media.discordapp.net/attachments/523227151240134664/803843877999607818/misc.png?ex=660cdaf3&is=65fa65f3&hm=beee26fd9f9b9f571893884ce18299d96a8b4a7f0ca7ad2ee4bc16758a0d31a5&=&format=webp&quality=lossless")
+:scroll: 13. **Discord Terms of Service and Community Guidelines apply.** You must be at least 13 years old to use Discord, and abide by all other terms and guidelines."""]
+
 
 rank_upgrade_winner_announcement = '''# RANK UPGRADE
 {date}

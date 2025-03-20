@@ -6,7 +6,7 @@ import discord
 import discord.ui as ui
 from discord.ui import Button, View
 
-from src.utils.consts import (neg_color, neutral_color, tickets_embed)
+from src.utils.consts import (neg_color, neutral_color, tickets_messages)
 from src.utils.db_utils import get_member_gexp_history
 from src.utils.request_utils import get_jpg_file
 
@@ -307,8 +307,7 @@ class ModalCreator(discord.ui.Modal):
         await interaction.response.send_message(embeds=[self.embed])
 
 
-
-async def tickets() -> tuple[discord.File, discord.Embed, any]:
+async def tickets() -> tuple[discord.File, list, any]:
     image = await get_jpg_file(
         "https://media.discordapp.net/attachments/650248396480970782/873866686049189898/tickets.jpg")
 
@@ -318,4 +317,4 @@ async def tickets() -> tuple[discord.File, discord.Embed, any]:
             self.add_item(Button(label="Create Ticket", custom_id="tickets",
                                  style=discord.ButtonStyle.blurple, emoji="✉️"))
 
-    return image, tickets_embed, TicketView()
+    return image, tickets_messages, TicketView()
