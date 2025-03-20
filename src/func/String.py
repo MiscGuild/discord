@@ -67,7 +67,10 @@ class String:
         return f"Following is the source code for {self.string}\n{final_url}"
 
     async def gmember(self, ctx: discord.ApplicationContext) -> discord.Embed | str | None:
-        if self.uuid and self.username:
+        if self.uuid and not self.username:
+            uuid = self.uuid
+            name = await get_name_by_uuid(uuid)
+        elif self.uuid and self.username:
             uuid = self.uuid
             name = self.username
         else:
