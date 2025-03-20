@@ -79,18 +79,16 @@ async def create_ticket(user: discord.Member, ticket_name: str,
 
                 # Add milestone, DNKL application, staff application, GvG application if user is a member
                 if bot.member_role in user.roles:
-                    self.add_option(label="Register a milestone", emoji="🏆")
+                    self.add_option(label="I want to register a milestone", emoji="🏆")
                     self.add_option(label="I am going to be inactive", emoji="<:dnkl:877657298703634483>")
                     self.add_option(label="I won a rank upgrade", emoji="💰")
+                    self.add_option(label="I want to join the staff team", emoji="🤵")
                     self.add_option(label="I want to join the GvG team", emoji="⚔️")
 
                 # Add default options
-                self.add_option(label="I want to join the staff team", emoji="🤵")
-                self.add_option(label="Report a player", emoji="🗒️")
+                self.add_option(label="I want to report a player", emoji="🗒️")
                 self.add_option(label="I have a question", emoji="🤔")
                 self.add_option(label="I have a problem", emoji="❌")
-
-                # Add "Other" option last
                 self.add_option(label="Other", emoji="❓")
 
             # Override default callback
@@ -102,11 +100,11 @@ async def create_ticket(user: discord.Member, ticket_name: str,
                     limit=100)  # Deleting the interaction like this so that we can respond to the interaction later
 
                 # Logic for handling ticket types
-                if option == "Report a player":
+                if option == "I want to report a player":
                     await player_report(ticket, interaction, ign, uuid)
                 if option == "I have a question":
                     await query(ticket, interaction, ign)
-                if option == "Register a milestone":
+                if option == "I want to register a milestone":
                     await milestone(ticket, interaction, ign)
                 if option == "I am going to be inactive":
                     await dnkl(ticket, interaction, ign, uuid)
