@@ -7,7 +7,7 @@ from src.func.General import General
 from src.func.String import String
 from src.func.Union import Union
 from src.utils.consts import partner_channel_id, information_message, information_requirements_embed, neutral_color, \
-    rules_embed, elite_member_categories
+    rules_messages, elite_member_categories
 
 
 class Staff(commands.Cog, name="staff"):
@@ -83,7 +83,8 @@ class Staff(commands.Cog, name="staff"):
     @bridge.bridge_command()
     @commands.has_role("Guild Master")
     async def rules(self, ctx: discord.ApplicationContext) -> None:
-        await ctx.send(embed=rules_embed)
+        for message in rules_messages:
+            await ctx.send(content=message)
 
     @bridge.bridge_command(name="elite_member", description="Give a user the Elite Member role!")
     @commands.has_role("Staff")
