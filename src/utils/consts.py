@@ -189,7 +189,6 @@ information_requirements_embed = discord.Embed(title="", color=0x4f5058).add_fie
 
 tickets_messages = ["""# Tickets
 Tickets can be created for one of the following reasons:
-
 ## Ticket Categories for Members 
 - :trophy: I want to register a milestone
 - <:dnkl:877657298703634483> I am going to be inactive
@@ -200,7 +199,6 @@ Tickets can be created for one of the following reasons:
 - <:Misc:540990817872117780> I want to join Miscellaneous
 - :crossed_swords: I want to organize a GvG with Miscellaneous
 - :handshake: My guild wishes to ally Miscellaneous
-
 ## Ticket Categories for Everyone
 - :notepad_spiral: I want to report a player
 - :thinking: I have a question
@@ -209,8 +207,7 @@ Tickets can be created for one of the following reasons:
 1. Create a ticket using `,new` or by clicking the button below.
 2. Once your ticket has been created, the bot will link you to your ticket. 
 3. Inside your ticket, the bot will ask you why you made the ticket. Choose your reason from the dropdown list provided.
-4. Once you have picked your reason, you might need to answer a few of the bot's followup prompts.  
-Staff will respond within 24 hours."""]
+4. Once you have picked your reason, you might need to answer a few of the bot's followup prompts."""]
 
 resident_embed = discord.Embed(title="How can I get Resident?",
                                description="To be eligible for Resident, you must be satisfy at least one of the following requirements:",
