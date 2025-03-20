@@ -339,15 +339,21 @@ dnkl_creation_embed = discord.Embed(title="Do-not-kick-list",
     inline=False
 )
 
-rules_embed = discord.Embed(title="Rules", description='''## In-Game Rules\n:small_blue_diamond: All Hypixel Rules apply.
-:small_blue_diamond: Be respectful of all guild members.
-:small_blue_diamond: Keep chat appropriate at all times.
-:small_blue_diamond: Cheating is prohibited.
-:small_blue_diamond: Refrain from spamming messages in guild chat or guild party chat.\n## Discord Rules\n:smiley: 1. **Be cool, kind, and civil.** Treat all members with respect and express your thoughts in a constructive manner.
+rules_messages = ["""# Rules
+
+## In-Game Rules
+:small_blue_diamond: All Hypixel rules must be followed.
+:small_blue_diamond: Treat all guild members with respect.
+:small_blue_diamond: Keep chat respectful and appropriate at all times.
+:small_blue_diamond: Refrain from spamming messages in guild chat or guild party chat.
+:small_blue_diamond: Use the bridge bot responsibly to prevent any risk of it being banned or muted.""", """
+
+## Discord Rules
+:smiley: 1. **Be cool, kind, and civil.** Treat all members with respect and express your thoughts in a constructive manner.
 :abc: 2. **Use English only.** Communicate in English, but be considerate of all languages.
 :card_index: 3. **Use an appropriate name and avatar.** Avoid special characters, emoji, obscenities, and impersonation.
 :incoming_envelope: 4. **Do not spam.** Avoid excessive messages, images, formatting, emoji, commands, and @mentions.
-:no_bell: 5. **Do not @mention or direct message Miscellaneous Staff.** Respect their time, they are people too.
+:no_bell: 5. **Do not @mention or direct message Miscellaneous Staff unnecessarily.** Respect their time, they are people too.
 :loudspeaker: 6. **No self-promotion or advertisements.** This includes unsolicited references and links to other social media, servers, communities, and services in chat or direct messages.
 7. **No personal information.** Protect your privacy and the privacy of others.
 :head_bandage: 8. **No harassment, abuse, or bullying**. We have zero-tolerance for harming others.
@@ -355,9 +361,8 @@ rules_embed = discord.Embed(title="Rules", description='''## In-Game Rules\n:sma
 :classical_building: 10. **No political or religious topics.** These complex subjects result in controversial and offensive posts.
 :rotating_light: 11. **No piracy, sexual, NSFW, or otherwise suspicious content.** We do not condone illegal or suspicious discussions and activity.
 :thinking: 12. **Rules are subject to common sense.** These rules are not comprehensive and use of loopholes to violate the spirit of these rules is subject to enforcement.
-:scroll: 13. **Discord Terms of Service and Community Guidelines apply.** You must be at least 13 years old to use Discord, and abide by all other terms and guidelines.
-''', color=neutral_color).set_thumbnail(
-    url="https://media.discordapp.net/attachments/523227151240134664/803843877999607818/misc.png?ex=660cdaf3&is=65fa65f3&hm=beee26fd9f9b9f571893884ce18299d96a8b4a7f0ca7ad2ee4bc16758a0d31a5&=&format=webp&quality=lossless")
+:scroll: 13. **Discord Terms of Service and Community Guidelines apply.** You must be at least 13 years old to use Discord, and abide by all other terms and guidelines."""]
+
 
 rank_upgrade_winner_announcement = '''# RANK UPGRADE
 {date}
