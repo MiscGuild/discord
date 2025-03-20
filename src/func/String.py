@@ -302,7 +302,10 @@ class String:
         await bot.get_channel(qotd_ans_channel_id).send(rainbow_separator)
 
     async def invites(self) -> discord.Embed:
-        if self.uuid and self.username:
+        if self.uuid and not self.username:
+            uuid = self.uuid
+            name = await get_name_by_uuid(uuid)
+        elif self.uuid and self.username:
             uuid = self.uuid
             name = self.username
         else:
