@@ -163,7 +163,6 @@ dnkl_entries_not_found = discord.Embed(title="No entries!",
 information_message = """# Miscellaneous
 
 Founded by <@307402461734240257> in 2014, Miscellaneous is an all games Hypixel guild. Our primary goal is to be a guild that is friendly to everyone, as a result all of our guild requirements are well thought out. Miscellaneous strives to be a good community while maintaining its position on the guild leaderboards. 
-
 ## Partners
 > - [XL](https://hypixel.net/threads/2744756/) 
 > - [Lucid](https://hypixel.net/threads/4432628/)
@@ -171,7 +170,6 @@ Founded by <@307402461734240257> in 2014, Miscellaneous is an all games Hypixel 
 > - [Betrayed](https://hypixel.net/threads/2550417/)
 > - [Blight](https://hypixel.net/threads/3864658/)
 > - [Cubelify](https://www.cubelify.com)
-
 ## Guild Resources
 > - <:hypixellogo:1352069969738989680> [Guild Thread](https://hypixel.net/threads/853102/)
 > - <:githublogo:1352069949837021215> [GitHub Projects](https://github.com/MiscGuild)
