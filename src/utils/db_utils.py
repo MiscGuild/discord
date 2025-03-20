@@ -330,3 +330,8 @@ async def get_dnkl_list() -> list:
         username, uuid = await get_db_uuid_username(uuid=row[1])
         players.append((username, uuid))
     return players
+
+
+async def get_all_usernames() -> list:
+    rows = await select_all("SELECT username FROM users")
+    return [row[0] for row in rows]
