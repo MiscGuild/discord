@@ -36,21 +36,21 @@ class Hypixel(commands.Cog, name="hypixel"):
         elif isinstance(res, str):
             await ctx.respond(res)
 
-    @bridge.bridge_command(aliases=['i'])
-    @bridge.bridge_option(
-        name="name",
-        description="The Minecraft username of the player whose stats you'd like to view",
-        required=False,
-        input_type=str
-    )
-    async def info(self, ctx: discord.ApplicationContext, name: str = None) -> None:
-        """View Hypixel stats of the given user!"""
-        if not name:
-            uuid, username = await get_db_uuid_username(discord_id=ctx.author.id)
-            res = await String(uuid=uuid, username=username).info()
-        else:
-            res = await String(string=name).info()
-        await ctx.respond(embed=res)
+    # @bridge.bridge_command(aliases=['i'])
+    # @bridge.bridge_option(
+    #     name="name",
+    #     description="The Minecraft username of the player whose stats you'd like to view",
+    #     required=False,
+    #     input_type=str
+    # )
+    # async def info(self, ctx: discord.ApplicationContext, name: str = None) -> None:
+    #     """View Hypixel stats of the given user!"""
+    #     if not name:
+    #         uuid, username = await get_db_uuid_username(discord_id=ctx.author.id)
+    #         res = await String(uuid=uuid, username=username).info()
+    #     else:
+    #         res = await String(string=name).info()
+    #     await ctx.respond(embed=res)
 
     @bridge.bridge_group(name="dnkl", description="Manage dnkl-related things", invoke_without_command=True)
     async def dnkl(self, ctx: bridge.BridgeContext):
