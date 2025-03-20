@@ -8,6 +8,7 @@ from src.func.String import String
 from src.func.Union import Union
 from src.utils.consts import partner_channel_id, information_message, information_requirements_embed, neutral_color, \
     rules_messages, elite_member_categories
+from src.utils.ui_utils import tickets
 
 
 class Staff(commands.Cog, name="staff"):
@@ -81,7 +82,7 @@ class Staff(commands.Cog, name="staff"):
         await General().rolecheck(ctx, send_ping)
 
     @bridge.bridge_command()
-    @commands.has_role("Guild Master")
+    @commands.has_role("Admin")
     async def rules(self, ctx: discord.ApplicationContext) -> None:
         for message in rules_messages:
             await ctx.send(content=message)
@@ -102,6 +103,14 @@ class Staff(commands.Cog, name="staff"):
     )
     async def elite_member(self, ctx: discord.ApplicationContext, username: str, reason: str) -> None:
         await ctx.send(embed=await String(string=reason, username=username).elite_member())
+
+    @bridge.bridge_command()
+    @commands.has_role("Admin")
+    async def tickets(self, ctx: discord.ApplicationContext) -> None:
+        """Send a ticket help embed!"""
+        image, messages, view = await tickets()
+        await ctx.send(content=messages[0])
+        await ctx.send(content=messages[1], view=view)
 
 
 def setup(bot):
