@@ -6,7 +6,7 @@ from src.func.Integer import Integer
 from src.func.String import String
 from src.utils.calculation_utils import check_if_mention
 from src.utils.consts import gvg_info_embed, requirements_embed, resident_embed
-from src.utils.db_utils import get_db_uuid_username
+from src.utils.db_utils import get_db_uuid_username, get_all_usernames
 
 
 class Guild(commands.Cog, name="guild"):
@@ -16,6 +16,14 @@ class Guild(commands.Cog, name="guild"):
 
     def __init__(self, bot):
         self.bot = bot
+
+    async def get_username_autocomplete(self, ctx: discord.AutocompleteContext):
+        username_list = await get_all_usernames()  # Fetch all usernames (list of tuples)
+        query = ctx.value.lower()
+        filtered_usernames = [
+            (value, name) for value, name in username_list if query in name.lower()
+        ]
+        return [discord.OptionChoice(name, value) for value, name in filtered_usernames[:25]]
 
     @bridge.bridge_group(name="g", description="Invoke guild related commands!", invoke_without_command=True)
     async def g(self, ctx: bridge.BridgeContext, name: str | discord.Member = None) -> None:
@@ -38,8 +46,8 @@ class Guild(commands.Cog, name="guild"):
     @bridge.bridge_option(
         name="name",
         description="The username of the player whose guild experience you'd like to view",
+        autocomplete=get_username_autocomplete,
         required=False,
-        input_type=str
     )
     @bridge.bridge_option(
         name="member",
@@ -50,6 +58,9 @@ class Guild(commands.Cog, name="guild"):
     async def gmember(self, ctx: discord.ApplicationContext, name: str = None,
                       discord_member: discord.Member = None) -> None:
         """View the given user's guild experience over the past week!"""
+        uuid = None
+        if name and len(name) == 32:
+            uuid = name
         if not name and not discord_member:
             username, uuid = await get_db_uuid_username(discord_id=ctx.author.id)
             res = await String(uuid=uuid, username=username).gmember(ctx)
@@ -57,7 +68,10 @@ class Guild(commands.Cog, name="guild"):
             username, uuid = await get_db_uuid_username(discord_id=discord_member.id)
             res = await String(uuid=uuid, username=username).gmember(ctx)
         else:
-            res = await String(string=name).gmember(ctx)
+            if uuid:
+                res = await String(uuid=uuid).gmember(ctx)
+            else:
+                res = await String(string=name).gmember(ctx)
         if isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
         elif isinstance(res, str):
@@ -113,16 +127,34 @@ class Guild(commands.Cog, name="guild"):
         name="name",
         description="The username of the player whose invites you'd like to view",
         required=False,
-        input_type=str
+        autocomplete=get_username_autocomplete
     )
-    async def invites(self, ctx: discord.ApplicationContext, name: str = None) -> None:
-        """View your invitation stats"""
+    @bridge.bridge_option(
+        name="member",
+        description="The discord member whose invites you'd like to view",
+        required=False,
+        input_type=discord.Member
+    )
+    async def invites(self, ctx: discord.ApplicationContext, name: str = None,
+                      discord_member: discord.Member = None) -> None:
+        """View a user's invitation stats"""
         await ctx.defer()
-        if not name:
+
+        uuid = None
+        if name and len(name) == 32:
+            uuid = name
+        if not name and not discord_member:
             username, uuid = await get_db_uuid_username(discord_id=ctx.author.id)
             res = await String(uuid=uuid, username=username).invites()
+        elif discord_member:
+            username, uuid = await get_db_uuid_username(discord_id=discord_member.id)
+            res = await String(uuid=uuid, username=username).invites()
         else:
-            res = await String(string=name).invites()
+            if uuid:
+                res = await String(uuid=uuid).invites()
+            else:
+                res = await String(string=name).invites()
+
         await ctx.respond(embed=res)
 
 
