@@ -225,6 +225,31 @@ tickets_embed = discord.Embed(title="Tickets",
                             inline=False).set_thumbnail(
     url=f"https://images-ext-1.discordapp.net/external/ziYSZZe7dPyKDYLxA1s2jqpKi-kdCvPFpPaz3zft-wo/%3Fwidth%3D671%26height%3D671/https/media.discordapp.net/attachments/523227151240134664/803843877999607818/misc.png")
 
+tickets_messages = ["""# Tickets
+Tickets can be created for one of the following reasons:
+
+## Ticket Categories for Members 
+- :trophy: I want to register a milestone
+- <:dnkl:877657298703634483> I am going to be inactive
+- :moneybag: I won a rank upgrade
+- :person_in_tuxedo: I want to join the staff team
+- :crossed_swords: I want to join the GvG team
+## Ticket Categories for Guests
+- <:Misc:540990817872117780> I want to join Miscellaneous
+- :crossed_swords: I want to organize a GvG with Miscellaneous
+- :handshake: My guild wishes to ally Miscellaneous
+
+## Ticket Categories for Everyone
+- :notepad_spiral: I want to report a player
+- :thinking: I have a question
+- :x: I have a problem
+- :question: Other""", """## How to create a ticket?
+1. Create a ticket using `,new` or by clicking the button below.
+2. Once your ticket has been created, the bot will link you to your ticket. 
+3. Inside your ticket, the bot will ask you why you made the ticket. Choose your reason from the dropdown list provided.
+4. Once you have picked your reason, you might need to answer a few of the bot's followup prompts.  
+Staff will respond within 24 hours."""]
+
 resident_embed = discord.Embed(title="How can I get Resident?",
                                description="To be eligible for Resident, you must be satisfy at least one of the following requirements:",
                                color=neutral_color).add_field(name="Youtuber",
