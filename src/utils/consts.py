@@ -174,7 +174,6 @@ Founded by <@307402461734240257> in 2014, Miscellaneous is an all games Hypixel 
 > - <:hypixellogo:1352069969738989680> [Guild Thread](https://hypixel.net/threads/853102/)
 > - <:githublogo:1352069949837021215> [GitHub Projects](https://github.com/MiscGuild)
 > - <:discord:977349801412788266> Discord: `https://discord.gg/bHFWukp`
-
 ## Requirements
 """
 information_requirements_embed = discord.Embed(title="", color=0x4f5058).add_field(
