@@ -333,5 +333,5 @@ async def get_dnkl_list() -> list:
 
 
 async def get_all_usernames() -> list:
-    rows = await select_all("SELECT username FROM users")
-    return [row[0] for row in rows]
+    rows = await select_all("SELECT uuid, username FROM users")
+    return rows
