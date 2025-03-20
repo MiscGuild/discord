@@ -129,15 +129,32 @@ class Guild(commands.Cog, name="guild"):
         required=False,
         autocomplete=get_username_autocomplete
     )
+    @bridge.bridge_option(
+        name="member",
+        description="The discord member whose invites you'd like to view",
+        required=False,
+        input_type=discord.Member
+    )
     async def invites(self, ctx: discord.ApplicationContext, name: str = None,
                       discord_member: discord.Member = None) -> None:
-        """View your invitation stats"""
+        """View a user's invitation stats"""
         await ctx.defer()
-        if not name:
+
+        uuid = None
+        if name and len(name) == 32:
+            uuid = name
+        if not name and not discord_member:
             username, uuid = await get_db_uuid_username(discord_id=ctx.author.id)
             res = await String(uuid=uuid, username=username).invites()
+        elif discord_member:
+            username, uuid = await get_db_uuid_username(discord_id=discord_member.id)
+            res = await String(uuid=uuid, username=username).invites()
         else:
-            res = await String(string=name).invites()
+            if uuid:
+                res = await String(uuid=uuid).invites()
+            else:
+                res = await String(string=name).invites()
+
         await ctx.respond(embed=res)
 
 
