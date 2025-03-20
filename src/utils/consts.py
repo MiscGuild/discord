@@ -123,42 +123,72 @@ dnkl_entries_not_found = discord.Embed(title="No entries!",
                                        description="There are no users on the do-not-kick-list!",
                                        color=neg_color)
 
-information_embed = discord.Embed(title="Miscellaneous", url="https://plancke.io/hypixel/guild/name/Miscellaneous",
-                                  description="Miscellaneous is an all games Hypixel guild. "
-                                              "Our primary goal is to be a guild that is friendly to everyone. "
-                                              "All of our guild requirements are well thought out. "
-                                              "Miscellaneous strives to be a good community while maintaining its position on the guild leaderboards. "
-                                              "We were founded in 2014 by Fantastic_Doge making us one of the oldest guilds on the Hypixel Network. "
-                                              "We, the miscellaneous staff team will do anything to protect the legacy of this spectacle of a guild.",
-                                  color=neutral_color).add_field(name="Partners",
-                                                                 value="XL - https://discord.gg/XvqCvYn\n"
-                                                                       "Lucid - https://discord.gg/DDTMad2pYR\n"
-                                                                       "OUT - https://discord.gg/td75grErXq\n"
-                                                                       "Betrayed - https://discord.gg/kcJkAr2tW2\n"
-                                                                       "Blight - https://discord.gg/dgTWpgy\n"
-                                                                       "The Happy Pixels - https://discord.gg/JVTqPr9t\n"
-                                                                       "FireTree V2 - https://discord.gg/UcrACnWTpE\n"
-                                                                       "High Altitude - https://discord.gg/highaltitude\n"
-                                                                       "Alpha Project - https://discord.gg/cN6fSAErtz\n"
-                                                                       "Cubelify - https://cubelify.com/ / https://discord.gg/cubelify",
-                                                                 inline=False).add_field(
-    name="Useful Resources",
-    value="Guild Thread: https://bit.ly/MiscThread\n"
-          "Discord: https://discord.gg/bHFWukp",
-    inline=False).add_field(name="Requirements",
-                            value="__**Active**__\n"
-                                  f"➤ {format(active_req, ',d')} Weekly Guild Experience\n"
-                                  "__**Member**__\n"
-                                  f"➤ {format(member_req, ',d')} Weekly Guild Experience\n"
-                                  f"__**Resident**__\n"
-                                  f"➤ {format(resident_req, ',d')} Weekly Guild Experience\n",
-                            inline=False).set_thumbnail(
-    url="https://images-ext-2.discordapp.net/external/c1AaQE93xCcn0mQDOLY1-d14TTEVIOg78IRhqaAnk1I/https/images-ext-1.discordapp.net/external/rey4uPv9eHzVTkM9_GVWvWiK1jyrtBy_sUQjBaE5qbE/"
-        "https/images-ext-2.discordapp.net/external/oTPK3H5eQJWBw_syuTTVUJ3yP7YkvvXTb0JbMX0cdJQ/https/"
-        "images-ext-1.discordapp.net/external/ziYSZZe7dPyKDYLxA1s2jqpKi-kdCvPFpPaz3zft-wo/"
-        "%2525253Fwidth%2525253D671%25252526height%2525253D671/https/media.discordapp.net/"
-        "attachments/523227151240134664/803843877999607818/misc.png").set_footer(
-    text="If you have any queries, kindly make a ticket!")
+# information_embed = discord.Embed(title="Miscellaneous", url="https://plancke.io/hypixel/guild/name/Miscellaneous",
+#                                   description="Miscellaneous is an all games Hypixel guild. "
+#                                               "Our primary goal is to be a guild that is friendly to everyone. "
+#                                               "All of our guild requirements are well thought out. "
+#                                               "Miscellaneous strives to be a good community while maintaining its position on the guild leaderboards. "
+#                                               "We were founded in 2014 by Fantastic_Doge making us one of the oldest guilds on the Hypixel Network. "
+#                                               "We, the miscellaneous staff team will do anything to protect the legacy of this spectacle of a guild.",
+#                                   color=neutral_color).add_field(name="Partners",
+#                                                                  value="XL - https://discord.gg/XvqCvYn\n"
+#                                                                        "Lucid - https://discord.gg/DDTMad2pYR\n"
+#                                                                        "OUT - https://discord.gg/td75grErXq\n"
+#                                                                        "Betrayed - https://discord.gg/kcJkAr2tW2\n"
+#                                                                        "Blight - https://discord.gg/dgTWpgy\n"
+#                                                                        "The Happy Pixels - https://discord.gg/JVTqPr9t\n"
+#                                                                        "FireTree V2 - https://discord.gg/UcrACnWTpE\n"
+#                                                                        "High Altitude - https://discord.gg/highaltitude\n"
+#                                                                        "Alpha Project - https://discord.gg/cN6fSAErtz\n"
+#                                                                        "Cubelify - https://cubelify.com/ / https://discord.gg/cubelify",
+#                                                                  inline=False).add_field(
+#     name="Useful Resources",
+#     value="Guild Thread: https://bit.ly/MiscThread\n"
+#           "Discord: https://discord.gg/bHFWukp",
+#     inline=False).add_field(name="Requirements",
+#                             value="__**Active**__\n"
+#                                   f"➤ {format(active_req, ',d')} Weekly Guild Experience\n"
+#                                   "__**Member**__\n"
+#                                   f"➤ {format(member_req, ',d')} Weekly Guild Experience\n"
+#                                   f"__**Resident**__\n"
+#                                   f"➤ {format(resident_req, ',d')} Weekly Guild Experience\n",
+#                             inline=False).set_thumbnail(
+#     url="https://images-ext-2.discordapp.net/external/c1AaQE93xCcn0mQDOLY1-d14TTEVIOg78IRhqaAnk1I/https/images-ext-1.discordapp.net/external/rey4uPv9eHzVTkM9_GVWvWiK1jyrtBy_sUQjBaE5qbE/"
+#         "https/images-ext-2.discordapp.net/external/oTPK3H5eQJWBw_syuTTVUJ3yP7YkvvXTb0JbMX0cdJQ/https/"
+#         "images-ext-1.discordapp.net/external/ziYSZZe7dPyKDYLxA1s2jqpKi-kdCvPFpPaz3zft-wo/"
+#         "%2525253Fwidth%2525253D671%25252526height%2525253D671/https/media.discordapp.net/"
+#         "attachments/523227151240134664/803843877999607818/misc.png").set_footer(
+#     text="If you have any queries, kindly make a ticket!")
+
+information_message = """# Miscellaneous
+
+Founded by <@307402461734240257> in 2014, Miscellaneous is an all games Hypixel guild. Our primary goal is to be a guild that is friendly to everyone, as a result all of our guild requirements are well thought out. Miscellaneous strives to be a good community while maintaining its position on the guild leaderboards. 
+
+## Partners
+> - [XL](https://hypixel.net/threads/2744756/) 
+> - [Lucid](https://hypixel.net/threads/4432628/)
+> - [OUT](https://hypixel.net/threads/4550875/)
+> - [Betrayed](https://hypixel.net/threads/2550417/)
+> - [Blight](https://hypixel.net/threads/3864658/)
+> - [Cubelify](https://www.cubelify.com)
+
+## Guild Resources
+> - <:hypixellogo:1352069969738989680> [Guild Thread](https://hypixel.net/threads/853102/)
+> - <:githublogo:1352069949837021215> [GitHub Projects](https://github.com/MiscGuild)
+> - <:discord:977349801412788266> Discord: `https://discord.gg/bHFWukp`
+
+## Requirements
+"""
+information_requirements_embed = discord.Embed(title="", color=0x4f5058).add_field(
+    name="Active",
+    value=f"•  {format(active_req, ',d')} Weekly Guild Experience",
+    inline=False).add_field(name="Member",
+                            value=f"•  {format(member_req, ',d')} Weekly Guild Experience",
+                            inline=False).add_field(name="Resident",
+                                                    value=f"•  {format(resident_req, ',d')} Weekly Guild Experience",
+                                                    inline=False).add_field(name="Do-not-kick-list Eligibility",
+                                                                            value=f"•  {format(dnkl_req, ',d')} Weekly Guild Experience",
+                                                                            inline=False)
 
 tickets_embed = discord.Embed(title="Tickets",
                               description="""Tickets can be created for any of the following reasons:
@@ -331,6 +361,7 @@ rules_embed = discord.Embed(title="Rules", description='''## In-Game Rules\n:sma
 :scroll: 13. **Discord Terms of Service and Community Guidelines apply.** You must be at least 13 years old to use Discord, and abide by all other terms and guidelines.
 ''', color=neutral_color).set_thumbnail(
     url="https://media.discordapp.net/attachments/523227151240134664/803843877999607818/misc.png?ex=660cdaf3&is=65fa65f3&hm=beee26fd9f9b9f571893884ce18299d96a8b4a7f0ca7ad2ee4bc16758a0d31a5&=&format=webp&quality=lossless")
+
 rank_upgrade_winner_announcement = '''# RANK UPGRADE
 {date}
 

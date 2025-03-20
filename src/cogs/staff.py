@@ -6,7 +6,8 @@ from discord.ext import commands, bridge
 from src.func.General import General
 from src.func.String import String
 from src.func.Union import Union
-from src.utils.consts import partner_channel_id, information_embed, neutral_color, rules_embed, elite_member_categories
+from src.utils.consts import partner_channel_id, information_message, information_requirements_embed, neutral_color, \
+    rules_embed, elite_member_categories
 
 
 class Staff(commands.Cog, name="staff"):
@@ -65,7 +66,7 @@ class Staff(commands.Cog, name="staff"):
     @bridge.bridge_command()
     @commands.has_role("Admin")
     async def information(self, ctx: discord.ApplicationContext) -> None:
-        await ctx.respond(embed=information_embed)
+        await ctx.send(content=information_message, embed=information_requirements_embed)
 
     @bridge.bridge_command()
     @commands.has_any_role("Staff", "Discord Moderator")
