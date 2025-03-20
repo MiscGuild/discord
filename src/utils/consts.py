@@ -187,44 +187,6 @@ information_requirements_embed = discord.Embed(title="", color=0x4f5058).add_fie
                                                                             value=f"•  {format(dnkl_req, ',d')} Weekly Guild Experience",
                                                                             inline=False)
 
-tickets_embed = discord.Embed(title="Tickets",
-                              description="""Tickets can be created for any of the following reasons:
-                                        > Player Report
-                                        > Problems/Queries
-                                        > Milestone
-                                        > Do-not-kick-list Application
-                                        > Staff Application
-                                        > GvG Team Application
-                                        > Event (When applicable)
-                                        > Other
-                                        Once you have created a ticket by clicking the button, you will be linked to your ticket\n
-                                        The bot will ask you to choose the reason behind the creation of your ticket from a given list. Choose the appropriate reason and then proceed!\n
-                                        Once you have created your ticket, staff will respond within 24 hours.""",
-                              color=neutral_color).add_field(name="Do-not-kick-list Application",
-                                                             value="You must have a valid reason for applying and also meet the DNKL requirements.\n"
-                                                                   "Accepted Reasons:\n"
-                                                                   "> Exams\n"
-                                                                   "> Medical Reasons\n"
-                                                                   "> Computer Problems\n"
-                                                                   "> Vacation\n"
-                                                                   "> Other (subject to staff judgment)\n"
-                                                                   "If your account is banned, it may be temporarily kicked until unbanned.",
-                                                             inline=False).add_field(name="Player Report",
-                                                                                     value="When reporting a player, you're expected to explain the situation in maximum detail. Providing the following is considered the bare minimum:\n"
-                                                                                           "> Username of the accused\n"
-                                                                                           "> Explanantion of the offense\n"
-                                                                                           "> Time of offense\n"
-                                                                                           "> Proof of offense\n"
-                                                                                           "If you wish to report a staff member, please DM the acting guild master with your report.",
-                                                                                     inline=False).add_field(
-    name="Milestone",
-    value="You'll be prompted to present the milestone you've achieved and proof of its occurence. "
-          "Staff will review your milestone and if accepted, will be include it in the next week's milestone post!",
-    inline=False).add_field(name="Staff Application",
-                            value="After you're done with your application, the staff team will review your it and make a decision to accept or deny it.",
-                            inline=False).set_thumbnail(
-    url=f"https://images-ext-1.discordapp.net/external/ziYSZZe7dPyKDYLxA1s2jqpKi-kdCvPFpPaz3zft-wo/%3Fwidth%3D671%26height%3D671/https/media.discordapp.net/attachments/523227151240134664/803843877999607818/misc.png")
-
 tickets_messages = ["""# Tickets
 Tickets can be created for one of the following reasons:
 
