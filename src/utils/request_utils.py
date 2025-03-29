@@ -1,22 +1,60 @@
+import asyncio
 import random
 import re
 from __main__ import bot
+from functools import wraps
 from io import BytesIO
+from typing import Tuple, List, Callable, Any
 
 import aiohttp
 import discord
+import requests
 
 from src.utils.consts import config, error_channel_id
+from src.utils.db_utils import get_db_uuid_username, check_and_update_username
 
 
-async def get_hyapi_key():
+def async_retry(max_attempts: int = 5, delay: float = 0.5):
+    """Decorator to retry an async function on failure."""
+
+    def decorator(func: Callable[..., Any]):
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            for attempt in range(1, max_attempts + 1):
+                try:
+                    result = await func(*args, **kwargs)
+                    if result:
+                        return result
+                except Exception as e:
+                    pass
+                if attempt < max_attempts:
+                    await asyncio.sleep(delay)
+
+            return None
+
+        return wrapper
+
+    return decorator
+
+
+async def get_hyapi_key() -> str:
     return random.choice(config["api_keys"])
 
 
+async def update_usernames(uuid: str, username: str) -> None:
+    db_username, uuid = await get_db_uuid_username(uuid=uuid)
+    if db_username is None:
+        return
+    elif db_username != username:
+        await check_and_update_username(uuid, username)
+
+
 # Base JSON-getter for all JSON based requests. Catches Invalid API Key errors
-async def get_json_response(url: str):
+async def get_json_response(url: str) -> dict | None:
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
+            if resp.status != 200:
+                return None
             resp = await resp.json(content_type=None)
             await session.close()
 
@@ -25,62 +63,99 @@ async def get_json_response(url: str):
 
     # Check for invalid API keys
     if "cause" in resp and resp["cause"] == "Invalid API key":
-        bot.get_channel(error_channel_id).send(
+        await bot.get_channel(error_channel_id).send(
             f"WARNING: The API key {re.search(r'(?<=key=)(.*?)(?=&)', url).group(0)} is invalid!")
 
     # Return JSON response
     return resp
 
 
-async def get_mojang_profile(name: str):
-    resp = await get_json_response(f"https://api.mojang.com/users/profiles/minecraft/{name}")
+@async_retry(max_attempts=3, delay=0)
+async def get_mojang_profile_from_name(name: str) -> Tuple[str, str] | Tuple[None, None]:
+    url = f"https://api.mojang.com/users/profiles/minecraft/{name}"
+    resp = await get_json_response(url)
+    if not resp:
+        return None, None
 
-    # If player and request is valid
-    if resp and "error" not in resp:
-        return resp["name"], resp["id"]
-    api_key = await get_hyapi_key()
-    resp = await get_json_response(f"https://api.hypixel.net/player?key={api_key}&name={name}")
-    if resp and 'player' in resp and resp['player']:
-        return resp['player']['displayname'], resp['player']['uuid']
+    if "error" in resp:
+        return None, None
 
-    # Player does not exist
+    if "id" not in resp:
+        return None, None
+
+    return resp["name"], resp["id"]
+
+
+async def get_uuid_by_name(name: str) -> Tuple[str, str] | Tuple[None, None]:
+    username, uuid = await get_mojang_profile_from_name(name)
+    if username and uuid:
+        await update_usernames(uuid=uuid, username=username)
+        return username, uuid
+
+    resp = await get_hypixel_player(name=name)
+    if resp and "uuid" in resp:
+        await update_usernames(uuid=resp["uuid"], username=resp["displayname"])
+        return resp["displayname"], resp["uuid"]
+
     return None, None
 
 
-async def get_hypixel_player(name: str = None, uuid: str = None):
+@async_retry(max_attempts=3, delay=0)
+async def get_mojang_profile_from_uuid(uuid: str) -> Tuple[str, str] | Tuple[None, str]:
+    url = f"https://sessionserver.mojang.com/session/minecraft/profile/{uuid}"
+    resp = await get_json_response(url)
+
+    if not resp:
+        return None, uuid
+
+    if "error" in resp:
+        return None, uuid
+
+    if "name" not in resp:
+        return None, uuid
+
+    return resp["name"], uuid
+
+
+async def get_name_by_uuid(uuid: str, is_sync: bool = False) -> str | None:
+    if not is_sync:
+        username, uuid = await get_db_uuid_username(uuid=uuid)
+        if username:
+            return username
+
+    username, uuid = await get_mojang_profile_from_uuid(uuid)
+
+    if username and uuid:
+        await update_usernames(uuid=uuid, username=username)
+        return username
+
+    resp = await get_hypixel_player(uuid=uuid)
+    if resp and "displayname" in resp:
+        await update_usernames(uuid=uuid, username=resp["displayname"])
+        return resp["displayname"]
+
+    return None
+
+
+async def get_hypixel_player(name: str = None, uuid: str = None) -> dict | None:
     api_key = await get_hyapi_key()
     if name:
         resp = await get_json_response(f"https://api.hypixel.net/player?key={api_key}&name={name}")
     else:
         resp = await get_json_response(f"https://api.hypixel.net/player?key={api_key}&uuid={uuid}")
 
+    if not resp:
+        return None
     # Player doesn't exist
     if "player" not in resp or not resp["player"]:
         return None
 
     # Player exists
+    await update_usernames(uuid=resp["player"]["uuid"], username=resp["player"]["displayname"])
     return resp["player"]
 
 
-async def get_name_by_uuid(uuid: str):
-    i = 0
-    while i < 5:
-        i += 1
-        resp = await get_json_response(f"https://sessionserver.mojang.com/session/minecraft/profile/{uuid}")
-        # Player does not exist
-        if not resp:
-            continue
-
-        return resp["name"]
-    api_key = await get_hyapi_key()
-    # If the Mojang API fails to return a name, the bot checks using the hypixel API
-    resp = await get_json_response(f"https://api.hypixel.net/player?key={api_key}&uuid={uuid}")
-    if "player" not in resp:
-        return None
-    return resp['player']['displayname']
-
-
-def session_get_name_by_uuid(session, uuid):
+def session_get_name_by_uuid(session: requests.Session, uuid: str) -> str | None:
     with session.get(f"https://sessionserver.mojang.com/session/minecraft/profile/{uuid}") as resp:
         data = resp.json()
 
@@ -89,7 +164,7 @@ def session_get_name_by_uuid(session, uuid):
         return data["name"]
 
 
-async def get_player_guild(uuid):
+async def get_player_guild(uuid: str) -> dict | None:
     api_key = await get_hyapi_key()
     resp = await get_json_response(f"https://api.hypixel.net/guild?key={api_key}&player={uuid}")
 
@@ -101,9 +176,12 @@ async def get_player_guild(uuid):
     return resp["guild"]
 
 
-async def get_guild_by_name(name):
+async def get_guild_by_name(name: str) -> dict | None:
     api_key = await get_hyapi_key()
     resp = await get_json_response(f"https://api.hypixel.net/guild?key={api_key}&name={name}")
+
+    if not resp:
+        return None
 
     # Player is not in a guild
     if "guild" not in resp or not resp["guild"]:
@@ -113,64 +191,36 @@ async def get_guild_by_name(name):
     return resp["guild"]
 
 
-async def get_guild_uuids(guild_name: str):
+async def get_guild_uuids(guild_name: str) -> List[str] | None:
     resp = await get_guild_by_name(guild_name)
     if not resp:
         return None
     return [member["uuid"] for member in resp["members"]]
 
 
-async def get_gtag(name):
+async def get_gtag(name: str) -> str:
     api_key = await get_hyapi_key()
     resp = await get_json_response(f"https://api.hypixel.net/guild?key={api_key}&name={name}")
 
     if len(resp["guild"]) < 2:
-        return (" ")
+        return " "
     if not resp["guild"]["tag"]:
-        return (" ")
-    else:
-        gtag = resp["guild"]["tag"]
-        return (f"[{gtag}]")
+        return " "
+    gtag = resp["guild"]["tag"]
+    return f"[{gtag}]"
 
 
-async def get_jpg_file(url: str):
+async def get_jpg_file(url: str) -> discord.File | None:
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
+            if resp.status != 200:
+                return None
             resp = BytesIO(await resp.read())
             await session.close()
     return discord.File(resp, "image.jpg")
 
 
-async def get_guild_level(exp):
-    EXP_NEEDED = [100000, 150000, 250000, 500000, 750000, 1000000, 1250000, 1500000, 2000000, 2500000, 2500000, 2500000,
-                  2500000, 2500000, 3000000]
-    # A list of amount of XP required for leveling up in each of the beginning levels (1-15).
-
-    level = 0
-
-    for i in range(1000):
-        # Increment by one from zero to the level cap.
-        need = 0
-        if i >= len(EXP_NEEDED):
-            need = EXP_NEEDED[len(EXP_NEEDED) - 1]
-        else:
-            need = EXP_NEEDED[i]
-        # Determine the current amount of XP required to level up,
-        # in regards to the "i" variable.
-
-        if (exp - need) < 0:
-            return round(((level + (exp / need)) * 100) / 100, 2)
-        # If the remaining exp < the total amount of XP required for the next level,
-        # return their level using this formula.
-
-        level += 1
-        exp -= need
-        # Otherwise, increase their level by one,
-        # and subtract the required amount of XP to level up,
-        # from the total amount of XP that the guild had.
-
-
-async def get_rank(uuid):
+async def get_rank(uuid: str) -> str | None:
     player = await get_hypixel_player(uuid=uuid)
     if player is None:
         return None
@@ -181,16 +231,13 @@ async def get_rank(uuid):
                 mvp_plus_plus = (player["monthlyPackageRank"])
                 if mvp_plus_plus == "NONE":
                     return '[MVP+]'
-                else:
-                    return "[MVP++]"
-            else:
-                return "[MVP+]"
-        elif rank == 'MVP':
+                return "[MVP++]"
+            return "[MVP+]"
+        if rank == 'MVP':
             return '[MVP]'
-        elif rank == 'VIP_PLUS':
+        if rank == 'VIP_PLUS':
             return 'VIP+'
-        elif rank == 'VIP':
+        if rank == 'VIP':
             return '[VIP]'
 
-    else:
-        return None
+    return None

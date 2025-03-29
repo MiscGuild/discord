@@ -23,14 +23,13 @@ bot.remove_command("help")
 after_cache_ready.start()
 # Load extensions
 for extension in ["src.cogs.general", "src.cogs.giveaways", "src.cogs.guild", "src.cogs.hypixel",
-                  "src.cogs.listeners", "src.cogs.menus", "src.cogs.moderation", "src.cogs.staff",
+                  "src.cogs.listeners", "src.cogs.moderation", "src.cogs.staff",
                   "src.cogs.tickets", "src.cogs.help"]:
     try:
         bot.load_extension(extension)
         print(f"Loaded {extension}")
     except Exception as e:
-        print(f"WARNING: Failed to load extension {extension}", file=sys.stderr)
-        print(e)
+        print(f"WARNING: Failed to load extension {extension}\n{e}", file=sys.stderr)
 
 # Run bot
 bot.run(config["token"])

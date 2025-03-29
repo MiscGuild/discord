@@ -4,8 +4,11 @@ import discord
 from discord.ext import commands, bridge
 
 from src.func.General import General
+from src.func.String import String
 from src.func.Union import Union
-from src.utils.consts import partner_channel_id, information_embed, neutral_color
+from src.utils.consts import partner_channel_id, information_message, information_requirements_embed, neutral_color, \
+    rules_messages, elite_member_categories
+from src.utils.ui_utils import tickets
 
 
 class Staff(commands.Cog, name="staff"):
@@ -18,17 +21,29 @@ class Staff(commands.Cog, name="staff"):
 
     @bridge.bridge_command()
     @commands.has_role("Staff")
-    async def inactive(self, ctx):
+    async def inactive(self, ctx: discord.ApplicationContext) -> None:
         """View all inactive users in the guild!"""
         await ctx.defer()
-        for embed in await General.inactive(ctx):
+        for embed in await General().inactive():
             await ctx.respond(embed=embed)
 
     @bridge.bridge_command(aliases=["fs"])
-    @commands.has_role("Staff")
-    async def forcesync(self, ctx, member: discord.Member, name: str):
+    @commands.has_any_role("Staff", "Discord Moderator")
+    @bridge.bridge_option(
+        name="member",
+        description="The Discord member who you would like to forcesync",
+        required=True,
+        input_type=discord.Member
+    )
+    @bridge.bridge_option(
+        name="name",
+        description="Their Minecraft username",
+        required=False,
+        input_type=str
+    )
+    async def forcesync(self, ctx: discord.ApplicationContext, member: discord.Member, name: str = None) -> None:
         """Update a user's discord nick, tag and roles for them!"""
-        res = await Union(user=member).sync(ctx, name, None, True)
+        res = await Union(user=ctx.guild.get_member(member.id)).sync(ctx, name, None, True)
         if isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
         elif isinstance(res, str):
@@ -36,34 +51,66 @@ class Staff(commands.Cog, name="staff"):
 
     @bridge.bridge_command()
     @commands.has_role("Admin")
-    async def partner(self, ctx, organization_name: str):
+    @bridge.bridge_option(
+        name="organization_name",
+        description="The name of the organization you are partnering with",
+        required=True,
+        input_type=str
+    )
+    async def partner(self, ctx: discord.ApplicationContext, *, organization_name: str) -> None:
         """Create an embed with information about a partner!"""
-        await bot.get_channel(partner_channel_id).send(embed=await General.partner(ctx, organization_name))
+        await bot.get_channel(partner_channel_id).send(embed=await General().partner(ctx, organization_name))
         await ctx.respond(embed=discord.Embed(title=f"Miscellaneous has officially partnered with {organization_name}",
                                               color=neutral_color).set_footer(
             text="The partner embed has been sent to the partners channel!"))
 
     @bridge.bridge_command()
     @commands.has_role("Admin")
-    async def information(self, ctx):
-        await ctx.respond(embed=information_embed)
+    async def information(self, ctx: discord.ApplicationContext) -> None:
+        await ctx.send(content=information_message, embed=information_requirements_embed)
 
     @bridge.bridge_command()
-    @commands.has_role("Staff")
-    async def rolecheck(self, ctx, send_ping: bool = True):
+    @commands.has_any_role("Staff", "Discord Moderator")
+    @bridge.bridge_option(
+        name="send_ping",
+        description="Enter 'False' if you don't want to ping New Members upon completion of rolecheck",
+        required=False,
+        input_type=bool
+    )
+    async def rolecheck(self, ctx: discord.ApplicationContext, send_ping: bool = True) -> None:
         """Sync the names and roles of everyone in the discord!"""
-        await General.rolecheck(ctx, send_ping)
+        await General().rolecheck(ctx, send_ping)
 
-    @bridge.bridge_command(aliases=[])
-    @commands.has_role("Moderator")
-    async def residency(self, ctx, member: discord.Member = None, reason: int = None):
-        """Used to update a member's residency in the guild!"""
-        await General.resident_membership(ctx, member, reason)
+    @bridge.bridge_command()
+    @commands.has_role("Admin")
+    async def rules(self, ctx: discord.ApplicationContext) -> None:
+        for message in rules_messages:
+            await ctx.send(content=message)
 
-    @bridge.bridge_command(aliases=['rl', 'reslist', 'residencylist'])
+    @bridge.bridge_command(name="elite_member", description="Give a user the Elite Member role!")
     @commands.has_role("Staff")
-    async def residentlist(self, ctx):
-        await ctx.respond(embed=(await General.resident_list(ctx)))
+    @bridge.bridge_option(
+        name="username",
+        description="The username of the player you would like to give the Elite Member role",
+        required=True,
+        input_type=str
+    )
+    @bridge.bridge_option(
+        name="reason",
+        description="Why do they deserve the Elite Member role?",
+        required=True,
+        choices=[discord.OptionChoice(name=x, value=x) for x in elite_member_categories],
+    )
+    async def elite_member(self, ctx: discord.ApplicationContext, username: str, reason: str) -> None:
+        await ctx.send(embed=await String(string=reason, username=username).elite_member())
+
+    @bridge.bridge_command()
+    @commands.has_role("Admin")
+    async def tickets(self, ctx: discord.ApplicationContext) -> None:
+        """Send a ticket help embed!"""
+        image, messages, view = await tickets()
+        await ctx.send(content=messages[0])
+        await ctx.send(content=messages[1], view=view)
 
 
 def setup(bot):

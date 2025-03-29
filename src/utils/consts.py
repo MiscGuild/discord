@@ -35,6 +35,8 @@ qotd_ans_channel_id = config["qotd_ans_channel"]
 milestones_channel = config["milestones_channel"]
 weekly_lb_channel = config["weekly_gexp_lb"]
 daily_lb_channel = config["daily_gexp_lb"]
+rank_upgrade_channel = config["rank_upgrade_channel"]
+staff_bridge_channel = config["staff_bridge_channel"]
 
 # Other variables
 guild_handle = config["guild_handle"]
@@ -47,65 +49,48 @@ pos_color = 0x00A86B
 neutral_color = 0x8369ff
 error_color = 0xDE3163
 
-# Pronoun roles
-reaction_roles = {
-    "Skyblock": "🪓",
-    "Minigames": "🕹",
-    "QOTD Ping": "❓",
-    "Giveaways/Events": "🎉",
-    "Storytimes": "📖",
-}
 
-pronoun_roles = {
-    "He/Him": "👨",
-    "She/Her": "👩",
-    "They/Them": "🏳️‍🌈",
-    "Other": "❓",
+milestone_categories = {
+    "hypixel": "Hypixel",
+    "bedwars": "BedWars",
+    "skywars": "SkyWars",
+    "duels": "Duels",
+    "skyblock": "SkyBlock",
+    "build_battle": "Build Battle",
+    "arcade": "Arcade",
+    "turbo_kart_racers": "Turbo Kart Racers",
+    "pit": "The Pit",
+    "murder_mystery": "Murder Mystery",
+    "copsvcrims": "Cops and Crims",
+    "miscellaneous": "Miscellaneous",
+    "discord": "Discord",
+    "other": "Other"
 }
 
 milestone_emojis = {
-    "HYPIXEL": "<:hypixel:823036946984730662>",
-    "BEDWARS": "<:BedWars64:823036962150547477>",
-    "SKYWARS": "<:Skywars:823036980526972948>",
-    "DUELS": "<:Duels:823036885089255434>",
-    "SKYBLOCK": "<:sb:732824932177805405>",
-    "BUILD_BATTLE": "<:buildbattle:828113746978406481>",
-    "ARCADE": "<:arcade:825723888477929472>",
-    "TURBO_KART_RACERS": "<:TurboKartRacers64:846306861950304267>",
-    "PIT": "<:pit:851361342744690728>",
-    "MURDER_MYSTERY": "<:MurderMystery64:823036899974447105>",
-    "MISCELLANEOUS": "<:Misc:540990817872117780>",
-    "DISCORD": "<:discord:977349801412788266>",
-    "OTHER": "❓"
+    "hypixel": "<:hypixel:823036946984730662>",
+    "bedwars": "<:BedWars64:823036962150547477>",
+    "skywars": "<:Skywars:823036980526972948>",
+    "duels": "<:Duels:823036885089255434>",
+    "skyblock": "<:sb:732824932177805405>",
+    "build_battle": "<:buildbattle:828113746978406481>",
+    "arcade": "<:arcade:825723888477929472>",
+    "turbo_kart_racers": "<:TurboKartRacers64:846306861950304267>",
+    "pit": "<:pit:851361342744690728>",
+    "murder_mystery": "<:MurderMystery64:823036899974447105>",
+    "copsvcrims": "<:CVC64:846306846717378560>",
+    "miscellaneous": "<:Misc:540990817872117780>",
+    "discord": "<:discord:977349801412788266>",
+    "other": "❓"
 }
 
-residency_reasons = {
-    "GVG": ["⚔️", {"LOSS": 1, "WIN": 2}],
-    "DONOR": ["💰", 4],
-    "BOOSTER": ["⬆️", 4],
-    "YOUTUBER": ["<:youtube:1011088525506117642>", 9999]
-}  # The number represents
-
-button_types = {"GvG_Application_Positive": {"roleadd": "GvG Team", "roleremove": None,
-                                             "title": ", welcome to the GvG team!", "color": neutral_color},
-                "GvG_Application_Negative": {"roleadd": None, "roleremove": "GvG Team",
-                                             "title": ", your GvG Application was denied because you didn't meet the "
-                                                      "requirements",
-                                             "color": neg_color},
-                "GvG_Residency_Positive": {"roleadd": None, "roleremove": None,
-                                           "title": f", was granted {residency_reasons['GVG'][1]['WIN']} weeks of "
-                                                    f"residency!",
-                                           "color": neutral_color},
-                "GvG_Residency_Negative": {"roleadd": None, "roleremove": None,
-                                           "title": f", was granted {residency_reasons['GVG'][1]['LOSS']} week of "
-                                                    f"residency!",
-                                           "color": neg_color}}
+elite_member_categories = ("Event Sponsor", "GvG Team", "YouTuber", "Other")
 
 # General embeds
 registration_embed = discord.Embed(title=f"Welcome to the {guild_handle} Discord!",
                                    description="Before you can view the server, please register with your Minecraft username.",
                                    color=neutral_color).add_field(name="To register use the following command:",
-                                                                  value=",register `Your Minecraft Name`\n\nExample:\n,register John",
+                                                                  value="/register `Your Minecraft Name`\n\nExample:\n/register John",
                                                                   inline=False)
 
 ticket_deleted_embed = discord.Embed(title="Your ticket was deleted!",
@@ -134,41 +119,95 @@ requirements_embed = discord.Embed(title="Miscellaneous Guild Requirements",
                                                                             inline=False).set_footer(
     text="If you fail to meet these requirements, you will be kicked!")
 
-resident_removed = discord.Embed(title="Your resident rank has been removed!", color=neutral_color)
+dnkl_entries_not_found = discord.Embed(title="No entries!",
+                                       description="There are no users on the do-not-kick-list!",
+                                       color=neg_color)
 
-information_embed = discord.Embed(title="Miscellaneous", url="https://plancke.io/hypixel/guild/name/Miscellaneous",
-                                  description="Miscellaneous is an all games Hypixel guild. "
-                                              "Our primary goal is to be a guild that is friendly to everyone. "
-                                              "All of our guild requirements are well thought out. "
-                                              "Miscellaneous strives to be a good community while maintaining its position on the guild leaderboards. "
-                                              "We were founded in 2014 by Fantastic_Doge making us one of the oldest guilds on the Hypixel Network. "
-                                              "We, the miscellaneous staff team will do anything to protect the legacy of this spectacle of a guild.",
-                                  color=neutral_color).add_field(name="Partners",
-                                                                 value="XL - https://discord.gg/XvqCvYn\n"
-                                                                       "Lucid - https://discord.gg/DDTMad2pYR\n"
-                                                                       "OUT - https://discord.gg/td75grErXq\n"
-                                                                       "Betrayed - https://discord.gg/kcJkAr2tW2\n"
-                                                                       "Blight - https://discord.gg/dgTWpgy\n"
-                                                                       "The Happy Pixels - https://discord.gg/JVTqPr9t\n"
-                                                                       "Cubelify - https://cubelify.com/ / https://discord.gg/cubelify",
-                                                                 inline=False).add_field(
-    name="Useful Resources",
-    value="Guild Thread: http://bit.ly/MiscThread\n"
-          "Discord: https://discord.gg/bHFWukp",
-    inline=False).add_field(name="Requirements",
-                            value="__**Active**__\n"
-                                  f"➤ {format(active_req, ',d')} Weekly Guild Experience\n"
-                                  "__**Member**__\n"
-                                  f"➤ {format(member_req, ',d')} Weekly Guild Experience\n"
-                                  f"__**Resident**__\n"
-                                  f"➤ {format(resident_req, ',d')} Weekly Guild Experience\n",
-                            inline=False).set_thumbnail(
-    url="https://images-ext-2.discordapp.net/external/c1AaQE93xCcn0mQDOLY1-d14TTEVIOg78IRhqaAnk1I/https/images-ext-1.discordapp.net/external/rey4uPv9eHzVTkM9_GVWvWiK1jyrtBy_sUQjBaE5qbE/"
-        "https/images-ext-2.discordapp.net/external/oTPK3H5eQJWBw_syuTTVUJ3yP7YkvvXTb0JbMX0cdJQ/https/"
-        "images-ext-1.discordapp.net/external/ziYSZZe7dPyKDYLxA1s2jqpKi-kdCvPFpPaz3zft-wo/"
-        "%2525253Fwidth%2525253D671%25252526height%2525253D671/https/media.discordapp.net/"
-        "attachments/523227151240134664/803843877999607818/misc.png").set_footer(
-    text="If you have any queries, kindly make a ticket!")
+# information_embed = discord.Embed(title="Miscellaneous", url="https://plancke.io/hypixel/guild/name/Miscellaneous",
+#                                   description="Miscellaneous is an all games Hypixel guild. "
+#                                               "Our primary goal is to be a guild that is friendly to everyone. "
+#                                               "All of our guild requirements are well thought out. "
+#                                               "Miscellaneous strives to be a good community while maintaining its position on the guild leaderboards. "
+#                                               "We were founded in 2014 by Fantastic_Doge making us one of the oldest guilds on the Hypixel Network. "
+#                                               "We, the miscellaneous staff team will do anything to protect the legacy of this spectacle of a guild.",
+#                                   color=neutral_color).add_field(name="Partners",
+#                                                                  value="XL - https://discord.gg/XvqCvYn\n"
+#                                                                        "Lucid - https://discord.gg/DDTMad2pYR\n"
+#                                                                        "OUT - https://discord.gg/td75grErXq\n"
+#                                                                        "Betrayed - https://discord.gg/kcJkAr2tW2\n"
+#                                                                        "Blight - https://discord.gg/dgTWpgy\n"
+#                                                                        "The Happy Pixels - https://discord.gg/JVTqPr9t\n"
+#                                                                        "FireTree V2 - https://discord.gg/UcrACnWTpE\n"
+#                                                                        "High Altitude - https://discord.gg/highaltitude\n"
+#                                                                        "Alpha Project - https://discord.gg/cN6fSAErtz\n"
+#                                                                        "Cubelify - https://cubelify.com/ / https://discord.gg/cubelify",
+#                                                                  inline=False).add_field(
+#     name="Useful Resources",
+#     value="Guild Thread: https://bit.ly/MiscThread\n"
+#           "Discord: https://discord.gg/bHFWukp",
+#     inline=False).add_field(name="Requirements",
+#                             value="__**Active**__\n"
+#                                   f"➤ {format(active_req, ',d')} Weekly Guild Experience\n"
+#                                   "__**Member**__\n"
+#                                   f"➤ {format(member_req, ',d')} Weekly Guild Experience\n"
+#                                   f"__**Resident**__\n"
+#                                   f"➤ {format(resident_req, ',d')} Weekly Guild Experience\n",
+#                             inline=False).set_thumbnail(
+#     url="https://images-ext-2.discordapp.net/external/c1AaQE93xCcn0mQDOLY1-d14TTEVIOg78IRhqaAnk1I/https/images-ext-1.discordapp.net/external/rey4uPv9eHzVTkM9_GVWvWiK1jyrtBy_sUQjBaE5qbE/"
+#         "https/images-ext-2.discordapp.net/external/oTPK3H5eQJWBw_syuTTVUJ3yP7YkvvXTb0JbMX0cdJQ/https/"
+#         "images-ext-1.discordapp.net/external/ziYSZZe7dPyKDYLxA1s2jqpKi-kdCvPFpPaz3zft-wo/"
+#         "%2525253Fwidth%2525253D671%25252526height%2525253D671/https/media.discordapp.net/"
+#         "attachments/523227151240134664/803843877999607818/misc.png").set_footer(
+#     text="If you have any queries, kindly make a ticket!")
+
+information_message = """# Miscellaneous
+
+Founded by <@307402461734240257> in 2014, Miscellaneous is an all games Hypixel guild. Our primary goal is to be a guild that is friendly to everyone, as a result all of our guild requirements are well thought out. Miscellaneous strives to be a good community while maintaining its position on the guild leaderboards. 
+## Partners
+> - [XL](https://hypixel.net/threads/2744756/) 
+> - [Lucid](https://hypixel.net/threads/4432628/)
+> - [OUT](https://hypixel.net/threads/4550875/)
+> - [Betrayed](https://hypixel.net/threads/2550417/)
+> - [Blight](https://hypixel.net/threads/3864658/)
+> - [Cubelify](https://www.cubelify.com)
+## Guild Resources
+> - <:hypixellogo:1352069969738989680> [Guild Thread](https://hypixel.net/threads/853102/)
+> - <:githublogo:1352069949837021215> [GitHub Projects](https://github.com/MiscGuild)
+> - <:discord:977349801412788266> Discord: `https://discord.gg/bHFWukp`
+## Requirements
+"""
+information_requirements_embed = discord.Embed(title="", color=0x4f5058).add_field(
+    name="Active",
+    value=f"•  {format(active_req, ',d')} Weekly Guild Experience",
+    inline=False).add_field(name="Member",
+                            value=f"•  {format(member_req, ',d')} Weekly Guild Experience",
+                            inline=False).add_field(name="Resident",
+                                                    value=f"•  {format(resident_req, ',d')} Weekly Guild Experience",
+                                                    inline=False).add_field(name="Do-not-kick-list Eligibility",
+                                                                            value=f"•  {format(dnkl_req, ',d')} Weekly Guild Experience",
+                                                                            inline=False)
+
+tickets_messages = ["""# Tickets
+Tickets can be created for one of the following reasons:
+## Ticket Categories for Members 
+- :trophy: I want to register a milestone
+- <:dnkl:877657298703634483> I am going to be inactive
+- :moneybag: I won a rank upgrade
+- :person_in_tuxedo: I want to join the staff team
+- :crossed_swords: I want to join the GvG team
+## Ticket Categories for Guests
+- <:Misc:540990817872117780> I want to join Miscellaneous
+- :crossed_swords: I want to organize a GvG with Miscellaneous
+- :handshake: My guild wishes to ally Miscellaneous
+## Ticket Categories for Everyone
+- :notepad_spiral: I want to report a player
+- :thinking: I have a question
+- :x: I have a problem
+- :question: Other""", """## How to create a ticket?
+1. Create a ticket using `,new` or by clicking the button below.
+2. Once your ticket has been created, the bot will link you to your ticket. 
+3. Inside your ticket, the bot will ask you why you made the ticket. Choose your reason from the dropdown list provided.
+4. Once you have picked your reason, you might need to answer a few of the bot's followup prompts."""]
 
 resident_embed = discord.Embed(title="How can I get Resident?",
                                description="To be eligible for Resident, you must be satisfy at least one of the following requirements:",
@@ -198,6 +237,10 @@ gvg_info_embed = discord.Embed(title="GvG Information",
                                             Duels Kills: `{gvg_requirements["duels_kills"]}`""",
     inline=False
 )
+
+positive_responses = (
+    "yes", "yeah", "yup", "yea", "sure", "ok", "okay", "affirmative", "y", "ye", "yea", "yep", "yuppers", "yessir",
+    "yessum", "yessirree", "yessumree", "yessiree", "yessumree")
 
 # Errors
 unknown_ign_msg = "Unknown IGN!"
@@ -247,10 +290,84 @@ unknown_ign_embed = discord.Embed(title="Please enter a valid Minecraft username
                                   color=error_color)
 
 discord_not_linked_embed = discord.Embed(title="This account is not linked to your discord account!",
-                                         description="Please follow the following steps to link your Hypixel profile with discord:\nGo to 'Your Profile' > Social Media > DISCORD and paste your discord info.",
+                                         description="Please follow the following steps to link your Hypixel profile with discord:\nGo to 'Your Profile' > Social Media > DISCORD",
                                          color=error_color)
+join_request_embed = discord.Embed(color=neutral_color).add_field(name="Our requirements are as follows:",
+                                                                  value="__Active__\n"
+                                                                        f"➤ {format(active_req, ',d')} Weekly Guild Experience\n"
+                                                                        "__Member__\n"
+                                                                        f"➤ {format(member_req, ',d')} Weekly Guild Experience\n"
+                                                                        f"__Resident__\n"
+                                                                        f"➤ {format(resident_req, ',d')} Weekly Guild Experience\n\n"
+                                                                        f"You will join the guild as a Member.\n\n",
+                                                                  inline=False).set_footer(
+    text="Staff should invite you to the guild within 2 hours.\nWhile you wait, you can explore the guild discord!")
 discord_not_linked_embed.set_image(
     url="https://media.discordapp.net/attachments/796061149593731128/953770877395284008/osl_.gif")
+
+dnkl_creation_embed = discord.Embed(title="Do-not-kick-list",
+                                    description="In order to create a do-not-kick-list entry, you need to have a valid reason and meet the DNKL requirements.",
+                                    color=neutral_color
+                                    ).add_field(
+    name="Accepted Reasons",
+    value="- Exams\n" \
+          "- Vacation\n" \
+          "- Medical reasons\n" \
+          "- Computer Problems\n" \
+          "- Other (Subject to staff judgement)",
+    inline=False
+).add_field(
+    name="Requirements",
+    value=f"- {format(dnkl_req, ',d')} weekly guild experience\n" \
+          f"- DNKL period must be less than 3 weeks",
+    inline=False
+)
+
+rules_messages = ["""# Rules
+
+## In-Game Rules
+:small_blue_diamond: All Hypixel rules must be followed.
+:small_blue_diamond: Treat all guild members with respect.
+:small_blue_diamond: Keep chat respectful and appropriate at all times.
+:small_blue_diamond: Refrain from spamming messages in guild chat or guild party chat.
+:small_blue_diamond: Use the bridge bot responsibly to prevent any risk of it being banned or muted.""", """
+
+## Discord Rules
+:smiley: 1. **Be cool, kind, and civil.** Treat all members with respect and express your thoughts in a constructive manner.
+:abc: 2. **Use English only.** Communicate in English, but be considerate of all languages.
+:card_index: 3. **Use an appropriate name and avatar.** Avoid special characters, emoji, obscenities, and impersonation.
+:incoming_envelope: 4. **Do not spam.** Avoid excessive messages, images, formatting, emoji, commands, and @mentions.
+:no_bell: 5. **Do not @mention or direct message Miscellaneous Staff unnecessarily.** Respect their time, they are people too.
+:loudspeaker: 6. **No self-promotion or advertisements.** This includes unsolicited references and links to other social media, servers, communities, and services in chat or direct messages.
+7. **No personal information.** Protect your privacy and the privacy of others.
+:head_bandage: 8. **No harassment, abuse, or bullying**. We have zero-tolerance for harming others.
+:anger_right: 9. **No racist, sexist, anti-LGBTQ+, or otherwise offensive content.** We have zero-tolerance for hate speech.
+:classical_building: 10. **No political or religious topics.** These complex subjects result in controversial and offensive posts.
+:rotating_light: 11. **No piracy, sexual, NSFW, or otherwise suspicious content.** We do not condone illegal or suspicious discussions and activity.
+:thinking: 12. **Rules are subject to common sense.** These rules are not comprehensive and use of loopholes to violate the spirit of these rules is subject to enforcement.
+:scroll: 13. **Discord Terms of Service and Community Guidelines apply.** You must be at least 13 years old to use Discord, and abide by all other terms and guidelines."""]
+
+
+rank_upgrade_winner_announcement = '''# RANK UPGRADE
+{date}
+
+**The winner is....**
+## {winner}
+> Total Guild Experience:- `{winner_gexp}`
+> Valid Invites:- `{winner_invites}`
+> Total Entries:- `{winner_entries}`
+
+This rank upgrade must be claimed within a week of this message by creating a ticket. If not claimed, it will be voided.
+
+### Here are some statistics for the past week
+- Total unscaled guild experience earned - `{total_gexp}`
+- Total players invited (valid) - `{total_invites}`
+- Total entries - `{total_entries}`
+
+*To know how the winner is picked, go here https://discord.com/channels/522586672148381726/1152480866585554994/1164962591198683146*'''
+
+# Do not change to https. Divider breaks.
+rainbow_separator = "http://rainbowdivider.com/images/dividers/movrblin02.gif"
 
 
 class ChatColor(Enum):
