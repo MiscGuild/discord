@@ -1,6 +1,5 @@
+import discord
 from discord.ext import commands, bridge
-from discord.commands import option
-
 
 from src.func.General import General
 from src.func.Integer import Integer
@@ -14,50 +13,58 @@ class Giveaways(commands.Cog, name="giveaways"):
     def __init__(self, bot):
         self.bot = bot
 
-    @bridge.bridge_command(aliases=["gcreate"])
-    @commands.has_role("Giveaway Creator")
-    async def giveawaycreate(self, ctx):
-        """Create a giveaway!"""
-        await ctx.respond(await General.giveawaycreate(ctx))
+    @bridge.bridge_group(name="giveaway", description="Manage giveaways", invoke_without_command=True)
+    async def giveaway(self, ctx: bridge.BridgeContext):
+        if ctx.invoked_subcommand is None:  # Ensures this runs only if no subcommand is called
+            await ctx.respond("Use `/giveaway create`, `/giveaway end `, or `/giveaway reroll` or `/giveaway end`.")
 
-    @bridge.bridge_command(aliases=["gend", "giveawayfinish", "gfinish"])
+    @giveaway.command(name="create", aliases=["c"])
     @commands.has_role("Giveaway Creator")
-    @option(
+    async def giveaway_create(self, ctx: discord.ApplicationContext) -> None:
+        """Create a giveaway!"""
+        await ctx.respond(
+            "Please provide the required information to create the giveaway by responding to the following prompts!")
+        await General().giveawaycreate(ctx)
+
+    @giveaway.command(name="end", aliases=["e", "f", "finish"])
+    @commands.has_role("Giveaway Creator")
+    @bridge.bridge_option(
         name="message_id",
         description="The message ID of the giveaway you would like to end",
         required=True,
         input_type=int
     )
-    async def giveawayend(self, ctx, message_id: int):
+    async def giveaway_end(self, ctx: discord.ApplicationContext, message_id: int) -> None:
         """Ends the giveaway with the given message ID!"""
         res = await Integer(integer=message_id).giveawayend()
         if res:
             await ctx.respond(res)
 
-    @bridge.bridge_command(aliases=["greroll", "reroll"])
+    @giveaway.command(name="reroll", aliases=["r"])
     @commands.has_role("Giveaway Creator")
-    @option(
+    @bridge.bridge_option(
         name="message_id",
-        description="The message ID of the giveaway you would like to end",
+        description="The message ID of the giveaway you would like to reroll",
         required=True,
         input_type=int
     )
-    @option(
+    @bridge.bridge_option(
         name="reroll_number",
         description="Number of winners you would like to generate in the reroll",
         required=False,
         input_type=int
     )
-    async def giveawayreroll(self, ctx, message_id: int, reroll_number: int = None):
-        """Rerolls the giveaway with the given message ID!"""
+    async def giveaway_reroll(self, ctx: discord.ApplicationContext, message_id: int,
+                              reroll_number: int = None) -> None:
+        """Re-rolls the giveaway with the given message ID!"""
         res = await Integer(integer=message_id).giveawayreroll(reroll_number)
         if res:
             await ctx.respond(res)
 
-    @bridge.bridge_command(aliases=["glist"])
-    async def giveawaylist(self, ctx):
-        """View all giveaway from the last 10 days!"""
-        await ctx.respond(embed=await General.giveawaylist(ctx))
+    @giveaway.command(name="list", aliases=["l"])
+    async def giveaway_list(self, ctx: discord.ApplicationContext) -> None:
+        """View all giveaways from the last 10 days!"""
+        await ctx.respond(embed=await General().giveawaylist())
 
 
 def setup(bot):
