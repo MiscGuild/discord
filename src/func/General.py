@@ -1,78 +1,56 @@
 # The following file contains: weeklylb, dnkllist, rolecheck, staffreview, delete, accept, transcript, new, partner, deny, inactive, giveawaycreate, giveawaylist
 
 import asyncio
+import io
 import re
 from __main__ import bot
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
-import aiohttp
 import discord
 import discord.ui
 
-import src.utils.ui_utils as uiutils
 from src.func.Union import Union
+from src.utils.calculation_utils import get_gexp_sorted, generate_lb_text
 from src.utils.consts import (accepted_staff_application_embed, active_req,
-                              allies, error_color, guild_handle,
+                              error_color, guild_handle,
                               invalid_guild_embed, log_channel_id, member_req,
                               milestone_emojis, milestones_channel, neg_color,
                               neutral_color, pos_color, ticket_deleted_embed,
                               registration_channel_id, registration_embed,
-                              staff_application_questions, ticket_categories, 
+                              staff_application_questions, ticket_categories,
                               resident_req, dnkl_entries_not_found,
-                              positive_responses)
-from src.utils.db_utils import insert_new_giveaway, select_all
-from src.utils.discord_utils import (create_ticket, create_transcript,
+                              positive_responses, allies)
+from src.utils.db_utils import insert_new_giveaway, select_all, \
+    get_db_uuid_username, update_member
+from src.utils.discord_utils import (create_ticket,
                                      get_ticket_creator, log_event,
-                                     name_grabber, get_ticket_properties,
                                      name_grabber, has_tag_perms)
-from src.utils.minecraft_utils import get_hypixel_player_rank
 from src.utils.request_utils import (get_guild_by_name, get_guild_uuids,
-                                     get_hypixel_player, get_jpg_file,
-                                     get_mojang_profile, get_name_by_uuid,
+                                     get_name_by_uuid, get_uuid_by_name,
                                      get_player_guild)
+from src.utils.ticket_utils.tickets import create_transcript, get_ticket_properties
 
 
 class General:
-    async def weeklylb(ctx):
+
+    @staticmethod
+    async def weeklylb(is_automatic=False) -> discord.Embed | str:
         # Get guild data
         guild_data = await get_guild_by_name(guild_handle)
-        member_gexp = {}
 
         if not guild_data:
             return invalid_guild_embed
 
-        # Loop through all guild members' gexp, adding it to dict
-        for member in guild_data["members"]:
-            member_gexp[member["uuid"]] = sum(
-                member["expHistory"].values())
+        member_gexp = await get_gexp_sorted(guild_data)
 
-        # Sort member gexp
-        member_gexp = sorted(member_gexp.items(),
-                             key=lambda item: item[1], reverse=True)
+        # text = "&f&lWeekly Top&r%5Cn"
+        text = "**Weekly Top**\n"
+        text = await generate_lb_text(member_gexp, text, is_automatic)
+        return text
+        # return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
 
-        # Create url
-        text = "&f&lWeekly Top&r%5Cn"
-        count = 0
-        for i in member_gexp[:10]:
-            count += 1
-            user_data = i
-            name = await get_name_by_uuid(user_data[0])
-            rank, _ = await get_hypixel_player_rank(
-                await get_hypixel_player(uuid=user_data[0]))  # Ignores value without color formatting
-
-            # Add new entry to image content
-            text += f"&6{count}. {rank} {name} &2{format(user_data[1], ',d')} Guild Experience"
-            # Add new line
-            if count < 10:
-                text += "%5Cn"
-
-        # Replace characters for the URL
-        text = text.replace("+", "%2B").replace("&", "%26").replace(" ", "%20").replace(",", "%2C")
-
-        # Return image
-        return await get_jpg_file(f"https://fake-chat.matdoes.dev/render.png?m=custom&d={text}&t=1")
-
-    async def dnkllist(ctx):
+    @staticmethod
+    async def dnkllist() -> discord.Embed:
         # Fetch all rows
         rows = await select_all("SELECT * FROM dnkl")
 
@@ -82,56 +60,48 @@ class General:
         # Create embed
         content = ""
         for _set in rows:
-            _, _, username = _set
-            content += f"{username}\n"
+            _, uuid = _set
+            username = await get_name_by_uuid(uuid)
+            content += f"{username} ||{uuid}||\n"
 
         return discord.Embed(title="The people on the do-not-kick-list are as follows:", description=content,
                              color=neutral_color).set_footer(text=f"Total: {len(content.split())}")
 
-    async def rolecheck(ctx, send_ping: bool):
+    @staticmethod
+    async def rolecheck(ctx: discord.ApplicationContext, send_ping: bool) -> None:
         # Define a message for sending progress updates
-        progress_message = await ctx.send("Processing prerequisites...")
+        progress_message = await ctx.respond("Processing prerequisites...")
 
         discord_members = bot.guild.members
 
+        discord_member_uuids = [x[0] for x in await select_all("SELECT uuid FROM members")]
         # Define arrays for guild and ally uuids and names
-        guild_members = (await get_guild_by_name(guild_handle))['members']
+        guild_members = (await get_guild_by_name(guild_handle))["members"]
         guild_uuids = await get_guild_uuids(guild_handle)
-        guild_usernames, ally_usernames, ally_uuids, ally_divisions = [], [], [], []
 
-        # Appending UUIDs of members of all ally guilds into one array
+        # Allies dict; {uuid: {username, gtag}}
+        allies_dict = {}
+
+        # Guild dict; {uuid: {username, gexp}}
+        guild = {}
+
         for ally in allies:
-            await progress_message.edit(content=f"Fetching ally UUIDs - {ally}")
-            ally_uuids.extend(await get_guild_uuids(ally))
-            req = await get_player_guild(ally_uuids[-1])
-            gtag = " " if not req["tag"] or not req else req["tag"]
-            ally_divisions.append([len(ally_uuids), gtag])
-            # Ally divisions marks the separation point of one guild from another in the ally_uuids array along with the guild's gtag
+            await progress_message.edit(content=f"Fetching ally UUIDs and usernames - {ally}")
+            ally_uuids = await get_guild_uuids(ally)
+            gtag = (await get_player_guild(ally_uuids[-1]))["tag"]
+            for uuid in ally_uuids:
+                if uuid not in discord_member_uuids:
+                    continue
+                allies_dict[uuid] = {"username": (await get_db_uuid_username(uuid=uuid))[0], "tag": gtag}
+        await progress_message.edit(content=f"Fetching {guild_handle}'s UUIDs and usernames")
 
-        # Limiting the maximum concurrency
-        async def gather_with_concurrency(n, *tasks):
-            semaphore = asyncio.Semaphore(n)
-
-            async def sem_task(task):
-                async with semaphore:
-                    return await task
-
-            return await asyncio.gather(*(sem_task(task) for task in tasks))
-
-        # Get guild and ally names from their respective UUIDs
-        await progress_message.edit(content="Retrieving usernames...")
-
-
-        for _set in [[guild_uuids, guild_usernames], [ally_uuids, ally_usernames]]:
-            draw, dump = _set
-            async with aiohttp.ClientSession():
-                tasks = await gather_with_concurrency(2,
-                                                      *[
-                                                          get_name_by_uuid(uuid) for uuid in draw
-                                                      ])  # Gathering with a max concurrency of 2
-            dump.extend(tasks)
-        # Loop through discord members
-
+        for uuid in guild_uuids:
+            if uuid not in discord_member_uuids:
+                continue
+            for player in guild_members:
+                if player["uuid"] == uuid:
+                    guild[uuid] = {"username": (await get_db_uuid_username(uuid=uuid))[0],
+                                   "gexp": sum(player["expHistory"].values())}
 
         await ctx.send("If you see the bot is stuck on a member along with an error message, "
                        "forcesync member the bot is stuck on.")
@@ -141,22 +111,29 @@ class General:
             if discord_member.id in bot.admin_ids or discord_member.bot:
                 continue
 
-            username = await name_grabber(discord_member)
+            nick = await name_grabber(discord_member)
+            username, uuid = await get_db_uuid_username(discord_id=discord_member.id)
+            if not uuid and username:
+                username, uuid = await get_uuid_by_name(username)
+                if username and uuid:
+                    await update_member(discord_member.id, uuid, username)
+
+            if not uuid and not username:
+                await discord_member.remove_roles(bot.member_role, bot.ally, bot.guest, bot.active_role)
+                await discord_member.add_roles(bot.new_member_role)
+                continue
             has_tag_permission = await has_tag_perms(discord_member)
-            await progress_message.edit(content=f"Checking {username} - {discord_member}")
+            await progress_message.edit(content=f"Checking {nick} - {discord_member}")
+
             # Member of guild
-            if username in guild_usernames:
-                for guild_member in guild_members:
-                    if guild_uuids[guild_usernames.index(username)] == guild_member['uuid']:
-                        # Finds a given UUID's corresponding hypixel data
+            if uuid in guild.keys():
+                weekly_exp = guild[uuid]["gexp"]
+                if weekly_exp >= active_req:  # Meets active req
+                    await discord_member.add_roles(bot.active_role)
+                elif weekly_exp < active_req and bot.active_role in discord_member.roles:  # Doesn't meet active req
+                    await discord_member.remove_roles(bot.active_role)
 
-                        weekly_exp = sum(guild_member["expHistory"].values())
-                        if weekly_exp >= active_req:    # Meets active req
-                            await discord_member.add_roles(bot.active_role)
-                        elif weekly_exp < active_req and bot.active_role in discord_member.roles:   # Doesn't meet active req
-                            await discord_member.remove_roles(bot.active_role)
-
-                if not has_tag_permission:
+                if nick != username and not has_tag_permission:
                     await discord_member.edit(nick=username)
 
                 # Edit roles
@@ -164,23 +141,9 @@ class General:
                 await discord_member.remove_roles(bot.new_member_role, bot.guest, bot.ally)
                 continue
 
-
-            # Member of an ally guild
-            if username in ally_usernames:
-                # Get player gtag
-                position = ally_usernames.index(username)
-                last_value = 1
-                for guild_division in ally_divisions:
-                    if last_value > 1:
-                        if last_value < position < guild_division[0]:
-                            gtag = guild_division[1]
-
-                    elif position < guild_division[0]:
-                        gtag = guild_division[1]
-                    last_value = guild_division[0]
-
-                # Set nick
-                if not discord_member.nick or gtag not in discord_member.nick:
+            elif uuid in allies_dict.keys():
+                gtag = allies_dict[uuid]["tag"]
+                if not discord_member.nick or nick != username or f"[{gtag}]" not in discord_member.nick:
                     await discord_member.edit(nick=username + f' [{gtag}]')
 
                 # Edit roles
@@ -188,68 +151,70 @@ class General:
                 await discord_member.remove_roles(bot.new_member_role, bot.member_role, bot.active_role)
                 continue
 
-            # Get player data
-            username, uuid = await get_mojang_profile(username)
-            if not username:
-                # Edit roles and continue loop
+            elif not uuid:
                 await discord_member.remove_roles(bot.member_role, bot.ally, bot.guest, bot.active_role)
                 await discord_member.add_roles(bot.new_member_role)
                 continue
 
             # Guests
             else:
-                print("Rolecheck reached guests.", username, uuid, discord_member)
-                if not has_tag_permission:
+                if not has_tag_permission and discord_member.nick != username:
                     await discord_member.edit(nick=username)
                 await discord_member.add_roles(bot.guest)
                 await discord_member.remove_roles(bot.new_member_role, bot.member_role, bot.active_role, bot.ally)
                 continue
-
-        # Send ping to new member role in registration channel
+        # Send ping to new mem
+        # ber role in registration channel
         if send_ping:
             await bot.get_channel(registration_channel_id).send(bot.new_member_role.mention, embed=registration_embed)
 
         await progress_message.edit(content="Rolecheck complete!")
 
-    async def delete(ctx):
+    @staticmethod
+    async def delete(ctx: discord.ApplicationContext) -> None | str:
         embed = discord.Embed(title="This ticket will be deleted in 10 seconds!", color=neg_color)
 
         if not ctx.channel.category or ctx.channel.category.name not in ticket_categories.values():
             return "This command cannot be used here"
-        
+
         elif ctx.channel.category.name == ticket_categories["registrees"]:
             member = await get_ticket_creator(ctx.channel)
             if member:
-                ign, uuid = await get_mojang_profile(await name_grabber(member))
+                ign, uuid = await get_uuid_by_name(await name_grabber(member))
                 await Union(user=member).sync(ctx, ign, None, True)
                 embed.set_footer(text=f"{ign}'s roles have been updated automatically!")
 
         # Send deletion warning and gather transcript
         await ctx.respond(embed=embed)
-        transcript = await create_transcript(ctx.channel)
+        single_use_transcript = await create_transcript(ctx.channel)
+        transcript_bytes = single_use_transcript.fp.read()
+        transcript_for_user = discord.File(io.BytesIO(transcript_bytes), filename=ctx.channel.name + "-transcript.txt")
+        transcript_for_logs = discord.File(io.BytesIO(transcript_bytes), filename=ctx.channel.name + "-transcript.txt")
 
-        # Sleep and delete channel
         await asyncio.sleep(10)
         await discord.TextChannel.delete(ctx.channel)
 
-        if transcript:
+        if transcript_bytes:
             # Log outcome
             await log_event(f"{ctx.channel.name} was deleted by {ctx.author}")
             ticket_details = await get_ticket_properties(ctx.channel)
             if ticket_details:
+                await bot.get_channel(log_channel_id).send(file=transcript_for_logs)
                 try:
                     await (await bot.fetch_user(ticket_details[0])).send(
-                        embed=ticket_deleted_embed.set_footer(text=ctx.channel.name), file=transcript)
-                except:
-                    pass
-                await bot.get_channel(log_channel_id).send(file=transcript)
+                        embed=ticket_deleted_embed.set_footer(text=ctx.channel.name), file=transcript_for_user)
+                except PermissionError:
+                    await bot.get_channel(log_channel_id).send(
+                        f"Failed to send transcript to {await bot.fetch_user(ticket_details[0])}!")
 
-    async def accept(ctx):
+    @staticmethod
+    async def accept(ctx: discord.ApplicationContext) -> discord.Embed | str:
         if ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
         return accepted_staff_application_embed
 
-    async def transcript(ctx):
+    @staticmethod
+    async def transcript(ctx: discord.ApplicationContext) -> str | discord.Embed | discord.File:
         if ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
         # Create transcript
@@ -259,22 +224,24 @@ class General:
         # Transcript is valid
         return transcript
 
-    async def new(ctx):
+    @staticmethod
+    async def new(ctx: discord.ApplicationContext) -> str:
         # Create ticket
         ticket = await create_ticket(ctx.author, f"ticket-{await name_grabber(ctx.author)}")
 
         # Return message with link to ticket
         return f"Click the following link to go to your ticket! <#{ticket.id}>"
 
-    async def partner(ctx, organization_name: str):
+    @staticmethod
+    async def partner(ctx: discord.ApplicationContext, organization_name: str) -> discord.Embed:
         await ctx.send("In one message, please provide a brief description of the guild/organization being partnered.")
         # Wait for description
-        description = (await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)).content
+        description = (await bot.wait_for("message", check=lambda x: x.author == ctx.author)).content
 
         await ctx.send(
             "Please provide the logo of the organization/guild. (Please provide the URL. If they don't have a logo, type `None`)")
         # Wait for Logo
-        response = (await bot.wait_for("message", check=lambda x: x.author == ctx.message.author)).content
+        response = (await bot.wait_for("message", check=lambda x: x.author == ctx.author)).content
         logo = response if not response.lower() == "none" else None
 
         if logo:
@@ -282,7 +249,9 @@ class General:
                 url=logo)
         return discord.Embed(title=organization_name, description=description, color=neutral_color)
 
-    async def deny(ctx, channel: discord.TextChannel):
+    @staticmethod
+    async def deny(ctx: discord.ApplicationContext, channel: discord.TextChannel) -> tuple[discord.Embed, None] | tuple[
+        discord.Embed, discord.File]:
         # Copy real question list and append 0th element for general critiquing
         application_questions = staff_application_questions.copy()
         application_questions[0] = "General critiquing"
@@ -290,13 +259,10 @@ class General:
         application_embed = (await channel.fetch_message(int(application_embed_id))).embeds[0]
         member = await get_ticket_creator(channel)
 
-
-
         if not member.nick:
             nick = member.name
         else:
             nick = member.nick
-
 
         await ctx.send(embed=application_embed.set_footer(text=""))
 
@@ -304,7 +270,6 @@ class General:
         denial_embed = discord.Embed(title="Your staff application has been denied!",
                                      description="The reasons have been listed below", color=error_color)
 
-        # Loop for getting question feedback
         while True:
             while True:
                 await ctx.send(
@@ -312,30 +277,29 @@ class General:
                     "\nIf you would like to critique something in general, reply with `0`")
                 question = await bot.wait_for("message",
                                               check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
-                # Try-except for checking if the given number is valid
                 try:
                     question = application_questions[int(question.content)]
                     break
-                # Catch KeyError if number is invalid
-                except:
+                except KeyError:
                     await ctx.send("Please respond with a valid question number.")
 
             await ctx.send(f"`{question}`\n**What was the issue that you found with {nick}'s reply?**")
             issue_found = await bot.wait_for("message",
-                                          check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+                                             check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
 
             # Update embed and send preview
             denial_embed.add_field(name=question,
-                                   value=issue_found.content, 
+                                   value=issue_found.content,
                                    inline=False)
-            
+
             await ctx.send(embed=denial_embed)
 
             # Ask user if they want to critique more questions and wait for reply
             await ctx.send("Would you like to critique more questions? (y/n)")
 
             continue_critiquing = await bot.wait_for("message",
-                                        check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
+                                                     check=lambda
+                                                         x: x.channel == ctx.channel and x.author == ctx.author)
             continue_critiquing = continue_critiquing.content.lower()
 
             # User does not want to critique more questions
@@ -349,8 +313,8 @@ class General:
                 return denial_embed.set_footer(text="You may reapply in 2 weeks.\
                                                \nFollowing is the transcript so that you can refer to it while reapplying."), transcript
 
-
-    async def inactive(ctx):
+    @staticmethod
+    async def inactive() -> list[discord.Embed] | discord.Embed:
 
         # Fetch guid data
         guild_data = await get_guild_by_name(guild_handle)
@@ -368,7 +332,8 @@ class General:
         # Loop through all guild members with a session to fetch names
         for member in guild_data["members"]:
             uuid = member["uuid"]
-            name = await get_name_by_uuid(uuid)
+
+            name = await get_name_by_uuid(uuid=uuid)
 
             if name in bot.staff_names:
                 continue
@@ -376,6 +341,8 @@ class General:
             if not name:
                 skipped_users.append(uuid)
                 continue
+
+            name = name.replace("_", "\\_")
 
             # Gather data
             guild_rank = member["rank"] if uuid not in dnkl_uuids else "DNKL"
@@ -406,7 +373,7 @@ class General:
                             datetime.now() - datetime.fromtimestamp(member["joined"] / 1000.0)).days
                     if days_since_join <= 7 and weekly_exp > ((member_req / 7) * days_since_join):
                         continue
-                    
+
                     inactive[name] = weekly_exp
 
         # Define embeds array to be returned
@@ -415,7 +382,7 @@ class General:
         # Loop through dicts, descriptions and colors
         for _dict, title, color in [[to_promote_active, "Promote the following users to active:", pos_color],
                                     [to_demote_active, "Demote the following users from active:",
-                                        neg_color],
+                                     neg_color],
                                     [to_demote_resident, "Demote the following from resident:", neg_color],
                                     [inactive, "Following are the users to be kicked:", neg_color]]:
             # Filter categories with no users
@@ -444,7 +411,8 @@ class General:
 
         return embeds
 
-    async def giveawaycreate(ctx):
+    @staticmethod
+    async def giveawaycreate(ctx: discord.ApplicationContext) -> str:
         # Define progress message for asking questions
         progress_message = await ctx.send(
             "**Which channel should the giveaway be hosted in?**\n\n`Please respond with a channel shortcut or ID`\n\n**At any time, you can cancel the giveaway by replying with `cancel` to one of the upcoming prompts.**")
@@ -513,6 +481,7 @@ class General:
         await progress_message.edit(
             content=f"Neat! There will be {number_winners} winner(s).\n\n**How long should the giveaway last?**\n\n`Please enter a duration. Use a 's' for seconds, 'm' for minutes and 'd' for days`")
 
+        end_date = None
         while True:
             # Wait for answer and check for cancellation
             duration = await bot.wait_for("message",
@@ -528,9 +497,9 @@ class General:
             if duration == "cancel":
                 return "Giveaway cancelled!"
             try:
-                end_date = datetime.utcnow() + timedelta(seconds=duration)
+                end_date = datetime.now(timezone.utc) + timedelta(seconds=duration)
                 end_date = end_date.strftime("%Y-%m-%d %H:%M:%S.%f")[:-7]
-            except Exception:
+            except (TypeError, ValueError):
                 await ctx.send("Invalid duration! Please try again.", delete_after=3)
                 continue
             break
@@ -558,7 +527,7 @@ class General:
                     try:
                         required_gexp = int(
                             required_gexp[:-1]) * unit_multiplier[required_gexp[-1]]
-                    except Exception:
+                    except (ValueError, KeyError):
                         await ctx.send("Invalid gexp requirement! Please try again.", delete_after=3)
                         continue
 
@@ -593,7 +562,7 @@ class General:
                 required_roles = [required_roles]
 
             # Function for checking all roles are valid
-            async def check_roles():
+            async def check_roles() -> bool | list[int]:
                 role_ids = []
                 for name in required_roles:
                     role = discord.utils.get(ctx.guild.roles, name=name)
@@ -668,7 +637,8 @@ class General:
         # Return confirmation
         return f"Ok! The giveaway has been set up in <#{destination.id}>!"
 
-    async def giveawaylist(ctx):
+    @staticmethod
+    async def giveawaylist() -> discord.Embed:
         all_giveaways = await select_all(
             "SELECT prize, channel_id, message_id, number_winners, time_of_finish FROM giveaways")
 
@@ -691,7 +661,11 @@ class General:
 
             return embed
 
-    async def add_milestone(ctx, gamemode, milestone):
+    @staticmethod
+    async def add_milestone(ctx: discord.ApplicationContext, gamemode: str | None, milestone: str | None) -> tuple[
+                                                                                                                 discord.Embed, None] | \
+                                                                                                             tuple[
+                                                                                                                 discord.Embed, discord.ui.View]:
         member = await get_ticket_creator(ctx.channel)
         name = await name_grabber(member)
         channel = ctx.channel
@@ -711,21 +685,23 @@ class General:
                 await interaction.response.send_message(f"**Milestone Category:** {option}"
                                                         f"\n**What is {name}'s milestone?**\n"
                                                         f"{option_emoji}{name}.... (Complete the sentence)")
-                milestone = await bot.wait_for("message",
-                                               check=lambda
-                                                   x: x.channel == channel and x.author == interaction.user)
-                await channel.send(embed=await milestone_ticket_update(ctx, channel, option_emoji, milestone.content))
+                milestone_message = await bot.wait_for("message",
+                                                       check=lambda
+                                                           x: x.channel == channel and x.author == interaction.user)
+                await channel.send(
+                    embed=await milestone_ticket_update(ctx, channel, option_emoji, milestone_message.content))
 
-        async def milestone_ticket_update(ctx, channel, emoji, milestone):
+        async def milestone_ticket_update(ctx: discord.ApplicationContext, channel: discord.TextChannel, emoji: str,
+                                          milestone: str) -> discord.Embed:
             milestone_string = f"{emoji} {member.mention} {milestone}|"
             channel_description = channel.topic + milestone_string
             await ctx.send(
                 "Please give the bot up to 10 minutes to add the milestone. Once it has done it, you'll receive a completion message.")
             await channel.edit(topic=str(channel_description))
-            embed = discord.Embed(title="Milestone Registered!",
-                                  description=milestone_string[:-1], color=neutral_color)
+            milestone_registration = discord.Embed(title="Milestone Registered!",
+                                                   description=milestone_string[:-1], color=neutral_color)
 
-            return embed
+            return milestone_registration
 
         if gamemode and milestone:
             if gamemode.lower() in [x for x in milestone_emojis.keys()]:
@@ -745,13 +721,15 @@ class General:
                               color=neutral_color)
         return embed, view
 
-    async def update_milestone(ctx):
+    @staticmethod
+    async def update_milestone(ctx: discord.ApplicationContext) -> tuple[discord.Embed, discord.ui.View]:
         member = await get_ticket_creator(ctx.channel)
         name = await name_grabber(member)
 
         channel_details = await get_ticket_properties(ctx.channel)
         # Has a list in the format ["MEMBER ID","MILESTONE 1", "MILESTONE 2"....}
         all_milestones = channel_details[1:-1]
+
         # Omits the Member ID from channel_description_list and also an empty string from the end
 
         class MilestoneTypeSelect(discord.ui.Select):
@@ -785,11 +763,13 @@ class General:
                 new_milestone_message = f"{emoji} {member.mention} {milestone.content}"
                 channel_details[index] = new_milestone_message
 
-                await ctx.channel.edit(topic="|".join(channel_details))
-                embed = discord.Embed(title="Milestone Registered!",
-                                      description=new_milestone_message, color=neutral_color)
+                await ctx.send(
+                    "Please give the bot up to 10 minutes to update the milestone. Once it has done it, you'll receive a completion message.")
 
-                await ctx.send(embed=embed)
+                await ctx.channel.edit(topic="|".join(channel_details))
+
+                await ctx.send(embed=discord.Embed(title="Milestone Registered!",
+                                                   description=new_milestone_message, color=neutral_color))
 
         # Create view and embed, send to ticket
         view = discord.ui.View()
@@ -799,8 +779,10 @@ class General:
                               color=neutral_color)
         return embed, view
 
-    async def compile_milestones(ctx):
-        day_number = 86 + round((datetime.utcnow() - datetime.strptime("2022/05/15", "%Y/%m/%d")).days / 7)
+    @staticmethod
+    async def compile_milestones() -> str:
+        day_number = 86 + round((datetime.now(timezone.utc) - datetime.strptime("2022/05/15", "%Y/%m/%d").replace(
+            tzinfo=timezone.utc)).days / 7)
 
         milestone_message = f"**Weekly Milestones**\nThis is week __{day_number}__ of weekly milestones\n\n"
         count = 0
