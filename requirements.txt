@@ -16,7 +16,7 @@ pytz==2022.2.1
 quickchart.io==2.0.0
 requests==2.31.0
 toml==0.10.2
-typing-extensions==4.3.0
+typing-extensions==4.7.1
 urllib3==2.0.4
 yarl==1.8.1
 zope.interface==6.0
