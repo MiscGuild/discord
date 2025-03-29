@@ -1,4 +1,5 @@
 import discord
+from discord.commands import option
 from discord.ext import commands, bridge
 
 from src.func.String import String
@@ -14,24 +15,73 @@ class General(commands.Cog, name="general"):
         self.bot = bot
 
     # Command from https://github.com/Rapptz/RoboDanny
-    @bridge.bridge_command(aliases=['src'])
-    async def source(self, ctx, *, command: str = None):
-        """View the source code for a command!"""
+    @bridge.bridge_command(name="source", aliases=['src'])
+    @bridge.bridge_option(
+        name="command",
+        description="The command you would like to see the source code for",
+        required=False,
+        input_type=str
+    )
+    async def source(self, ctx: discord.ApplicationContext, *, command: str = None) -> None:
+        """View the source code for the bot or a specific command"""
         await ctx.respond(await String(string=command).source())
 
     @bridge.bridge_command()
-    async def avatar(self, ctx, user: discord.Member = None):
+    @bridge.bridge_option(
+        name="user",
+        description="User whose avatar you'd like to view",
+        required=False,
+        input_type=discord.Member
+    )
+    async def avatar(self, ctx: discord.ApplicationContext, user: discord.Member = None) -> None:
         """See the avatar of a given user!"""
         await ctx.respond(embed=await Union(user=user or ctx.author).avatar())
 
-    @bridge.bridge_command()
+    @commands.slash_command()
+    @option(
+        name="setting",
+        description="Do you want the bot to ping you in daily and weekly gexp leaderboards?",
+        choices=[discord.OptionChoice("Yes", value=1), discord.OptionChoice("No", value=0)],
+        required=True
+    )
+    async def do_pings(self, ctx: discord.ApplicationContext, setting: int) -> None:
+        """Used to enable/disable pings in automatic daily and weekly leaderboard messages!"""
+        await ctx.respond(embed=await Union(ctx.author).do_pings(setting=setting))
+
+    @commands.slash_command()
     @commands.has_any_role("QOTD Manager", "Staff")
-    async def qotd(self, ctx):
+    async def qotd(self, ctx: discord.ApplicationContext) -> None:
         """Used by QOTD Managers to register a QOTD"""
-        await ctx.respond("**What is the question of the day?**")
-        question = await self.bot.wait_for("message",
-                                           check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
-        await String(string=question.content).qotd(ctx)
+
+        class ModalCreator(discord.ui.Modal):
+            def __init__(self) -> None:
+                #   fields = ["LABEL", "PLACEHOLDER", STYLE]
+                super().__init__(title="QOTD Creator")
+                self.add_item(discord.ui.InputText(label="What is the question of the day?",
+                                                   placeholder="Enter the question here",
+                                                   max_length=256,
+                                                   style=discord.InputTextStyle.long))
+                self.add_item(discord.ui.InputText(label="Who suggested this question?",
+                                                   placeholder="Enter their username. If it was you, enter your username.",
+                                                   max_length=256,
+                                                   style=discord.InputTextStyle.short))
+
+            async def callback(self, interaction: discord.Interaction):
+                await String(string=self.children[0].value).qotd(ctx, self.children[1].value)
+                await interaction.response.send_message("The QOTD has been sent!")
+
+        await ctx.send_modal(modal=ModalCreator())
+
+    @bridge.bridge_command()
+    @bridge.bridge_option(
+        name="Member",
+        description="The discord user whose minecraft ign you'd like to find",
+        required=True,
+        input_type=discord.Member
+    )
+    async def whois(self, ctx: discord.ApplicationContext, member: discord.Member = None) -> None:
+        """Used to find a player's minecraft username and uuid using their discord account."""
+        await ctx.respond(embed=await Union(member or ctx.author).whois())
 
 
 def setup(bot):
