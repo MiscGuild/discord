@@ -73,12 +73,15 @@ async def dnkl_approve(channel: discord.TextChannel, author: discord.User, ign: 
     msg = await bot.get_channel(dnkl_channel_id).send(embed=embed)
 
     # Check if user is already on DNKL
-    current_message = await select_one("SELECT message_id FROM dnkl WHERE uuid = (?)",
-                                       (uuid,))
+    current_message = (await select_one("SELECT message_id FROM dnkl WHERE uuid = (?)",
+                                        (uuid,)))
+
     # User is not currently on DNKL
     if not current_message:
         await insert_new_dnkl(msg.id, uuid, ign)
         return await interaction.edit_original_response(content="**This user has been added to the do-not-kick-list!**")
+
+    current_message = current_message[0]
 
     # User is already on DNKl
     # Try to delete current message
