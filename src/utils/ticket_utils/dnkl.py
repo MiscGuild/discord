@@ -69,7 +69,7 @@ async def dnkl_approve(channel: discord.TextChannel, author: discord.User, ign: 
     if bot.staff not in interaction.user.roles:
         await channel.send(embed=missing_permissions_embed)
         return None
-
+    message = await interaction.response.send_message("Processing...")
     msg = await bot.get_channel(dnkl_channel_id).send(embed=embed)
 
     # Check if user is already on DNKL
@@ -78,7 +78,7 @@ async def dnkl_approve(channel: discord.TextChannel, author: discord.User, ign: 
     # User is not currently on DNKL
     if not current_message:
         await insert_new_dnkl(msg.id, uuid, ign)
-        return await interaction.response.send_message("**This user has been added to the do-not-kick-list!**")
+        return await interaction.edit_original_response(content="**This user has been added to the do-not-kick-list!**")
 
     # User is already on DNKl
     # Try to delete current message
@@ -90,8 +90,8 @@ async def dnkl_approve(channel: discord.TextChannel, author: discord.User, ign: 
         pass
 
     await update_dnkl(msg.id, uuid)
-    await interaction.response.send_message(
-        "**Since this user was already on the do-not-kick-list, their entry has been updated.**")
+    await interaction.edit_original_response(
+        content="**Since this user was already on the do-not-kick-list, their entry has been updated.**")
 
     return True
 
