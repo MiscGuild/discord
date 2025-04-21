@@ -169,7 +169,7 @@ Founded by <@307402461734240257> in 2014, Miscellaneous is an all games Hypixel 
 > - [OUT](https://hypixel.net/threads/4550875/)
 > - [Betrayed](https://hypixel.net/threads/2550417/)
 > - [Blight](https://hypixel.net/threads/3864658/)
-> - [Cubelify](https://www.cubelify.com)
+> - [Cubelify](https://www.cubelify.com) 
 ## Guild Resources
 > - <:hypixellogo:1352069969738989680> [Guild Thread](https://hypixel.net/threads/853102/)
 > - <:githublogo:1352069949837021215> [GitHub Projects](https://github.com/MiscGuild)
