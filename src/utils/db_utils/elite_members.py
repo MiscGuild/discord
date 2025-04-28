@@ -12,6 +12,6 @@ async def get_elite_member(uuid: str) -> Tuple[str, str] | None:
     return await select_one("SELECT reason, is_indefinite, expiry from elite_members WHERE uuid = (?)", (uuid,))
 
 
-async def insert_elite_member(uuid: str, reason: str, expiry: str = None) -> None:
-    await bot.db.execute("INSERT INTO elite_members VALUES (?, ?, ?)", (uuid, reason, expiry))
+async def insert_elite_member(uuid: str, reason: str, is_indefinite: bool, expiry: str = None) -> None:
+    await bot.db.execute("INSERT INTO elite_members VALUES (?, ?, ?, ?)", (uuid, reason, is_indefinite, expiry))
     await bot.db.commit()
