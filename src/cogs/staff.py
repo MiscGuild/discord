@@ -101,7 +101,15 @@ class Staff(commands.Cog, name="staff"):
         required=True,
         choices=[discord.OptionChoice(name=x, value=x) for x in elite_member_categories],
     )
-    async def elite_member(self, ctx: discord.ApplicationContext, username: str, reason: str) -> None:
+    @bridge.bridge_option(
+        name="monetary_value",
+        description="How much money have they spent on the server (in dollars)?",
+        required=False,
+        input_type=int,
+        min_value=10
+    )
+    async def elite_member(self, ctx: discord.ApplicationContext, username: str, reason: str,
+                           monetary_value: int) -> None:
         await ctx.send(embed=await String(string=reason, username=username).elite_member())
 
     @bridge.bridge_command()
