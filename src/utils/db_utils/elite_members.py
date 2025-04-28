@@ -1,11 +1,11 @@
 from __main__ import bot
 from typing import Tuple
 
-from .connection import select_one
+from .connection import select_one, select_all
 
 
 async def get_all_elite_members() -> list[Tuple[str, str, str]] | None:
-    return await select_one(
+    return await select_all(
         "SELECT uuid, is_booster, is_sponsor, is_gvg, is_creator, is_indefinite, expiry FROM elite_members")
 
 
