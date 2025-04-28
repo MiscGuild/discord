@@ -157,6 +157,14 @@ class Guild(commands.Cog, name="guild"):
 
         await ctx.respond(embed=res)
 
+    @bridge.bridge_command(name="elite_members")
+    async def elite_members(self, ctx: discord.ApplicationContext) -> None:
+        """View all elite members and their categories!"""
+        embed = await General().elite_members()
+        if isinstance(embed, discord.Embed):
+            await ctx.respond(embed=embed)
+        else:
+            await ctx.respond(embed=resident_embed)
 
 def setup(bot):
     bot.add_cog(Guild(bot))
