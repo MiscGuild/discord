@@ -164,6 +164,7 @@ information_message = """# Miscellaneous
 
 Founded by <@307402461734240257> in 2014, Miscellaneous is an all games Hypixel guild. Our primary goal is to be a guild that is friendly to everyone, as a result all of our guild requirements are well thought out. Miscellaneous strives to be a good community while maintaining its position on the guild leaderboards. 
 ## Partners
+> - [XL](https://hypixel.net/threads/2744756/)
 > - [Lucid](https://hypixel.net/threads/4432628/)
 > - [OUT](https://hypixel.net/threads/4550875/)
 > - [Betrayed](https://hypixel.net/threads/2550417/)
