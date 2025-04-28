@@ -9,7 +9,8 @@ from src.func.General import General
 from src.func.Integer import Integer
 from src.utils.calculation_utils import get_guild_gexp_data
 from src.utils.consts import weekly_lb_channel, daily_lb_channel, guild_handle
-from src.utils.db_utils import (select_all, set_member_gexp_history, get_all_guild_members, remove_guild_member)
+from src.utils.db_utils import (select_all, set_member_gexp_history, get_all_guild_members, remove_guild_member,
+                                get_all_elite_members, delete_elite_member)
 from src.utils.discord_utils import update_recruiter_role
 from src.utils.giveaway_utils import roll_giveaway
 from src.utils.referral_utils import check_invitation_validity, generate_rank_upgrade
@@ -126,3 +127,14 @@ async def update_gexp() -> None:
         uuid = uuid[0]
         if uuid not in gexp_data:
             await remove_guild_member(uuid)
+
+
+async def update_elite_members() -> None:
+    elite_members = await get_all_elite_members()
+
+    for uuid, is_booster, is_sponsor, is_gvg, is_creator, is_indefinite, expiry in elite_members:
+        if is_indefinite:
+            continue
+
+        if expiry and datetime.strptime(expiry, "%Y-%m-%d %H:%M:%S") < datetime.now(timezone.utc):
+            await delete_elite_member(uuid)
