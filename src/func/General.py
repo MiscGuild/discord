@@ -807,3 +807,45 @@ class General:
         milestone_message = milestone_message + "\n**Congrats to everyone this week. If you wish to submit a milestone, look over at <#650248396480970782>!**"
         await bot.get_channel(milestones_channel).send(milestone_message)
         return f"{count} milestones have been compiled and sent in {bot.get_channel(milestones_channel)}"
+
+    @staticmethod
+    async def elite_members() -> discord.Embed | str:
+        elite_members = await get_all_elite_members()
+        if not elite_members:
+            return "There are no elite members currently."
+
+        embed = discord.Embed(title="Elite Members", color=pos_color)
+        boosters, sponsors, gvg, creators = [], [], [], []
+        for uuid, is_booster, is_sponsor, is_gvg, is_creator, is_indefinite, expiry in elite_members:
+            name = await get_name_by_uuid(uuid)
+            if not name:
+                continue
+            if is_booster:
+                boosters.append(name)
+            if is_sponsor:
+                sponsors.append(name)
+            if is_gvg:
+                gvg.append(name)
+            if is_creator:
+                creators.append(name)
+        embed.add_field(
+            name="Boosters",
+            value=f"{', '.join(boosters) if boosters else 'None'}\n",
+            inline=False
+        )
+        embed.add_field(
+            name="Sponsors",
+            value=f"{', '.join(sponsors) if sponsors else 'None'}",
+            inline=False
+        )
+        embed.add_field(
+            name="GVG",
+            value=f"{', '.join(gvg) if gvg else 'None'}",
+            inline=False
+        )
+        embed.add_field(
+            name="Creators",
+            value=f"{', '.join(creators) if creators else 'None'}",
+            inline=False
+        )
+        return embed
