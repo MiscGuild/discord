@@ -389,9 +389,13 @@ class String:
             resident_days = (1 + (monetary_value - 10) / 8) * 30
 
             now = datetime.now(timezone.utc)
-            expiry_dt = datetime.strptime(expiry, "%Y-%m-%d %H:%M:%S")
-            if expiry and expiry_dt > now:
-                expiry = expiry_dt + timedelta(days=resident_days)
+
+            if expiry:
+                expiry_dt = datetime.strptime(expiry, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+                if expiry_dt > now:
+                    expiry = expiry_dt + timedelta(days=resident_days)
+                else:
+                    expiry = now + timedelta(days=resident_days)
             else:
                 expiry = now + timedelta(days=resident_days)
 
