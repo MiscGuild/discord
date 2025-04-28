@@ -18,10 +18,10 @@ from src.utils.consts import (accepted_staff_application_embed, active_req,
                               neutral_color, pos_color, ticket_deleted_embed,
                               registration_channel_id, registration_embed,
                               staff_application_questions, ticket_categories,
-                              resident_req, dnkl_entries_not_found,
+                              dnkl_entries_not_found,
                               positive_responses, allies)
 from src.utils.db_utils import insert_new_giveaway, select_all, \
-    get_db_uuid_username, update_member
+    get_db_uuid_username, update_member, get_all_elite_members, delete_elite_member
 from src.utils.discord_utils import (create_ticket,
                                      get_ticket_creator, log_event,
                                      name_grabber, has_tag_perms)
@@ -326,8 +326,17 @@ class General:
         for tup in dnkl_uuids:
             dnkl_uuids[dnkl_uuids.index(tup)] = tup[0]
 
+        elite_members = await get_all_elite_members() or []
+        elite_member_uuids = []
+        for uuid, is_booster, is_sponsor, is_gvg, is_creator, is_indefinite, expiry in elite_members:
+            if any([is_booster, is_sponsor, is_gvg, is_creator]):
+                elite_member_uuids.append(uuid)
+            else:
+                await delete_elite_member(uuid)
+
+
         # Define dicts for each category of users
-        to_promote_active, to_demote_active, to_demote_resident, inactive, skipped_users = {}, {}, {}, {}, []
+        to_promote_elite, to_demote_elite, inactive, skipped_users = {}, {}, {}, []
 
         # Loop through all guild members with a session to fetch names
         for member in guild_data["members"]:
@@ -353,17 +362,13 @@ class General:
             guild_rank = member["rank"]
             # Remove dnkl users from list
 
-            if guild_rank == "Resident":
-                if weekly_exp < resident_req:
-                    to_demote_resident[name] = weekly_exp
+            # Elite members who are not on the elite members list and are not active
+            if guild_rank == "Elite Member" and uuid not in elite_member_uuids and weekly_exp < active_req:
+                to_demote_elite[name] = weekly_exp
 
             # Members who need to be promoted
             elif guild_rank == "Member" and weekly_exp >= active_req:
-                to_promote_active[name] = weekly_exp
-
-            # Active members who need to be demoted
-            elif guild_rank == "Active" and weekly_exp < active_req:
-                to_demote_active[name] = weekly_exp
+                to_promote_elite[name] = weekly_exp
 
             # Members who do not meet the requirements
             elif weekly_exp < member_req:
@@ -380,10 +385,9 @@ class General:
         embeds = []
 
         # Loop through dicts, descriptions and colors
-        for _dict, title, color in [[to_promote_active, "Promote the following users to active:", pos_color],
-                                    [to_demote_active, "Demote the following users from active:",
+        for _dict, title, color in [[to_promote_elite, "Promote the following users to Elite Member:", pos_color],
+                                    [to_demote_elite, "Demote the following users from Elite Member:",
                                      neg_color],
-                                    [to_demote_resident, "Demote the following from resident:", neg_color],
                                     [inactive, "Following are the users to be kicked:", neg_color]]:
             # Filter categories with no users
             if _dict:
@@ -803,3 +807,45 @@ class General:
         milestone_message = milestone_message + "\n**Congrats to everyone this week. If you wish to submit a milestone, look over at <#650248396480970782>!**"
         await bot.get_channel(milestones_channel).send(milestone_message)
         return f"{count} milestones have been compiled and sent in {bot.get_channel(milestones_channel)}"
+
+    @staticmethod
+    async def elite_members() -> discord.Embed | str:
+        elite_members = await get_all_elite_members()
+        if not elite_members:
+            return "There are no elite members currently."
+
+        embed = discord.Embed(title="Elite Members", color=pos_color)
+        boosters, sponsors, gvg, creators = [], [], [], []
+        for uuid, is_booster, is_sponsor, is_gvg, is_creator, is_indefinite, expiry in elite_members:
+            name = await get_name_by_uuid(uuid)
+            if not name:
+                continue
+            if is_booster:
+                boosters.append(name)
+            if is_sponsor:
+                sponsors.append(name)
+            if is_gvg:
+                gvg.append(name)
+            if is_creator:
+                creators.append(name)
+        embed.add_field(
+            name="Boosters",
+            value=f"{', '.join(boosters) if boosters else 'None'}\n",
+            inline=False
+        )
+        embed.add_field(
+            name="Sponsors",
+            value=f"{', '.join(sponsors) if sponsors else 'None'}",
+            inline=False
+        )
+        embed.add_field(
+            name="GVG",
+            value=f"{', '.join(gvg) if gvg else 'None'}",
+            inline=False
+        )
+        embed.add_field(
+            name="Creators",
+            value=f"{', '.join(creators) if creators else 'None'}",
+            inline=False
+        )
+        return embed

@@ -112,9 +112,9 @@ class Guild(commands.Cog, name="guild"):
         """View guild experience requirements!"""
         await ctx.respond(embed=requirements_embed)
 
-    @bridge.bridge_command(aliases=["res"])
-    async def resident(self, ctx: discord.ApplicationContext) -> None:
-        """See the different ways of obtaining the resident rank!"""
+    @bridge.bridge_command(aliases=["res", "elite", "elitemember", "em"])
+    async def elite_member(self, ctx: discord.ApplicationContext) -> None:
+        """See the different ways of obtaining the elite member rank!"""
         await ctx.respond(embed=resident_embed)
 
     @bridge.bridge_command()
@@ -157,6 +157,14 @@ class Guild(commands.Cog, name="guild"):
 
         await ctx.respond(embed=res)
 
+    @bridge.bridge_command(name="elite_members")
+    async def elite_members(self, ctx: discord.ApplicationContext) -> None:
+        """View all elite members and their categories!"""
+        embed = await General().elite_members()
+        if isinstance(embed, discord.Embed):
+            await ctx.respond(embed=embed)
+        else:
+            await ctx.respond(embed=resident_embed)
 
 def setup(bot):
     bot.add_cog(Guild(bot))

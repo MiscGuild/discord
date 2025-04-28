@@ -57,8 +57,12 @@ async def connect_db():
         );""")
 
     await bot.db.execute("""CREATE TABLE IF NOT EXISTS elite_members(
-        uuid text NOT NULL,
-        reason text NOT NULL,
+        uuid text PRIMARY KEY ,
+        is_booster boolean NOT NULL DEFAULT 0,
+        is_sponsor boolean NOT NULL DEFAULT 0,
+        is_gvg boolean NOT NULL DEFAULT 0,
+        is_creator boolean NOT NULL DEFAULT 0,
+        is_indefinite boolean NOT NULL,
         expiry text,
         FOREIGN KEY (uuid) REFERENCES users(uuid) ON DELETE CASCADE)""")
 

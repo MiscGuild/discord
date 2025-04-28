@@ -84,7 +84,7 @@ milestone_emojis = {
     "other": "❓"
 }
 
-elite_member_categories = ("Event Sponsor", "GvG Team", "YouTuber", "Other")
+elite_member_categories = ("Event Sponsor", "GvG Team", "YouTuber")
 
 # General embeds
 registration_embed = discord.Embed(title=f"Welcome to the {guild_handle} Discord!",
@@ -123,47 +123,11 @@ dnkl_entries_not_found = discord.Embed(title="No entries!",
                                        description="There are no users on the do-not-kick-list!",
                                        color=neg_color)
 
-# information_embed = discord.Embed(title="Miscellaneous", url="https://plancke.io/hypixel/guild/name/Miscellaneous",
-#                                   description="Miscellaneous is an all games Hypixel guild. "
-#                                               "Our primary goal is to be a guild that is friendly to everyone. "
-#                                               "All of our guild requirements are well thought out. "
-#                                               "Miscellaneous strives to be a good community while maintaining its position on the guild leaderboards. "
-#                                               "We were founded in 2014 by Fantastic_Doge making us one of the oldest guilds on the Hypixel Network. "
-#                                               "We, the miscellaneous staff team will do anything to protect the legacy of this spectacle of a guild.",
-#                                   color=neutral_color).add_field(name="Partners",
-#                                                                  value="XL - https://discord.gg/XvqCvYn\n"
-#                                                                        "Lucid - https://discord.gg/DDTMad2pYR\n"
-#                                                                        "OUT - https://discord.gg/td75grErXq\n"
-#                                                                        "Betrayed - https://discord.gg/kcJkAr2tW2\n"
-#                                                                        "Blight - https://discord.gg/dgTWpgy\n"
-#                                                                        "The Happy Pixels - https://discord.gg/JVTqPr9t\n"
-#                                                                        "FireTree V2 - https://discord.gg/UcrACnWTpE\n"
-#                                                                        "High Altitude - https://discord.gg/highaltitude\n"
-#                                                                        "Alpha Project - https://discord.gg/cN6fSAErtz\n"
-#                                                                        "Cubelify - https://cubelify.com/ / https://discord.gg/cubelify",
-#                                                                  inline=False).add_field(
-#     name="Useful Resources",
-#     value="Guild Thread: https://bit.ly/MiscThread\n"
-#           "Discord: https://discord.gg/bHFWukp",
-#     inline=False).add_field(name="Requirements",
-#                             value="__**Active**__\n"
-#                                   f"➤ {format(active_req, ',d')} Weekly Guild Experience\n"
-#                                   "__**Member**__\n"
-#                                   f"➤ {format(member_req, ',d')} Weekly Guild Experience\n"
-#                                   f"__**Resident**__\n"
-#                                   f"➤ {format(resident_req, ',d')} Weekly Guild Experience\n",
-#                             inline=False).set_thumbnail(
-#     url="https://images-ext-2.discordapp.net/external/c1AaQE93xCcn0mQDOLY1-d14TTEVIOg78IRhqaAnk1I/https/images-ext-1.discordapp.net/external/rey4uPv9eHzVTkM9_GVWvWiK1jyrtBy_sUQjBaE5qbE/"
-#         "https/images-ext-2.discordapp.net/external/oTPK3H5eQJWBw_syuTTVUJ3yP7YkvvXTb0JbMX0cdJQ/https/"
-#         "images-ext-1.discordapp.net/external/ziYSZZe7dPyKDYLxA1s2jqpKi-kdCvPFpPaz3zft-wo/"
-#         "%2525253Fwidth%2525253D671%25252526height%2525253D671/https/media.discordapp.net/"
-#         "attachments/523227151240134664/803843877999607818/misc.png").set_footer(
-#     text="If you have any queries, kindly make a ticket!")
-
 information_message = """# Miscellaneous
 
 Founded by <@307402461734240257> in 2014, Miscellaneous is an all games Hypixel guild. Our primary goal is to be a guild that is friendly to everyone, as a result all of our guild requirements are well thought out. Miscellaneous strives to be a good community while maintaining its position on the guild leaderboards. 
 ## Partners
+> - [XL](https://hypixel.net/threads/2744756/)
 > - [Lucid](https://hypixel.net/threads/4432628/)
 > - [OUT](https://hypixel.net/threads/4550875/)
 > - [Betrayed](https://hypixel.net/threads/2550417/)
@@ -208,16 +172,19 @@ Tickets can be created for one of the following reasons:
 3. Inside your ticket, the bot will ask you why you made the ticket. Choose your reason from the dropdown list provided.
 4. Once you have picked your reason, you might need to answer a few of the bot's followup prompts."""]
 
-resident_embed = discord.Embed(title="How can I get Resident?",
-                               description="To be eligible for Resident, you must be satisfy at least one of the following requirements:",
+resident_embed = discord.Embed(title="How can I get Elite Member?",
+                               description="To be eligible for Elite Member, you must satisfy at least one of the following requirements:",
                                color=neutral_color).add_field(name="Youtuber",
-                                                              value="If you're a youtuber with more than 5,000 subscribers, you aren't subject to any guild requirements.",
-                                                              inline=False).add_field(name="Rich Kid",
-                                                                                      value="Spend Money on the guild by doing giveaways and or sponsoring events!",
+                                                              value="If you're a youtuber with more than 5,000 subscribers, you will receive Elite Member indefinitely.",
+                                                              inline=False).add_field(name="Event Sponsor",
+                                                                                      value="Spend Money on the guild by doing giveaways or sponsoring events. The length of your Elite Member status will depend on the amount you spend.",
                                                                                       inline=False).add_field(
-    name="Server Booster", value="Boost the guild discord!",
-    inline=False).add_field(name="GvG Team", value="Be an exceptional GvG player.",
-                            inline=False).set_footer(
+    name="Server Booster",
+    value="If you boost the server, you will be given Elite Member status for the duration of your boost. This status is contingent upon maintaining your boost and will be revoked if you discontinue boosting.",
+    inline=False).add_field(name="GvG Team",
+                            value="If you are an exceptional member of the GvG team, you will be granted Elite Member status indefinitely, unless you are removed from the team.",
+                            inline=False).add_field(name="Active Member",
+                                                    value=f"If you earn more than {format(active_req, ',d')} weekly guild experience, you will be given Elite Member.").set_footer(
     text=f"Unless otherwise specified, all residents must get {format(resident_req, ',d')} weekly guild experience.")
 
 gvg_info_embed = discord.Embed(title="GvG Information",

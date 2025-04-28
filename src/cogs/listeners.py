@@ -32,6 +32,10 @@ class Listeners(commands.Cog, name="listeners"):
     async def on_message(self, message) -> None:
         await Listener(obj=message).on_invitation_message()
 
+    @commands.Cog.listener()
+    async def on_member_update(self, before: discord.Member, after: discord.Member) -> None:
+        await Listener(obj=(before, after)).on_member_update()
+
 
 def setup(bot):
     bot.add_cog(Listeners(bot))

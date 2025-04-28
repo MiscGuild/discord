@@ -6,10 +6,11 @@ from __main__ import bot
 import discord
 from discord.ext import commands
 
+from src.func.String import String
 from src.utils.calculation_utils import extract_usernames
 from src.utils.consts import (error_channel_id, invalid_command_embed,
                               member_not_found_embed, missing_permissions_embed, missing_role_embed,
-                              not_owner_embed, staff_bridge_channel,
+                              not_owner_embed, staff_bridge_channel, log_channel_id,
                               registration_channel_id,
                               registration_embed, err_404_embed, bot_missing_perms_embed)
 from src.utils.discord_utils import create_ticket
@@ -167,3 +168,24 @@ class Listener:
         return_message = await validate_invites(inviter, invitee)
 
         await self.obj.channel.send(return_message)
+
+    async def on_member_update(self) -> None:
+        before: discord.Member
+        after: discord.Member
+        before, after = self.obj
+
+        if before.premium_since is None and after.premium_since is not None:
+            await String(string="Server Booster").elite_member(is_automatic=True, discord_member=after)
+            embed = discord.Embed(title=f"{after.name} just boosted the server!",
+                                  description=f"They have been added to the list of Elite Members",
+                                  color=0xFFD700)
+            embed.set_thumbnail(url=after.display_avatar.url)
+            await bot.get_channel(log_channel_id).send(embed=embed)
+
+        elif before.premium_since is not None and after.premium_since is None:
+            await String(string="Server Booster").elite_member(is_automatic=True, discord_member=after)
+            embed = discord.Embed(title=f"{after.name} just unboosted the server!",
+                                  description=f"They have been removed from the list of Elite Members",
+                                  color=0xFFD700)
+            embed.set_thumbnail(url=after.display_avatar.url)
+            await bot.get_channel(log_channel_id).send(embed=embed)

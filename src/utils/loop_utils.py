@@ -9,7 +9,8 @@ from src.func.General import General
 from src.func.Integer import Integer
 from src.utils.calculation_utils import get_guild_gexp_data
 from src.utils.consts import weekly_lb_channel, daily_lb_channel, guild_handle
-from src.utils.db_utils import (select_all, set_member_gexp_history, get_all_guild_members, remove_guild_member)
+from src.utils.db_utils import (select_all, set_member_gexp_history, get_all_guild_members, remove_guild_member,
+                                get_all_elite_members, delete_elite_member)
 from src.utils.discord_utils import update_recruiter_role
 from src.utils.giveaway_utils import roll_giveaway
 from src.utils.referral_utils import check_invitation_validity, generate_rank_upgrade
@@ -37,26 +38,30 @@ async def check_giveaways() -> None:
 async def scheduler() -> None:
     while True:
         now = datetime.now(pytz.utc)
-
-        # Define the target timezone (EST)
         est = pytz.timezone("America/New_York")
         now_est = now.astimezone(est)
 
-        # Get next 12 AM EST
-        next_run = now_est.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
-        next_run_utc = next_run.astimezone(pytz.utc)
-
+        # Run immediately
         await update_gexp()
+        await update_elite_members()
 
-        # update_invites() runs at 11:59 PM to ensure everyone's gexp is at a maximum
-        sleep_time_invites = (next_run_utc - now).total_seconds() - 60
-        await asyncio.sleep(sleep_time_invites)
+        # Get next 12 AM EST
+        next_run_est = now_est.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
+        next_run_utc = next_run_est.astimezone(pytz.utc)
+
+        # Sleep until 11:59 PM EST
+        sleep_time_invites = (next_run_utc - datetime.now(pytz.utc)).total_seconds() - 60
+        if sleep_time_invites > 0:
+            await asyncio.sleep(sleep_time_invites)
+
         await update_invites()
 
-        # send_gexp_lb() runs at 12:00 AM EST
+        # Sleep until 12:05 AM EST
         now = datetime.now(pytz.utc)
         remaining_sleep_time = (next_run_utc - now).total_seconds() + 300
-        await asyncio.sleep(remaining_sleep_time)
+        if remaining_sleep_time > 0:
+            await asyncio.sleep(remaining_sleep_time)
+
         await send_gexp_lb()
 
 
@@ -126,3 +131,18 @@ async def update_gexp() -> None:
         uuid = uuid[0]
         if uuid not in gexp_data:
             await remove_guild_member(uuid)
+
+
+async def update_elite_members() -> None:
+    elite_members = await get_all_elite_members()
+
+    if not elite_members:
+        return
+
+    for uuid, is_booster, is_sponsor, is_gvg, is_creator, is_indefinite, expiry in elite_members:
+        if is_indefinite:
+            continue
+
+        if expiry and datetime.strptime(expiry, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc) < datetime.now(
+                timezone.utc):
+            await delete_elite_member(uuid)
