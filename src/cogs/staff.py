@@ -87,8 +87,9 @@ class Staff(commands.Cog, name="staff"):
         for message in rules_messages:
             await ctx.send(content=message)
 
+
     @bridge.bridge_command(name="update_elite_member", description="Update a user's Elite Member role!")
-    @commands.has_role("Staff")
+    @commands.has_role("Admin")
     @bridge.bridge_option(
         name="username",
         description="The username of the player you would like to give the Elite Member role",
