@@ -379,7 +379,13 @@ class String:
 
         elif "sponsor" in reason.lower():
             reason = "Event Sponsor"
-            is_sponsor = not is_sponsor
+            is_sponsor = True
+            if monetary_value is None:
+                return discord.Embed(title="Monetary Value Required",
+                                     description="Please provide the amount of money (in dollars) they have spent on the server.",
+                                     color=neg_color)
+
+
             resident_days = (1 + (monetary_value - 10) / 8) * 30
 
             now = datetime.now(timezone.utc)
