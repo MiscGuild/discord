@@ -3,7 +3,7 @@
 import inspect
 import os
 from __main__ import bot
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 import discord
 from quickchart import QuickChart
@@ -18,7 +18,7 @@ from src.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed,
                               ticket_categories, unknown_ign_embed, rainbow_separator, guild_handle,
                               missing_permissions_embed, member_req)
 from src.utils.db_utils import (delete_dnkl, select_one,
-                                get_invites, get_member_gexp_history)
+                                get_invites, get_member_gexp_history, insert_elite_member, get_elite_member)
 from src.utils.referral_utils import check_invitation_validity
 from src.utils.request_utils import (get_hypixel_player,
                                      get_player_guild, get_name_by_uuid, get_uuid_by_name)
@@ -356,7 +356,7 @@ class String:
                               "If they joined in the middle of the week, their guild experience will be scaled up.")
         return embed
 
-    async def elite_member(self) -> discord.Embed:
+    async def elite_member(self, monetary_value: int, is_automatic: bool = False) -> discord.Embed:
         username = self.username
         reason = self.string
         name, uuid = await get_uuid_by_name(username)
