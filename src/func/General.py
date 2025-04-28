@@ -18,10 +18,10 @@ from src.utils.consts import (accepted_staff_application_embed, active_req,
                               neutral_color, pos_color, ticket_deleted_embed,
                               registration_channel_id, registration_embed,
                               staff_application_questions, ticket_categories,
-                              resident_req, dnkl_entries_not_found,
+                              dnkl_entries_not_found,
                               positive_responses, allies)
 from src.utils.db_utils import insert_new_giveaway, select_all, \
-    get_db_uuid_username, update_member
+    get_db_uuid_username, update_member, get_all_elite_members, delete_elite_member
 from src.utils.discord_utils import (create_ticket,
                                      get_ticket_creator, log_event,
                                      name_grabber, has_tag_perms)
