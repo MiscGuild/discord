@@ -6,10 +6,11 @@ from __main__ import bot
 import discord
 from discord.ext import commands
 
+from src.func.String import String
 from src.utils.calculation_utils import extract_usernames
 from src.utils.consts import (error_channel_id, invalid_command_embed,
                               member_not_found_embed, missing_permissions_embed, missing_role_embed,
-                              not_owner_embed, staff_bridge_channel,
+                              not_owner_embed, staff_bridge_channel, log_channel_id,
                               registration_channel_id,
                               registration_embed, err_404_embed, bot_missing_perms_embed)
 from src.utils.discord_utils import create_ticket
