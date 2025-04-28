@@ -87,7 +87,7 @@ class Staff(commands.Cog, name="staff"):
         for message in rules_messages:
             await ctx.send(content=message)
 
-    @bridge.bridge_command(name="elite_member", description="Give a user the Elite Member role!")
+    @bridge.bridge_command(name="update_elite_member", description="Update a user's Elite Member role!")
     @commands.has_role("Staff")
     @bridge.bridge_option(
         name="username",
@@ -108,7 +108,7 @@ class Staff(commands.Cog, name="staff"):
         input_type=int,
         min_value=10
     )
-    async def elite_member(self, ctx: discord.ApplicationContext, username: str, reason: str,
+    async def update_elite_member(self, ctx: discord.ApplicationContext, username: str, reason: str,
                            monetary_value: int) -> None:
         await ctx.send(embed=await String(string=reason, username=username).elite_member())
 
