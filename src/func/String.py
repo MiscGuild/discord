@@ -363,4 +363,60 @@ class String:
         if not name:
             return unknown_ign_embed
 
-        return discord.Embed()
+        is_indefinite = False
+        expiry = None
+
+        if "booster" in reason.lower() and is_automatic:
+            reason = "Server Booster"
+            is_indefinite = True
+
+            current_expiry = await get_elite_member(uuid)
+            if current_expiry:
+                expiry = current_expiry[2]
+
+            await insert_elite_member(uuid, reason, is_indefinite, expiry)
+
+        if "sponsor" in reason.lower():
+            reason = "Event Sponsor"
+            resident_days = (1 + (monetary_value - 10) / 8) * 30
+            expiry = datetime.now(timezone.utc) + timedelta(days=resident_days)
+
+            current_expiry = await get_elite_member(uuid)
+            if current_expiry:
+                expiry = datetime.strptime(current_expiry[2], "%Y-%m-%d %H:%M:%S") + timedelta(days=resident_days)
+
+            expiry = expiry.strftime("%Y-%m-%d %H:%M:%S")
+
+            await insert_elite_member(uuid, reason, is_indefinite, expiry)
+
+        elif "gvg" in reason.lower():
+            reason = "GvG Team"
+            is_indefinite = True
+
+            current_expiry = await get_elite_member(uuid)
+            if current_expiry:
+                expiry = current_expiry[2]
+
+            await insert_elite_member(uuid, reason, is_indefinite, expiry)
+
+        elif reason.lower() in ("yt", "content creator", "youtube", "twitch", "streamer", "youtuber"):
+            reason = "Content Creator"
+            is_indefinite = True
+
+            current_expiry = await get_elite_member(uuid)
+            if current_expiry:
+                expiry = current_expiry[2]
+
+            await insert_elite_member(uuid, reason, is_indefinite, expiry)
+
+        else:
+            return discord.Embed(title="Invalid Reason",
+                                 description="Please choose a valid reason for the Elite Member role.",
+                                 color=neg_color)
+
+        embed = discord.Embed(title=f"Elite Member: {name}", color=neutral_color)
+        embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
+        embed.add_field(name="Reason", value=reason, inline=False)
+        embed.add_field(name="Indefinite", value=str(is_indefinite), inline=True)
+        embed.add_field(name="Expiry", value=expiry if expiry else "None", inline=True)
+        return embed
