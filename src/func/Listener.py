@@ -168,3 +168,24 @@ class Listener:
         return_message = await validate_invites(inviter, invitee)
 
         await self.obj.channel.send(return_message)
+
+    async def on_member_update(self) -> None:
+        before: discord.Member
+        after: discord.Member
+        before, after = self.obj
+
+        if before.premium_since is None and after.premium_since is not None:
+            await String(string="Server Booster").elite_member(is_automatic=True, discord_member=after)
+            embed = discord.Embed(title=f"{after.name} just boosted the server!",
+                                  description=f"They have been added to the list of Elite Members",
+                                  color=0xFFD700)
+            embed.set_thumbnail(url=after.display_avatar.url)
+            await bot.get_channel(log_channel_id).send(embed=embed)
+
+        elif before.premium_since is not None and after.premium_since is None:
+            await String(string="Server Booster").elite_member(is_automatic=True, discord_member=after)
+            embed = discord.Embed(title=f"{after.name} just unboosted the server!",
+                                  description=f"They have been removed from the list of Elite Members",
+                                  color=0xFFD700)
+            embed.set_thumbnail(url=after.display_avatar.url)
+            await bot.get_channel(log_channel_id).send(embed=embed)
