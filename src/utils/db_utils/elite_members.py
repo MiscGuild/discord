@@ -36,3 +36,8 @@ async def insert_elite_member(
             expiry = excluded.expiry
     """, (uuid, is_booster, is_sponsor, is_gvg, is_creator, is_indefinite, expiry))
     await bot.db.commit()
+
+
+async def delete_elite_member(uuid: str) -> None:
+    await bot.db.execute("DELETE FROM elite_members WHERE uuid = ?", (uuid,))
+    await bot.db.commit()
