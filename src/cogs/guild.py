@@ -112,9 +112,9 @@ class Guild(commands.Cog, name="guild"):
         """View guild experience requirements!"""
         await ctx.respond(embed=requirements_embed)
 
-    @bridge.bridge_command(aliases=["res"])
-    async def resident(self, ctx: discord.ApplicationContext) -> None:
-        """See the different ways of obtaining the resident rank!"""
+    @bridge.bridge_command(aliases=["res", "elite", "elitemember", "em"])
+    async def elite_member(self, ctx: discord.ApplicationContext) -> None:
+        """See the different ways of obtaining the elite member rank!"""
         await ctx.respond(embed=resident_embed)
 
     @bridge.bridge_command()
