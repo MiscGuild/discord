@@ -326,7 +326,7 @@ class General:
         for tup in dnkl_uuids:
             dnkl_uuids[dnkl_uuids.index(tup)] = tup[0]
 
-        elite_members = await get_all_elite_members()
+        elite_members = await get_all_elite_members() or []
         elite_member_uuids = []
         for uuid, is_booster, is_sponsor, is_gvg, is_creator, is_indefinite, expiry in elite_members:
             if any([is_booster, is_sponsor, is_gvg, is_creator]):
