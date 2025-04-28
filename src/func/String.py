@@ -17,7 +17,7 @@ from src.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed,
                               qotd_ans_channel_id, qotd_channel_id,
                               ticket_categories, unknown_ign_embed, rainbow_separator, guild_handle,
                               missing_permissions_embed, member_req)
-from src.utils.db_utils import (delete_dnkl, select_one,
+from src.utils.db_utils import (delete_dnkl, select_one, get_db_uuid_username,
                                 get_invites, get_member_gexp_history, insert_elite_member, get_elite_member)
 from src.utils.referral_utils import check_invitation_validity
 from src.utils.request_utils import (get_hypixel_player,
@@ -356,63 +356,62 @@ class String:
                               "If they joined in the middle of the week, their guild experience will be scaled up.")
         return embed
 
-    async def elite_member(self, monetary_value: int, is_automatic: bool = False) -> discord.Embed:
-        username = self.username
-        reason = self.string
-        name, uuid = await get_uuid_by_name(username)
+    async def elite_member(self, discord_member: discord.Member = None, monetary_value: int = None,
+                           is_automatic: bool = False) -> discord.Embed:
+        if discord_member:
+            name, uuid = await get_db_uuid_username(discord_id=discord_member.id)
+        else:
+            username = self.username
+            name, uuid = await get_uuid_by_name(username)
         if not name:
             return unknown_ign_embed
 
-        is_indefinite = False
-        expiry = None
+        reason = self.string or ""
 
-        if "booster" in reason.lower() and is_automatic:
+        (is_booster, is_sponsor, is_gvg, is_creator, is_indefinite, expiry) = await get_elite_member(uuid) or (
+            False, False, False, False, False, None)
+
+        if "server booster" in reason.lower() and is_automatic:
             reason = "Server Booster"
             is_indefinite = True
+            is_booster = not is_booster
 
-            current_expiry = await get_elite_member(uuid)
-            if current_expiry:
-                expiry = current_expiry[2]
-
-            await insert_elite_member(uuid, reason, is_indefinite, expiry)
-
-        if "sponsor" in reason.lower():
+        elif "sponsor" in reason.lower():
             reason = "Event Sponsor"
+            is_sponsor = not is_sponsor
             resident_days = (1 + (monetary_value - 10) / 8) * 30
-            expiry = datetime.now(timezone.utc) + timedelta(days=resident_days)
 
-            current_expiry = await get_elite_member(uuid)
-            if current_expiry:
-                expiry = datetime.strptime(current_expiry[2], "%Y-%m-%d %H:%M:%S") + timedelta(days=resident_days)
+            now = datetime.now(timezone.utc)
+            expiry_dt = datetime.strptime(expiry, "%Y-%m-%d %H:%M:%S")
+            if expiry and expiry_dt > now:
+                expiry = expiry_dt + timedelta(days=resident_days)
+            else:
+                expiry = now + timedelta(days=resident_days)
 
             expiry = expiry.strftime("%Y-%m-%d %H:%M:%S")
-
-            await insert_elite_member(uuid, reason, is_indefinite, expiry)
 
         elif "gvg" in reason.lower():
             reason = "GvG Team"
             is_indefinite = True
-
-            current_expiry = await get_elite_member(uuid)
-            if current_expiry:
-                expiry = current_expiry[2]
-
-            await insert_elite_member(uuid, reason, is_indefinite, expiry)
+            is_gvg = not is_gvg
 
         elif reason.lower() in ("yt", "content creator", "youtube", "twitch", "streamer", "youtuber"):
             reason = "Content Creator"
             is_indefinite = True
-
-            current_expiry = await get_elite_member(uuid)
-            if current_expiry:
-                expiry = current_expiry[2]
-
-            await insert_elite_member(uuid, reason, is_indefinite, expiry)
+            is_creator = not is_creator
 
         else:
             return discord.Embed(title="Invalid Reason",
                                  description="Please choose a valid reason for the Elite Member role.",
                                  color=neg_color)
+
+        await insert_elite_member(uuid=uuid, is_booster=is_booster, is_sponsor=is_sponsor, is_creator=is_creator,
+                                  is_gvg=is_gvg, is_indefinite=is_indefinite, expiry=expiry)
+
+        if not any([is_sponsor, is_booster, is_creator, is_gvg]):
+            embed = discord.Embed(title=f"Elite Member Removed: {name}", color=neutral_color)
+            embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
+            return embed
 
         embed = discord.Embed(title=f"Elite Member: {name}", color=neutral_color)
         embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
