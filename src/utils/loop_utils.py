@@ -136,6 +136,9 @@ async def update_gexp() -> None:
 async def update_elite_members() -> None:
     elite_members = await get_all_elite_members()
 
+    if not elite_members:
+        return
+
     for uuid, is_booster, is_sponsor, is_gvg, is_creator, is_indefinite, expiry in elite_members:
         if is_indefinite:
             continue
