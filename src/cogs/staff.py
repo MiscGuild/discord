@@ -109,8 +109,9 @@ class Staff(commands.Cog, name="staff"):
         min_value=10
     )
     async def update_elite_member(self, ctx: discord.ApplicationContext, username: str, reason: str,
-                           monetary_value: int) -> None:
-        await ctx.send(embed=await String(string=reason, username=username).elite_member())
+                                  monetary_value: int = None) -> None:
+        await ctx.respond(
+            embed=await String(string=reason, username=username).elite_member(monetary_value=monetary_value))
 
     @bridge.bridge_command()
     @commands.has_role("Admin")
