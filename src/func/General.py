@@ -336,7 +336,7 @@ class General:
 
 
         # Define dicts for each category of users
-        to_promote_active, to_demote_active, to_demote_resident, inactive, skipped_users = {}, {}, {}, {}, []
+        to_promote_elite, to_demote_elite, inactive, skipped_users = {}, {}, {}, []
 
         # Loop through all guild members with a session to fetch names
         for member in guild_data["members"]:
@@ -362,17 +362,13 @@ class General:
             guild_rank = member["rank"]
             # Remove dnkl users from list
 
-            if guild_rank == "Resident":
-                if weekly_exp < resident_req:
-                    to_demote_resident[name] = weekly_exp
+            # Elite members who are not on the elite members list and are not active
+            if guild_rank == "Elite Member" and uuid not in elite_member_uuids and weekly_exp < active_req:
+                to_demote_elite[name] = weekly_exp
 
             # Members who need to be promoted
             elif guild_rank == "Member" and weekly_exp >= active_req:
-                to_promote_active[name] = weekly_exp
-
-            # Active members who need to be demoted
-            elif guild_rank == "Active" and weekly_exp < active_req:
-                to_demote_active[name] = weekly_exp
+                to_promote_elite[name] = weekly_exp
 
             # Members who do not meet the requirements
             elif weekly_exp < member_req:
@@ -389,10 +385,9 @@ class General:
         embeds = []
 
         # Loop through dicts, descriptions and colors
-        for _dict, title, color in [[to_promote_active, "Promote the following users to active:", pos_color],
-                                    [to_demote_active, "Demote the following users from active:",
+        for _dict, title, color in [[to_promote_elite, "Promote the following users to Elite Member:", pos_color],
+                                    [to_demote_elite, "Demote the following users from Elite Member:",
                                      neg_color],
-                                    [to_demote_resident, "Demote the following from resident:", neg_color],
                                     [inactive, "Following are the users to be kicked:", neg_color]]:
             # Filter categories with no users
             if _dict:
