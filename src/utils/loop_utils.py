@@ -143,5 +143,6 @@ async def update_elite_members() -> None:
         if is_indefinite:
             continue
 
-        if expiry and datetime.strptime(expiry, "%Y-%m-%d %H:%M:%S") < datetime.now(timezone.utc):
+        if expiry and datetime.strptime(expiry, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc) < datetime.now(
+                timezone.utc):
             await delete_elite_member(uuid)
