@@ -370,6 +370,7 @@ class String:
 
         (is_booster, is_sponsor, is_gvg, is_creator, is_indefinite, expiry) = await get_elite_member(uuid) or (
             False, False, False, False, False, None)
+        resident_days = 0
 
         if "server booster" in reason.lower() and is_automatic:
             reason = "Server Booster"
@@ -418,4 +419,6 @@ class String:
         embed.add_field(name="Reason", value=reason, inline=False)
         embed.add_field(name="Indefinite", value=str(is_indefinite), inline=True)
         embed.add_field(name="Expiry", value=expiry if expiry else "None", inline=True)
+        if reason == "Event Sponsor":
+            embed.add_field(name="Days Added", value=f"{resident_days}", inline=True)
         return embed
