@@ -172,16 +172,19 @@ Tickets can be created for one of the following reasons:
 3. Inside your ticket, the bot will ask you why you made the ticket. Choose your reason from the dropdown list provided.
 4. Once you have picked your reason, you might need to answer a few of the bot's followup prompts."""]
 
-resident_embed = discord.Embed(title="How can I get Resident?",
-                               description="To be eligible for Resident, you must be satisfy at least one of the following requirements:",
+resident_embed = discord.Embed(title="How can I get Elite Member?",
+                               description="To be eligible for Elite Member, you must satisfy at least one of the following requirements:",
                                color=neutral_color).add_field(name="Youtuber",
-                                                              value="If you're a youtuber with more than 5,000 subscribers, you aren't subject to any guild requirements.",
-                                                              inline=False).add_field(name="Rich Kid",
-                                                                                      value="Spend Money on the guild by doing giveaways and or sponsoring events!",
+                                                              value="If you're a youtuber with more than 5,000 subscribers, you will receive Elite Member indefinitely.",
+                                                              inline=False).add_field(name="Event Sponsor",
+                                                                                      value="Spend Money on the guild by doing giveaways or sponsoring events. The length of your Elite Member status will depend on the amount you spend.",
                                                                                       inline=False).add_field(
-    name="Server Booster", value="Boost the guild discord!",
-    inline=False).add_field(name="GvG Team", value="Be an exceptional GvG player.",
-                            inline=False).set_footer(
+    name="Server Booster",
+    value="If you boost the server, you will be given Elite Member status for the duration of your boost. This status is contingent upon maintaining your boost and will be revoked if you discontinue boosting.",
+    inline=False).add_field(name="GvG Team",
+                            value="If you are an exceptional member of the GvG team, you will be granted Elite Member status indefinitely, unless you are removed from the team.",
+                            inline=False).add_field(name="Active Member",
+                                                    value=f"If you earn more than {format(active_req, ',d')} weekly guild experience, you will be given Elite Member.").set_footer(
     text=f"Unless otherwise specified, all residents must get {format(resident_req, ',d')} weekly guild experience.")
 
 gvg_info_embed = discord.Embed(title="GvG Information",
