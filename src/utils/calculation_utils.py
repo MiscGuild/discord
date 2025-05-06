@@ -231,3 +231,17 @@ async def check_if_mention(message: str) -> int | None:
     if not message:
         return None
     return int(message[2:-1]) if message.startswith("<@") and message.endswith(">") else None
+
+
+async def get_monthly_gexp(gexp_data: dict) -> int:
+    today = datetime.today()
+    current_month_str = today.strftime("%Y-%m")  # e.g., "2025-05"
+
+    monthly_gexp = {
+        date: gexp for date, gexp in gexp_data.items()
+        if date.startswith(current_month_str)
+    }
+
+    monthly_gexp_total = sum(monthly_gexp.values())
+
+    return monthly_gexp_total

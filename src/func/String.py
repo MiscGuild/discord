@@ -11,7 +11,7 @@ from quickchart import QuickChart
 from src.utils.calculation_utils import (calculate_network_level,
                                          get_color_by_gexp,
                                          get_hypixel_player_rank,
-                                         get_player_gexp)
+                                         get_player_gexp, get_monthly_gexp)
 from src.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed,
                               months, neg_color, neutral_color, pos_color,
                               qotd_ans_channel_id, qotd_channel_id,
@@ -117,8 +117,7 @@ class String:
             yearly_gexp = 0
 
             if historical_gexp_data:
-                monthly_gexp = sum(
-                    v for k, v in sorted(historical_gexp_data.items(), key=lambda x: x[0], reverse=True)[:30])
+                monthly_gexp = await get_monthly_gexp(historical_gexp_data)
                 yearly_gexp = sum(historical_gexp_data.values())
 
             join_date = str(datetime.fromtimestamp(int(str(member["joined"])[:-3])))[:10]

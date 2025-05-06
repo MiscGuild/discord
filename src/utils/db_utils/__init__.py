@@ -20,5 +20,5 @@ __all__ = [
     "insert_new_giveaway", "get_giveaway_status", "set_giveaway_inactive",
     "insert_new_inviter", "add_invitee", "get_invites",
     "get_all_guild_members", "remove_guild_member", "get_member_gexp_history", "set_member_gexp_history",
-    "get_all_elite_members", "get_elite_member", "insert_elite_member", "delete_elite_member"
+    "get_all_elite_members", "get_elite_member", "insert_elite_member", "delete_elite_member", "get_db_uuid_username"
 ]
