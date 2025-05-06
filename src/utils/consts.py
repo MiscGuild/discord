@@ -140,11 +140,11 @@ Founded by <@307402461734240257> in 2014, Miscellaneous is an all games Hypixel 
 ## Requirements
 """
 information_requirements_embed = discord.Embed(title="", color=0x4f5058).add_field(
-    name="Active",
+    name="Elite Member - Active",
     value=f"•  {format(active_req, ',d')} Weekly Guild Experience",
     inline=False).add_field(name="Member",
                             value=f"•  {format(member_req, ',d')} Weekly Guild Experience",
-                            inline=False).add_field(name="Resident",
+                            inline=False).add_field(name="Elite Member - Regular",
                                                     value=f"•  {format(resident_req, ',d')} Weekly Guild Experience",
                                                     inline=False).add_field(name="Do-not-kick-list Eligibility",
                                                                             value=f"•  {format(dnkl_req, ',d')} Weekly Guild Experience",
