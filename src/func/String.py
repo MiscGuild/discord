@@ -118,7 +118,7 @@ class String:
 
             if historical_gexp_data:
                 monthly_gexp = sum(
-                    dict(sorted(historical_gexp_data.items(), key=lambda x: x[0], reverse=True)).values())
+                    v for k, v in sorted(historical_gexp_data.items(), key=lambda x: x[0], reverse=True)[:30])
                 yearly_gexp = sum(historical_gexp_data.values())
 
             join_date = str(datetime.fromtimestamp(int(str(member["joined"])[:-3])))[:10]
@@ -384,7 +384,6 @@ class String:
                 return discord.Embed(title="Monetary Value Required",
                                      description="Please provide the amount of money (in dollars) they have spent on the server.",
                                      color=neg_color)
-
 
             resident_days = (1 + (monetary_value - 10) / 8) * 30
 
