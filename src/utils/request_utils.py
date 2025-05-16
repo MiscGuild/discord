@@ -169,7 +169,7 @@ async def get_player_guild(uuid: str) -> dict | None:
     resp = await get_json_response(f"https://api.hypixel.net/guild?key={api_key}&player={uuid}")
 
     # Player is not in a guild
-    if "guild" not in resp or not resp["guild"]:
+    if not resp or "guild" not in resp or not resp["guild"]:
         return None
 
     # Player is in a guild

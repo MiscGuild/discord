@@ -6,6 +6,8 @@ import toml
 # Define config
 config = toml.load("config.toml")
 
+prefix = config["prefix"]
+
 # Gexp requirements
 member_req = config["member_req"]
 resident_req = config["resident_req"]

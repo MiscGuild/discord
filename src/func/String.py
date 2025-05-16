@@ -12,7 +12,7 @@ from src.utils.calculation_utils import (calculate_network_level,
                                          get_color_by_gexp,
                                          get_hypixel_player_rank,
                                          get_player_gexp, get_monthly_gexp)
-from src.utils.consts import (dnkl_channel_id, dnkl_req, guildless_embed,
+from src.utils.consts import (prefix, dnkl_channel_id, dnkl_req, guildless_embed,
                               months, neg_color, neutral_color, pos_color,
                               qotd_ans_channel_id, qotd_channel_id,
                               ticket_categories, unknown_ign_embed, rainbow_separator, guild_handle,
@@ -209,11 +209,18 @@ class String:
         return embed.set_image(url=f"https://gen.plancke.io/exp/{ign}.png")
 
     async def dnkladd(self, ctx: discord.ApplicationContext) -> discord.Embed | None:
-        # start, end, reason
-        ign, uuid = await get_uuid_by_name(self.string)
+        if self.uuid:
+            ign = await get_name_by_uuid(self.uuid)
+            uuid = self.uuid
+        else:
+            ign, uuid = await get_uuid_by_name(self.string)
+            if not ign:
+                return unknown_ign_embed
+
         _, weekly_gexp = await get_player_gexp(uuid)
         if not ign:
             return unknown_ign_embed
+
         await ctx.respond("Please respond to the following prompts: ")
         # Ask DNKL application questions
         await dnkl_application(ign, uuid, ctx.channel, ctx.author, weekly_gexp)
@@ -246,14 +253,18 @@ class String:
         if self.uuid and self.username:
             uuid = self.uuid
             name = self.username
+        elif self.uuid:
+            name = await get_name_by_uuid(self.uuid)
+            uuid = self.uuid
         else:
             name, uuid = await get_uuid_by_name(self.string)
             if not name:
                 return unknown_ign_embed
+
         _, weeklygexp = await get_player_gexp(uuid)
 
         # Player is not in a guild
-        if not weeklygexp:
+        if weeklygexp is None:
             return guildless_embed
 
         # Player is eligible
@@ -273,13 +284,15 @@ class String:
         embed.set_author(name="Do-not-kick-list: Eligibility Check")
         return embed
 
-    async def rename(self, ctx: discord.ApplicationContext) -> int | discord.Embed | discord.Message:
-        # Channel is not a ticket
+    async def rename(self, ctx: discord.ApplicationContext) -> discord.Embed | str:
         if ctx.channel.category.name not in ticket_categories.values():
-            return await ctx.send("This command can only be used in tickets!")
+            return "This command can only be used in tickets!"
 
-        old_name = ctx.channel.name
+        if not self.string:
+            return f"**SYNTAX:** `{prefix}rename <new channel name>`"
+
         # Channel is a ticket
+        old_name = ctx.channel.name
         channel_name = self.string.replace(" ", "-")
         await ctx.channel.edit(name=channel_name)
         return discord.Embed(title=f"The channel name was changed from {old_name} to {channel_name}",
@@ -313,7 +326,9 @@ class String:
                 return unknown_ign_embed
 
         guild = await get_player_guild(uuid)
-        if ("name" not in guild) or (guild["name"] != guild_handle):
+        if not guild:
+            return guildless_embed
+        elif ("name" not in guild) or (guild["name"] != guild_handle):
             return missing_permissions_embed
 
         invites = await get_invites(uuid)

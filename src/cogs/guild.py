@@ -4,9 +4,9 @@ from discord.ext import commands, bridge
 from src.func.General import General
 from src.func.Integer import Integer
 from src.func.String import String
-from src.utils.calculation_utils import check_if_mention
+from src.utils.calculation_utils import check_if_mention, get_username_autocomplete
 from src.utils.consts import gvg_info_embed, requirements_embed, resident_embed
-from src.utils.db_utils import get_db_uuid_username, get_all_usernames
+from src.utils.db_utils import get_db_uuid_username
 
 
 class Guild(commands.Cog, name="guild"):
@@ -17,13 +17,6 @@ class Guild(commands.Cog, name="guild"):
     def __init__(self, bot):
         self.bot = bot
 
-    async def get_username_autocomplete(self, ctx: discord.AutocompleteContext):
-        username_list = await get_all_usernames()  # Fetch all usernames (list of tuples)
-        query = ctx.value.lower()
-        filtered_usernames = [
-            (value, name) for value, name in username_list if query in name.lower()
-        ]
-        return [discord.OptionChoice(name, value) for value, name in filtered_usernames[:25]]
 
     @bridge.bridge_group(name="g", description="Invoke guild related commands!", invoke_without_command=True)
     async def g(self, ctx: bridge.BridgeContext, name: str | discord.Member = None) -> None:

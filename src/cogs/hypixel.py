@@ -4,7 +4,13 @@ from discord.ext import commands, bridge
 from src.func.General import General
 from src.func.String import String
 from src.func.Union import Union
+from src.utils.calculation_utils import get_username_autocomplete
 from src.utils.db_utils import get_dnkl_list, get_db_uuid_username
+
+
+async def get_dnkl_autocomplete(ctx: discord.AutocompleteContext):
+    dnkl_list = await get_dnkl_list()
+    return [discord.OptionChoice(name, value) for name, value in dnkl_list]
 
 
 class Hypixel(commands.Cog, name="hypixel"):
@@ -36,21 +42,6 @@ class Hypixel(commands.Cog, name="hypixel"):
         elif isinstance(res, str):
             await ctx.respond(res)
 
-    # @bridge.bridge_command(aliases=['i'])
-    # @bridge.bridge_option(
-    #     name="name",
-    #     description="The Minecraft username of the player whose stats you'd like to view",
-    #     required=False,
-    #     input_type=str
-    # )
-    # async def info(self, ctx: discord.ApplicationContext, name: str = None) -> None:
-    #     """View Hypixel stats of the given user!"""
-    #     if not name:
-    #         uuid, username = await get_db_uuid_username(discord_id=ctx.author.id)
-    #         res = await String(uuid=uuid, username=username).info()
-    #     else:
-    #         res = await String(string=name).info()
-    #     await ctx.respond(embed=res)
 
     @bridge.bridge_group(name="dnkl", description="Manage dnkl-related things", invoke_without_command=True)
     async def dnkl(self, ctx: bridge.BridgeContext):
@@ -62,20 +53,20 @@ class Hypixel(commands.Cog, name="hypixel"):
     @bridge.bridge_option(
         name="name",
         description="The Minecraft username of the player you want to add to the do-not-kick list",
+        autocomplete=get_username_autocomplete,
         required=True,
         input_type=str
     )
     async def dnkl_add(self, ctx: discord.ApplicationContext, name: str) -> None:
         """Add a user to the do-not-kick list!"""
-        res = await String(string=name).dnkladd(ctx)
+        if name and len(name) == 32:
+            res = await String(uuid=name).dnkladd(ctx)
+        else:
+            res = await String(string=name).dnkladd(ctx)
         if isinstance(res, str):
             await ctx.respond(res)
         elif isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
-
-    async def get_dnkl_autocomplete(self, ctx: discord.AutocompleteContext):
-        dnkl_list = await get_dnkl_list()
-        return [discord.OptionChoice(name, value) for name, value in dnkl_list]
 
     @dnkl.command(name="remove", aliases=['rmv', 'r'])
     @commands.has_permissions(manage_messages=True)
@@ -107,14 +98,18 @@ class Hypixel(commands.Cog, name="hypixel"):
     @bridge.bridge_option(
         name="name",
         description="The Minecraft username of the player whose do-not-kick-list eligibility you'd like to check",
+        autocomplete=get_username_autocomplete,
         required=False,
         input_type=str
     )
     async def dnkl_check(self, ctx: discord.ApplicationContext, name: str = None) -> None:
         """Check whether a player is on the do-not-kick list!"""
-        if not name:
+
+        if name and len(name) == 32:
+            res = await String(uuid=name).dnklcheck()
+        elif not name:
             username, uuid = await get_db_uuid_username(discord_id=ctx.author.id)
-            res = await String(uuid=uuid, username=username).dnklcheck()
+            res = await String(uuid=uuid).dnklcheck()
         else:
             res = await String(string=name).dnklcheck()
 
