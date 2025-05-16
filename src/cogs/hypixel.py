@@ -7,6 +7,11 @@ from src.func.Union import Union
 from src.utils.db_utils import get_dnkl_list, get_db_uuid_username
 
 
+async def get_dnkl_autocomplete(ctx: discord.AutocompleteContext):
+    dnkl_list = await get_dnkl_list()
+    return [discord.OptionChoice(name, value) for name, value in dnkl_list]
+
+
 class Hypixel(commands.Cog, name="hypixel"):
     """
     All discord related Hypixel commands.
@@ -72,10 +77,6 @@ class Hypixel(commands.Cog, name="hypixel"):
             await ctx.respond(res)
         elif isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
-
-    async def get_dnkl_autocomplete(self, ctx: discord.AutocompleteContext):
-        dnkl_list = await get_dnkl_list()
-        return [discord.OptionChoice(name, value) for name, value in dnkl_list]
 
     @dnkl.command(name="remove", aliases=['rmv', 'r'])
     @commands.has_permissions(manage_messages=True)
