@@ -21,7 +21,7 @@ from src.utils.consts import (accepted_staff_application_embed, active_req,
                               dnkl_entries_not_found,
                               positive_responses, allies)
 from src.utils.db_utils import insert_new_giveaway, select_all, \
-    get_db_uuid_username, update_member, get_all_elite_members, delete_elite_member
+    get_db_uuid_username, update_member, get_all_elite_members, delete_elite_member, get_dnkl_list
 from src.utils.discord_utils import (create_ticket,
                                      get_ticket_creator, log_event,
                                      name_grabber, has_tag_perms)
@@ -322,9 +322,8 @@ class General:
             return invalid_guild_embed
 
         # Retrieve DNKL users so they can be filtered out
-        dnkl_uuids = await select_all("SELECT uuid FROM dnkl")
-        for tup in dnkl_uuids:
-            dnkl_uuids[dnkl_uuids.index(tup)] = tup[0]
+        dnkl_uuids = [x[1] for x in await get_dnkl_list()]
+
 
         elite_members = await get_all_elite_members() or []
         elite_member_uuids = []
@@ -336,7 +335,7 @@ class General:
 
 
         # Define dicts for each category of users
-        to_promote_elite, to_demote_elite, inactive, skipped_users = {}, {}, {}, []
+        to_promote_elite, to_demote_elite, inactive, dnkl, skipped_users = {}, {}, {}, {}, []
 
         # Loop through all guild members with a session to fetch names
         for member in guild_data["members"]:
@@ -354,16 +353,18 @@ class General:
             name = name.replace("_", "\\_")
 
             # Gather data
-            guild_rank = member["rank"] if uuid not in dnkl_uuids else "DNKL"
+            guild_rank = member["rank"]
             weekly_exp = sum(member["expHistory"].values())
             name += f" [{guild_rank}]\n" + \
                     str(datetime.fromtimestamp(
                         int(str(member["joined"])[:-3])))[0:10]
             guild_rank = member["rank"]
-            # Remove dnkl users from list
+
+            if uuid in dnkl_uuids:
+                dnkl[name] = weekly_exp
 
             # Elite members who are not on the elite members list and are not active
-            if guild_rank == "Elite Member" and uuid not in elite_member_uuids and weekly_exp < active_req:
+            elif guild_rank == "Elite Member" and uuid not in elite_member_uuids and weekly_exp < active_req:
                 to_demote_elite[name] = weekly_exp
 
             # Members who need to be promoted
@@ -385,7 +386,8 @@ class General:
         embeds = []
 
         # Loop through dicts, descriptions and colors
-        for _dict, title, color in [[to_promote_elite, "Promote the following users to Elite Member:", pos_color],
+        for _dict, title, color in [[dnkl, "Please verify if these DNKL entries have expired:", neutral_color],
+                                    [to_promote_elite, "Promote the following users to Elite Member:", pos_color],
                                     [to_demote_elite, "Demote the following users from Elite Member:",
                                      neg_color],
                                     [inactive, "Following are the users to be kicked:", neg_color]]:
