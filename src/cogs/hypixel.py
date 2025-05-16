@@ -25,7 +25,6 @@ class Hypixel(commands.Cog, name="hypixel"):
     @bridge.bridge_option(
         name="name",
         description="Your Minecraft Username",
-        autocomplete=get_username_autocomplete,
         required=False,
         input_type=str
     )
