@@ -209,11 +209,18 @@ class String:
         return embed.set_image(url=f"https://gen.plancke.io/exp/{ign}.png")
 
     async def dnkladd(self, ctx: discord.ApplicationContext) -> discord.Embed | None:
-        # start, end, reason
-        ign, uuid = await get_uuid_by_name(self.string)
+        if self.uuid:
+            ign = await get_name_by_uuid(self.uuid)
+            uuid = self.uuid
+        else:
+            ign, uuid = await get_uuid_by_name(self.string)
+            if not ign:
+                return unknown_ign_embed
+
         _, weekly_gexp = await get_player_gexp(uuid)
         if not ign:
             return unknown_ign_embed
+
         await ctx.respond("Please respond to the following prompts: ")
         # Ask DNKL application questions
         await dnkl_application(ign, uuid, ctx.channel, ctx.author, weekly_gexp)
@@ -246,14 +253,18 @@ class String:
         if self.uuid and self.username:
             uuid = self.uuid
             name = self.username
+        elif self.uuid:
+            name = await get_name_by_uuid(self.uuid)
+            uuid = self.uuid
         else:
             name, uuid = await get_uuid_by_name(self.string)
             if not name:
                 return unknown_ign_embed
+
         _, weeklygexp = await get_player_gexp(uuid)
 
         # Player is not in a guild
-        if not weeklygexp:
+        if weeklygexp is None:
             return guildless_embed
 
         # Player is eligible
