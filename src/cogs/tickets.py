@@ -84,7 +84,11 @@ class Tickets(commands.Cog, name="tickets"):
     )
     async def rename(self, ctx: discord.ApplicationContext, *, channel_name: str) -> None:
         """Rename a ticket!"""
-        await ctx.respond(embed=await String(string=channel_name).rename(ctx))
+        res = await String(string=channel_name).rename(ctx)
+        if isinstance(res, discord.Embed):
+            await ctx.respond(embed=res)
+        elif isinstance(res, str):
+            await ctx.respond(res)
 
     @bridge.bridge_command()
     @commands.has_any_role("Staff", "Discord Moderator")
