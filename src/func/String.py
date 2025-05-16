@@ -284,16 +284,15 @@ class String:
         embed.set_author(name="Do-not-kick-list: Eligibility Check")
         return embed
 
-    async def rename(self, ctx: discord.ApplicationContext) -> int | discord.Embed | str:
+    async def rename(self, ctx: discord.ApplicationContext) -> discord.Embed | str:
         if ctx.channel.category.name not in ticket_categories.values():
             return "This command can only be used in tickets!"
-
-        old_name = ctx.channel.name
 
         if not self.string:
             return f"**SYNTAX:** `{prefix}rename <new channel name>`"
 
         # Channel is a ticket
+        old_name = ctx.channel.name
         channel_name = self.string.replace(" ", "-")
         await ctx.channel.edit(name=channel_name)
         return discord.Embed(title=f"The channel name was changed from {old_name} to {channel_name}",
