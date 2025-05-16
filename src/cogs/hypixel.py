@@ -59,7 +59,10 @@ class Hypixel(commands.Cog, name="hypixel"):
     )
     async def dnkl_add(self, ctx: discord.ApplicationContext, name: str) -> None:
         """Add a user to the do-not-kick list!"""
-        res = await String(string=name).dnkladd(ctx)
+        if name and len(name) == 32:
+            res = await String(uuid=name).dnkladd(ctx)
+        else:
+            res = await String(string=name).dnkladd(ctx)
         if isinstance(res, str):
             await ctx.respond(res)
         elif isinstance(res, discord.Embed):
@@ -101,9 +104,12 @@ class Hypixel(commands.Cog, name="hypixel"):
     )
     async def dnkl_check(self, ctx: discord.ApplicationContext, name: str = None) -> None:
         """Check whether a player is on the do-not-kick list!"""
-        if not name:
+
+        if name and len(name) == 32:
+            res = await String(uuid=name).dnklcheck()
+        elif not name:
             username, uuid = await get_db_uuid_username(discord_id=ctx.author.id)
-            res = await String(uuid=uuid, username=username).dnklcheck()
+            res = await String(uuid=uuid).dnklcheck()
         else:
             res = await String(string=name).dnklcheck()
 
