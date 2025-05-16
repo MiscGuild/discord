@@ -4,7 +4,7 @@ from discord.ext import commands, bridge
 from src.func.General import General
 from src.func.Integer import Integer
 from src.func.String import String
-from src.utils.calculation_utils import check_if_mention
+from src.utils.calculation_utils import check_if_mention, get_username_autocomplete
 from src.utils.consts import gvg_info_embed, requirements_embed, resident_embed
 from src.utils.db_utils import get_db_uuid_username
 
