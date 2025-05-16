@@ -3,8 +3,10 @@ import re
 from datetime import datetime, timedelta, timezone
 from typing import Tuple, List
 
+import discord
+
 from src.utils.consts import ChatColor, active_req, member_req, resident_req
-from src.utils.db_utils import get_do_ping, get_db_uuid_username
+from src.utils.db_utils import get_do_ping, get_db_uuid_username, get_all_usernames
 from src.utils.request_utils import get_player_guild, get_name_by_uuid
 
 
@@ -245,3 +247,12 @@ async def get_monthly_gexp(gexp_data: dict) -> int:
     monthly_gexp_total = sum(monthly_gexp.values())
 
     return monthly_gexp_total
+
+
+async def get_username_autocomplete(self, ctx: discord.AutocompleteContext):
+    username_list = await get_all_usernames()  # Fetch all usernames (list of tuples)
+    query = ctx.value.lower()
+    filtered_usernames = [
+        (value, name) for value, name in username_list if query in name.lower()
+    ]
+    return [discord.OptionChoice(name, value) for value, name in filtered_usernames[:25]]
