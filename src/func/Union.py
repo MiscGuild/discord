@@ -13,7 +13,7 @@ from src.utils.consts import (active_req, allies, discord_not_linked_embed, guil
                               staff_impersonation_embed, ticket_categories,
                               unknown_ign_embed, join_request_embed, guildless_embed)
 from src.utils.db_utils import update_member, insert_new_member, get_db_uuid_username, set_do_ping_db, \
-    get_member_gexp_history, get_elite_member
+    get_member_gexp_history, get_elite_member, get_do_ping
 from src.utils.discord_utils import (create_ticket, has_tag_perms,
                                      is_linked_discord)
 from src.utils.referral_utils import get_invitation_stats
@@ -384,7 +384,8 @@ class Union:
         embed = discord.Embed(
             title=username,
             description=f"**Discord Username:** {self.user.name}\n"
-                        f"**Discord Nick:** {self.user.nick}",
+                        f"**Discord Nick:** {self.user.nick}\n"
+                        f"**Mentions:** {'✅' if (await get_do_ping(uuid))[1] else '❌'}\n",
             color=neutral_color
         )
         if any([is_booster, is_sponsor, is_gvg, is_creator]):
