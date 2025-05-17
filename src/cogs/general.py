@@ -83,6 +83,18 @@ class General(commands.Cog, name="general"):
         """Used to find a player's minecraft username and uuid using their discord account."""
         await ctx.respond(embed=await Union(member or ctx.author).whois())
 
+    @bridge.bridge_command()
+    @bridge.bridge_option(
+        name="user",
+        description="Discord member whose profile you'd like to view",
+        required=False,
+        input_type=discord.Member
+    )
+    async def me(self, ctx: discord.ApplicationContext, user: discord.Member = None) -> None:
+        """View a user's profile"""
+        await ctx.respond(embed=await Union(user or ctx.author).me())
+
+
 
 def setup(bot):
     bot.add_cog(General(bot))
