@@ -1,21 +1,6 @@
 from dataclasses import dataclass, asdict, field
 from typing import List
 
-
-@dataclass
-class Player:
-    uuid: str
-    username: str = None
-    discord_id: int = None
-
-    def to_dict(self):
-        return {
-            "uuid": self.uuid,
-            "name": self.username,
-            "discord_id": self.discord_id,
-        }
-
-
 @dataclass
 class WeeklyStats:
     total: int = 0
