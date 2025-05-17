@@ -2,18 +2,21 @@
 
 import asyncio
 from __main__ import bot
+from datetime import datetime, timezone
 from typing import Union as typingUnion, Tuple
 
 import discord
 
-from src.utils.calculation_utils import check_tag
+from src.utils.calculation_utils import check_tag, get_monthly_gexp
 from src.utils.consts import (active_req, allies, discord_not_linked_embed, guild_handle, neg_color, neutral_color,
                               pos_color, registration_channel_id,
                               staff_impersonation_embed, ticket_categories,
-                              unknown_ign_embed, join_request_embed)
-from src.utils.db_utils import update_member, insert_new_member, get_db_uuid_username, set_do_ping_db
+                              unknown_ign_embed, join_request_embed, guildless_embed)
+from src.utils.db_utils import update_member, insert_new_member, get_db_uuid_username, set_do_ping_db, \
+    get_member_gexp_history, get_elite_member, get_do_ping
 from src.utils.discord_utils import (create_ticket, has_tag_perms,
                                      is_linked_discord)
+from src.utils.referral_utils import get_invitation_stats
 from src.utils.request_utils import (get_gtag, get_hypixel_player,
                                      get_player_guild, get_name_by_uuid, get_uuid_by_name)
 
@@ -345,5 +348,73 @@ class Union:
             description=f"You will **{'now' if bool(setting) else 'not'}** be pinged in automatic daily and weekly leaderboard messages!",
             color=neutral_color
         )
+        embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
+        return embed
+
+    async def me(self):
+        username, uuid = await get_db_uuid_username(discord_id=self.user.id)
+        is_booster, is_sponsor, is_gvg, is_creator, is_indefinite, expiry = await get_elite_member(uuid) or (
+            False, False, False, False, False, None)
+        historical_gexp_data = await get_member_gexp_history(uuid)
+        guild = await get_player_guild(uuid)
+
+        if not guild:
+            return guildless_embed
+        if guild["name"] != guild_handle:
+            return discord.Embed(
+                title="You are not a member of Miscellaneous!",
+                description=f"Member of {guild['name']}",
+                color=neg_color
+            )
+
+        member = next((m for m in guild["members"] if m["uuid"] == uuid), None)
+        weekly_gexp_history = member["expHistory"]
+
+        guild_rank = member["rank"]
+        weekly_gexp = sum(weekly_gexp_history.values())
+        monthly_gexp = 0
+        yearly_gexp = 0
+
+        if historical_gexp_data:
+            monthly_gexp = await get_monthly_gexp(historical_gexp_data)
+            yearly_gexp = sum(historical_gexp_data.values())
+
+        invitation_stats = await get_invitation_stats(uuid)
+
+        embed = discord.Embed(
+            title=username,
+            description=f"**Discord Username:** {self.user.name}\n"
+                        f"**Discord Nick:** {self.user.nick}\n"
+                        f"**Mentions:** {'✅' if (await get_do_ping(uuid))[1] else '❌'}\n",
+            color=neutral_color
+        )
+        if any([is_booster, is_sponsor, is_gvg, is_creator]):
+            expiry_str = expiry if not is_indefinite else None
+            if expiry_str:
+                expiry_dt = datetime.strptime(expiry_str, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+                unix_ts = int(expiry_dt.timestamp())
+                expiry_display = f"<t:{unix_ts}:R>"
+            else:
+                expiry_display = "Never"
+
+            embed.add_field(name="Elite Member", value=f"`✚` Server Booster: {'✅' if is_booster else '❌'}\n"
+                                                       f"`✚` Event Sponsor: {'✅' if is_sponsor else '❌'}\n"
+                                                       f"`✚` Exceptional GvG Team Member: {'✅' if is_gvg else '❌'}\n"
+                                                       f"`✚` Content Creator: {'✅' if is_creator else '❌'}\n"
+                                                       f"`✚` Expiry: {expiry_display}", inline=False)
+        elif guild_rank == "Elite Member":
+            embed.add_field(name="Current Rank", value=f"Elite Member - Active", inline=False)
+        else:
+            embed.add_field(name="Current Rank", value=f"{guild_rank}", inline=False)
+        embed.add_field(name="GEXP History", value=f"`✚` Weekly: {format(weekly_gexp, ',d')}\n"
+                                                   f"`✚` Monthly: {format(monthly_gexp, ',d')}\n"
+                                                   f"`✚` Yearly: {format(yearly_gexp, ',d')}", inline=True)
+
+        embed.add_field(name="Invites",
+                        value=f"`✚` Weekly Valid: {format(invitation_stats.weekly.valid, ',d')}\n"
+                              f"`✚` Weekly: {format(invitation_stats.weekly.total, ',d')}\n"
+                              f"`✚` Total Valid: {format(invitation_stats.valid, ',d')}\n"
+                              f"`✚` Total: {format(invitation_stats.total, ',d')}\n", inline=True)
+
         embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
         return embed
