@@ -7,7 +7,8 @@ from typing import List
 from src.utils.calculation_utils import get_player_gexp, get_gexp_sorted
 from src.utils.consts import guild_handle, member_req, active_req, rank_upgrade_channel, \
     rank_upgrade_winner_announcement
-from src.utils.db_utils import select_one, insert_new_inviter, add_invitee, get_db_uuid_username
+from src.utils.data_classes import InvitationStats
+from src.utils.db_utils import select_one, insert_new_inviter, add_invitee, get_db_uuid_username, get_invites
 from src.utils.request_utils import get_player_guild, get_guild_by_name, get_name_by_uuid, get_uuid_by_name
 
 
@@ -135,3 +136,23 @@ async def generate_rank_upgrade(weekly_invites: list) -> None:
     )
 
     await bot.get_channel(rank_upgrade_channel).send(announcement)
+
+
+async def get_invitation_stats(uuid: str) -> InvitationStats:
+    stats = InvitationStats(uuid=uuid)
+    invites_raw = await get_invites(uuid)
+
+    if not invites_raw:
+        return stats
+
+    stats.total = invites_raw[1]
+    stats.valid = invites_raw[2]
+
+    stats.weekly.all_uuids = invites_raw[0].split()
+    stats.weekly.total = len(stats.weekly.all_uuids)
+
+    valid_invites = await check_invitation_validity(stats.weekly.all_uuids)
+    stats.weekly.valid_uuids = valid_invites
+    stats.weekly.valid = len(valid_invites)
+
+    return stats
