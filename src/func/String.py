@@ -18,8 +18,8 @@ from src.utils.consts import (prefix, dnkl_channel_id, dnkl_req, guildless_embed
                               ticket_categories, unknown_ign_embed, rainbow_separator, guild_handle,
                               missing_permissions_embed, member_req)
 from src.utils.db_utils import (delete_dnkl, select_one, get_db_uuid_username,
-                                get_invites, get_member_gexp_history, insert_elite_member, get_elite_member)
-from src.utils.referral_utils import check_invitation_validity
+                                get_member_gexp_history, insert_elite_member, get_elite_member)
+from src.utils.referral_utils import get_invitation_stats
 from src.utils.request_utils import (get_hypixel_player,
                                      get_player_guild, get_name_by_uuid, get_uuid_by_name)
 from src.utils.ticket_utils.dnkl import dnkl_application
@@ -331,34 +331,32 @@ class String:
         elif ("name" not in guild) or (guild["name"] != guild_handle):
             return missing_permissions_embed
 
-        invites = await get_invites(uuid)
+        invitation_stats = await get_invitation_stats(uuid)
+        weekly_invites = invitation_stats.weekly.total
+        weekly_valid_invites = invitation_stats.weekly.valid
+        total_invites = invitation_stats.total
+        total_valid_invites = invitation_stats.valid
+
+        weekly_invites_dict = {}
+        for invitee in invitation_stats.weekly.all_uuids:
+            weekly_invites_dict[invitee] = await get_name_by_uuid(invitee)
+
+        valid_invites = [weekly_invites_dict[invitee] for invitee in invitation_stats.weekly.valid_uuids]
+
         invites_text = ""
-        if not invites:
-            weekly_invites, total_invites, total_valid_invites = None, 0, "0"
-            valid_invites = []
-        else:
-            weekly_invites, total_invites, total_valid_invites = invites
-            weekly_invites = weekly_invites.split()
-            valid_invites = await check_invitation_validity(weekly_invites)
-            weekly_invites_dict = {}
-            for invitee in weekly_invites:
-                weekly_invites_dict[invitee] = await get_name_by_uuid(invitee)
-
-            valid_invites = [weekly_invites_dict[invitee] for invitee in valid_invites]
-
-            for invitee in weekly_invites_dict.values():
-                invitee = invitee.replace("_", "\\_")
-                if invitee in valid_invites:
-                    invites_text += f"🟢 {invitee}\n"
-                else:
-                    invites_text += f"🔴 {invitee}\n"
+        for invitee in weekly_invites_dict.values():
+            invitee = invitee.replace("_", "\\_")
+            if invitee in valid_invites:
+                invites_text += f"🟢 {invitee}\n"
+            else:
+                invites_text += f"🔴 {invitee}\n"
         embed = discord.Embed(title=f"{name}'s Invites", color=neutral_color)
         embed.add_field(name="Weekly Invites", value=None if not invites_text else invites_text, inline=False)
-        embed.add_field(name="This week's statistics", value=f"Total Valid Invites: {len(valid_invites)}\n"
-                                                             f"Total Invites: {len(weekly_invites) if weekly_invites else 0}\n"
-                                                             f"Success Rate: {round(len(valid_invites) * 100 / len(weekly_invites)) if weekly_invites else 0}%",
+        embed.add_field(name="This week's statistics", value=f"Valid Invites: {weekly_valid_invites}\n"
+                                                             f"Total Invites: {weekly_invites}\n"
+                                                             f"Success Rate: {round(weekly_valid_invites * 100 / weekly_invites) if weekly_invites else 0}%",
                         inline=False)
-        embed.add_field(name="Total Valid Invites", value=total_valid_invites, inline=True)
+        embed.add_field(name="Total Valid Invites", value=str(total_valid_invites), inline=True)
         embed.add_field(name="Total Invites", value=str(total_invites), inline=True)
         embed.add_field(name="Total Success Rate",
                         value=f"{round(total_valid_invites * 100 / total_invites if total_invites else 0)}%",
@@ -369,6 +367,7 @@ class String:
                               f"{format(2 * member_req, ',d')} guild experience at the end of the week. "
                               "If they joined in the middle of the week, their guild experience will be scaled up.")
         return embed
+
 
     async def elite_member(self, discord_member: discord.Member = None, monetary_value: int = None,
                            is_automatic: bool = False) -> discord.Embed:
