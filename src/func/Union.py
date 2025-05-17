@@ -2,18 +2,21 @@
 
 import asyncio
 from __main__ import bot
+from datetime import datetime, timezone
 from typing import Union as typingUnion, Tuple
 
 import discord
 
-from src.utils.calculation_utils import check_tag
+from src.utils.calculation_utils import check_tag, get_monthly_gexp
 from src.utils.consts import (active_req, allies, discord_not_linked_embed, guild_handle, neg_color, neutral_color,
                               pos_color, registration_channel_id,
                               staff_impersonation_embed, ticket_categories,
-                              unknown_ign_embed, join_request_embed)
-from src.utils.db_utils import update_member, insert_new_member, get_db_uuid_username, set_do_ping_db
+                              unknown_ign_embed, join_request_embed, guildless_embed)
+from src.utils.db_utils import update_member, insert_new_member, get_db_uuid_username, set_do_ping_db, \
+    get_member_gexp_history, get_elite_member
 from src.utils.discord_utils import (create_ticket, has_tag_perms,
                                      is_linked_discord)
+from src.utils.referral_utils import get_invitation_stats
 from src.utils.request_utils import (get_gtag, get_hypixel_player,
                                      get_player_guild, get_name_by_uuid, get_uuid_by_name)
 
@@ -376,6 +379,7 @@ class Union:
             monthly_gexp = await get_monthly_gexp(historical_gexp_data)
             yearly_gexp = sum(historical_gexp_data.values())
 
+        invitation_stats = await get_invitation_stats(uuid)
 
         embed = discord.Embed(
             title=username,
@@ -406,10 +410,10 @@ class Union:
                                                    f"`✚` Yearly: {format(yearly_gexp, ',d')}", inline=True)
 
         embed.add_field(name="Invites",
-                        value=f"`✚` Weekly Valid: {format(invitation_stats["weekly"]["total_valid"], ',d')}\n"
-                              f"`✚` Weekly: {format(invitation_stats["weekly"]["total"], ',d')}\n"
-                              f"`✚` Total Valid: {format(invitation_stats["total_valid"], ',d')}\n"
-                              f"`✚` Total: {format(invitation_stats["total"], ',d')}\n", inline=True)
+                        value=f"`✚` Weekly Valid: {format(invitation_stats.weekly.valid, ',d')}\n"
+                              f"`✚` Weekly: {format(invitation_stats.weekly.total, ',d')}\n"
+                              f"`✚` Total Valid: {format(invitation_stats.valid, ',d')}\n"
+                              f"`✚` Total: {format(invitation_stats.total, ',d')}\n", inline=True)
 
         embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
         return embed
