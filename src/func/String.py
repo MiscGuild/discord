@@ -387,11 +387,12 @@ class String:
 
         if "server booster" in reason.lower() and is_automatic:
             reason = "Server Booster"
-            is_indefinite = True
             is_booster = not is_booster
+
 
         elif "sponsor" in reason.lower():
             reason = "Event Sponsor"
+
             is_sponsor = True
             if monetary_value is None:
                 return discord.Embed(title="Monetary Value Required",
@@ -415,18 +416,19 @@ class String:
 
         elif "gvg" in reason.lower():
             reason = "GvG Team"
-            is_indefinite = True
             is_gvg = not is_gvg
 
         elif reason.lower() in ("yt", "content creator", "youtube", "twitch", "streamer", "youtuber"):
             reason = "Content Creator"
-            is_indefinite = True
             is_creator = not is_creator
 
         else:
             return discord.Embed(title="Invalid Reason",
                                  description="Please choose a valid reason for the Elite Member role.",
                                  color=neg_color)
+
+        is_indefinite = True if any([is_booster, is_creator, is_gvg]) else False
+
 
         await insert_elite_member(uuid=uuid, is_booster=is_booster, is_sponsor=is_sponsor, is_creator=is_creator,
                                   is_gvg=is_gvg, is_indefinite=is_indefinite, expiry=expiry)
