@@ -18,7 +18,7 @@ async def organize_gvg(ticket: discord.TextChannel, interaction: discord.Interac
         embed = discord.Embed(title="GvG Request", color=neutral_color)
     else:
         embed = discord.Embed(
-            title=f"{ign} wishes to organize a GvG with Miscellaneous on behalf of {guild['name']}",
+            title=f"{ign} wishes to organize a GvG with {guild_handle} on behalf of {guild['name']}",
             description=f"Guild Level: {await get_guild_level(guild['exp'])}",
             color=neutral_color)
     fields.extend(
