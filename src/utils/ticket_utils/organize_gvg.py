@@ -28,3 +28,7 @@ async def organize_gvg(ticket: discord.TextChannel, interaction: discord.Interac
          ["Time & Timezone", "", discord.InputTextStyle.short, "Time & Timezone"]])
     await interaction.response.send_modal(
         modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, title="GvG Request", uuid=uuid))
+
+    await ticket.edit(name=f"gvg-request-{ign}", topic=f"{interaction.user.id if interaction else user.id}|",
+                      category=discord.utils.get((interaction.guild if interaction else ticket.guild).categories,
+                                                 name=ticket_categories["generic"]))
