@@ -88,7 +88,7 @@ milestone_emojis = {
     "other": "❓"
 }
 
-elite_member_categories = ("Event Sponsor", "GvG Team", "YouTuber")
+elite_member_categories = ("Event Sponsor", "GvG Team", "YouTuber", "Server Booster")
 
 # General embeds
 registration_embed = discord.Embed(title=f"Welcome to the {guild_handle} Discord!",
