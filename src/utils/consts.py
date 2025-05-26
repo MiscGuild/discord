@@ -112,11 +112,11 @@ accepted_staff_application_embed = discord.Embed(title="Congratulations, your st
 requirements_embed = discord.Embed(title="Miscellaneous Guild Requirements",
                                    description="These requirements are subject to change!",
                                    color=neutral_color).add_field(
-    name="Active",
+    name="Elite Member - Active",
     value=f"•  {format(active_req, ',d')} Weekly Guild Experience",
     inline=False).add_field(name="Member",
                             value=f"•  {format(member_req, ',d')} Weekly Guild Experience",
-                            inline=False).add_field(name="Resident",
+                            inline=False).add_field(name="Elite Member - Regular",
                                                     value=f"•  {format(resident_req, ',d')} Weekly Guild Experience",
                                                     inline=False).add_field(name="Do-not-kick-list Eligibility",
                                                                             value=f"•  {format(dnkl_req, ',d')} Weekly Guild Experience",
