@@ -6,10 +6,11 @@ from src.utils.consts import neutral_color, ticket_categories, neg_color, positi
     staff_application_questions
 
 
-async def staff_application(ticket: discord.TextChannel, interaction: discord.Interaction, ign: str):
+async def staff_application(ticket: discord.TextChannel, interaction: discord.Interaction, user: discord.Member,
+                            ign: str):
     # Edit category and send info embed with requirements
-    await ticket.edit(name=f"staff-application-{ign}", topic=f"{interaction.user.id}|",
-                      category=discord.utils.get(interaction.guild.categories,
+    await ticket.edit(name=f"staff-application-{ign}", topic=f"{interaction.user.id if interaction else user.id}|",
+                      category=discord.utils.get((interaction.guild if interaction else ticket.guild).categories,
                                                  name=ticket_categories["generic"]))
     await ticket.send(embed=discord.Embed(title=f"{ign} wishes to apply for staff!",
                                           description="Please respond to the bot's prompts appropriately!",
@@ -22,7 +23,7 @@ async def staff_application(ticket: discord.TextChannel, interaction: discord.In
         inline=False))
 
     meets_requirements = await bot.wait_for("message", check=lambda
-        x: x.channel == ticket and x.author == interaction.user)
+        x: x.channel == ticket and (x.author == interaction.user or x.author == user))
 
     # If user doesn't meet requirements, deny application
     if meets_requirements.content.lower() not in positive_responses:
@@ -40,7 +41,7 @@ async def staff_application(ticket: discord.TextChannel, interaction: discord.In
                                               color=neutral_color))
         answer = await bot.wait_for("message",
                                     check=lambda
-                                        x: x.channel == ticket and x.author == interaction.user)
+                                        x: x.channel == ticket and (x.author == interaction.user or x.author == user))
 
         # Place answer into array with question number
         answers[number] = answer.content
@@ -58,4 +59,4 @@ async def staff_application(ticket: discord.TextChannel, interaction: discord.In
 
     # Send embed
     message = await ticket.send(embed=review_embed)
-    await ticket.edit(topic=f"{interaction.user.id}|{message.id}")
+    await ticket.edit(topic=f"{interaction.user.id if interaction else user.id}|{message.id}")
