@@ -2,7 +2,7 @@ from __main__ import bot
 
 import discord
 
-from src.utils.consts import neutral_color, ticket_categories
+from src.utils.consts import ticket_categories, join_request_embed
 
 
 async def join_guild(ticket: discord.TextChannel, interaction: discord.Interaction, user: discord.Member, ign: str):
@@ -12,6 +12,4 @@ async def join_guild(ticket: discord.TextChannel, interaction: discord.Interacti
                                                  name=ticket_categories["registrees"]))
     await ticket.purge(limit=100)
     await ticket.send(
-        embed=discord.Embed(title=f"{ign} wishes to join Miscellaneous!",
-                            description=f"Please await staff assistance!\nIn the meanwhile, you may explore the Discord!",
-                            color=neutral_color))
+        embed=join_request_embed.set_author(name=f"{ign} wishes to join Miscellaneous"))
