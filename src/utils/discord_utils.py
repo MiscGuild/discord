@@ -174,6 +174,57 @@ async def send_ticket_dropdown(ticket: discord.TextChannel, user: discord.Member
     await ticket.send(embed=embed, view=view)
 
 
+async def handle_ticket_reason(reason: str, ticket: discord.TextChannel,
+                               interaction: Optional[discord.Interaction], user: discord.Member, ctx=None) -> None:
+    ign, uuid = await get_uuid_by_name(await name_grabber(user))
+
+    reason = reason.lower().replace(" ", "_").replace("-", "_").replace("'", "").replace("!", "").replace("?", "")
+
+    if "report" in reason:
+        if interaction:
+            await player_report(ticket, interaction, user, ign, uuid)
+        else:
+            await ticket.send(
+                "⚠️ This ticket reason is only available through the following dropdown.")
+            await send_ticket_dropdown(ticket, user, ctx)
+    elif "question" in reason:
+        await query(ticket, interaction, user, ign)
+    elif "milestone" in reason:
+        await milestone(ticket, interaction, user, ign)
+    elif "inactive" in reason or "dnkl" in reason:
+        await dnkl(ticket, interaction, user, ign, uuid)
+    elif "rank_upgrade" in reason:
+        await rank_upgrade(ticket, interaction, user, ign)
+    elif "staff" in reason:
+        await staff_application(ticket, interaction, user, ign)
+    elif "gvg_team" in reason:
+        await gvg_application(ticket, interaction, ign, uuid, user)
+    elif "join_guild" in reason or f"join_{guild_handle.lower()}" in reason:
+        await join_guild(ticket, interaction, user, ign)
+    elif "organize_gvg" in reason or "organize_a_gvg" in reason:
+        if interaction:
+            await organize_gvg(ticket, interaction, user, ign, uuid)
+        else:
+            await ticket.send(
+                "⚠️ This ticket reason is only available through the following dropdown.")
+            await send_ticket_dropdown(ticket, user, ctx)
+    elif "ally" in reason:
+        if interaction:
+            await ally_request(ticket, interaction, user, ign, uuid)
+        else:
+            await ticket.send(
+                "⚠️ This ticket reason is only available through the following dropdown.")
+            await send_ticket_dropdown(ticket, user, ctx)
+    elif "problem" in reason:
+        await problem(ticket, interaction, user, ign)
+    elif "other" in reason:
+        await other(ticket, interaction, user, ign, uuid)
+    else:
+        await ticket.send(
+            "⚠️ Not a valid ticket reason! Please select a valid reason from the dropdown.")
+        await send_ticket_dropdown(ticket, user, ctx)
+
+
 async def log_event(title: str, description: str = None) -> None:
     embed = discord.Embed(title=title, description=description, color=neutral_color)
     await bot.get_channel(log_channel_id).send(embed=embed)
