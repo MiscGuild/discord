@@ -19,7 +19,7 @@ from src.utils.consts import (accepted_staff_application_embed, active_req,
                               registration_channel_id, registration_embed,
                               staff_application_questions, ticket_categories,
                               dnkl_entries_not_found,
-                              positive_responses, allies)
+                              positive_responses, allies, milestone_categories)
 from src.utils.db_utils import insert_new_giveaway, select_all, \
     get_db_uuid_username, update_member, get_all_elite_members, delete_elite_member, get_dnkl_list
 from src.utils.discord_utils import (create_ticket,
@@ -680,7 +680,7 @@ class General:
             def __init__(self):
                 super().__init__()
                 for key, value in milestone_emojis.items():
-                    self.add_option(label=key.replace("_", " ").title(), emoji=f"{value}")
+                    self.add_option(label=milestone_categories[key], emoji=f"{value}")
 
             # Override default callback
             async def callback(self, interaction: discord.Interaction):
