@@ -225,9 +225,9 @@ class General:
         return transcript
 
     @staticmethod
-    async def new(ctx: discord.ApplicationContext) -> str:
+    async def new(ctx: discord.ApplicationContext, reason: str = None) -> str:
         # Create ticket
-        ticket = await create_ticket(ctx.author, f"ticket-{await name_grabber(ctx.author)}")
+        ticket = await create_ticket(ctx.author, f"ticket-{await name_grabber(ctx.author)}", reason=reason, ctx=ctx)
 
         # Return message with link to ticket
         return f"Click the following link to go to your ticket! <#{ticket.id}>"
@@ -324,7 +324,6 @@ class General:
         # Retrieve DNKL users so they can be filtered out
         dnkl_uuids = [x[1] for x in await get_dnkl_list()]
 
-
         elite_members = await get_all_elite_members() or []
         elite_member_uuids = []
         for uuid, is_booster, is_sponsor, is_gvg, is_creator, is_indefinite, expiry in elite_members:
@@ -332,7 +331,6 @@ class General:
                 elite_member_uuids.append(uuid)
             else:
                 await delete_elite_member(uuid)
-
 
         # Define dicts for each category of users
         to_promote_elite, to_demote_elite, inactive, dnkl, skipped_users = {}, {}, {}, {}, []
