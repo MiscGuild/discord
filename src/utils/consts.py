@@ -88,6 +88,27 @@ milestone_emojis = {
     "other": "❓"
 }
 
+guest_ticket_reasons = {
+    f"I want to join {guild_handle}": "<:Misc:540990817872117780>",
+    f"I want to organize a GvG with {guild_handle}": "⚔️",
+    f"My guild wishes to ally {guild_handle}": "🤝"
+}
+
+member_ticket_reasons = {
+    "I want to register a milestone": "🏆",
+    "I am going to be inactive": "<:dnkl:877657298703634483>",
+    "I won a rank upgrade": "💰",
+    "I want to join the staff team": "🤵",
+    "I want to join the GvG team": "⚔️"
+}
+
+general_ticket_reasons = {
+    "I want to report a player": "🗒️",
+    "I have a question": "🤔",
+    "I have a problem": "❌",
+    "Other": "❓"
+}
+
 elite_member_categories = ("Event Sponsor", "GvG Team", "YouTuber", "Server Booster")
 
 # General embeds
