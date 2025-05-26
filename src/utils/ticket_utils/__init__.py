@@ -8,6 +8,7 @@ from .milestone import milestone
 from .organize_gvg import organize_gvg
 from .other import other
 from .player_report import player_report
+from .problem import problem
 from .query import query
 from .rank_upgrade import rank_upgrade
 from .staff_application import staff_application
