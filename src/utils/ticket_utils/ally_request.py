@@ -6,10 +6,8 @@ from src.utils.consts import neutral_color, ticket_categories, guild_handle
 from src.utils.request_utils import get_player_guild
 
 
-async def ally_request(ticket: discord.TextChannel, interaction: discord.Interaction, ign: str, uuid: str):
-    await ticket.edit(name=f"alliance-request-{ign}", topic=f"{interaction.user.id}|",
-                      category=discord.utils.get(interaction.guild.categories,
-                                                 name=ticket_categories["generic"]))
+async def ally_request(ticket: discord.TextChannel, interaction: discord.Interaction, user: discord.Member, ign: str,
+                       uuid: str):
     guild = await get_player_guild(uuid)
     fields = []
 
@@ -20,7 +18,7 @@ async def ally_request(ticket: discord.TextChannel, interaction: discord.Interac
         embed = discord.Embed(title="Alliance Request Request", color=neutral_color)
     else:
         embed = discord.Embed(
-            title=f"{ign} wishes to ally with Miscellaneous on behalf of {guild['name']}",
+            title=f"{ign} wishes to ally with {guild_handle} on behalf of {guild['name']}",
             description=f"Guild Level: {await get_guild_level(guild['exp'])}",
             color=neutral_color)
     embed.set_footer(text="Please provide:\nGuild Logo\nGuild Advertisement Message")
@@ -33,3 +31,7 @@ async def ally_request(ticket: discord.TextChannel, interaction: discord.Interac
     await interaction.response.send_modal(
         modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, uuid=uuid,
                                    title="Alliance Request"))
+
+    await ticket.edit(name=f"alliance-request-{ign}", topic=f"{interaction.user.id if interaction else user.id}|",
+                      category=discord.utils.get((interaction.guild if interaction else ticket.guild).categories,
+                                                 name=ticket_categories["generic"]))
