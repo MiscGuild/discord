@@ -40,8 +40,8 @@ async def gvg_deny(channel: discord.TextChannel, author: discord.User, ign: str,
 
 async def gvg_application(ticket: discord.TextChannel, interaction: discord.Interaction, ign: str, uuid: str,
                           user: discord.Member):
-    await ticket.edit(name=f"gvg-application-{ign}", topic=f"{interaction.user.id}|",
-                      category=discord.utils.get(interaction.guild.categories,
+    await ticket.edit(name=f"gvg-application-{ign}", topic=f"{interaction.user.id if interaction else user.id}|",
+                      category=discord.utils.get((interaction.guild if interaction else ticket.guild).categories,
                                                  name=ticket_categories["generic"]))
 
     # Fetch player data
