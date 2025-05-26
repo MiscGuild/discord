@@ -422,6 +422,11 @@ class String:
             reason = "Content Creator"
             is_creator = not is_creator
 
+        elif "server booster" in reason.lower():
+            reason = "Server Booster"
+            is_booster = not is_booster
+
+
         else:
             return discord.Embed(title="Invalid Reason",
                                  description="Please choose a valid reason for the Elite Member role.",
