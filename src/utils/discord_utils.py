@@ -137,6 +137,43 @@ async def create_ticket(user: discord.Member, ticket_name: str,
     return ticket
 
 
+async def send_ticket_dropdown(ticket: discord.TextChannel, user: discord.Member, ctx=None) -> None:
+    # Send the dropdown for ticket creation
+    class TicketTypeSelect(ui.Select):
+        def __init__(self):
+            super().__init__()
+
+            if bot.guest in user.roles:
+                for key, value in guest_ticket_reasons.items():
+                    self.add_option(label=key, emoji=value)
+
+            # Add milestone, DNKL application, staff application, GvG application if user is a member
+            if bot.member_role in user.roles:
+                for key, value in member_ticket_reasons.items():
+                    self.add_option(label=key, emoji=value)
+
+            # Add default options
+            for key, value in general_ticket_reasons.items():
+                self.add_option(label=key, emoji=value)
+
+        # Override default callback
+        async def callback(self, interaction: discord.Interaction):
+            ign, uuid = await get_uuid_by_name(await name_grabber(interaction.user))
+            # Set option var and delete Select so it cannot be used twice
+            option = list(interaction.data.values())[0][0]
+            await ticket.purge(
+                limit=100)  # Deleting the interaction like this so that we can respond to the interaction later
+            await handle_ticket_reason(option, ticket, interaction, user, ctx)
+
+    # Create view and embed, send to ticket
+    view = discord.ui.View()
+    view.add_item(TicketTypeSelect())
+    embed = discord.Embed(title="Why did you make this ticket?",
+                          description="Please select your reason from the dropdown given below!",
+                          color=neutral_color)
+    await ticket.send(embed=embed, view=view)
+
+
 async def log_event(title: str, description: str = None) -> None:
     embed = discord.Embed(title=title, description=description, color=neutral_color)
     await bot.get_channel(log_channel_id).send(embed=embed)
