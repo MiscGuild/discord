@@ -129,9 +129,16 @@ class Tickets(commands.Cog, name="tickets"):
             return await channel.send(file=file)
 
     @bridge.bridge_command()
-    async def new(self, ctx: discord.ApplicationContext):
+    @bridge.bridge_option(
+        name="reason",
+        description="The reason for creating the ticket",
+        required=False,
+        input_type=str
+    )
+    async def new(self, ctx: discord.ApplicationContext, *, reason: str = None) -> None:
         """Create a new ticket!"""
-        await ctx.respond(await General().new(ctx))
+        await ctx.defer()
+        await ctx.respond(await General().new(ctx, reason))
 
         # Main command group: `/milestone`
 

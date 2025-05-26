@@ -51,7 +51,6 @@ pos_color = 0x00A86B
 neutral_color = 0x8369ff
 error_color = 0xDE3163
 
-
 milestone_categories = {
     "hypixel": "Hypixel",
     "bedwars": "BedWars",
@@ -61,6 +60,7 @@ milestone_categories = {
     "build_battle": "Build Battle",
     "arcade": "Arcade",
     "turbo_kart_racers": "Turbo Kart Racers",
+    "tnt_games": "TNT Games",
     "pit": "The Pit",
     "murder_mystery": "Murder Mystery",
     "copsvcrims": "Cops and Crims",
@@ -78,6 +78,7 @@ milestone_emojis = {
     "build_battle": "<:buildbattle:828113746978406481>",
     "arcade": "<:arcade:825723888477929472>",
     "turbo_kart_racers": "<:TurboKartRacers64:846306861950304267>",
+    "tnt_games": "<:TNTGames:828117342973198386>",
     "pit": "<:pit:851361342744690728>",
     "murder_mystery": "<:MurderMystery64:823036899974447105>",
     "copsvcrims": "<:CVC64:846306846717378560>",
@@ -86,7 +87,28 @@ milestone_emojis = {
     "other": "❓"
 }
 
-elite_member_categories = ("Event Sponsor", "GvG Team", "YouTuber")
+guest_ticket_reasons = {
+    f"I want to join {guild_handle}": "<:Misc:540990817872117780>",
+    f"I want to organize a GvG with {guild_handle}": "⚔️",
+    f"My guild wishes to ally {guild_handle}": "🤝"
+}
+
+member_ticket_reasons = {
+    "I want to register a milestone": "🏆",
+    "I am going to be inactive": "<:dnkl:877657298703634483>",
+    "I won a rank upgrade": "💰",
+    "I want to join the staff team": "🤵",
+    "I want to join the GvG team": "⚔️"
+}
+
+general_ticket_reasons = {
+    "I want to report a player": "🗒️",
+    "I have a question": "🤔",
+    "I have a problem": "❌",
+    "Other": "❓"
+}
+
+elite_member_categories = ("Event Sponsor", "GvG Team", "YouTuber", "Server Booster")
 
 # General embeds
 registration_embed = discord.Embed(title=f"Welcome to the {guild_handle} Discord!",
@@ -110,11 +132,11 @@ accepted_staff_application_embed = discord.Embed(title="Congratulations, your st
 requirements_embed = discord.Embed(title="Miscellaneous Guild Requirements",
                                    description="These requirements are subject to change!",
                                    color=neutral_color).add_field(
-    name="Active",
+    name="Elite Member - Active",
     value=f"•  {format(active_req, ',d')} Weekly Guild Experience",
     inline=False).add_field(name="Member",
                             value=f"•  {format(member_req, ',d')} Weekly Guild Experience",
-                            inline=False).add_field(name="Resident",
+                            inline=False).add_field(name="Elite Member - Regular",
                                                     value=f"•  {format(resident_req, ',d')} Weekly Guild Experience",
                                                     inline=False).add_field(name="Do-not-kick-list Eligibility",
                                                                             value=f"•  {format(dnkl_req, ',d')} Weekly Guild Experience",
@@ -314,7 +336,6 @@ rules_messages = ["""# Rules
 :rotating_light: 11. **No piracy, sexual, NSFW, or otherwise suspicious content.** We do not condone illegal or suspicious discussions and activity.
 :thinking: 12. **Rules are subject to common sense.** These rules are not comprehensive and use of loopholes to violate the spirit of these rules is subject to enforcement.
 :scroll: 13. **Discord Terms of Service and Community Guidelines apply.** You must be at least 13 years old to use Discord, and abide by all other terms and guidelines."""]
-
 
 rank_upgrade_winner_announcement = '''# RANK UPGRADE
 {date}

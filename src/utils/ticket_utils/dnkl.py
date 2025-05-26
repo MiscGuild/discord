@@ -99,11 +99,11 @@ async def dnkl_approve(channel: discord.TextChannel, author: discord.User, ign: 
     return True
 
 
-
-async def dnkl(ticket: discord.TextChannel, interaction: discord.Interaction, ign: str, uuid: str):
+async def dnkl(ticket: discord.TextChannel, interaction: discord.Interaction, user: discord.Member, ign: str,
+               uuid: str):
     # Edit channel name and category
-    await ticket.edit(name=f"dnkl-{ign}", topic=f"{interaction.user.id}|",
-                      category=discord.utils.get(interaction.guild.categories,
+    await ticket.edit(name=f"dnkl-{ign}", topic=f"{interaction.user.id if interaction else user.id}|",
+                      category=discord.utils.get((interaction.guild if interaction else ticket.guild).categories,
                                                  name=ticket_categories["dnkl"]))
 
     # Notify user if they don't meet gexp req, however ask questions anyway
@@ -123,4 +123,4 @@ async def dnkl(ticket: discord.TextChannel, interaction: discord.Interaction, ig
                                               description=f"You have {format(weekly_gexp, ',d')} weekly guild experience!",
                                               color=neutral_color))
 
-    await dnkl_application(ign, uuid, ticket, interaction.user, weekly_gexp)
+    await dnkl_application(ign, uuid, ticket, (interaction.user if interaction else user), weekly_gexp)

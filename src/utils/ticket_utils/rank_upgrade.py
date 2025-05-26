@@ -3,9 +3,9 @@ import discord
 from src.utils.consts import neutral_color, ticket_categories
 
 
-async def rank_upgrade(ticket: discord.TextChannel, interaction: discord.Interaction, ign: str):
-    await ticket.edit(name=f"rank-upgrade-{ign}", topic=f"{interaction.user.id}|",
-                      category=discord.utils.get(interaction.guild.categories,
+async def rank_upgrade(ticket: discord.TextChannel, interaction: discord.Interaction, user: discord.Member, ign: str):
+    await ticket.edit(name=f"rank-upgrade-{ign}", topic=f"{interaction.user.id if interaction else user.id}|",
+                      category=discord.utils.get((interaction.guild if interaction else ticket.guild).categories,
                                                  name=ticket_categories[
                                                      "generic"]))
     await ticket.send(embed=discord.Embed(title=f"{ign} claims to have won a rank upgrade.",

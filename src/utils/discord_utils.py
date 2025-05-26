@@ -1,11 +1,12 @@
 from __main__ import bot
+from typing import Optional
 
 import discord
 import discord.ui as ui
 from discord.ext import tasks
 
 from src.utils.consts import (config, log_channel_id, neutral_color, ticket_categories,
-                              guild_handle)
+                              guest_ticket_reasons, member_ticket_reasons, general_ticket_reasons, guild_handle)
 from src.utils.db_utils import connect_db, get_db_uuid_username
 from src.utils.request_utils import get_uuid_by_name
 from src.utils.ticket_utils import *
@@ -36,7 +37,8 @@ async def get_ticket_creator(channel: discord.TextChannel) -> discord.Member:
 
 
 async def create_ticket(user: discord.Member, ticket_name: str,
-                        category_name: str = ticket_categories["generic"]) -> discord.TextChannel:
+                        category_name: str = ticket_categories["generic"], reason: str = None,
+                        ctx=None) -> discord.TextChannel:
     # Create ticket
     ticket: discord.TextChannel = await bot.guild.create_text_channel(ticket_name,
                                                                       category=discord.utils.get(bot.guild.categories,
@@ -66,75 +68,101 @@ async def create_ticket(user: discord.Member, ticket_name: str,
                                  add_reactions=True, embed_links=True,
                                  attach_files=True,
                                  read_message_history=True, external_emojis=True)
-    if category_name != ticket_categories["registrees"]:
-        # Send the dropdown for ticket creation
-        class TicketTypeSelect(ui.Select):
-            def __init__(self):
-                super().__init__()
-
-                if bot.guest in user.roles:
-                    self.add_option(label=f"I want to join {guild_handle}", emoji="<:Misc:540990817872117780>")
-                    self.add_option(label=f"I want to organize a GvG with {guild_handle}", emoji="⚔️")
-                    self.add_option(label=f"My guild wishes to ally {guild_handle}", emoji="🤝")
-
-                # Add milestone, DNKL application, staff application, GvG application if user is a member
-                if bot.member_role in user.roles:
-                    self.add_option(label="I want to register a milestone", emoji="🏆")
-                    self.add_option(label="I am going to be inactive", emoji="<:dnkl:877657298703634483>")
-                    self.add_option(label="I won a rank upgrade", emoji="💰")
-                    self.add_option(label="I want to join the staff team", emoji="🤵")
-                    self.add_option(label="I want to join the GvG team", emoji="⚔️")
-
-                # Add default options
-                self.add_option(label="I want to report a player", emoji="🗒️")
-                self.add_option(label="I have a question", emoji="🤔")
-                self.add_option(label="I have a problem", emoji="❌")
-                self.add_option(label="Other", emoji="❓")
-
-            # Override default callback
-            async def callback(self, interaction: discord.Interaction):
-                ign, uuid = await get_uuid_by_name(await name_grabber(interaction.user))
-                # Set option var and delete Select so it cannot be used twice
-                option = list(interaction.data.values())[0][0]
-                await ticket.purge(
-                    limit=100)  # Deleting the interaction like this so that we can respond to the interaction later
-
-                # Logic for handling ticket types
-                if option == "I want to report a player":
-                    await player_report(ticket, interaction, ign, uuid)
-                if option == "I have a question":
-                    await query(ticket, interaction, ign)
-                if option == "I want to register a milestone":
-                    await milestone(ticket, interaction, ign)
-                if option == "I am going to be inactive":
-                    await dnkl(ticket, interaction, ign, uuid)
-                if option == "I won a rank upgrade":
-                    await rank_upgrade(ticket, interaction, ign)
-                if option == "I want to join the staff team":
-                    await staff_application(ticket, interaction, ign)
-                if option == "I want to join the GvG team":
-                    await gvg_application(ticket, interaction, ign, uuid, user)
-                if option == f"I want to join {guild_handle}":
-                    await join_guild(ticket, interaction, ign)
-                if option == f"I want to organize a GvG with {guild_handle}":
-                    await organize_gvg(ticket, interaction, ign, uuid)
-                if option == f"My guild wishes to ally  {guild_handle}":
-                    await ally_request(ticket, interaction, ign, uuid)
-                if option == "I have a problem":
-                    await problem(ticket, interaction, ign)
-                if option == "Other":
-                    await other(ticket, interaction, ign, uuid)
-
-        # Create view and embed, send to ticket
-        view = discord.ui.View()
-        view.add_item(TicketTypeSelect())
-        embed = discord.Embed(title="Why did you make this ticket?",
-                              description="Please select your reason from the dropdown given below!",
-                              color=neutral_color)
-        await ticket.send(embed=embed, view=view)
+    if reason:
+        await handle_ticket_reason(reason, ticket, interaction=None, user=user, ctx=ctx)
+    elif category_name != ticket_categories["registrees"]:
+        await send_ticket_dropdown(ticket, user, ctx)
 
     # Return ticket for use
     return ticket
+
+
+async def send_ticket_dropdown(ticket: discord.TextChannel, user: discord.Member, ctx=None) -> None:
+    # Send the dropdown for ticket creation
+    class TicketTypeSelect(ui.Select):
+        def __init__(self):
+            super().__init__()
+
+            if bot.guest in user.roles:
+                for key, value in guest_ticket_reasons.items():
+                    self.add_option(label=key, emoji=value)
+
+            # Add milestone, DNKL application, staff application, GvG application if user is a member
+            if bot.member_role in user.roles:
+                for key, value in member_ticket_reasons.items():
+                    self.add_option(label=key, emoji=value)
+
+            # Add default options
+            for key, value in general_ticket_reasons.items():
+                self.add_option(label=key, emoji=value)
+
+        # Override default callback
+        async def callback(self, interaction: discord.Interaction):
+            ign, uuid = await get_uuid_by_name(await name_grabber(interaction.user))
+            # Set option var and delete Select so it cannot be used twice
+            option = list(interaction.data.values())[0][0]
+            await ticket.purge(
+                limit=100)  # Deleting the interaction like this so that we can respond to the interaction later
+            await handle_ticket_reason(option, ticket, interaction, user, ctx)
+
+    # Create view and embed, send to ticket
+    view = discord.ui.View()
+    view.add_item(TicketTypeSelect())
+    embed = discord.Embed(title="Why did you make this ticket?",
+                          description="Please select your reason from the dropdown given below!",
+                          color=neutral_color)
+    await ticket.send(embed=embed, view=view)
+
+
+async def handle_ticket_reason(reason: str, ticket: discord.TextChannel,
+                               interaction: Optional[discord.Interaction], user: discord.Member, ctx=None) -> None:
+    ign, uuid = await get_uuid_by_name(await name_grabber(user))
+
+    reason = reason.lower().replace(" ", "_").replace("-", "_").replace("'", "").replace("!", "").replace("?", "")
+
+    if "report" in reason:
+        if interaction:
+            await player_report(ticket, interaction, user, ign, uuid)
+        else:
+            await ticket.send(
+                "⚠️ This ticket reason is only available through the following dropdown.")
+            await send_ticket_dropdown(ticket, user, ctx)
+    elif "question" in reason:
+        await query(ticket, interaction, user, ign)
+    elif "milestone" in reason:
+        await milestone(ticket, interaction, user, ign)
+    elif "inactive" in reason or "dnkl" in reason:
+        await dnkl(ticket, interaction, user, ign, uuid)
+    elif "rank_upgrade" in reason:
+        await rank_upgrade(ticket, interaction, user, ign)
+    elif "staff" in reason:
+        await staff_application(ticket, interaction, user, ign)
+    elif "gvg_team" in reason:
+        await gvg_application(ticket, interaction, ign, uuid, user)
+    elif "join_guild" in reason or f"join_{guild_handle.lower()}" in reason:
+        await join_guild(ticket, interaction, user, ign)
+    elif "organize_gvg" in reason or "organize_a_gvg" in reason:
+        if interaction:
+            await organize_gvg(ticket, interaction, user, ign, uuid)
+        else:
+            await ticket.send(
+                "⚠️ This ticket reason is only available through the following dropdown.")
+            await send_ticket_dropdown(ticket, user, ctx)
+    elif "ally" in reason:
+        if interaction:
+            await ally_request(ticket, interaction, user, ign, uuid)
+        else:
+            await ticket.send(
+                "⚠️ This ticket reason is only available through the following dropdown.")
+            await send_ticket_dropdown(ticket, user, ctx)
+    elif "problem" in reason:
+        await problem(ticket, interaction, user, ign)
+    elif "other" in reason:
+        await other(ticket, interaction, user, ign, uuid)
+    else:
+        await ticket.send(
+            "⚠️ Not a valid ticket reason! Please select a valid reason from the dropdown.")
+        await send_ticket_dropdown(ticket, user, ctx)
 
 
 async def log_event(title: str, description: str = None) -> None:
@@ -188,7 +216,6 @@ async def after_cache_ready() -> None:
     bot.recruiter = discord.utils.get(bot.guild.roles, name="Recruiter")
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff,
                              bot.server_booster, bot.rich_kid, bot.gvg, bot.veteran, bot.recruiter)
-
 
     from src.utils.loop_utils import check_giveaways, before_scheduler
     check_giveaways.start()
