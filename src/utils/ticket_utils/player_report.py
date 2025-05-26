@@ -21,3 +21,7 @@ async def player_report(ticket: discord.TextChannel, interaction: discord.Intera
     await interaction.response.send_modal(
         modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, uuid=uuid,
                                    title="Player Report"))
+
+    await ticket.edit(name=f"report-{ign}", topic=f"{interaction.user.id if interaction else user.id}|",
+                      category=discord.utils.get((interaction.guild if interaction else ticket.guild).categories,
+                                                 name=ticket_categories["generic"]))
