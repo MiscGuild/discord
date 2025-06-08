@@ -11,13 +11,14 @@ from src.utils.ticket_utils.tickets import close_ticket
 
 
 async def dnkl_application(ign: str, uuid: str, channel: discord.TextChannel, author: discord.User,
-                           weekly_gexp: int = None):
+                           weekly_gexp: int = None, days_in_guild: int = None):
     YearView = discord.ui.View()
     buttons = (("Approve", "DNKL_Approve", discord.enums.ButtonStyle.green, dnkl_approve),
                ("Deny", "DNKL_Deny", discord.enums.ButtonStyle.red, dnkl_deny),
                ("Error", "DNKL_Error", discord.enums.ButtonStyle.gray, dnkl_error))
     YearView.add_item(uiutils.StartYearSelect(channel=channel, ign=ign, uuid=uuid,
-                                              weekly_gexp=weekly_gexp, buttons=buttons))  # Year Selection Dropdown
+                                              weekly_gexp=weekly_gexp, days_in_guild=days_in_guild,
+                                              buttons=buttons))  # Year Selection Dropdown
     embed = discord.Embed(title=f"In which year will {ign}'s inactivity begin?",
                           color=neutral_color)
     await channel.send(embed=embed, view=YearView)
@@ -107,7 +108,7 @@ async def dnkl(ticket: discord.TextChannel, interaction: discord.Interaction, us
                                                  name=ticket_categories["dnkl"]))
 
     # Notify user if they don't meet gexp req, however ask questions anyway
-    _, weekly_gexp = await get_player_gexp(uuid)
+    _, weekly_gexp, days_in_guild = await get_player_gexp(uuid)
     if weekly_gexp is None:
         return await ticket.send(embed=unknown_ign_embed)
     await ticket.send(embed=dnkl_creation_embed)
@@ -123,4 +124,4 @@ async def dnkl(ticket: discord.TextChannel, interaction: discord.Interaction, us
                                               description=f"You have {format(weekly_gexp, ',d')} weekly guild experience!",
                                               color=neutral_color))
 
-    await dnkl_application(ign, uuid, ticket, (interaction.user if interaction else user), weekly_gexp)
+    await dnkl_application(ign, uuid, ticket, (interaction.user if interaction else user), weekly_gexp, days_in_guild)

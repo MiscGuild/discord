@@ -12,16 +12,18 @@ from src.utils.request_utils import get_jpg_file
 
 
 class StartYearSelect(ui.Select):
-    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, weekly_gexp: int, buttons: tuple) -> None:
+    def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, weekly_gexp: int, days_in_guild: int,
+                 buttons: tuple) -> None:
         super().__init__(placeholder="Year")
         self.channel = channel
         self.ign = ign
         self.uuid = uuid
         self.weekly_gexp = weekly_gexp
+        self.days_in_guild = days_in_guild
         self.buttons = buttons
 
         self.add_option(label=str(datetime.now().year))
-        if datetime.now().month == 11:
+        if datetime.now().month >= 11:
             self.add_option(label=str(datetime.now().year + 1))
 
     # Override default callback
@@ -32,6 +34,7 @@ class StartYearSelect(ui.Select):
         MonthView = discord.ui.View()
         MonthView.add_item(StartMonthSelect(channel=self.channel, ign=self.ign, uuid=self.uuid,
                                             year=start_year, weekly_gexp=self.weekly_gexp,
+                                            days_in_guild=self.days_in_guild,
                                             buttons=self.buttons))  # Month Selection Dropdown
         embed = discord.Embed(title=f"In which month of {start_year} will {self.ign}'s inactivity begin?",
                               color=neutral_color).set_footer(text=f"Start Date - ?/?/{start_year}")
@@ -41,6 +44,7 @@ class StartYearSelect(ui.Select):
 
 class StartMonthSelect(ui.Select, object):
     def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, year: int, weekly_gexp: int,
+                 days_in_guild: int,
                  buttons: tuple) -> None:
         super().__init__(placeholder="Month")
         self.channel = channel
@@ -48,6 +52,7 @@ class StartMonthSelect(ui.Select, object):
         self.ign = ign
         self.uuid = uuid
         self.weekly_gexp = weekly_gexp
+        self.days_in_guild = days_in_guild
         self.buttons = buttons
 
         for x in range(datetime.now().month, datetime.now().month + 2):
@@ -62,7 +67,7 @@ class StartMonthSelect(ui.Select, object):
 
         DayView = discord.ui.View()
         DayView.add_item(StartDaySelect(channel=self.channel, ign=self.ign, uuid=self.uuid, month=start_month,
-                                        year=self.year, weekly_gexp=self.weekly_gexp,
+                                        year=self.year, weekly_gexp=self.weekly_gexp, days_in_guild=self.days_in_guild,
                                         buttons=self.buttons))  # Day Selection Dropdown
 
         embed = discord.Embed(title=f"What is the closest day to the start of {self.ign}'s inactivity?",
@@ -73,6 +78,7 @@ class StartMonthSelect(ui.Select, object):
 
 class StartDaySelect(ui.Select):
     def __init__(self, channel: discord.TextChannel, ign: str, uuid: str, month: str, year: int, weekly_gexp: int,
+                 days_in_guild: int,
                  buttons: tuple) -> None:
         super().__init__(placeholder="Day")
         self.channel = channel
@@ -81,6 +87,7 @@ class StartDaySelect(ui.Select):
         self.month = month
         self.year = year
         self.weekly_gexp = weekly_gexp
+        self.days_in_guild = days_in_guild
         self.buttons = buttons
 
         month_number = datetime.strptime(self.month, "%B").month
@@ -99,7 +106,7 @@ class StartDaySelect(ui.Select):
         LengthView.add_item(
             InactivityLenSelect(author=interaction.user, channel=self.channel, ign=self.ign, uuid=self.uuid,
                                 day=start_day, month=self.month, year=self.year, weekly_gexp=self.weekly_gexp,
-                                buttons=self.buttons))
+                                days_in_guild=self.days_in_guild, buttons=self.buttons))
         embed = discord.Embed(title=f"How long will {self.ign} be inactive?",
                               color=neutral_color).set_footer(
             text=f"Start Date - {start_day}/{self.month}/{self.year}")
@@ -109,7 +116,7 @@ class StartDaySelect(ui.Select):
 
 class InactivityLenSelect(ui.Select):
     def __init__(self, author: discord.User, channel: discord.TextChannel, ign: str, uuid: str, day: int, month: str,
-                 year: int, weekly_gexp: int, buttons: tuple) -> None:
+                 year: int, weekly_gexp: int, days_in_guild: int, buttons: tuple) -> None:
         super().__init__(placeholder="Length")
         self.author = author
         self.channel = channel
@@ -119,27 +126,37 @@ class InactivityLenSelect(ui.Select):
         self.year = year
         self.day = day
         self.weekly_gexp = weekly_gexp
+        self.days_in_guild = days_in_guild
         self.buttons = buttons
         self.deny = buttons[1][3]
 
-        # self.add_option(label=f"1 Week", value=str(1))
-        # for x in range(2, 4):
-        #     self.add_option(label=f"{x} Weeks", value=str(x * 7))
-        # self.add_option(label=f"More than {3} weeks", value='?')
 
         for i in range(1, 8):
             self.add_option(label=f"{i} Day{'s' if i > 1 else ''}", value=str(i))
-        self.add_option(label="More than 7 days", value="?")
+
+        for i in range(2, 4):
+            self.add_option(label=f"{i} Week{'s' if i > 1 else ''}", value=str(i * 7))
+        self.add_option(label="More than 3 weeks", value="?")
 
 
     async def callback(self, interaction: discord.Interaction) -> None:
         length = list(interaction.data.values())[0][0]
         if length == "?":
-            # embed = discord.Embed(title=f"We do not accept do-not-kick-list applications that are longer than 3 weeks!",
-            #                       description="If you think you will be unable to meet the guild requirements during your inactivity period,"
-            #                                   " you can leave the guild and notify staff once you're back. We'll gladly invite you back!",
-            #                       color=neg_color)
-            embed = discord.Embed(title=f"We do not accept do-not-kick-list applications that are longer than 7 days!",
+            embed = discord.Embed(title=f"We do not accept do-not-kick-list applications that are longer than 3 weeks!",
+                                  description="If you think you will be unable to meet the guild requirements during your inactivity period,"
+                                              " you can leave the guild and notify staff once you're back. We'll gladly invite you back!",
+                                  color=neg_color)
+            await self.deny(channel=self.channel, author=self.author, ign=self.ign, uuid=self.uuid, embed=embed,
+                            interaction=interaction, self_denial=True)
+
+            await interaction.response.send_message("**If you missclicked, kindly create a new ticket!**\n"
+                                                    "You will be punished if you lie and abuse the DNKL system.",
+                                                    ephemeral=True)
+            self.view.stop()
+            return
+        elif int(length) > 7 and self.days_in_guild < 30:
+            embed = discord.Embed(
+                title=f"You cannot apply for a do-not-kick-list longer than 7 days since you joined the guild less than a month ago!",
                                   description="If you think you will be unable to meet the guild requirements during your inactivity period,"
                                               " you can leave the guild and notify staff once you're back. We'll gladly invite you back!",
                                   color=neg_color)
@@ -225,7 +242,6 @@ class InactivityReasonSelect(ui.Select):
                 dict(sorted(historical_gexp_data.items(), key=lambda x: x[0], reverse=True)).values())
             yearly_gexp = sum(historical_gexp_data.values())
 
-        print(self.length)
         date = datetime.strptime(f"{self.day}/{self.month}/{self.year}", "%d/%B/%Y") + timedelta(days=int(self.length))
         final_embed = discord.Embed(title=self.ign, url=f'https://plancke.io/hypixel/player/stats/{self.ign}',
                                     color=neutral_color)

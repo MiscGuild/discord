@@ -65,7 +65,7 @@ async def roll_giveaway(message_id: int, reroll_target: int = None) -> discord.A
             # Gexp requirements
             if req_gexp != 0:
                 _, uuid = await get_uuid_by_name(await name_grabber(winner))
-                _, weekly_exp = await get_player_gexp(uuid)
+                _, weekly_exp, _ = await get_player_gexp(uuid)
 
                 # Player meets gexp req
                 if weekly_exp and weekly_exp >= req_gexp:

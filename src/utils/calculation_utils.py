@@ -10,7 +10,7 @@ from src.utils.db_utils import get_do_ping, get_db_uuid_username, get_all_userna
 from src.utils.request_utils import get_player_guild, get_name_by_uuid
 
 
-async def get_player_gexp(uuid: str, guild_data: dict = None) -> Tuple[dict, int] | Tuple[None, None]:
+async def get_player_gexp(uuid: str, guild_data: dict = None) -> Tuple[dict, int, int] | Tuple[None, None, None]:
     if not guild_data:
         guild_data = await get_player_guild(uuid)
 
@@ -18,10 +18,25 @@ async def get_player_gexp(uuid: str, guild_data: dict = None) -> Tuple[dict, int
     if guild_data:
         for member in guild_data["members"]:
             if member["uuid"] == uuid:
-                return member["expHistory"], sum(member["expHistory"].values())
+                exp_history = member["expHistory"]
+                weekly_gexp = sum(exp_history.values())
+                days_in_guild = await get_days_in_guild(member["joined"])
+                return exp_history, weekly_gexp, days_in_guild
 
     # Player is not in a guild
-    return None, None
+    return None, None, None
+
+
+async def get_days_in_guild(joined: str) -> int:
+    joined_ms = int(joined)
+
+    joined_dt = datetime.fromtimestamp(joined_ms / 1000, tz=timezone.utc)
+
+    now = datetime.now(tz=timezone.utc)
+
+    days_in_guild = (now - joined_dt).days
+
+    return days_in_guild
 
 
 async def get_color_by_gexp(rank: str, weekly_gexp: int) -> Tuple[int, str, str]:
