@@ -122,15 +122,24 @@ class InactivityLenSelect(ui.Select):
         self.buttons = buttons
         self.deny = buttons[1][3]
 
-        self.add_option(label=f"1 Week", value=str(1))
-        for x in range(2, 4):
-            self.add_option(label=f"{x} Weeks", value=str(x))
-        self.add_option(label=f"More than {3} weeks", value='?')
+        # self.add_option(label=f"1 Week", value=str(1))
+        # for x in range(2, 4):
+        #     self.add_option(label=f"{x} Weeks", value=str(x * 7))
+        # self.add_option(label=f"More than {3} weeks", value='?')
+
+        for i in range(1, 8):
+            self.add_option(label=f"{i} Day{'s' if i > 1 else ''}", value=str(i))
+        self.add_option(label="More than 7 days", value="?")
+
 
     async def callback(self, interaction: discord.Interaction) -> None:
         length = list(interaction.data.values())[0][0]
         if length == "?":
-            embed = discord.Embed(title=f"We do not accept do-not-kick-list applications that are longer than 3 weeks!",
+            # embed = discord.Embed(title=f"We do not accept do-not-kick-list applications that are longer than 3 weeks!",
+            #                       description="If you think you will be unable to meet the guild requirements during your inactivity period,"
+            #                                   " you can leave the guild and notify staff once you're back. We'll gladly invite you back!",
+            #                       color=neg_color)
+            embed = discord.Embed(title=f"We do not accept do-not-kick-list applications that are longer than 7 days!",
                                   description="If you think you will be unable to meet the guild requirements during your inactivity period,"
                                               " you can leave the guild and notify staff once you're back. We'll gladly invite you back!",
                                   color=neg_color)
@@ -158,7 +167,7 @@ class InactivityLenSelect(ui.Select):
         embed = discord.Embed(title=f"What is the reason behind {self.ign}'s inactivity?",
                               color=neutral_color)
         embed.set_footer(text=f"Start Date - {self.day}/{self.month}/{self.year}\n"
-                              f"Length - {int(length) * 7} Days")
+                              f"Length - {int(length)} Days")
         await interaction.response.send_message(embed=embed, view=reason_view)
         self.view.stop()
 
@@ -216,7 +225,8 @@ class InactivityReasonSelect(ui.Select):
                 dict(sorted(historical_gexp_data.items(), key=lambda x: x[0], reverse=True)).values())
             yearly_gexp = sum(historical_gexp_data.values())
 
-        date = datetime.strptime(f"{self.day}/{self.month}/{self.year}", "%d/%B/%Y") + timedelta(weeks=int(self.length))
+        print(self.length)
+        date = datetime.strptime(f"{self.day}/{self.month}/{self.year}", "%d/%B/%Y") + timedelta(days=int(self.length))
         final_embed = discord.Embed(title=self.ign, url=f'https://plancke.io/hypixel/player/stats/{self.ign}',
                                     color=neutral_color)
         final_embed.set_thumbnail(url=f"https://visage.surgeplay.com/full/{self.uuid}.png")
