@@ -24,7 +24,19 @@ async def get_player_gexp(uuid: str, guild_data: dict = None) -> Tuple[dict, int
                 return exp_history, weekly_gexp, days_in_guild
 
     # Player is not in a guild
-    return None, None
+    return None, None, None
+
+
+async def get_days_in_guild(joined: str) -> int:
+    joined_ms = int(joined)
+
+    joined_dt = datetime.fromtimestamp(joined_ms / 1000, tz=timezone.utc)
+
+    now = datetime.now(tz=timezone.utc)
+
+    days_in_guild = (now - joined_dt).days
+
+    return days_in_guild
 
 
 async def get_color_by_gexp(rank: str, weekly_gexp: int) -> Tuple[int, str, str]:
