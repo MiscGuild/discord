@@ -242,7 +242,6 @@ class InactivityReasonSelect(ui.Select):
                 dict(sorted(historical_gexp_data.items(), key=lambda x: x[0], reverse=True)).values())
             yearly_gexp = sum(historical_gexp_data.values())
 
-        print(self.length)
         date = datetime.strptime(f"{self.day}/{self.month}/{self.year}", "%d/%B/%Y") + timedelta(days=int(self.length))
         final_embed = discord.Embed(title=self.ign, url=f'https://plancke.io/hypixel/player/stats/{self.ign}',
                                     color=neutral_color)
