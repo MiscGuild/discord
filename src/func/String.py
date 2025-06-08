@@ -217,13 +217,13 @@ class String:
             if not ign:
                 return unknown_ign_embed
 
-        _, weekly_gexp = await get_player_gexp(uuid)
+        _, weekly_gexp, days_in_guild = await get_player_gexp(uuid)
         if not ign:
             return unknown_ign_embed
 
         await ctx.respond("Please respond to the following prompts: ")
         # Ask DNKL application questions
-        await dnkl_application(ign, uuid, ctx.channel, ctx.author, weekly_gexp)
+        await dnkl_application(ign, uuid, ctx.channel, ctx.author, weekly_gexp, days_in_guild)
 
     async def dnklremove(self) -> str:
         if self.string:
@@ -261,7 +261,7 @@ class String:
             if not name:
                 return unknown_ign_embed
 
-        _, weeklygexp = await get_player_gexp(uuid)
+        _, weeklygexp, _ = await get_player_gexp(uuid)
 
         # Player is not in a guild
         if weeklygexp is None:
