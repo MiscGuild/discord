@@ -51,7 +51,7 @@ async def check_invitation_validity(invitations: list) -> List[str]:
         if invitee_uuid not in members.keys():
             continue
 
-        _, weekly_gexp = await get_player_gexp(invitee_uuid, guild_data)
+        _, weekly_gexp, _ = await get_player_gexp(invitee_uuid, guild_data)
 
         # Player earns more than double the member requirement
         if weekly_gexp > (member_req * 2):
