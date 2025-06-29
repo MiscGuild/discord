@@ -10,7 +10,7 @@ from src.func.Integer import Integer
 from src.utils.calculation_utils import get_guild_gexp_data
 from src.utils.consts import weekly_lb_channel, daily_lb_channel, guild_handle
 from src.utils.db_utils import (select_all, set_member_gexp_history, get_all_guild_members, remove_guild_member,
-                                get_all_elite_members, delete_elite_member)
+                                get_all_elite_members, delete_elite_member, set_event_member_gexp_history)
 from src.utils.discord_utils import update_recruiter_role
 from src.utils.giveaway_utils import roll_giveaway
 from src.utils.referral_utils import check_invitation_validity, generate_rank_upgrade
@@ -124,6 +124,7 @@ async def update_gexp() -> None:
 
     for uuid, exp_history in gexp_data.items():
         await set_member_gexp_history(uuid, exp_history)
+        await set_event_member_gexp_history(uuid, exp_history)
 
     all_members_in_db = await get_all_guild_members()
 
