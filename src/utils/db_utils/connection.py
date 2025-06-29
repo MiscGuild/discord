@@ -66,6 +66,12 @@ async def connect_db():
         expiry text,
         FOREIGN KEY (uuid) REFERENCES users(uuid) ON DELETE CASCADE)""")
 
+    await bot.db.execute("""CREATE TABLE IF NOT EXISTS event (
+        uuid TEXT PRIMARY KEY NOT NULL,
+        gexp_history TEXT,
+        FOREIGN KEY (uuid) REFERENCES users(uuid) ON DELETE CASCADE
+    );""")
+
     # Commit any changes
     await bot.db.commit()
 
