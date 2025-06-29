@@ -3,12 +3,14 @@ from datetime import datetime, timedelta, timezone
 from math import exp
 from random import shuffle, choice
 from typing import List
+from zoneinfo import ZoneInfo
 
 from src.utils.calculation_utils import get_player_gexp, get_gexp_sorted
 from src.utils.consts import guild_handle, member_req, active_req, rank_upgrade_channel, \
     rank_upgrade_winner_announcement
 from src.utils.data_classes import InvitationStats
-from src.utils.db_utils import select_one, insert_new_inviter, add_invitee, get_db_uuid_username, get_invites
+from src.utils.db_utils import select_one, insert_new_inviter, add_invitee, get_db_uuid_username, get_invites, \
+    insert_event_invitee
 from src.utils.request_utils import get_player_guild, get_guild_by_name, get_name_by_uuid, get_uuid_by_name
 
 
@@ -26,6 +28,9 @@ async def validate_invites(inviter_ign, invitee_ign) -> str:
 
     if guild_name != guild_handle:
         return f"{inviter_ign} is a member of {guild_name}\nThis reference will not count."
+
+    if datetime.now(ZoneInfo("America/New_York")).month == 7:
+        await insert_event_invitee(inviter_uuid, invitee_uuid)
 
     inviter = await select_one("SELECT current_invitee_uuids FROM invites WHERE inviter_uuid = (?)",
                                (inviter_uuid,))
