@@ -72,6 +72,17 @@ async def connect_db():
         FOREIGN KEY (uuid) REFERENCES users(uuid) ON DELETE CASCADE
     );""")
 
+    await bot.db.execute("""CREATE TABLE IF NOT EXISTS event_invites (
+        inviter_uuid TEXT NOT NULL,
+        invitee_uuid TEXT NOT NULL,
+        PRIMARY KEY (invitee_uuid),
+        FOREIGN KEY (inviter_uuid) REFERENCES users(uuid) ON DELETE CASCADE,
+        FOREIGN KEY (invitee_uuid) REFERENCES users(uuid) ON DELETE CASCADE
+    );
+    """)
+
+
+
     # Commit any changes
     await bot.db.commit()
 
