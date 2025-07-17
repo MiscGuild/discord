@@ -154,7 +154,7 @@ class InactivityLenSelect(ui.Select):
                                                     ephemeral=True)
             self.view.stop()
             return
-        elif int(length) > 7 and self.days_in_guild < 30:
+        elif int(length) > 7 and self.days_in_guild < 30 and bot.staff not in interaction.user.roles:
             embed = discord.Embed(
                 title=f"You cannot apply for a do-not-kick-list longer than 7 days since you joined the guild less than a month ago!",
                                   description="If you think you will be unable to meet the guild requirements during your inactivity period,"
