@@ -42,7 +42,6 @@ class Hypixel(commands.Cog, name="hypixel"):
         elif isinstance(res, str):
             await ctx.respond(res)
 
-
     @bridge.bridge_group(name="dnkl", description="Manage dnkl-related things", invoke_without_command=True)
     async def dnkl(self, ctx: bridge.BridgeContext):
         if ctx.invoked_subcommand is None:  # Ensures this runs only if no subcommand is called
@@ -79,15 +78,6 @@ class Hypixel(commands.Cog, name="hypixel"):
     async def dnkl_remove(self, ctx: discord.ApplicationContext, player: str) -> None:
         """Remove a player from the do-not-kick list"""
         await ctx.respond(await String(uuid=player).dnklremove())
-        # if not name and not uuid:
-        #     await ctx.respond("Please provide either the username or the UUID of the player you want to remove.")
-        #     return
-        # if name and not uuid and len(name) > 16:
-        #     uuid = name
-        # if uuid:
-        #     await ctx.respond(await String(uuid=uuid).dnklremove())
-        # else:
-        #     await ctx.respond(await String(string=name).dnklremove())
 
     @dnkl.command(name="list", aliases=['l'])
     async def dnkl_list(self, ctx: discord.ApplicationContext) -> None:
