@@ -114,7 +114,7 @@ class Union:
         if not await is_linked_discord(player_data, self.user) and is_fs is False:
             embed = discord_not_linked_embed.copy()
             return embed.add_field(name="Do the above and then enter the following in chat:",
-                                   value=f"`{str(self.user)}`")
+                                   value=f"`{str(self.user.name)}`")
 
         await update_member(discord_id=self.user.id,
                             uuid=uuid,
