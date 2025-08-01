@@ -43,7 +43,6 @@ class Staff(commands.Cog, name="staff"):
         elif isinstance(res, str):
             await ctx.respond(res)
 
-
     @bridge.bridge_command()
     @commands.has_permissions(kick_members=True)
     @bridge.bridge_option(
@@ -56,19 +55,16 @@ class Staff(commands.Cog, name="staff"):
         """Sync the names and roles of everyone in the discord!"""
         await General().rolecheck(ctx, send_ping)
 
-
     @bridge.bridge_command()
     @commands.has_permissions(administrator=True)
     async def information(self, ctx: discord.ApplicationContext) -> None:
         await ctx.send(content=information_message, embed=information_requirements_embed)
-
 
     @bridge.bridge_command()
     @commands.has_permissions(administrator=True)
     async def rules(self, ctx: discord.ApplicationContext) -> None:
         for message in rules_messages:
             await ctx.send(content=message)
-
 
     @bridge.bridge_command(name="update_elite_member", description="Update a user's Elite Member role!")
     @commands.has_permissions(administrator=True)
