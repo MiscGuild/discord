@@ -6,7 +6,6 @@ from discord.ext import commands, bridge
 from src.func.General import General
 from src.func.String import String
 from src.func.Union import Union
-from src.utils.calculation_utils import get_username_autocomplete
 from src.utils.consts import partner_channel_id, information_message, information_requirements_embed, neutral_color, \
     rules_messages, elite_member_categories
 from src.utils.ui_utils import tickets
@@ -35,13 +34,6 @@ class Staff(commands.Cog, name="staff"):
         description="The Discord member who you would like to forcesync",
         required=True,
         input_type=discord.Member
-    )
-    @bridge.bridge_option(
-        name="name",
-        description="Their Minecraft username",
-        autocomplete=get_username_autocomplete,
-        required=False,
-        input_type=str
     )
     async def forcesync(self, ctx: discord.ApplicationContext, member: discord.Member, name: str = None) -> None:
         """Update a user's discord nick, tag and roles for them!"""
