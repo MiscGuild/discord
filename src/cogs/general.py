@@ -95,6 +95,5 @@ class General(commands.Cog, name="general"):
         await ctx.respond(embed=await Union(user or ctx.author).me())
 
 
-
 def setup(bot):
     bot.add_cog(General(bot))
