@@ -20,7 +20,7 @@ class Staff(commands.Cog, name="staff"):
         self.bot = bot
 
     @bridge.bridge_command()
-    @commands.has_permissions(deafen_members=True)
+    @commands.has_permissions(kick_members=True)
     async def inactive(self, ctx: discord.ApplicationContext) -> None:
         """View all inactive users in the guild!"""
         await ctx.defer()
