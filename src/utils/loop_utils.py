@@ -1,6 +1,6 @@
 import asyncio
 from __main__ import bot
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone, timedelta
 
 import pytz
 from discord.ext import tasks
@@ -20,19 +20,26 @@ from src.utils.request_utils import get_guild_by_name
 @tasks.loop(minutes=1)
 async def check_giveaways() -> None:
     # Get all giveaway data
-    all_giveaways = await select_all("SELECT message_id, time_of_finish, is_active FROM giveaways")
+    all_giveaways = await select_all(
+        "SELECT message_id, time_of_finish, is_active FROM giveaways"
+    )
+
+    now = datetime.now(timezone.utc)
+    deletes = []
 
     for message_id, time_of_finish, is_active in all_giveaways:
-        time_of_finish = datetime.strptime(time_of_finish, "%Y-%m-%d %H:%M:%S")
+        # Parse as naive, then mark it as UTC-aware
+        finish_at = datetime.strptime(time_of_finish, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
 
-        # Giveaway needs to be ended
-        if is_active and time_of_finish < datetime.now(timezone.utc):
+        if is_active and finish_at < now:
             await roll_giveaway(message_id)
 
-        # Giveaway ended more than 10 days ago, delete it
-        elif not is_active and datetime.now(timezone.utc) > time_of_finish + timedelta(days=10):
-            await bot.db.execute("DELETE FROM Giveaways WHERE message_id = (?)", (message_id,))
-            await bot.db.commit()
+        elif (not is_active) and (now > finish_at + timedelta(days=10)):
+            deletes.append((message_id,))
+
+    if deletes:
+        await bot.db.executemany("DELETE FROM giveaways WHERE message_id = (?)", deletes)
+        await bot.db.commit()
 
 
 async def scheduler() -> None:
