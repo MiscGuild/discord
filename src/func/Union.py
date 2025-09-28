@@ -190,7 +190,9 @@ class Union:
             return staff_impersonation_embed, None
 
         username, uuid, check_already_registered = await get_db_uuid_username(uuid=uuid, get_discord_id=True)
-        if not check_already_registered:
+
+        discord_account_already_linked = await get_db_uuid_username(discord_id=check_already_registered)
+        if not check_already_registered and not any(discord_account_already_linked):
             await insert_new_member(discord_id=self.user.id,
                                     uuid=uuid,
                                     username=ign)
@@ -222,6 +224,27 @@ class Union:
                                   color=neg_color)
             embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
             embed.set_footer(text="If you no longer have access to the other discord account/"
+                                  "would like to transfer to this discord account, let staff know. "
+                                  "They will use `/forcesync`.")
+            await ticket.send(embed=embed)
+        elif any(discord_account_already_linked):
+            original_account_uuid = discord_account_already_linked[1]
+            original_username = discord_account_already_linked[0]
+            await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
+            ticket = await create_ticket(ctx.author, f"ticket-{ign}",
+                                         category_name=ticket_categories["registrees"])
+            await ticket.purge(limit=1000)
+            await ticket.edit(name=f"duplicate-registration-{ign}-{original_username}", topic=f"{ctx.author.id}|",
+                              category=discord.utils.get(ctx.guild.categories,
+                                                         name=ticket_categories["registrees"]))
+            guest_ticket = ticket
+
+            embed = discord.Embed(title="Conflict during registration!",
+                                  description=f"<@{self.user.id}> is already registered to {original_username}. \
+                                  Miscellaneous does not support multiple accounts for a single discord account.\n",
+                                  color=neg_color)
+            embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
+            embed.set_footer(text="If you no longer have access to the other minecraft account/"
                                   "would like to transfer to this discord account, let staff know. "
                                   "They will use `/forcesync`.")
             await ticket.send(embed=embed)
