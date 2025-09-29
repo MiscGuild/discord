@@ -19,5 +19,5 @@ toml==0.10.2
 typing-extensions==4.7.1
 urllib3==2.0.4
 yarl==1.8.1
-zope.interface==6.0
+zope.interface==8.0.1
 
