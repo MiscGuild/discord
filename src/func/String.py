@@ -13,9 +13,8 @@ from src.utils.calculation_utils import (calculate_network_level,
                                          get_hypixel_player_rank,
                                          get_player_gexp, get_monthly_gexp)
 from src.utils.consts import (prefix, dnkl_channel_id, dnkl_req, guildless_embed,
-                              months, neg_color, neutral_color, pos_color,
-                              qotd_ans_channel_id, qotd_channel_id,
-                              ticket_categories, unknown_ign_embed, rainbow_separator, guild_handle,
+                              neg_color, neutral_color, pos_color,
+                              ticket_categories, unknown_ign_embed, guild_handle,
                               missing_permissions_embed, member_req)
 from src.utils.db_utils import (delete_dnkl, select_one, get_db_uuid_username,
                                 get_member_gexp_history, insert_elite_member, get_elite_member)
@@ -298,21 +297,6 @@ class String:
         return discord.Embed(title=f"The channel name was changed from {old_name} to {channel_name}",
                              color=neutral_color)
 
-    async def qotd(self, ctx: discord.ApplicationContext, suggester: str) -> None:
-        # 15th May 2022 was the 473rd QOTD day. It is used as a reference point to calculate the day number.
-        day_number = 473 + (datetime.now(timezone.utc) - datetime.strptime("2022/05/15", "%Y/%m/%d").replace(
-            tzinfo=timezone.utc)).days
-        embed = discord.Embed(
-            title=f"**{self.string}\n**",
-            description=f"Respond in: <#{qotd_ans_channel_id}>\n"
-                        f"-# Requested by {suggester}\n"
-                        f"-# Posted by {ctx.author.nick if ctx.author.nick else ctx.author.name}", color=neutral_color)
-        embed.set_author(
-            name=f"Day {day_number}: {datetime.now(timezone.utc).day} {months[datetime.now(timezone.utc).month]} {datetime.now(timezone.utc).year}")
-
-        await bot.get_channel(qotd_channel_id).send("<@&923978802818871356>", embed=embed)
-        await bot.get_channel(qotd_ans_channel_id).send(rainbow_separator)
-
     async def invites(self) -> discord.Embed:
         if self.uuid and not self.username:
             uuid = self.uuid
@@ -367,7 +351,6 @@ class String:
                               f"{format(2 * member_req, ',d')} guild experience at the end of the week. "
                               "If they joined in the middle of the week, their guild experience will be scaled up.")
         return embed
-
 
     async def elite_member(self, discord_member: discord.Member = None, monetary_value: int = None,
                            is_automatic: bool = False) -> discord.Embed:
@@ -433,7 +416,6 @@ class String:
                                  color=neg_color)
 
         is_indefinite = True if any([is_booster, is_creator, is_gvg]) else False
-
 
         await insert_elite_member(uuid=uuid, is_booster=is_booster, is_sponsor=is_sponsor, is_creator=is_creator,
                                   is_gvg=is_gvg, is_indefinite=is_indefinite, expiry=expiry)
