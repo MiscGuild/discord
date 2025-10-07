@@ -8,7 +8,7 @@ from src.func.Union import Union
 
 class General(commands.Cog, name="general"):
     """
-    Contains source, avatar, qotd.
+    Contains source, avatar.
     """
 
     def __init__(self, bot):
@@ -48,29 +48,29 @@ class General(commands.Cog, name="general"):
         """Used to enable/disable pings in automatic daily and weekly leaderboard messages!"""
         await ctx.respond(embed=await Union(ctx.author).do_pings(setting=setting))
 
-    @commands.slash_command()
-    @commands.has_any_role("QOTD Manager", "Staff")
-    async def qotd(self, ctx: discord.ApplicationContext) -> None:
-        """Used by QOTD Managers to register a QOTD"""
-
-        class ModalCreator(discord.ui.Modal):
-            def __init__(self) -> None:
-                #   fields = ["LABEL", "PLACEHOLDER", STYLE]
-                super().__init__(title="QOTD Creator")
-                self.add_item(discord.ui.InputText(label="What is the question of the day?",
-                                                   placeholder="Enter the question here",
-                                                   max_length=256,
-                                                   style=discord.InputTextStyle.long))
-                self.add_item(discord.ui.InputText(label="Who suggested this question?",
-                                                   placeholder="Enter their username. If it was you, enter your username.",
-                                                   max_length=256,
-                                                   style=discord.InputTextStyle.short))
-
-            async def callback(self, interaction: discord.Interaction):
-                await String(string=self.children[0].value).qotd(ctx, self.children[1].value)
-                await interaction.response.send_message("The QOTD has been sent!")
-
-        await ctx.send_modal(modal=ModalCreator())
+    # @commands.slash_command()
+    # @commands.has_any_role("QOTD Manager", "Staff")
+    # async def qotd(self, ctx: discord.ApplicationContext) -> None:
+    #     """Used by QOTD Managers to register a QOTD"""
+    #
+    #     class ModalCreator(discord.ui.Modal):
+    #         def __init__(self) -> None:
+    #             #   fields = ["LABEL", "PLACEHOLDER", STYLE]
+    #             super().__init__(title="QOTD Creator")
+    #             self.add_item(discord.ui.InputText(label="What is the question of the day?",
+    #                                                placeholder="Enter the question here",
+    #                                                max_length=256,
+    #                                                style=discord.InputTextStyle.long))
+    #             self.add_item(discord.ui.InputText(label="Who suggested this question?",
+    #                                                placeholder="Enter their username. If it was you, enter your username.",
+    #                                                max_length=256,
+    #                                                style=discord.InputTextStyle.short))
+    #
+    #         async def callback(self, interaction: discord.Interaction):
+    #             await String(string=self.children[0].value).qotd(ctx, self.children[1].value)
+    #             await interaction.response.send_message("The QOTD has been sent!")
+    #
+    #     await ctx.send_modal(modal=ModalCreator())
 
     @bridge.bridge_command()
     @bridge.bridge_option(
