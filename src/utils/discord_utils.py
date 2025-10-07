@@ -63,9 +63,9 @@ async def create_ticket(user: discord.Member, ticket_name: str,
                                  read_message_history=True, external_emojis=True)
     await ticket.set_permissions(bot.new_member_role, send_messages=False,
                                  read_messages=False,
-                                 add_reactions=True, embed_links=True,
-                                 attach_files=True,
-                                 read_message_history=True, external_emojis=True)
+                                 add_reactions=False, embed_links=False,
+                                 attach_files=False,
+                                 read_message_history=False, external_emojis=False)
     if reason:
         await handle_ticket_reason(reason, ticket, interaction=None, user=user, ctx=ctx)
     elif category_name != ticket_categories["registrees"]:
