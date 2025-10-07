@@ -5,8 +5,10 @@ import discord
 import discord.ui as ui
 from discord.ext import tasks
 
+from src.utils.calculation_utils import get_qotd_day_number
 from src.utils.consts import (config, log_channel_id, neutral_color, ticket_categories,
-                              guest_ticket_reasons, member_ticket_reasons, general_ticket_reasons, guild_handle)
+                              guest_ticket_reasons, member_ticket_reasons, general_ticket_reasons, guild_handle,
+                              qotd_thread_id, geoguessr_thread_id, spoilers_ahead)
 from src.utils.db_utils import connect_db, get_db_uuid_username
 from src.utils.request_utils import get_uuid_by_name
 from src.utils.ticket_utils import *
@@ -185,6 +187,21 @@ async def update_recruiter_role(uuid: str, invites: int) -> None:
     return
 
 
+async def send_thread_message(thread: discord.Thread) -> None:
+    if thread.parent.id == qotd_thread_id:
+        day_number, day, month, year = await get_qotd_day_number()
+
+        embed = discord.Embed(
+            title=f"Question of the Day",
+            description=f"**Day {day_number}**\n"
+                        f"**Date:** {day} {month} {year}\n",
+            color=neutral_color)
+        await thread.send(f"<@&{bot.qotd.id}>", embed=embed)
+    if thread.parent.id == geoguessr_thread_id:
+        await thread.send(f"<@&{bot.geoguessr.id}> New GeoGuessr challenge posted!\n"
+                          f"{spoilers_ahead}")
+
+
 @tasks.loop(count=1)
 async def after_cache_ready() -> None:
     await connect_db()
@@ -209,6 +226,8 @@ async def after_cache_ready() -> None:
     bot.giveaways_events = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["giveaways"])
     bot.veteran = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["veteran"])
     bot.recruiter = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["recruiter"])
+    bot.qotd = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["qotd_ping"])
+    bot.geoguessr = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["geoguessr"])
     bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff,
                              bot.server_booster, bot.rich_kid, bot.gvg, bot.veteran, bot.recruiter)
 

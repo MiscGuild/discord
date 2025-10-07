@@ -12,8 +12,9 @@ from src.utils.consts import (error_channel_id, invalid_command_embed,
                               member_not_found_embed, missing_permissions_embed, missing_role_embed,
                               not_owner_embed, staff_bridge_channel, log_channel_id,
                               registration_channel_id,
-                              registration_embed, err_404_embed, bot_missing_perms_embed)
-from src.utils.discord_utils import create_ticket
+                              registration_embed, err_404_embed, bot_missing_perms_embed, qotd_thread_id,
+                              geoguessr_thread_id)
+from src.utils.discord_utils import create_ticket, send_thread_message
 from src.utils.referral_utils import validate_invites
 
 
@@ -189,3 +190,36 @@ class Listener:
                                   color=0xFFD700)
             embed.set_thumbnail(url=after.display_avatar.url)
             await bot.get_channel(log_channel_id).send(embed=embed)
+
+    async def on_thread_create(self) -> None:
+
+        # A forum "post" is a thread under a ForumChannel
+        thread: discord.Thread = self.obj
+
+        # Only act for the target forum channel
+        if not thread.parent or thread.parent.id not in (qotd_thread_id, geoguessr_thread_id):
+            return
+
+        try:
+            await thread.join()
+        except discord.Forbidden:
+            await bot.get_channel(error_channel_id).send(
+                f"Missing permissions to join thread {thread.id} in forum {thread.parent.id}."
+            )
+            return
+        except Exception as e:
+            await bot.get_channel(error_channel_id).send(
+                f"Error joining thread {thread.id}: {e!r}"
+            )
+            return
+
+        try:
+            await send_thread_message(thread)
+        except discord.Forbidden:
+            await bot.get_channel(error_channel_id).send(
+                f"Missing permissions to send message in thread {thread.id}."
+            )
+        except Exception as e:
+            await bot.get_channel(error_channel_id).send(
+                f"Error sending message in thread {thread.id}: {e!r}"
+            )

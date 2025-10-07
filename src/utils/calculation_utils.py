@@ -5,7 +5,7 @@ from typing import Tuple, List
 
 import discord
 
-from src.utils.consts import ChatColor, active_req, member_req, resident_req
+from src.utils.consts import ChatColor, active_req, member_req, resident_req, months
 from src.utils.db_utils import get_do_ping, get_db_uuid_username, get_all_usernames
 from src.utils.request_utils import get_player_guild, get_name_by_uuid
 
@@ -271,3 +271,9 @@ async def get_username_autocomplete(self, ctx: discord.AutocompleteContext):
         (value, name) for value, name in username_list if query in name.lower()
     ]
     return [discord.OptionChoice(name, value) for value, name in filtered_usernames[:25]]
+
+
+async def get_qotd_day_number() -> Tuple[int, int, str, int]:
+    return 473 + (datetime.now(timezone.utc) - datetime.strptime("2022/05/15", "%Y/%m/%d").replace(
+        tzinfo=timezone.utc)).days, datetime.now(timezone.utc).day, months[
+        datetime.now(timezone.utc).month], datetime.now(timezone.utc).year
