@@ -84,6 +84,7 @@ async def gvg_application(ticket: discord.TextChannel, interaction: discord.Inte
         embed.add_field(name="Skywars Wins", value=f"`{sw_wins}`")
         embed.add_field(name="Skywars KDR", value=f"`{sw_kdr}`")
         embed.add_field(name="Duels WLR", value=f"`{duels_wlr}`")
+        embed.add_field(name="Duels Wins", value=f"`{duels_wins}`")
         embed.add_field(name="Duels Kills", value=f"`{duels_kills}`")
 
     # User is not eligible for any team
@@ -97,6 +98,7 @@ async def gvg_application(ticket: discord.TextChannel, interaction: discord.Inte
         embed.add_field(name="Skywars Wins", value=f"`{sw_wins}`")
         embed.add_field(name="Skywars KDR", value=f"`{sw_kdr}`")
         embed.add_field(name="Duels WLR", value=f"`{duels_wlr}`")
+        embed.add_field(name="Duels Wins", value=f"`{duels_wins}`")
         embed.add_field(name="Duels Kills", value=f"`{duels_kills}`")
         await ticket.send(embed=discord.Embed(
             title="You are ineligible for the GvG Team as you do not meet the requirements!",
