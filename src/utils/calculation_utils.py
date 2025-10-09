@@ -1,11 +1,17 @@
+import io
+import logging
 import math
 import re
+import traceback
 from datetime import datetime, timedelta, timezone
 from typing import Tuple, List
 
 import discord
+from discord.ext import commands
 
-from src.utils.consts import ChatColor, active_req, member_req, resident_req, months
+from src.utils.consts import ChatColor, active_req, member_req, resident_req, months, not_owner_embed, \
+    missing_role_embed, missing_permissions_embed, member_not_found_embed, bot_missing_perms_embed, err_404_embed, \
+    ERROR_REPLY_EXCEPTIONS
 from src.utils.db_utils import get_do_ping, get_db_uuid_username, get_all_usernames
 from src.utils.request_utils import get_player_guild, get_name_by_uuid
 
@@ -277,3 +283,76 @@ async def get_qotd_day_number() -> Tuple[int, int, str, int]:
     return 473 + (datetime.now(timezone.utc) - datetime.strptime("2022/05/15", "%Y/%m/%d").replace(
         tzinfo=timezone.utc)).days, datetime.now(timezone.utc).day, months[
         datetime.now(timezone.utc).month], datetime.now(timezone.utc).year
+
+
+def classify_error_embed(error: Exception) -> discord.Embed | None:
+    """Return an embed appropriate to a known error type, else None."""
+
+    if isinstance(error, commands.NotOwner):
+        return not_owner_embed
+    if isinstance(error, (commands.MissingRole, commands.MissingAnyRole)):
+        return missing_role_embed
+    if isinstance(error, commands.MissingPermissions):
+        return missing_permissions_embed
+    if isinstance(error, commands.MemberNotFound):
+        return member_not_found_embed
+    if isinstance(error, discord.Forbidden):
+        return bot_missing_perms_embed
+    if isinstance(error, discord.NotFound):
+        return err_404_embed
+    return None
+
+
+async def safe_reply(ctx, **kwargs):
+    """
+    Reply in a way that works for both prefix and slash contexts.
+    - ApplicationContext: use respond() if not yet responded; else send_followup()
+    - commands.Context: use send()
+    """
+    try:
+        if hasattr(ctx, "respond"):  # likely ApplicationContext
+            if getattr(ctx, "responded", False):
+                return await ctx.send_followup(**kwargs)
+            else:
+                return await ctx.respond(**kwargs)
+        else:  # commands.Context
+            return await ctx.send(**kwargs)
+    except ERROR_REPLY_EXCEPTIONS:
+        return None
+
+
+def build_usage_embed(ctx) -> discord.Embed:
+    """
+    Conservative usage message that won’t break on slash commands.
+    For prefix commands try to show signature; for slash, show the command mention if available.
+    """
+    title = "Invalid Syntax"
+    try:
+        if hasattr(ctx, "command") and hasattr(ctx.command, "signature"):  # commands.Context path
+            prefix = getattr(ctx, "clean_prefix", "") or getattr(ctx, "prefix", "")
+            usage = f"{prefix}{ctx.command.qualified_name} {ctx.command.signature}".strip()
+            desc = f"Command usage:\n`{usage}`"
+        else:
+            name = getattr(ctx.command, "qualified_name", getattr(ctx.command, "name", "this command"))
+            desc = f"Missing required argument(s) for `{name}`."
+    except Exception:
+        desc = "Missing or invalid arguments."
+
+    return discord.Embed(title=title, description=desc, color=0xDE3163)
+
+
+async def log_traceback_to_channel(bot: commands.Bot, channel_id: int, ctx, error: Exception):
+    tb = "".join(traceback.format_exception(type(error), error, error.__traceback__))
+    channel = bot.get_channel(channel_id)
+    if channel is None:
+        logging.exception("Error in command %s (channel missing): %s", getattr(ctx, "command", "?"), tb)
+        return
+    try:
+        header = f"Ignoring exception in command {getattr(ctx, 'command', '?')}:"
+        if len(tb) <= 1900:
+            await channel.send(f"{header}\n```py\n{tb}\n```")
+        else:
+            fp = io.BytesIO(tb.encode("utf-8"))
+            await channel.send(content=header, file=discord.File(fp, filename="traceback.txt"))
+    except ERROR_REPLY_EXCEPTIONS:
+        logging.exception("Failed to send traceback to error channel:\n%s", tb)
