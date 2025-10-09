@@ -130,14 +130,12 @@ class InactivityLenSelect(ui.Select):
         self.buttons = buttons
         self.deny = buttons[1][3]
 
-
         for i in range(1, 8):
             self.add_option(label=f"{i} Day{'s' if i > 1 else ''}", value=str(i))
 
         for i in range(2, 4):
             self.add_option(label=f"{i} Week{'s' if i > 1 else ''}", value=str(i * 7))
         self.add_option(label="More than 3 weeks", value="?")
-
 
     async def callback(self, interaction: discord.Interaction) -> None:
         length = list(interaction.data.values())[0][0]
@@ -157,9 +155,9 @@ class InactivityLenSelect(ui.Select):
         elif int(length) > 7 and self.days_in_guild < 30 and bot.staff not in interaction.user.roles:
             embed = discord.Embed(
                 title=f"You cannot apply for a do-not-kick-list longer than 7 days since you joined the guild less than a month ago!",
-                                  description="If you think you will be unable to meet the guild requirements during your inactivity period,"
-                                              " you can leave the guild and notify staff once you're back. We'll gladly invite you back!",
-                                  color=neg_color)
+                description="If you think you will be unable to meet the guild requirements during your inactivity period,"
+                            " you can leave the guild and notify staff once you're back. We'll gladly invite you back!",
+                color=neg_color)
             await self.deny(channel=self.channel, author=self.author, ign=self.ign, uuid=self.uuid, embed=embed,
                             interaction=interaction, self_denial=True)
 
