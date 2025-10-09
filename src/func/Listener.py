@@ -1,5 +1,4 @@
 # The following file contains: on_member_join, on_error, on_command_error, reactionroles, tickets, on_interaction
-
 import traceback
 from __main__ import bot
 
@@ -7,219 +6,135 @@ import discord
 from discord.ext import commands
 
 from src.func.String import String
-from src.utils.calculation_utils import extract_usernames
-from src.utils.consts import (error_channel_id, invalid_command_embed,
-                              member_not_found_embed, missing_permissions_embed, missing_role_embed,
-                              not_owner_embed, staff_bridge_channel, log_channel_id,
-                              registration_channel_id,
-                              registration_embed, err_404_embed, bot_missing_perms_embed, qotd_thread_id,
-                              geoguessr_thread_id)
+from src.utils.calculation_utils import (
+    extract_usernames, classify_error_embed, safe_reply, build_usage_embed, log_traceback_to_channel
+)
+from src.utils.consts import (
+    error_channel_id, invalid_command_embed,
+    staff_bridge_channel, log_channel_id,
+    registration_channel_id, registration_embed, err_404_embed,
+    qotd_thread_id, geoguessr_thread_id
+)
 from src.utils.discord_utils import create_ticket, send_thread_message
 from src.utils.referral_utils import validate_invites
 
 
 class Listener:
-    def __init__(self, obj):
+    def __init__(self, bot, obj=None):
+        self.bot = bot
         self.obj = obj
 
-    async def on_member_join(self) -> None:
-        # Remove user's speaking perms and send info embed
-        await self.obj.add_roles(bot.new_member_role)
-        await bot.get_channel(registration_channel_id).send(embed=registration_embed)
+    async def on_member_join(self, member: discord.Member) -> None:
+        await member.add_roles(self.bot.new_member_role)
+        await self.bot.get_channel(registration_channel_id).send(embed=registration_embed)
 
-    async def on_error(self) -> None:
-        # Grabs the error being handled, formats it and sends it to the error channel
+    async def on_error(self, event_name: str) -> None:
         tb = traceback.format_exc()
-        await bot.get_channel(error_channel_id).send(f"Ignoring exception in event {self.obj}:\n```py\n{tb}\n```")
+        await self.bot.get_channel(error_channel_id).send(
+            f"Ignoring exception in event {event_name}:\n```py\n{tb}\n```"
+        )
 
-    async def on_command_error(self, ctx: discord.ApplicationContext) -> None | discord.Message:
-        # Prevents commands with local handlers or cogs with overwritten on_command_errors being handled here
-        if isinstance(self.obj, commands.CommandNotFound):
-            return await ctx.send(embed=invalid_command_embed)
-        elif ctx.command.has_error_handler() or ctx.cog.has_error_handler():
-            return None
+    async def on_command_error(self, ctx: commands.Context, error: commands.CommandError):
+        if ctx.command and (hasattr(ctx.command, "on_error") or (ctx.cog and hasattr(ctx.cog, "cog_command_error"))):
+            return
+        error = getattr(error, "original", error)
 
-        # Checks for the original exception raised and send to CommandInvokeError
-        self.obj = getattr(self.obj, "original", self.obj)
+        if isinstance(error, commands.CommandNotFound):
+            await safe_reply(ctx, embed=invalid_command_embed)
+            return
 
-        # Catch a series of common errors
-        if isinstance(self.obj, commands.NotOwner):
-            await ctx.respond(embed=not_owner_embed)
-        elif isinstance(self.obj, commands.MissingRole):
-            await ctx.respond(embed=missing_role_embed)
-        elif isinstance(self.obj, commands.MissingPermissions):
-            await ctx.respond(embed=missing_permissions_embed)
-        elif isinstance(self.obj, discord.ext.commands.MissingAnyRole):
-            await ctx.respond(embed=missing_permissions_embed)
-        elif isinstance(self.obj, commands.MemberNotFound):
-            await ctx.respond(embed=member_not_found_embed)
-        elif isinstance(self.obj, discord.errors.Forbidden):
-            await ctx.respond(embed=bot_missing_perms_embed)
-        elif isinstance(self.obj, discord.errors.NotFound):
-            await ctx.respond(embed=err_404_embed)
-        elif isinstance(self.obj, commands.MissingRequiredArgument):
-            usage = f"{ctx.prefix}{ctx.command.name}"
-            for key, value in ctx.command.clean_params.items():
-                if not value.default:
-                    usage += " [" + key + "]"
-                else:
-                    usage += " <" + key + ">"
-            embed = discord.Embed(title=f"Invalid Syntax",
-                                  description=f"Command usage:\n`{usage}`\nFor more help, see `{ctx.prefix}help {ctx.command}`",
-                                  color=0xDE3163)
-            await ctx.send(embed=embed)
-
-        # All other errors get sent to the error channel
+        embed = classify_error_embed(error)
+        if embed:
+            await safe_reply(ctx, embed=embed)
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await safe_reply(ctx, embed=build_usage_embed(ctx))
         else:
-            await ctx.respond(embed=err_404_embed)
-            tb = "".join(traceback.format_exception(
-                type(self.obj), self.obj, self.obj.__traceback__))
-            if len(tb) <= 1955:
-                await bot.get_channel(error_channel_id).send(
-                    f"Ignoring exception in command {ctx.command}:\n```py\n{tb}\n```")
+            await safe_reply(ctx, embed=err_404_embed)
+            await log_traceback_to_channel(self.bot, error_channel_id, ctx, error)
 
-            else:
-                await bot.get_channel(error_channel_id).send(
-                    f"```An error occurred in command '{ctx.command}' that could not be sent in this channel, check the console for the traceback. \n\n'{self.obj}'```")
-                print("The below exception could not be sent to the error channel:")
-                print(tb)
-
-    async def on_application_command_error(self, ctx: discord.ApplicationContext) -> None:
-        if ctx.command.has_error_handler() or ctx.cog.has_error_handler():
+    async def on_application_command_error(self, ctx: discord.ApplicationContext, error: Exception):
+        if (ctx.command and getattr(ctx.command, "has_error_handler", lambda: False)()) or \
+                (ctx.cog and getattr(ctx.cog, "has_error_handler", lambda: False)()):
             return
+        error = getattr(error, "original", error)
 
-        # Checks for the original exception raised and send to CommandInvokeError
-        self.obj = getattr(self.obj, "original", self.obj)
-
-        # Catch a series of common application errors
-        if isinstance(self.obj, commands.NotOwner):
-            await ctx.respond(embed=not_owner_embed)
-        elif isinstance(self.obj, commands.MissingRole):
-            await ctx.respond(embed=missing_role_embed)
-        elif isinstance(self.obj, commands.MissingPermissions):
-            await ctx.respond(embed=missing_permissions_embed)
-        elif isinstance(self.obj, discord.ext.commands.MissingAnyRole):
-            await ctx.respond(embed=missing_permissions_embed)
-        elif isinstance(self.obj, commands.MemberNotFound):
-            await ctx.respond(embed=member_not_found_embed)
-        elif isinstance(self.obj, discord.errors.Forbidden):
-            await ctx.respond(embed=bot_missing_perms_embed)
-        elif isinstance(self.obj, discord.errors.NotFound):
-            await ctx.respond(embed=err_404_embed)
-        elif isinstance(self.obj, commands.MissingRequiredArgument):
-            usage = f"{ctx.prefix}{ctx.command.name}"
-            for key, value in ctx.command.clean_params.items():
-                if not value.default:
-                    usage += " [" + key + "]"
-                else:
-                    usage += " <" + key + ">"
-            embed = discord.Embed(title=f"Invalid Syntax",
-                                  description=f"Command usage:\n`{usage}`\nFor more help, see `{ctx.prefix}help {ctx.command}`",
-                                  color=0xDE3163)
-            await ctx.send(embed=embed)
-
-        # All other errors get sent to the error channel
+        embed = classify_error_embed(error)
+        if embed:
+            await safe_reply(ctx, embed=embed)
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await safe_reply(ctx, embed=build_usage_embed(ctx))
         else:
-            tb = "".join(traceback.format_exception(
-                type(self.obj), self.obj, self.obj.__traceback__))
-            if len(tb) <= 1955:
-                await bot.get_channel(error_channel_id).send(
-                    f"Ignoring exception in command {ctx.command}:\n```py\n{tb}\n```")
+            await safe_reply(ctx, embed=err_404_embed)
+            await log_traceback_to_channel(self.bot, error_channel_id, ctx, error)
 
-            else:
-                await bot.get_channel(error_channel_id).send(
-                    f"```An error occurred in command '{ctx.command}' that could not be sent in this channel, check the console for the traceback. \n\n'{self.obj}'```")
-                print("The below exception could not be sent to the error channel:")
-                print(tb)
-
-    async def on_interaction(self) -> None:
-        self.obj: discord.Interaction
-        if "custom_id" not in self.obj.data:
-            pass
-        elif self.obj.data["custom_id"] == "tickets":
-            await self.obj.response.send_message("Creating your ticket...", ephemeral=True)
-            ticket = await create_ticket(self.obj.user, f"ticket-{self.obj.user.name}")
-
-            await self.obj.edit_original_response(
-                content=f"Ticket created!\n**Click the link below to view your ticket.**\n<#{ticket.id}>")
-
-    async def on_invitation_message(self) -> None:
-        if not self.obj.author.bot:
-            return
-        if self.obj.channel.id != staff_bridge_channel:
-            return
-        if not self.obj.embeds:
+    async def on_interaction(self, interaction: discord.Interaction) -> None:
+        if not interaction.data or "custom_id" not in interaction.data:
             return
 
-        embed = self.obj.embeds[0]
+        if interaction.data["custom_id"] == "tickets":
+            await interaction.response.send_message("Creating your ticket...", ephemeral=True)
+            ticket = await create_ticket(interaction.user, f"ticket-{interaction.user.name}")
+            await interaction.edit_original_response(
+                content=f"Ticket created!\n**Click the link below to view your ticket.**\n<#{ticket.id}>"
+            )
 
-        if not embed.description:
+    async def on_invitation_message(self, message: discord.Message) -> None:
+        if not message.author.bot:
+            return
+        if message.channel.id != staff_bridge_channel:
+            return
+        if not message.embeds:
+            return
+        embed = message.embeds[0]
+        if not embed.description or "invited" not in embed.description.lower():
             return
 
-        if "invited" not in embed.description.lower():
-            return
-
-        description = embed.description
-
-        inviter, invitee = await extract_usernames(description)
-
+        inviter, invitee = await extract_usernames(embed.description)
         if not all((inviter, invitee)):
             return
 
         return_message = await validate_invites(inviter, invitee)
+        await message.channel.send(return_message)
 
-        await self.obj.channel.send(return_message)
-
-    async def on_member_update(self) -> None:
-        before: discord.Member
-        after: discord.Member
-        before, after = self.obj
-
+    async def on_member_update(self, before: discord.Member, after: discord.Member) -> None:
         if before.premium_since is None and after.premium_since is not None:
             await String(string="Server Booster").elite_member(is_automatic=True, discord_member=after)
-            embed = discord.Embed(title=f"{after.name} just boosted the server!",
-                                  description=f"They have been added to the list of Elite Members",
-                                  color=0xFFD700)
-            embed.set_thumbnail(url=after.display_avatar.url)
-            await bot.get_channel(log_channel_id).send(embed=embed)
+            e = discord.Embed(
+                title=f"{after.name} just boosted the server!",
+                description="They have been added to the list of Elite Members",
+                color=0xFFD700
+            ).set_thumbnail(url=after.display_avatar.url)
+            await self.bot.get_channel(log_channel_id).send(embed=e)
 
         elif before.premium_since is not None and after.premium_since is None:
             await String(string="Server Booster").elite_member(is_automatic=True, discord_member=after)
-            embed = discord.Embed(title=f"{after.name} just unboosted the server!",
-                                  description=f"They have been removed from the list of Elite Members",
-                                  color=0xFFD700)
-            embed.set_thumbnail(url=after.display_avatar.url)
-            await bot.get_channel(log_channel_id).send(embed=embed)
+            e = discord.Embed(
+                title=f"{after.name} just unboosted the server!",
+                description="They have been removed from the list of Elite Members",
+                color=0xFFD700
+            ).set_thumbnail(url=after.display_avatar.url)
+            await self.bot.get_channel(log_channel_id).send(embed=e)
 
-    async def on_thread_create(self) -> None:
-
-        # A forum "post" is a thread under a ForumChannel
-        thread: discord.Thread = self.obj
-
-        # Only act for the target forum channel
+    async def on_thread_create(self, thread: discord.Thread) -> None:
         if not thread.parent or thread.parent.id not in (qotd_thread_id, geoguessr_thread_id):
             return
 
         try:
             await thread.join()
         except discord.Forbidden:
-            await bot.get_channel(error_channel_id).send(
+            await self.bot.get_channel(error_channel_id).send(
                 f"Missing permissions to join thread {thread.id} in forum {thread.parent.id}."
             )
             return
         except Exception as e:
-            await bot.get_channel(error_channel_id).send(
-                f"Error joining thread {thread.id}: {e!r}"
-            )
+            await self.bot.get_channel(error_channel_id).send(f"Error joining thread {thread.id}: {e!r}")
             return
 
         try:
             await send_thread_message(thread)
         except discord.Forbidden:
-            await bot.get_channel(error_channel_id).send(
+            await self.bot.get_channel(error_channel_id).send(
                 f"Missing permissions to send message in thread {thread.id}."
             )
         except Exception as e:
-            await bot.get_channel(error_channel_id).send(
-                f"Error sending message in thread {thread.id}: {e!r}"
-            )
+            await self.bot.get_channel(error_channel_id).send(f"Error sending message in thread {thread.id}: {e!r}")
