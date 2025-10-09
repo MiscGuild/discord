@@ -8,6 +8,8 @@ config = toml.load("config.toml")
 
 prefix = config["prefix"]
 
+ERROR_REPLY_EXCEPTIONS = (discord.Forbidden, discord.HTTPException, discord.NotFound)
+
 # Gexp requirements
 member_req = config["member_req"]
 resident_req = config["resident_req"]
