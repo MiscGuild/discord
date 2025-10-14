@@ -3,7 +3,6 @@ from discord.commands import option
 from discord.ext import commands, bridge
 
 from src.func.General import General
-from src.func.Listener import Listener
 from src.func.String import String
 from src.func.Union import Union
 from src.utils.consts import milestone_categories
@@ -175,10 +174,6 @@ class Tickets(commands.Cog, name="tickets"):
     async def milestone_compile(self, ctx: bridge.BridgeContext) -> None:
         await ctx.defer()
         await ctx.respond(await General().compile_milestones())
-
-    @commands.Cog.listener()
-    async def on_interaction(self, res) -> None:
-        await Listener(obj=res).on_interaction()
 
 
 def setup(bot):
