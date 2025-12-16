@@ -1,6 +1,5 @@
-from __main__ import bot
-
 import discord
+from __main__ import bot
 
 from src.utils.consts import neutral_color, ticket_categories, neg_color, positive_responses, \
     staff_application_questions
@@ -12,6 +11,8 @@ async def staff_application(ticket: discord.TextChannel, interaction: discord.In
     await ticket.edit(name=f"staff-application-{ign}", topic=f"{interaction.user.id if interaction else user.id}|",
                       category=discord.utils.get((interaction.guild if interaction else ticket.guild).categories,
                                                  name=ticket_categories["generic"]))
+    await ticket.send("**Staff Applications are currently CLOSED!**")
+    return
     await ticket.send(embed=discord.Embed(title=f"{ign} wishes to apply for staff!",
                                           description="Please respond to the bot's prompts appropriately!",
                                           color=neutral_color).add_field(
