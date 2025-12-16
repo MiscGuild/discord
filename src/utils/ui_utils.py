@@ -1,9 +1,8 @@
 import calendar
-from __main__ import bot
-from datetime import datetime, timedelta
-
 import discord
 import discord.ui as ui
+from __main__ import bot
+from datetime import datetime, timedelta
 from discord.ui import Button, View
 
 from src.utils.consts import (neg_color, neutral_color, tickets_messages)
@@ -139,7 +138,7 @@ class InactivityLenSelect(ui.Select):
 
     async def callback(self, interaction: discord.Interaction) -> None:
         length = list(interaction.data.values())[0][0]
-        if length == "?":
+        if length == "?" and bot.staff not in interaction.user.roles:
             embed = discord.Embed(title=f"We do not accept do-not-kick-list applications that are longer than 3 weeks!",
                                   description="If you think you will be unable to meet the guild requirements during your inactivity period,"
                                               " you can leave the guild and notify staff once you're back. We'll gladly invite you back!",
@@ -161,7 +160,7 @@ class InactivityLenSelect(ui.Select):
             await self.deny(channel=self.channel, author=self.author, ign=self.ign, uuid=self.uuid, embed=embed,
                             interaction=interaction, self_denial=True)
 
-            await interaction.response.send_message("**If you missclicked, kindly create a new ticket!**\n"
+            await interaction.response.send_message("**If you misclicked, kindly create a new ticket!**\n"
                                                     "You will be punished if you lie and abuse the DNKL system.",
                                                     ephemeral=True)
             self.view.stop()
