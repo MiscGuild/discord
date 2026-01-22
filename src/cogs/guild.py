@@ -5,7 +5,7 @@ from src.func.General import General
 from src.func.Integer import Integer
 from src.func.String import String
 from src.utils.calculation_utils import check_if_mention, get_username_autocomplete
-from src.utils.consts import gvg_info_embed, requirements_embed, resident_embed
+from src.utils.consts import GVG_INFO_EMBED, REQUIREMENTS_EMBED, RESIDENT_EMBED
 from src.utils.db_utils import get_db_uuid_username
 
 
@@ -103,17 +103,17 @@ class Guild(commands.Cog, name="guild"):
     @bridge.bridge_command(aliases=["req", "reqs"])
     async def requirements(self, ctx: discord.ApplicationContext) -> None:
         """View guild experience requirements!"""
-        await ctx.respond(embed=requirements_embed)
+        await ctx.respond(embed=REQUIREMENTS_EMBED)
 
     @bridge.bridge_command(aliases=["res", "elite", "elitemember", "em"])
     async def elite_member(self, ctx: discord.ApplicationContext) -> None:
         """See the different ways of obtaining the elite member rank!"""
-        await ctx.respond(embed=resident_embed)
+        await ctx.respond(embed=RESIDENT_EMBED)
 
     @bridge.bridge_command()
     async def gvg(self, ctx: discord.ApplicationContext):
         """View information about GvG team and the requirements!!"""
-        await ctx.respond(embed=gvg_info_embed)
+        await ctx.respond(embed=GVG_INFO_EMBED)
 
     @bridge.bridge_command(aliases=["invite", "inv"])
     @bridge.bridge_option(
@@ -157,7 +157,7 @@ class Guild(commands.Cog, name="guild"):
         if isinstance(embed, discord.Embed):
             await ctx.respond(embed=embed)
         else:
-            await ctx.respond(embed=resident_embed)
+            await ctx.respond(embed=RESIDENT_EMBED)
 
 def setup(bot):
     bot.add_cog(Guild(bot))
