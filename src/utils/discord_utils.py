@@ -6,9 +6,9 @@ import discord.ui as ui
 from discord.ext import tasks
 
 from src.utils.calculation_utils import get_qotd_day_number
-from src.utils.consts import (config, log_channel_id, neutral_color, ticket_categories,
-                              guest_ticket_reasons, member_ticket_reasons, general_ticket_reasons, guild_handle,
-                              qotd_thread_id, geoguessr_thread_id, spoilers_ahead)
+from src.utils.consts import (CONFIG, LOG_CHANNEL_ID, NEUTRAL_COLOR, TICKET_CATEGORIES,
+                              GUEST_TICKET_REASONS, MEMBER_TICKET_REASONS, GENERAL_TICKET_REASONS, GUILD_HANDLE,
+                              QOTD_THREAD_ID, GEOGUESSR_THREAD_ID, SPOILERS_AHEAD, INGAME_RANKS)
 from src.utils.db_utils import connect_db, get_db_uuid_username
 from src.utils.request_utils import get_uuid_by_name
 from src.utils.ticket_utils import *
@@ -39,7 +39,7 @@ async def get_ticket_creator(channel: discord.TextChannel) -> discord.Member:
 
 
 async def create_ticket(user: discord.Member, ticket_name: str,
-                        category_name: str = ticket_categories["generic"], reason: str = None,
+                        category_name: str = TICKET_CATEGORIES["generic"], reason: str = None,
                         ctx=None) -> discord.TextChannel:
     # Create ticket
     ticket: discord.TextChannel = await bot.guild.create_text_channel(ticket_name,
@@ -68,7 +68,7 @@ async def create_ticket(user: discord.Member, ticket_name: str,
                                  read_message_history=False, external_emojis=False)
     if reason:
         await handle_ticket_reason(reason, ticket, interaction=None, user=user, ctx=ctx)
-    elif category_name != ticket_categories["registrees"]:
+    elif category_name != TICKET_CATEGORIES["registrees"]:
         await send_ticket_dropdown(ticket, user, ctx)
 
     # Return ticket for use
@@ -82,16 +82,16 @@ async def send_ticket_dropdown(ticket: discord.TextChannel, user: discord.Member
             super().__init__()
 
             if bot.guest in user.roles:
-                for key, value in guest_ticket_reasons.items():
+                for key, value in GUEST_TICKET_REASONS.items():
                     self.add_option(label=key, emoji=value)
 
             # Add milestone, DNKL application, staff application, GvG application if user is a member
             if bot.member_role in user.roles:
-                for key, value in member_ticket_reasons.items():
+                for key, value in MEMBER_TICKET_REASONS.items():
                     self.add_option(label=key, emoji=value)
 
             # Add default options
-            for key, value in general_ticket_reasons.items():
+            for key, value in GENERAL_TICKET_REASONS.items():
                 self.add_option(label=key, emoji=value)
 
         # Override default callback
@@ -108,7 +108,7 @@ async def send_ticket_dropdown(ticket: discord.TextChannel, user: discord.Member
     view.add_item(TicketTypeSelect())
     embed = discord.Embed(title="Why did you make this ticket?",
                           description="Please select your reason from the dropdown given below!",
-                          color=neutral_color)
+                          color=NEUTRAL_COLOR)
     await ticket.send(embed=embed, view=view)
 
 
@@ -137,7 +137,7 @@ async def handle_ticket_reason(reason: str, ticket: discord.TextChannel,
         await staff_application(ticket, interaction, user, ign)
     elif "gvg_team" in reason:
         await gvg_application(ticket, interaction, ign, uuid, user)
-    elif "join_guild" in reason or f"join_{guild_handle.lower()}" in reason:
+    elif "join_guild" in reason or f"join_{GUILD_HANDLE.lower()}" in reason:
         await join_guild(ticket, interaction, user, ign)
     elif "organize_gvg" in reason or "organize_a_gvg" in reason:
         if interaction:
@@ -164,8 +164,8 @@ async def handle_ticket_reason(reason: str, ticket: discord.TextChannel,
 
 
 async def log_event(title: str, description: str = None) -> None:
-    embed = discord.Embed(title=title, description=description, color=neutral_color)
-    await bot.get_channel(log_channel_id).send(embed=embed)
+    embed = discord.Embed(title=title, description=description, color=NEUTRAL_COLOR)
+    await bot.get_channel(LOG_CHANNEL_ID).send(embed=embed)
 
 
 async def has_tag_perms(member: discord.Member) -> bool:
@@ -188,18 +188,18 @@ async def update_recruiter_role(uuid: str, invites: int) -> None:
 
 
 async def send_thread_message(thread: discord.Thread) -> None:
-    if thread.parent.id == qotd_thread_id:
+    if thread.parent.id == QOTD_THREAD_ID:
         day_number, day, month, year = await get_qotd_day_number()
 
         embed = discord.Embed(
             title=f"Question of the Day",
             description=f"**Day {day_number}**\n"
                         f"**Date:** {day} {month} {year}\n",
-            color=neutral_color)
+            color=NEUTRAL_COLOR)
         await thread.send(f"<@&{bot.qotd.id}>", embed=embed)
-    if thread.parent.id == geoguessr_thread_id:
+    if thread.parent.id == GEOGUESSR_THREAD_ID:
         await thread.send(f"<@&{bot.geoguessr.id}> New GeoGuessr challenge posted!\n"
-                          f"{spoilers_ahead}")
+                          f"{SPOILERS_AHEAD}")
 
 
 @tasks.loop(count=1)
@@ -207,28 +207,29 @@ async def after_cache_ready() -> None:
     await connect_db()
 
     # Set owner id(s) and guild
-    bot.owner_ids = config["owner_ids"]
-    bot.guild = bot.get_guild(config["guild_id"])
+    bot.owner_ids = CONFIG["owner_ids"]
+    bot.guild = bot.get_guild(CONFIG["guild_id"])
     # Set roles
-    bot.admin = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["admin"])
-    bot.staff = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["staff"])
-    bot.helper = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["helper"])
-    bot.former_staff = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["former_staff"])
-    bot.new_member_role = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["new_member"])
-    bot.processing = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["processing"])
-    bot.guest = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["guest"])
-    bot.member_role = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["member"])
-    bot.active_role = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["active"])
-    bot.ally = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["ally"])
-    bot.server_booster = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["booster"])
-    bot.rich_kid = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["sponsor"])
-    bot.gvg = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["gvg_team"])
-    bot.giveaways_events = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["giveaways"])
-    bot.veteran = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["veteran"])
-    bot.recruiter = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["recruiter"])
-    bot.qotd = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["qotd_ping"])
-    bot.geoguessr = discord.utils.get(bot.guild.roles, id=config["discord_roles"]["geoguessr"])
-    bot.tag_allowed_roles = (bot.active_role, bot.staff, bot.former_staff,
+    bot.admin = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["admin"])
+    bot.staff = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["staff"])
+    bot.helper = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["helper"])
+    bot.former_staff = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["former_staff"])
+    bot.new_member_role = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["new_member"])
+    bot.processing = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["processing"])
+    bot.guest = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["guest"])
+    bot.member_role = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["member"])
+    bot.achievable_rank_0 = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["achievable_rank_0"])
+    bot.achievable_rank_1 = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["achievable_rank_1"])
+    bot.ally = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["ally"])
+    bot.server_booster = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["booster"])
+    bot.rich_kid = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["sponsor"])
+    bot.gvg = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["gvg_team"])
+    bot.giveaways_events = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["giveaways"])
+    bot.veteran = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["veteran"])
+    bot.recruiter = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["recruiter"])
+    bot.qotd = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["qotd_ping"])
+    bot.geoguessr = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["geoguessr"])
+    bot.tag_allowed_roles = (bot.achievable_rank_0, bot.achievable_rank_1, bot.staff, bot.former_staff,
                              bot.server_booster, bot.rich_kid, bot.gvg, bot.veteran, bot.recruiter)
 
     from src.utils.loop_utils import check_giveaways, before_scheduler
