@@ -3,21 +3,21 @@ from __main__ import bot
 import discord
 
 import src.utils.ui_utils as uiutils
-from src.utils.consts import unknown_ign_embed, neutral_color, ticket_categories, neg_color, gvg_requirements, \
-    missing_permissions_embed
+from src.utils.consts import UNKNOWN_IGN_EMBED, NEUTRAL_COLOR, TICKET_CATEGORIES, NEG_COLOR, GVG_REQUIREMENTS, \
+    MISSING_PERMS_EMBED
 from src.utils.request_utils import get_hypixel_player
 
 
 async def gvg_approve(channel: discord.TextChannel, author: discord.User, ign: str, uuid: str, embed: discord.Embed,
                       interaction: discord.Interaction):
     if bot.staff not in interaction.user.roles:
-        await channel.send(embed=missing_permissions_embed)
+        await channel.send(embed=MISSING_PERMS_EMBED)
         return None
 
     await interaction.response.send_message(embed=discord.Embed(
         title="Your application has been accepted!",
         description="Please await staff assistance for more information!",
-        color=neutral_color))
+        color=NEUTRAL_COLOR))
     member = await bot.guild.fetch_member(author.id)
     await member.add_roles(bot.gvg)
 
@@ -27,13 +27,13 @@ async def gvg_approve(channel: discord.TextChannel, author: discord.User, ign: s
 async def gvg_deny(channel: discord.TextChannel, author: discord.User, ign: str, uuid: str, embed: discord.Embed,
                    interaction: discord.Interaction):
     if bot.staff not in interaction.user.roles:
-        await channel.send(embed=missing_permissions_embed)
+        await channel.send(embed=MISSING_PERMS_EMBED)
         return None
 
     await interaction.response.send_message(embed=discord.Embed(
         title="Your application has been denied!",
         description="Please await staff assistance for more information!",
-        color=neg_color))
+        color=NEG_COLOR))
 
     return True
 
@@ -42,12 +42,12 @@ async def gvg_application(ticket: discord.TextChannel, interaction: discord.Inte
                           user: discord.Member):
     await ticket.edit(name=f"gvg-application-{ign}", topic=f"{interaction.user.id if interaction else user.id}|",
                       category=discord.utils.get((interaction.guild if interaction else ticket.guild).categories,
-                                                 name=ticket_categories["generic"]))
+                                                 name=TICKET_CATEGORIES["generic"]))
 
     # Fetch player data
     player_data = await get_hypixel_player(uuid=uuid)
     if not player_data:
-        return await ticket.send(embed=unknown_ign_embed)
+        return await ticket.send(embed=UNKNOWN_IGN_EMBED)
     player_data = player_data["stats"]
 
     # Set vars for each stat
@@ -68,16 +68,16 @@ async def gvg_application(ticket: discord.TextChannel, interaction: discord.Inte
 
     # Define dict for eligibility and set each gamemode boolean
     eligibility = {}
-    eligibility["bedwars"] = False if bw_wins < gvg_requirements["bw_wins"] and bw_fkdr < \
-                                      gvg_requirements["bw_fkdr"] else True
-    eligibility["skywars"] = False if sw_wins < gvg_requirements["sw_wins"] and sw_kdr < \
-                                      gvg_requirements["sw_kdr"] else True
-    eligibility["duels"] = False if duels_wlr < gvg_requirements["duels_wlr"] and duels_kills < \
-                                    gvg_requirements["duels_kills"] else True
+    eligibility["bedwars"] = False if bw_wins < GVG_REQUIREMENTS["bw_wins"] and bw_fkdr < \
+                                      GVG_REQUIREMENTS["bw_fkdr"] else True
+    eligibility["skywars"] = False if sw_wins < GVG_REQUIREMENTS["sw_wins"] and sw_kdr < \
+                                      GVG_REQUIREMENTS["sw_kdr"] else True
+    eligibility["duels"] = False if duels_wlr < GVG_REQUIREMENTS["duels_wlr"] and duels_kills < \
+                                    GVG_REQUIREMENTS["duels_kills"] else True
 
     # Polyvalent eligibility
     if all(eligibility.values()):
-        embed = discord.Embed(title="You are eligible for the polyvalent team!", color=neutral_color)
+        embed = discord.Embed(title="You are eligible for the polyvalent team!", color=NEUTRAL_COLOR)
         embed.set_footer(text="Please await staff assistance for further information!")
         embed.add_field(name="Bedwars Wins", value=f"`{bw_wins}`")
         embed.add_field(name="Bedwars FKDR", value=f"`{bw_fkdr}`")
@@ -92,7 +92,7 @@ async def gvg_application(ticket: discord.TextChannel, interaction: discord.Inte
         embed = discord.Embed(
             title="You are ineligible for the GvG Team as you do not meet the requirements!",
             description="If you think this is incorrect, please await staff assistance",
-            color=neg_color)
+            color=NEG_COLOR)
         embed.add_field(name="Bedwars Wins", value=f"`{bw_wins}`")
         embed.add_field(name="Bedwars FKDR", value=f"`{bw_fkdr}`")
         embed.add_field(name="Skywars Wins", value=f"`{sw_wins}`")
@@ -103,7 +103,7 @@ async def gvg_application(ticket: discord.TextChannel, interaction: discord.Inte
         await ticket.send(embed=discord.Embed(
             title="You are ineligible for the GvG Team as you do not meet the requirements!",
             description="Please await staff assistance for further information!",
-            color=neg_color))
+            color=NEG_COLOR))
 
     # User is eligible for at least one gamemode
     else:
@@ -115,7 +115,7 @@ async def gvg_application(ticket: discord.TextChannel, interaction: discord.Inte
             # If user is eligible for that gamemode, create embed
             if eligibility[mode]:
                 embed = discord.Embed(title=f"You are eiligible for the {mode.capitalize()} team!",
-                                      color=neutral_color)
+                                      color=NEUTRAL_COLOR)
                 embed.set_footer(text="Please await staff assistance for further information!")
                 embed.add_field(name=req1_name, value=f"`{req1}`")
                 embed.add_field(name=req2_name, value=f"`{req2}`")

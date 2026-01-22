@@ -4,7 +4,7 @@ from __main__ import bot
 import discord
 
 from src.utils.calculation_utils import get_player_gexp
-from src.utils.consts import neutral_color
+from src.utils.consts import NEUTRAL_COLOR
 from src.utils.db_utils import (select_one,
                                 set_giveaway_inactive)
 from src.utils.discord_utils import name_grabber
@@ -83,7 +83,7 @@ async def roll_giveaway(message_id: int, reroll_target: int = None) -> discord.A
 
         # Edit embed
         embed = discord.Embed(
-            title=prize, description=f"Winners: {announcement}\nSponsored by: {sponsors}", color=neutral_color)
+            title=prize, description=f"Winners: {announcement}\nSponsored by: {sponsors}", color=NEUTRAL_COLOR)
         embed.set_footer(text=f"This giveaway ended at  {time_of_finish}")
         await set_giveaway_inactive(message_id)
         return await message.edit(embed=embed)

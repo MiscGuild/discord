@@ -1,23 +1,13 @@
-from enum import Enum
-
 import discord
 import toml
 
-# Define config
+from .bot_consts import GUILD_HANDLE, NEG_COLOR, NEUTRAL_COLOR, ERROR_COLOR
+from .ingame_consts import NON_STAFF_RANKS, DNKL_REQ
+
 config = toml.load("config.toml")
 
-prefix = config["prefix"]
-
-ERROR_REPLY_EXCEPTIONS = (discord.Forbidden, discord.HTTPException, discord.NotFound)
-
-# Gexp requirements
-member_req = config["member_req"]
-resident_req = config["resident_req"]
-active_req = config["active_req"]
-dnkl_req = config["dnkl_req"]
-
 # GvG team requirements
-gvg_requirements = {
+GVG_REQUIREMENTS = {
     "bw_fkdr": config["gvg_bw_fkdr"],
     "bw_wins": config["gvg_bw_wins"],
     "sw_kdr": config["gvg_sw_kdr"],
@@ -26,34 +16,24 @@ gvg_requirements = {
     "duels_wlr": config["gvg_duels_wlr"],
 }
 
-# Define channels
-error_channel_id = config["error_channel"]
-dnkl_channel_id = config["dnkl_channel"]
-ticket_channel_id = config["ticket_channel"]
-log_channel_id = config["log_channel"]
-registration_channel_id = config["registration_channel"]
-staff_announcements_id = config["staff_announcements_channel"]
-partner_channel_id = config["partner_channel"]
-qotd_thread_id = config["qotd_thread_channel"]
-geoguessr_thread_id = config["geoguessr_thread_channel"]
-milestones_channel = config["milestones_channel"]
-weekly_lb_channel = config["weekly_gexp_lb"]
-daily_lb_channel = config["daily_gexp_lb"]
-rank_upgrade_channel = config["rank_upgrade_channel"]
-staff_bridge_channel = config["staff_bridge_channel"]
+ERROR_CHANNEL_ID = config["error_channel"]
+DNKL_CHANNEL_ID = config["dnkl_channel"]
+TICKET_CHANNEL_ID = config["ticket_channel"]
+LOG_CHANNEL_ID = config["log_channel"]
+REGISTRATION_CHANNEL_ID = config["registration_channel"]
+STAFF_ANNOUNCEMENTS_CHANNEL_ID = config["staff_announcements_channel"]
+PARTNER_CHANNEL_ID = config["partner_channel"]
+QOTD_THREAD_ID = config["qotd_thread_channel"]
+GEOGUESSR_THREAD_ID = config["geoguessr_thread_channel"]
+MILESTONES_CHANNEL_ID = config["milestones_channel"]
+WEEKLY_LB_CHANNEL_ID = config["weekly_gexp_lb"]
+DAILY_LB_CHANNEL_ID = config["daily_gexp_lb"]
+RANK_UPGRADE_CHANNEL_ID = config["rank_upgrade_channel"]
+STAFF_BRIDGE_CHANNEL_ID = config["staff_bridge_channel"]
 
-# Other variables
-guild_handle = config["guild_handle"]
-ticket_categories = config["ticket_categories"]
-allies = config["allies"]
+TICKET_CATEGORIES = config["ticket_categories"]
 
-# Colors
-neg_color = 0xff3333
-pos_color = 0x00A86B
-neutral_color = 0x8369ff
-error_color = 0xDE3163
-
-milestone_categories = {
+MILESTONE_CATEGORIES = {
     "hypixel": "Hypixel",
     "bedwars": "BedWars",
     "skywars": "SkyWars",
@@ -71,7 +51,7 @@ milestone_categories = {
     "other": "Other"
 }
 
-milestone_emojis = {
+MILESTONE_EMOJIS = {
     "hypixel": "<:hypixel:823036946984730662>",
     "bedwars": "<:BedWars64:823036962150547477>",
     "skywars": "<:Skywars:823036980526972948>",
@@ -89,13 +69,13 @@ milestone_emojis = {
     "other": "❓"
 }
 
-guest_ticket_reasons = {
-    f"I want to join {guild_handle}": "<:Misc:540990817872117780>",
-    f"I want to organize a GvG with {guild_handle}": "⚔️",
-    f"My guild wishes to ally {guild_handle}": "🤝"
+GUEST_TICKET_REASONS = {
+    f"I want to join {GUILD_HANDLE}": "<:Misc:540990817872117780>",
+    f"I want to organize a GvG with {GUILD_HANDLE}": "⚔️",
+    f"My guild wishes to ally {GUILD_HANDLE}": "🤝"
 }
 
-member_ticket_reasons = {
+MEMBER_TICKET_REASONS = {
     "I want to register a milestone": "🏆",
     "I am going to be inactive": "<:dnkl:877657298703634483>",
     "I won a rank upgrade": "💰",
@@ -103,53 +83,51 @@ member_ticket_reasons = {
     "I want to join the GvG team": "⚔️"
 }
 
-general_ticket_reasons = {
+GENERAL_TICKET_REASONS = {
     "I want to report a player": "🗒️",
     "I have a question": "🤔",
     "I have a problem": "❌",
     "Other": "❓"
 }
 
-elite_member_categories = ("Event Sponsor", "GvG Team", "YouTuber", "Server Booster")
+ELITE_MEMBER_CATEGORIES = ("Event Sponsor", "GvG Team", "YouTuber", "Server Booster")
 
 # General embeds
-registration_embed = discord.Embed(title=f"Welcome to the {guild_handle} Discord!",
+REGISTRATION_EMBED = discord.Embed(title=f"Welcome to the {GUILD_HANDLE} Discord!",
                                    description="Before you can view the server, please register with your Minecraft username.",
-                                   color=neutral_color).add_field(name="To register use the following command:",
+                                   color=NEUTRAL_COLOR).add_field(name="To register use the following command:",
                                                                   value="/register `Your Minecraft Name`\n\nExample:\n/register John",
                                                                   inline=False)
 
-ticket_deleted_embed = discord.Embed(title="Your ticket was deleted!",
+TICKET_DELETED_EMBED = discord.Embed(title="Your ticket was deleted!",
                                      description="The file above is the transcript",
-                                     color=neutral_color).set_footer(
+                                     color=NEUTRAL_COLOR).set_footer(
     text="If your issue was not resolved, please make a new ticket!")
 
-staff_impersonation_embed = discord.Embed(title="Staff impersonation is a punishable offense!",
-                                          color=neg_color)
+STAFF_IMPERSONATION_EMBED = discord.Embed(title="Staff impersonation is a punishable offense!",
+                                          color=NEG_COLOR)
 
-accepted_staff_application_embed = discord.Embed(title="Congratulations, your staff application has been accepted!",
+ACCEPTED_STAFF_APPLICATION_EMBED = discord.Embed(title="Congratulations, your staff application has been accepted!",
                                                  description="Please view `https://bit.ly/MiscStaffGuide` and the `#staff-faq` channel to help you get started!",
-                                                 color=neutral_color)
+                                                 color=NEUTRAL_COLOR)
 
-requirements_embed = discord.Embed(title="Miscellaneous Guild Requirements",
+REQUIREMENTS_EMBED = discord.Embed(title="Miscellaneous Guild Requirements",
                                    description="These requirements are subject to change!",
-                                   color=neutral_color).add_field(
-    name="Elite Member - Active",
-    value=f"•  {format(active_req, ',d')} Weekly Guild Experience",
-    inline=False).add_field(name="Member",
-                            value=f"•  {format(member_req, ',d')} Weekly Guild Experience",
-                            inline=False).add_field(name="Elite Member - Regular",
-                                                    value=f"•  {format(resident_req, ',d')} Weekly Guild Experience",
-                                                    inline=False).add_field(name="Do-not-kick-list Eligibility",
-                                                                            value=f"•  {format(dnkl_req, ',d')} Weekly Guild Experience",
-                                                                            inline=False).set_footer(
+                                   color=NEUTRAL_COLOR)
+for rank_obj in NON_STAFF_RANKS:
+    REQUIREMENTS_EMBED.add_field(name=rank_obj.name,
+                                 value=f"•  {format(rank_obj.requirement, ',d')} Weekly Guild Experience", inline=False)
+
+REQUIREMENTS_EMBED.add_field(name="Do-not-kick-list Eligibility",
+                             value=f"•  {format(DNKL_REQ, ',d')} Weekly Guild Experience",
+                             inline=False).set_footer(
     text="If you fail to meet these requirements, you will be kicked!")
 
-dnkl_entries_not_found = discord.Embed(title="No entries!",
+DNKL_ENTRIES_NOT_FOUND = discord.Embed(title="No entries!",
                                        description="There are no users on the do-not-kick-list!",
-                                       color=neg_color)
+                                       color=NEG_COLOR)
 
-information_message = """# Miscellaneous
+INFORMATION_MESSAGE = """# Miscellaneous
 
 Founded by <@307402461734240257> in 2014, Miscellaneous is an all games Hypixel guild. Our primary goal is to be a guild that is friendly to everyone, as a result all of our guild requirements are well thought out. Miscellaneous strives to be a good community while maintaining its position on the guild leaderboards. 
 ## Partners
@@ -165,18 +143,16 @@ Founded by <@307402461734240257> in 2014, Miscellaneous is an all games Hypixel 
 > - <:discord:977349801412788266> Discord: `https://discord.gg/bHFWukp`
 ## Requirements
 """
-information_requirements_embed = discord.Embed(title="", color=0x4f5058).add_field(
-    name="Elite Member - Active",
-    value=f"•  {format(active_req, ',d')} Weekly Guild Experience",
-    inline=False).add_field(name="Member",
-                            value=f"•  {format(member_req, ',d')} Weekly Guild Experience",
-                            inline=False).add_field(name="Elite Member - Regular",
-                                                    value=f"•  {format(resident_req, ',d')} Weekly Guild Experience",
-                                                    inline=False).add_field(name="Do-not-kick-list Eligibility",
-                                                                            value=f"•  {format(dnkl_req, ',d')} Weekly Guild Experience",
-                                                                            inline=False)
+INFORMATION_REQUIREMENTS_EMBED = discord.Embed(title="", color=0x4f5058)
+for rank_obj in NON_STAFF_RANKS:
+    INFORMATION_REQUIREMENTS_EMBED.add_field(name=rank_obj.name,
+                                             value=f"•  {format(rank_obj.requirement, ',d')} Weekly Guild Experience",
+                                             inline=False)
+INFORMATION_REQUIREMENTS_EMBED.add_field(name="Do-not-kick-list Eligibility",
+                                         value=f"•  {format(DNKL_REQ, ',d')} Weekly Guild Experience",
+                                         inline=False)
 
-tickets_messages = ["""# Tickets
+TICKETS_MESSAGES = ["""# Tickets
 Tickets can be created for one of the following reasons:
 ## Ticket Categories for Members 
 - :trophy: I want to register a milestone
@@ -198,108 +174,109 @@ Tickets can be created for one of the following reasons:
 3. Inside your ticket, the bot will ask you why you made the ticket. Choose your reason from the dropdown list provided.
 4. Once you have picked your reason, you might need to answer a few of the bot's followup prompts."""]
 
-resident_embed = discord.Embed(title="How can I get Elite Member?",
-                               description="To be eligible for Elite Member, you must satisfy at least one of the following requirements:",
-                               color=neutral_color).add_field(name="Youtuber",
-                                                              value="If you're a youtuber with more than 5,000 subscribers, you will receive Elite Member indefinitely.",
+RESIDENT_EMBED = discord.Embed(title=f"How can I get {NON_STAFF_RANKS[-2].name}?",
+                               description=f"To be eligible for {NON_STAFF_RANKS[-2].name}, you must satisfy at least one of the following requirements:",
+                               color=NEUTRAL_COLOR).add_field(name="Youtuber",
+                                                              value=f"If you're a youtuber with more than 5,000 subscribers, you will receive {NON_STAFF_RANKS[-2].name} indefinitely.",
                                                               inline=False).add_field(name="Event Sponsor",
-                                                                                      value="Spend Money on the guild by doing giveaways or sponsoring events. The length of your Elite Member status will depend on the amount you spend.",
+                                                                                      value=f"Spend Money on the guild by doing giveaways or sponsoring events. The length of your {NON_STAFF_RANKS[-2].name} status will depend on the amount you spend.",
                                                                                       inline=False).add_field(
     name="Server Booster",
-    value="If you boost the server, you will be given Elite Member status for the duration of your boost. This status is contingent upon maintaining your boost and will be revoked if you discontinue boosting.",
+    value=f"If you boost the server, you will be given {NON_STAFF_RANKS[-2].name} status for the duration of your boost. This status is contingent upon maintaining your boost and will be revoked if you discontinue boosting.",
     inline=False).add_field(name="GvG Team",
-                            value="If you are an exceptional member of the GvG team, you will be granted Elite Member status indefinitely, unless you are removed from the team.",
+                            value=f"If you are an exceptional member of the GvG team, you will be granted {NON_STAFF_RANKS[-2].name} status indefinitely, unless you are removed from the team.",
                             inline=False).add_field(name="Active Member",
-                                                    value=f"If you earn more than {format(active_req, ',d')} weekly guild experience, you will be given Elite Member.").set_footer(
-    text=f"Unless otherwise specified, all residents must get {format(resident_req, ',d')} weekly guild experience.")
+                                                    value=f"If you earn more than {format(NON_STAFF_RANKS[-2].requirement, ',d')} weekly guild experience, you will be given {NON_STAFF_RANKS[-2].name}.").set_footer(
+    text=f"Unless otherwise specified, all residents must get {format(0, ',d')} weekly guild experience.")
 
-gvg_info_embed = discord.Embed(title="GvG Information",
+GVG_INFO_EMBED = discord.Embed(title="GvG Information",
                                description="Following is some general information and the requirements for the GvG team.",
-                               color=neutral_color).add_field(
+                               color=NEUTRAL_COLOR).add_field(
     name="Information",
     value="In a GvG (Guild vs Guild), players are organised by guild and play various gamemodes. The guild that wins the most games wins the GvG.",
     inline=False
 ).add_field(
     name="Requirements",
-    value=f"""Bedwars Wins: `{gvg_requirements["bw_wins"]}`
-                                            Bedwars FKDR: `{gvg_requirements["bw_fkdr"]}`
-                                            Skywars Wins: `{gvg_requirements["sw_wins"]}`
-                                            Skywars KDR: `{gvg_requirements["sw_kdr"]}`
-                                            Duels WLR: `{gvg_requirements["duels_wlr"]}`
-                                            Duels Kills: `{gvg_requirements["duels_kills"]}`""",
+    value=f"""Bedwars Wins: `{GVG_REQUIREMENTS["bw_wins"]}`
+                                            Bedwars FKDR: `{GVG_REQUIREMENTS["bw_fkdr"]}`
+                                            Skywars Wins: `{GVG_REQUIREMENTS["sw_wins"]}`
+                                            Skywars KDR: `{GVG_REQUIREMENTS["sw_kdr"]}`
+                                            Duels WLR: `{GVG_REQUIREMENTS["duels_wlr"]}`
+                                            Duels Kills: `{GVG_REQUIREMENTS["duels_kills"]}`""",
     inline=False
 )
 
-positive_responses = (
+POSITIVE_RESPONSES = (
     "yes", "yeah", "yup", "yea", "sure", "ok", "okay", "affirmative", "y", "ye", "yea", "yep", "yuppers", "yessir",
     "yessum", "yessirree", "yessumree", "yessiree", "yessumree")
 
 # Errors
-unknown_ign_msg = "Unknown IGN!"
+UNKNOWN_IGN_MSG = "Unknown IGN!"
 
-invalid_date_msg = "This date is invalid!\n*Enter dates in the format* **YYYY/MM/DD**\n\n For example,\n" \
+INVALID_DATE_MSG = "This date is invalid!\n*Enter dates in the format* **YYYY/MM/DD**\n\n For example,\n" \
                    "January 23rd 2022 would be 2022/01/23"
 
-missing_permissions_msg = "Your soul lacks the strength to utilize this feature!"
+MISSING_PERMS_MSG = "Your soul lacks the strength to utilize this feature!"
 
-invalid_command_embed = discord.Embed(title="Invalid Command!",
+INVALID_COMMAND_EMBED = discord.Embed(title="Invalid Command!",
                                       description="Use `,help` to view a list of all commands!",
-                                      color=error_color)
+                                      color=ERROR_COLOR)
 
-not_owner_embed = discord.Embed(title=missing_permissions_msg,
+NOT_OWNER_EMBED = discord.Embed(title=MISSING_PERMS_MSG,
                                 description="You are not the owner of this bot!",
-                                color=error_color)
+                                color=ERROR_COLOR)
 
-missing_role_embed = discord.Embed(title=missing_permissions_msg,
+MISSING_ROLES_EMBED = discord.Embed(title=MISSING_PERMS_MSG,
                                    description="You do not have the required roles to access this restricted command!",
-                                   color=error_color)
+                                    color=ERROR_COLOR)
 
-missing_permissions_embed = discord.Embed(title=missing_permissions_msg,
+MISSING_PERMS_EMBED = discord.Embed(title=MISSING_PERMS_MSG,
                                           description="You do not have the required permissions to access this restricted command!",
-                                          color=error_color)
+                                    color=ERROR_COLOR)
 
-member_not_found_embed = discord.Embed(title="Member not found",
+MEMBER_NOT_FOUND_EMBED = discord.Embed(title="Member not found",
                                        description="This member doesn't seem to exist.\nCheck you have their ID or tag's capitalization and spelling correct!",
-                                       color=error_color)
+                                       color=ERROR_COLOR)
 
-err_404_embed = discord.Embed(title="404 - Not Found",
+ERR_404_EMBED = discord.Embed(title="404 - Not Found",
                               description="The bot encountered an error 404 while performing this action!",
-                              color=error_color)
+                              color=ERROR_COLOR)
 
-bot_missing_perms_embed = discord.Embed(title="Missing permissions!",
+BOT_MISSING_PERMS_EMBED = discord.Embed(title="Missing permissions!",
                                         description="Due to the role hierarchy, I do not have the permission to do that!",
-                                        color=error_color)
+                                        color=ERROR_COLOR)
 
-guildless_embed = discord.Embed(title="Guildless!",
+GUILDLESS_EMBED = discord.Embed(title="Guildless!",
                                 description="This player is not in a guild!",
-                                color=error_color)
+                                color=ERROR_COLOR)
 
-invalid_guild_embed = discord.Embed(title="Invalid guild!",
+INVALID_GUILD_EMBED = discord.Embed(title="Invalid guild!",
                                     description="This guild doesn't seem to exist!",
-                                    color=error_color)
+                                    color=ERROR_COLOR)
 
-unknown_ign_embed = discord.Embed(title="Please enter a valid Minecraft username!",
-                                  color=error_color)
+UNKNOWN_IGN_EMBED = discord.Embed(title="Please enter a valid Minecraft username!",
+                                  color=ERROR_COLOR)
 
-discord_not_linked_embed = discord.Embed(title="This account is not linked to your discord account!",
+DISCORD_NOT_LINKED_EMBED = discord.Embed(title="This account is not linked to your discord account!",
                                          description="Please follow the following steps to link your Hypixel profile with discord:\nGo to 'Your Profile' > Social Media > DISCORD",
-                                         color=error_color)
-join_request_embed = discord.Embed(color=neutral_color).add_field(name="Our requirements are as follows:",
-                                                                  value="__Active__\n"
-                                                                        f"➤ {format(active_req, ',d')} Weekly Guild Experience\n"
-                                                                        "__Member__\n"
-                                                                        f"➤ {format(member_req, ',d')} Weekly Guild Experience\n"
-                                                                        f"__Resident__\n"
-                                                                        f"➤ {format(resident_req, ',d')} Weekly Guild Experience\n\n"
-                                                                        f"You will join the guild as a Member.\n\n",
-                                                                  inline=False).set_footer(
-    text="Staff should invite you to the guild within 2 hours.\nWhile you wait, you can explore the guild discord!")
-discord_not_linked_embed.set_image(
+                                         color=ERROR_COLOR)
+DISCORD_NOT_LINKED_EMBED.set_image(
     url="https://media.discordapp.net/attachments/796061149593731128/953770877395284008/osl_.gif")
 
-dnkl_creation_embed = discord.Embed(title="Do-not-kick-list",
+REQUIREMENTS_TEXT = ""
+for rank_obj in NON_STAFF_RANKS:
+    REQUIREMENTS_TEXT += f"__{rank_obj.name}__\n"
+    REQUIREMENTS_TEXT += f"➤ {format(rank_obj.requirement, ',d')} Weekly Guild Experience\n"
+REQUIREMENTS_TEXT += f"You will join the guild as a {NON_STAFF_RANKS[0].name}"
+
+JOIN_REQUEST_EMBED = discord.Embed(color=NEUTRAL_COLOR).add_field(name="Our requirements are as follows:",
+                                                                  value=REQUIREMENTS_TEXT,
+                                                                  inline=False).set_footer(
+    text="Staff should invite you to the guild within 2 hours.\nWhile you wait, you can explore the guild discord!")
+
+DNKL_CREATION_EMBED = discord.Embed(title="Do-not-kick-list",
                                     description="In order to create a do-not-kick-list entry, you need to have a valid reason and meet the DNKL requirements.",
-                                    color=neutral_color
+                                    color=NEUTRAL_COLOR
                                     ).add_field(
     name="Accepted Reasons",
     value="- Exams\n" \
@@ -310,12 +287,12 @@ dnkl_creation_embed = discord.Embed(title="Do-not-kick-list",
     inline=False
 ).add_field(
     name="Requirements",
-    value=f"- {format(dnkl_req, ',d')} weekly guild experience\n" \
+    value=f"- {format(DNKL_REQ, ',d')} weekly guild experience\n" \
           f"- DNKL period must be less than 3 weeks",
     inline=False
 )
 
-rules_messages = ["""# Rules
+RULES_MESSAGES = ["""# Rules
 
 ## In-Game Rules
 :small_blue_diamond: All Hypixel rules must be followed.
@@ -339,7 +316,7 @@ rules_messages = ["""# Rules
 :thinking: 12. **Rules are subject to common sense.** These rules are not comprehensive and use of loopholes to violate the spirit of these rules is subject to enforcement.
 :scroll: 13. **Discord Terms of Service and Community Guidelines apply.** You must be at least 13 years old to use Discord, and abide by all other terms and guidelines."""]
 
-rank_upgrade_winner_announcement = '''# RANK UPGRADE
+RANK_UPGRADE_WINNER_MESSAGE = '''# RANK UPGRADE
 {date}
 
 **The winner is....**
@@ -357,40 +334,7 @@ This rank upgrade must be claimed within a week of this message by creating a ti
 
 *To know how the winner is picked, go here https://discord.com/channels/522586672148381726/1152480866585554994/1164962591198683146*'''
 
-
-class ChatColor(Enum):
-    RED = "&c"
-    GOLD = "&6"
-    GREEN = "&a"
-    YELLOW = "&e"
-    LIGHT_PURPLE = "&d"
-    WHITE = "&f"
-    BLUE = "&9"
-    DARK_GREEN = "&2"
-    DARK_RED = "&4"
-    DARK_AQUA = "&3"
-    DARK_PURPLE = "&5"
-    DARK_GRAY = "&8"
-    BLACK = "&0"
-    DARK_BLUE = "&1"
-
-
-months = {
-    1: "January",
-    2: "February",
-    3: "March",
-    4: "April",
-    5: "May",
-    6: "June",
-    7: "July",
-    8: "August",
-    9: "September",
-    10: "October",
-    11: "November",
-    12: "December"
-}
-
-staff_application_questions = {
+STAFF_APPLICATION_QUESTIONS = {
     1: "What is your age?",
     2: "How long have you been in the guild for?",
     3: "Have you had any past infractions on Hypixel?",
@@ -406,7 +350,7 @@ staff_application_questions = {
     13: "Anything else you like would us to know?"
 }
 
-spoilers_ahead = """# Spoilers Ahead
+SPOILERS_AHEAD = """# Spoilers Ahead
 _
 
 

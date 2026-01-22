@@ -5,7 +5,7 @@ from discord.ext import commands, bridge
 from src.func.General import General
 from src.func.String import String
 from src.func.Union import Union
-from src.utils.consts import milestone_categories
+from src.utils.consts import MILESTONE_CATEGORIES
 
 
 class Tickets(commands.Cog, name="tickets"):
@@ -152,7 +152,7 @@ class Tickets(commands.Cog, name="tickets"):
     @bridge.bridge_option(
         name="gamemode",
         description="The gamemode in which the milestone was achieved",
-        choices=[discord.OptionChoice(v, value=k) for k, v in milestone_categories.items()],
+        choices=[discord.OptionChoice(v, value=k) for k, v in MILESTONE_CATEGORIES.items()],
         required=False
     )
     async def milestone_add(self, ctx: bridge.BridgeContext, gamemode: str = None, *,

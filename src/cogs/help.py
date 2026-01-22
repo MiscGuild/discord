@@ -2,7 +2,7 @@ import discord
 from discord.errors import Forbidden
 from discord.ext import commands, bridge
 
-from src.utils.consts import config, neutral_color
+from src.utils.consts import PREFIX, NEUTRAL_COLOR
 
 """This custom help command is a perfect replacement for the default one on any Discord Bot written in Discord.py!
 However, you must put "bot.remove_command('help')" in your bot, and the command must be in a cog for it to work.
@@ -54,7 +54,6 @@ class Help(commands.Cog):
     async def help(self, ctx: discord.ApplicationContext, module=None) -> None:
         """Shows all modules of the Miscellaneous bot"""
 
-        prefix = config['prefix'] if not ctx.is_app else '/'
 
         async def predicate(cmd):
             # Check if the command is enabled and not hidden
@@ -62,7 +61,7 @@ class Help(commands.Cog):
 
         if not module:
             emb = discord.Embed(title='Commands and modules', color=discord.Color.blue(),
-                                description=f'Use `{prefix}help <module/command>` to gain more information about that module '
+                                description=f'Use `{PREFIX}help <module/command>` to gain more information about that module '
                                             f':smiley:\n')
 
             cogs_desc = ''
@@ -89,13 +88,13 @@ class Help(commands.Cog):
             if module not in self.bot.cogs:
                 command = self.bot.get_command(module)
                 if command:
-                    syntax = f"{prefix}{command.name}"
+                    syntax = f"{PREFIX}{command.name}"
                     for key, value in command.clean_params.items():
                         if not value.default:
                             syntax += " [" + key + "]"
                         else:
                             syntax += " <" + key + ">"
-                    embed = discord.Embed(title=f"Help", color=neutral_color)
+                    embed = discord.Embed(title=f"Help", color=NEUTRAL_COLOR)
                     embed.add_field(name=f"`{syntax}`", value=command.help)
                     aliases = command.aliases
                     if aliases:
@@ -110,7 +109,7 @@ class Help(commands.Cog):
 
                     for command in self.bot.get_cog(cog).get_commands():
                         if await predicate(command):  # Check if the command can be run
-                            syntax = f"{prefix}{command.name}"
+                            syntax = f"{PREFIX}{command.name}"
                             for key, value in command.clean_params.items():
                                 if not value.default:
                                     syntax += " [" + key + "]"

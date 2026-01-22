@@ -5,7 +5,7 @@ from io import BytesIO
 import chat_exporter
 import discord
 
-from src.utils.consts import missing_permissions_embed, neg_color, log_channel_id
+from src.utils.consts import MISSING_PERMS_EMBED, NEG_COLOR, LOG_CHANNEL_ID
 
 
 async def create_transcript(channel: discord.TextChannel, limit: int = None):
@@ -27,10 +27,10 @@ async def get_ticket_properties(channel: discord.TextChannel):
 async def close_ticket(channel: discord.TextChannel, author: discord.User, ign: str, uuid: str,
                        embed: discord.Embed, interaction: discord.Interaction):
     if author != interaction.user:
-        await channel.send(embed=missing_permissions_embed)
+        await channel.send(embed=MISSING_PERMS_EMBED)
         return None
 
-    embed = discord.Embed(title="This ticket will be deleted in 20 seconds!", color=neg_color)
+    embed = discord.Embed(title="This ticket will be deleted in 20 seconds!", color=NEG_COLOR)
 
     # Send deletion warning and gather transcript
     await interaction.response.send_message(embed=embed)
@@ -38,9 +38,9 @@ async def close_ticket(channel: discord.TextChannel, author: discord.User, ign: 
     if transcript:
         transcript = discord.File(BytesIO(transcript.encode()),
                                   filename=f"transcript-{channel.name}.html")
-        await bot.get_channel(log_channel_id).send(
+        await bot.get_channel(LOG_CHANNEL_ID).send(
             f"DNKL Request was denied and channel was deleted by {author}")
-        await bot.get_channel(log_channel_id).send(file=transcript)
+        await bot.get_channel(LOG_CHANNEL_ID).send(file=transcript)
 
     # Sleep and delete channel
     await sleep(20)

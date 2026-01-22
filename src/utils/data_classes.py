@@ -1,5 +1,8 @@
 from dataclasses import dataclass, asdict, field
-from typing import List
+from typing import List, Optional
+
+import discord
+
 
 @dataclass
 class WeeklyStats:
@@ -30,4 +33,19 @@ class InvitationStats:
             "weekly": asdict(self.weekly),
             "total": self.total,
             "valid": self.valid,
+        }
+
+
+@dataclass
+class IngameRank:
+    name: str
+    requirement: int
+    is_staff: bool
+    discord_role: Optional[discord.Role] = None
+
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "requirement": self.requirement,
+            "is_staff": self.is_staff,
         }

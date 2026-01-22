@@ -10,7 +10,7 @@ import aiohttp
 import discord
 import requests
 
-from src.utils.consts import config, error_channel_id
+from src.utils.consts import ERROR_CHANNEL_ID, API_KEYS
 from src.utils.db_utils import get_db_uuid_username, check_and_update_username
 
 
@@ -38,7 +38,7 @@ def async_retry(max_attempts: int = 5, delay: float = 0.5):
 
 
 async def get_hyapi_key() -> str:
-    return random.choice(config["api_keys"])
+    return random.choice(API_KEYS)
 
 
 async def update_usernames(uuid: str, username: str) -> None:
@@ -63,7 +63,7 @@ async def get_json_response(url: str) -> dict | None:
 
     # Check for invalid API keys
     if "cause" in resp and resp["cause"] == "Invalid API key":
-        await bot.get_channel(error_channel_id).send(
+        await bot.get_channel(ERROR_CHANNEL_ID).send(
             f"WARNING: The API key {re.search(r'(?<=key=)(.*?)(?=&)', url).group(0)} is invalid!")
 
     # Return JSON response

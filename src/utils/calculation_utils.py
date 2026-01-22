@@ -3,14 +3,15 @@ import logging
 import math
 import re
 import traceback
+from calendar import month_name
 from datetime import datetime, timedelta, timezone
 from typing import Tuple, List
 
 import discord
 from discord.ext import commands
 
-from src.utils.consts import ChatColor, active_req, member_req, resident_req, months, not_owner_embed, \
-    missing_role_embed, missing_permissions_embed, member_not_found_embed, bot_missing_perms_embed, err_404_embed, \
+from src.utils.consts import ChatColor, NON_STAFF_RANKS, NOT_OWNER_EMBED, \
+    MISSING_ROLES_EMBED, MISSING_PERMS_EMBED, MEMBER_NOT_FOUND_EMBED, BOT_MISSING_PERMS_EMBED, ERR_404_EMBED, \
     ERROR_REPLY_EXCEPTIONS
 from src.utils.db_utils import get_do_ping, get_db_uuid_username, get_all_usernames
 from src.utils.request_utils import get_player_guild, get_name_by_uuid
@@ -46,26 +47,14 @@ async def get_days_in_guild(joined: str) -> int:
 
 
 async def get_color_by_gexp(rank: str, weekly_gexp: int) -> Tuple[int, str, str]:
-    if rank == "Resident":
-        # Member meets res reqs
-        if weekly_gexp > resident_req:
-            return 0xFF55FF, "rgba(255,85,255, 0.3)", "rgba(255,85,255, 0.3)"
-            # return 0x64ffb4, "rgba(100, 255, 180,0.3)", "rgba(100, 255, 180,0.3)"
+    if rank == NON_STAFF_RANKS[-1].name and weekly_gexp >= NON_STAFF_RANKS[-1].requirement:
+        return 0x00fbff, "rgba(0,251,255, 0.3)", "rgba(0,251,255, 0.3)"
 
-        # Member does not meet res reqs
-        return 0xffb464, "rgba(255, 180, 100,0.3)", "rgba(255, 180, 100,0.3)"
+    if rank == NON_STAFF_RANKS[-2].name and weekly_gexp >= NON_STAFF_RANKS[-2].requirement:
+        return 0x64ffb4, "rgba(100, 255, 180,0.3)", "rgba(100, 255, 180,0.3)"
 
-    # Member meets active reqs
-    if weekly_gexp > active_req:
+    if weekly_gexp > NON_STAFF_RANKS[-3].name and weekly_gexp > NON_STAFF_RANKS[-3].requirement:
         return 0x9c119c, "rgba(156, 17, 156,0.3)", "rgba(156, 17, 156,0.3)"
-        # return 0x64b4ff, "rgba(100, 180, 255,0.3)", "rgba(100, 180, 255,0.3)"
-
-    # Member meets normal reqs
-    if weekly_gexp > member_req:
-        return 0xFF55FF, "rgba(255,85,255, 0.3)", "rgba(255,85,255, 0.3)"
-        # return 0x64ffff, "rgba(100, 255, 255,0.3)", "rgba(100, 255, 255,0.3)"
-
-    # Member is inactive
 
     return 0xff6464, "rgba(255, 100, 100,0.3)", "rgba(255, 100, 100,0.3)"
 
@@ -281,7 +270,7 @@ async def get_username_autocomplete(self, ctx: discord.AutocompleteContext):
 
 async def get_qotd_day_number() -> Tuple[int, int, str, int]:
     return 473 + (datetime.now(timezone.utc) - datetime.strptime("2022/05/15", "%Y/%m/%d").replace(
-        tzinfo=timezone.utc)).days, datetime.now(timezone.utc).day, months[
+        tzinfo=timezone.utc)).days, datetime.now(timezone.utc).day, month_name[
         datetime.now(timezone.utc).month], datetime.now(timezone.utc).year
 
 
@@ -289,17 +278,17 @@ def classify_error_embed(error: Exception) -> discord.Embed | None:
     """Return an embed appropriate to a known error type, else None."""
 
     if isinstance(error, commands.NotOwner):
-        return not_owner_embed
+        return NOT_OWNER_EMBED
     if isinstance(error, (commands.MissingRole, commands.MissingAnyRole)):
-        return missing_role_embed
+        return MISSING_ROLES_EMBED
     if isinstance(error, commands.MissingPermissions):
-        return missing_permissions_embed
+        return MISSING_PERMS_EMBED
     if isinstance(error, commands.MemberNotFound):
-        return member_not_found_embed
+        return MEMBER_NOT_FOUND_EMBED
     if isinstance(error, discord.Forbidden):
-        return bot_missing_perms_embed
+        return BOT_MISSING_PERMS_EMBED
     if isinstance(error, discord.NotFound):
-        return err_404_embed
+        return ERR_404_EMBED
     return None
 
 

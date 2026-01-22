@@ -3,7 +3,7 @@
 import discord
 
 from src.utils.calculation_utils import generate_lb_text
-from src.utils.consts import error_color, invalid_guild_embed, guild_handle, log_channel_id, neutral_color
+from src.utils.consts import ERROR_COLOR, INVALID_GUILD_EMBED, GUILD_HANDLE, LOG_CHANNEL_ID, NEUTRAL_COLOR
 from src.utils.db_utils import get_giveaway_status
 from src.utils.discord_utils import name_grabber
 from src.utils.giveaway_utils import roll_giveaway
@@ -44,14 +44,14 @@ class Integer:
     async def gtop(self, is_automatic=False) -> discord.Embed | str:
         if self.integer > 6:
             return discord.Embed(title="Invalid timestamp!", description="You cannot request data this old!",
-                                 color=error_color)
+                                 color=ERROR_COLOR)
 
-        guild_data = await get_guild_by_name(guild_handle)
+        guild_data = await get_guild_by_name(GUILD_HANDLE)
         member_gexp = {}
         date = None
 
         if not guild_data:
-            return invalid_guild_embed
+            return INVALID_GUILD_EMBED
 
         # Loop through all members to find top 10
         for member in guild_data["members"]:
@@ -73,8 +73,8 @@ class Integer:
     async def purge(self, ctx: discord.ApplicationContext, reason: str = None) -> None:
         transcript = await create_transcript(ctx.channel, self.integer)
         await ctx.channel.purge(limit=self.integer)
-        await ctx.guild.get_channel(log_channel_id).send(embed=discord.Embed(
+        await ctx.guild.get_channel(LOG_CHANNEL_ID).send(embed=discord.Embed(
             title=f"{await name_grabber(ctx.author)} purged {self.integer} message(s) in {ctx.channel.name}",
             description=f"**Reason:** {reason}",
-            color=neutral_color).set_footer(text="Following is the transcript of the deleted messages"),
+            color=NEUTRAL_COLOR).set_footer(text="Following is the transcript of the deleted messages"),
                                                          file=transcript)
