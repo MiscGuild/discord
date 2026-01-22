@@ -1,11 +1,12 @@
 import calendar
-import discord
-import discord.ui as ui
 from __main__ import bot
 from datetime import datetime, timedelta
+
+import discord
+import discord.ui as ui
 from discord.ui import Button, View
 
-from src.utils.consts import (neg_color, neutral_color, tickets_messages)
+from src.utils.consts import (NEG_COLOR, NEUTRAL_COLOR, TICKETS_MESSAGES)
 from src.utils.db_utils import get_member_gexp_history
 from src.utils.request_utils import get_jpg_file
 
@@ -36,7 +37,7 @@ class StartYearSelect(ui.Select):
                                             days_in_guild=self.days_in_guild,
                                             buttons=self.buttons))  # Month Selection Dropdown
         embed = discord.Embed(title=f"In which month of {start_year} will {self.ign}'s inactivity begin?",
-                              color=neutral_color).set_footer(text=f"Start Date - ?/?/{start_year}")
+                              color=NEUTRAL_COLOR).set_footer(text=f"Start Date - ?/?/{start_year}")
         await interaction.response.send_message(embed=embed, view=MonthView)
         self.view.stop()
 
@@ -70,7 +71,7 @@ class StartMonthSelect(ui.Select, object):
                                         buttons=self.buttons))  # Day Selection Dropdown
 
         embed = discord.Embed(title=f"What is the closest day to the start of {self.ign}'s inactivity?",
-                              color=neutral_color).set_footer(text=f"Start Date - ?/{start_month}/{self.year}")
+                              color=NEUTRAL_COLOR).set_footer(text=f"Start Date - ?/{start_month}/{self.year}")
         await interaction.response.send_message(embed=embed, view=DayView)
         self.view.stop()
 
@@ -107,7 +108,7 @@ class StartDaySelect(ui.Select):
                                 day=start_day, month=self.month, year=self.year, weekly_gexp=self.weekly_gexp,
                                 days_in_guild=self.days_in_guild, buttons=self.buttons))
         embed = discord.Embed(title=f"How long will {self.ign} be inactive?",
-                              color=neutral_color).set_footer(
+                              color=NEUTRAL_COLOR).set_footer(
             text=f"Start Date - {start_day}/{self.month}/{self.year}")
         await interaction.response.send_message(embed=embed, view=LengthView)
         self.view.stop()
@@ -142,7 +143,7 @@ class InactivityLenSelect(ui.Select):
             embed = discord.Embed(title=f"We do not accept do-not-kick-list applications that are longer than 3 weeks!",
                                   description="If you think you will be unable to meet the guild requirements during your inactivity period,"
                                               " you can leave the guild and notify staff once you're back. We'll gladly invite you back!",
-                                  color=neg_color)
+                                  color=NEG_COLOR)
             await self.deny(channel=self.channel, author=self.author, ign=self.ign, uuid=self.uuid, embed=embed,
                             interaction=interaction, self_denial=True)
 
@@ -156,7 +157,7 @@ class InactivityLenSelect(ui.Select):
                 title=f"You cannot apply for a do-not-kick-list longer than 7 days since you joined the guild less than a month ago!",
                 description="If you think you will be unable to meet the guild requirements during your inactivity period,"
                             " you can leave the guild and notify staff once you're back. We'll gladly invite you back!",
-                color=neg_color)
+                color=NEG_COLOR)
             await self.deny(channel=self.channel, author=self.author, ign=self.ign, uuid=self.uuid, embed=embed,
                             interaction=interaction, self_denial=True)
 
@@ -179,7 +180,7 @@ class InactivityLenSelect(ui.Select):
                                                     buttons=self.buttons))
 
         embed = discord.Embed(title=f"What is the reason behind {self.ign}'s inactivity?",
-                              color=neutral_color)
+                              color=NEUTRAL_COLOR)
         embed.set_footer(text=f"Start Date - {self.day}/{self.month}/{self.year}\n"
                               f"Length - {int(length)} Days")
         await interaction.response.send_message(embed=embed, view=reason_view)
@@ -214,7 +215,7 @@ class InactivityReasonSelect(ui.Select):
             embed = discord.Embed(title="You cannot use the DNKL system if you are banned from the Hypixel!",
                                   description="If you are banned, you will be removed from the guild.\n"
                                               "You may rejoin once your ban is over.",
-                                  color=neg_color)
+                                  color=NEG_COLOR)
             await interaction.response.send_message(embed=embed)
             return
 
@@ -241,7 +242,7 @@ class InactivityReasonSelect(ui.Select):
 
         date = datetime.strptime(f"{self.day}/{self.month}/{self.year}", "%d/%B/%Y") + timedelta(days=int(self.length))
         final_embed = discord.Embed(title=self.ign, url=f'https://plancke.io/hypixel/player/stats/{self.ign}',
-                                    color=neutral_color)
+                                    color=NEUTRAL_COLOR)
         final_embed.set_thumbnail(url=f"https://visage.surgeplay.com/full/{self.uuid}.png")
         final_embed.add_field(name="IGN:", value=self.ign, inline=False)
         final_embed.add_field(name="Start:", value=f"{self.day} {self.month} {self.year}", inline=False)
@@ -340,4 +341,4 @@ async def tickets() -> tuple[discord.File, list, any]:
             self.add_item(Button(label="Create Ticket", custom_id="tickets",
                                  style=discord.ButtonStyle.blurple, emoji="✉️"))
 
-    return image, tickets_messages, TicketView()
+    return image, TICKETS_MESSAGES, TicketView()
