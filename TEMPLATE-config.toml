@@ -2,67 +2,58 @@
 token = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 # Bot prefix and status
-prefix = ""
-status = ""
+prefix = ","
+status = "xyzw"
 
 # The ids of all users who will have acces to owner commands
 owner_ids = [
     1234,
     1234,
+    1234,
 ]
 
 # The ids for your discord server and channel (Note: dnkl stands for do-not-kick-list)
-guild_id = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-error_channel = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-dnkl_channel = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-ticket_channel = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-log_channel = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-registration_channel = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-staff_announcements_channel = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-partner_channel = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-qotd_thread_channel = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-geoguessr_thread_channel = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-milestones_channel = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-weekly_gexp_lb = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-daily_gexp_lb = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-rank_upgrade_channel = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-staff_bridge_channel = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
+guild_id = 859916798111907871
+error_channel = 859916798111907875
+dnkl_channel = 859916798111907875
+ticket_channel = 859916798111907875
+log_channel = 859916798111907875
+registration_channel = 859916798111907875
+staff_announcements_channel = 859916798111907875
+partner_channel = 859916798111907875
+qotd_thread_channel = 1424565934672183326
+geoguessr_thread_channel = 1424565934672183326
+milestones_channel = 859916798111907875
+milestones_category = 859916798111907875
+weekly_gexp_lb = 859916798111907875
+daily_gexp_lb = 859916798111907875
+rank_upgrade_channel = 859916798111907875
+staff_bridge_channel = 859916798111907875
 
 # The name of your Hypixel guild
-guild_handle = ""
+guild_handle = "Miscellaneous"
 
-# Gexp requirements for the guild
-new_member_req = 0
-member_req = 0
-resident_req = 0
-active_req = 0
-dnkl_req = 0
 
 # The requirements for joining the GvG team
-gvg_bw_fkdr = 0
-gvg_bw_wins = 0
-gvg_sw_kdr = 0
-gvg_sw_wins = 0
-gvg_duels_kills = 0
-gvg_duels_wlr = 0
+gvg_bw_fkdr = 1.6
+gvg_bw_wins = 500
+gvg_sw_kdr = 1.2
+gvg_sw_wins = 1000
+gvg_duels_kills = 2000
+gvg_duels_wlr = 1.5
 
 # Names of allied guilds
 allies = [
-    "A",
-    "B",
-    "C",
-    "D",
-    "E",
-    "F",
+    "Betrayed",
+    "Blight",
+    "OUT",
+    "Electus",
+    "Lucid"
 ]
 
-# A list of Hypixel API keys for making requests
 api_keys = [
     "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 ]
 
 # The names of discord ticket categories
@@ -72,26 +63,36 @@ other = "OTHER"
 report = "REPORTS"
 milestone = "MILESTONES"
 dnkl = "DNKL"
+event = "EVENT"
 registration = "REGISTRATION"
 registrees = "REGISTREES"
 
+# Example: Rank 1 is member, 2 is VIP, 3 is MVP, 4 is Helper, 5 is Admin
+[ingame_ranks]
+rank_1 = { name = "RANK 1", requirement = 50000, is_staff = false }
+rank_2 = { name = "RANK 2", requirement = 200000, is_staff = false }
+rank_3 = { name = "RANK 3", requirement = 400000, is_staff = false }
+rank_4 = { name = "RANK 4", requirement = 50000, is_staff = true }
+rank_5 = { name = "RANK 5", requirement = 50000, is_staff = true }
+
 
 [discord_roles]
-admin = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-staff = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-helper = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-former_staff = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-new_member = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-processing = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-guest = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-member = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-active = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-ally = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-booster = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-sponsor = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-gvg_team = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-giveaways = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-veteran = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-recruiter = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+admin = 859925758801870848
+staff = 859925758801870848
+helper = 859925758801870848
+former_staff = 859925758801870848
+new_member = 859925758801870848
+processing = 859925758801870848
+guest = 859925758801870848
+member = 859925758801870848
+achievable_rank_0 = 859925758801870848
+achievable_rank_1 = 859925758801870848
+ally = 859925758801870848
+booster = 859925758801870848
+sponsor = 859925758801870848
+gvg_team = 859925758801870848
+giveaways = 859925758801870848
+veteran = 859925758801870848
+recruiter = 859925758801870848
 qotd_ping = 923978802818871356
 geoguessr = 1347488380161622036
