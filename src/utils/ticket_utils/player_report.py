@@ -1,7 +1,7 @@
 import discord
 
 import src.utils.ui_utils as uiutils
-from src.utils.consts import neutral_color, ticket_categories
+from src.utils.consts import NEUTRAL_COLOR, TICKET_CATEGORIES
 
 
 async def player_report(ticket: discord.TextChannel, interaction: discord.Interaction, user: discord.Member, ign: str,
@@ -15,11 +15,11 @@ async def player_report(ticket: discord.TextChannel, interaction: discord.Intera
          "Answer the question in no more than 100 words.",
          discord.InputTextStyle.long, "Description"]
     ]
-    embed = discord.Embed(title="Player Report", color=neutral_color)
+    embed = discord.Embed(title="Player Report", color=NEUTRAL_COLOR)
     await interaction.response.send_modal(
         modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, uuid=uuid,
                                    title="Player Report"))
 
     await ticket.edit(name=f"report-{ign}", topic=f"{interaction.user.id if interaction else user.id}|",
                       category=discord.utils.get((interaction.guild if interaction else ticket.guild).categories,
-                                                 name=ticket_categories["generic"]))
+                                                 name=TICKET_CATEGORIES["generic"]))
