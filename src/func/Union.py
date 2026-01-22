@@ -137,9 +137,16 @@ class Union:
 
             # Add active role if eligible
             for member in guild_data["members"]:
-                if member["uuid"] == uuid and sum(member["expHistory"].values()) > active_req:
-                    roles_to_add.append(bot.active_role)
-                    break
+                if member["uuid"] != uuid:
+                    continue
+
+                gexp = sum(member["expHistory"].values())
+
+                for rank_obj in NON_STAFF_RANKS[1:]:
+                    if gexp > rank_obj.requirement:
+                        roles_to_add.append(rank_obj.discord_rank)
+
+                break
 
         # User is an ally
         elif guild_name in ALLIES:
