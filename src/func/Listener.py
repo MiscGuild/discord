@@ -10,10 +10,10 @@ from src.utils.calculation_utils import (
     extract_usernames, classify_error_embed, safe_reply, build_usage_embed, log_traceback_to_channel
 )
 from src.utils.consts import (
-    error_channel_id, invalid_command_embed,
-    staff_bridge_channel, log_channel_id,
-    registration_channel_id, registration_embed, err_404_embed,
-    qotd_thread_id, geoguessr_thread_id
+    ERROR_CHANNEL_ID, INVALID_COMMAND_EMBED,
+    STAFF_BRIDGE_CHANNEL_ID, LOG_CHANNEL_ID,
+    REGISTRATION_CHANNEL_ID, REGISTRATION_EMBED, ERR_404_EMBED,
+    QOTD_THREAD_ID, GEOGUESSR_THREAD_ID
 )
 from src.utils.discord_utils import create_ticket, send_thread_message
 from src.utils.referral_utils import validate_invites
@@ -26,11 +26,11 @@ class Listener:
 
     async def on_member_join(self, member: discord.Member) -> None:
         await member.add_roles(self.bot.new_member_role)
-        await self.bot.get_channel(registration_channel_id).send(embed=registration_embed)
+        await self.bot.get_channel(REGISTRATION_CHANNEL_ID).send(embed=REGISTRATION_EMBED)
 
     async def on_error(self, event_name: str) -> None:
         tb = traceback.format_exc()
-        await self.bot.get_channel(error_channel_id).send(
+        await self.bot.get_channel(ERROR_CHANNEL_ID).send(
             f"Ignoring exception in event {event_name}:\n```py\n{tb}\n```"
         )
 
@@ -40,7 +40,7 @@ class Listener:
         error = getattr(error, "original", error)
 
         if isinstance(error, commands.CommandNotFound):
-            await safe_reply(ctx, embed=invalid_command_embed)
+            await safe_reply(ctx, embed=INVALID_COMMAND_EMBED)
             return
 
         embed = classify_error_embed(error)
@@ -49,8 +49,8 @@ class Listener:
         elif isinstance(error, commands.MissingRequiredArgument):
             await safe_reply(ctx, embed=build_usage_embed(ctx))
         else:
-            await safe_reply(ctx, embed=err_404_embed)
-            await log_traceback_to_channel(self.bot, error_channel_id, ctx, error)
+            await safe_reply(ctx, embed=ERR_404_EMBED)
+            await log_traceback_to_channel(self.bot, ERROR_CHANNEL_ID, ctx, error)
 
     async def on_application_command_error(self, ctx: discord.ApplicationContext, error: Exception):
         if (ctx.command and getattr(ctx.command, "has_error_handler", lambda: False)()) or \
@@ -64,8 +64,8 @@ class Listener:
         elif isinstance(error, commands.MissingRequiredArgument):
             await safe_reply(ctx, embed=build_usage_embed(ctx))
         else:
-            await safe_reply(ctx, embed=err_404_embed)
-            await log_traceback_to_channel(self.bot, error_channel_id, ctx, error)
+            await safe_reply(ctx, embed=ERR_404_EMBED)
+            await log_traceback_to_channel(self.bot, ERROR_CHANNEL_ID, ctx, error)
 
     async def on_interaction(self, interaction: discord.Interaction) -> None:
         if not interaction.data or "custom_id" not in interaction.data:
@@ -81,7 +81,7 @@ class Listener:
     async def on_invitation_message(self, message: discord.Message) -> None:
         if not message.author.bot:
             return
-        if message.channel.id != staff_bridge_channel:
+        if message.channel.id != STAFF_BRIDGE_CHANNEL_ID:
             return
         if not message.embeds:
             return
@@ -104,7 +104,7 @@ class Listener:
                 description="They have been added to the list of Elite Members",
                 color=0xFFD700
             ).set_thumbnail(url=after.display_avatar.url)
-            await self.bot.get_channel(log_channel_id).send(embed=e)
+            await self.bot.get_channel(LOG_CHANNEL_ID).send(embed=e)
 
         elif before.premium_since is not None and after.premium_since is None:
             await String(string="Server Booster").elite_member(is_automatic=True, discord_member=after)
@@ -113,28 +113,28 @@ class Listener:
                 description="They have been removed from the list of Elite Members",
                 color=0xFFD700
             ).set_thumbnail(url=after.display_avatar.url)
-            await self.bot.get_channel(log_channel_id).send(embed=e)
+            await self.bot.get_channel(LOG_CHANNEL_ID).send(embed=e)
 
     async def on_thread_create(self, thread: discord.Thread) -> None:
-        if not thread.parent or thread.parent.id not in (qotd_thread_id, geoguessr_thread_id):
+        if not thread.parent or thread.parent.id not in (QOTD_THREAD_ID, GEOGUESSR_THREAD_ID):
             return
 
         try:
             await thread.join()
         except discord.Forbidden:
-            await self.bot.get_channel(error_channel_id).send(
+            await self.bot.get_channel(ERROR_CHANNEL_ID).send(
                 f"Missing permissions to join thread {thread.id} in forum {thread.parent.id}."
             )
             return
         except Exception as e:
-            await self.bot.get_channel(error_channel_id).send(f"Error joining thread {thread.id}: {e!r}")
+            await self.bot.get_channel(ERROR_CHANNEL_ID).send(f"Error joining thread {thread.id}: {e!r}")
             return
 
         try:
             await send_thread_message(thread)
         except discord.Forbidden:
-            await self.bot.get_channel(error_channel_id).send(
+            await self.bot.get_channel(ERROR_CHANNEL_ID).send(
                 f"Missing permissions to send message in thread {thread.id}."
             )
         except Exception as e:
-            await self.bot.get_channel(error_channel_id).send(f"Error sending message in thread {thread.id}: {e!r}")
+            await self.bot.get_channel(ERROR_CHANNEL_ID).send(f"Error sending message in thread {thread.id}: {e!r}")
