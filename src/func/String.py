@@ -12,10 +12,10 @@ from src.utils.calculation_utils import (calculate_network_level,
                                          get_color_by_gexp,
                                          get_hypixel_player_rank,
                                          get_player_gexp, get_monthly_gexp)
-from src.utils.consts import (prefix, dnkl_channel_id, dnkl_req, guildless_embed,
-                              neg_color, neutral_color, pos_color,
-                              ticket_categories, unknown_ign_embed, guild_handle,
-                              missing_permissions_embed, member_req)
+from src.utils.consts import (PREFIX, DNKL_CHANNEL_ID, DNKL_REQ, GUILDLESS_EMBED,
+                              NEG_COLOR, NEUTRAL_COLOR, POS_COLOR,
+                              TICKET_CATEGORIES, UNKNOWN_IGN_EMBED, GUILD_HANDLE,
+                              MISSING_PERMS_EMBED, NON_STAFF_RANKS)
 from src.utils.db_utils import (delete_dnkl, select_one, get_db_uuid_username,
                                 get_member_gexp_history, insert_elite_member, get_elite_member)
 from src.utils.referral_utils import get_invitation_stats
@@ -75,13 +75,13 @@ class String:
         else:
             name, uuid = await get_uuid_by_name(self.string)
             if not name:
-                return unknown_ign_embed
+                return UNKNOWN_IGN_EMBED
 
         guild = await get_player_guild(uuid)
 
         # Player is guildless
         if not guild:
-            return guildless_embed
+            return GUILDLESS_EMBED
 
         # Get guild data
         gname = guild["name"]
@@ -97,7 +97,7 @@ class String:
             weekly_gexp = sum(gexp_history.values())
 
             # Send shortened version for non-command and non-ticket channels
-            if "commands" not in ctx.channel.name and str(ctx.channel.category) not in ticket_categories.values():
+            if "commands" not in ctx.channel.name and str(ctx.channel.category) not in TICKET_CATEGORIES.values():
                 return f"__**{name}**__\n**Guild Experience -** `{format(weekly_gexp, ',d')}`"
 
             week_dict = {
@@ -174,11 +174,11 @@ class String:
         else:
             name, uuid = await get_uuid_by_name(self.string)
             if not name:
-                return unknown_ign_embed
+                return UNKNOWN_IGN_EMBED
         player_data = await get_hypixel_player(name=uuid)
         # Player doesn't exist
         if not player_data:
-            return unknown_ign_embed
+            return UNKNOWN_IGN_EMBED
 
         # Gather info
         ign = player_data["displayname"]
@@ -214,11 +214,11 @@ class String:
         else:
             ign, uuid = await get_uuid_by_name(self.string)
             if not ign:
-                return unknown_ign_embed
+                return UNKNOWN_IGN_EMBED
 
         _, weekly_gexp, days_in_guild = await get_player_gexp(uuid)
         if not ign:
-            return unknown_ign_embed
+            return UNKNOWN_IGN_EMBED
 
         await ctx.respond("Please respond to the following prompts: ")
         # Ask DNKL application questions
@@ -241,7 +241,7 @@ class String:
 
             # Delete DNKL message
             try:
-                msg = await bot.get_channel(dnkl_channel_id).fetch_message(message_id)
+                msg = await bot.get_channel(DNKL_CHANNEL_ID).fetch_message(message_id)
                 await msg.delete()
             except discord.errors.NotFound:
                 return f"{username} has been removed from the do-not-kick-list, however the message was not found."
@@ -258,25 +258,25 @@ class String:
         else:
             name, uuid = await get_uuid_by_name(self.string)
             if not name:
-                return unknown_ign_embed
+                return UNKNOWN_IGN_EMBED
 
         _, weeklygexp, _ = await get_player_gexp(uuid)
 
         # Player is not in a guild
         if weeklygexp is None:
-            return guildless_embed
+            return GUILDLESS_EMBED
 
         # Player is eligible
-        if weeklygexp > dnkl_req:
-            embed = discord.Embed(title=name, color=pos_color)
+        if weeklygexp > DNKL_REQ:
+            embed = discord.Embed(title=name, color=POS_COLOR)
             embed.add_field(name="This player is eligible to apply for the do-not-kick-list.",
-                            value=f"They have {weeklygexp}/{dnkl_req} weekly guild experience.", inline=True)
+                            value=f"They have {weeklygexp}/{DNKL_REQ} weekly guild experience.", inline=True)
 
         # Player is not eligible
         else:
-            embed = discord.Embed(title=name, color=neg_color)
+            embed = discord.Embed(title=name, color=NEG_COLOR)
             embed.add_field(name="This player is not eligible to apply for the do-not-kick-list.",
-                            value=f"They have {weeklygexp}/{dnkl_req} weekly guild experience to be eligible.",
+                            value=f"They have {weeklygexp}/{DNKL_REQ} weekly guild experience to be eligible.",
                             inline=True)
 
         embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
@@ -284,18 +284,18 @@ class String:
         return embed
 
     async def rename(self, ctx: discord.ApplicationContext) -> discord.Embed | str:
-        if ctx.channel.category.name not in ticket_categories.values():
+        if ctx.channel.category.name not in TICKET_CATEGORIES.values():
             return "This command can only be used in tickets!"
 
         if not self.string:
-            return f"**SYNTAX:** `{prefix}rename <new channel name>`"
+            return f"**SYNTAX:** `{PREFIX}rename <new channel name>`"
 
         # Channel is a ticket
         old_name = ctx.channel.name
         channel_name = self.string.replace(" ", "-")
         await ctx.channel.edit(name=channel_name)
         return discord.Embed(title=f"The channel name was changed from {old_name} to {channel_name}",
-                             color=neutral_color)
+                             color=NEUTRAL_COLOR)
 
     async def invites(self) -> discord.Embed:
         if self.uuid and not self.username:
@@ -307,13 +307,13 @@ class String:
         else:
             name, uuid = await get_uuid_by_name(self.string)
             if not name:
-                return unknown_ign_embed
+                return UNKNOWN_IGN_EMBED
 
         guild = await get_player_guild(uuid)
         if not guild:
-            return guildless_embed
-        elif ("name" not in guild) or (guild["name"] != guild_handle):
-            return missing_permissions_embed
+            return GUILDLESS_EMBED
+        elif ("name" not in guild) or (guild["name"] != GUILD_HANDLE):
+            return MISSING_PERMS_EMBED
 
         invitation_stats = await get_invitation_stats(uuid)
         weekly_invites = invitation_stats.weekly.total
@@ -334,7 +334,7 @@ class String:
                 invites_text += f"🟢 {invitee}\n"
             else:
                 invites_text += f"🔴 {invitee}\n"
-        embed = discord.Embed(title=f"{name}'s Invites", color=neutral_color)
+        embed = discord.Embed(title=f"{name}'s Invites", color=NEUTRAL_COLOR)
         embed.add_field(name="Weekly Invites", value=None if not invites_text else invites_text, inline=False)
         embed.add_field(name="This week's statistics", value=f"Valid Invites: {weekly_valid_invites}\n"
                                                              f"Total Invites: {weekly_invites}\n"
@@ -348,7 +348,7 @@ class String:
         embed.set_footer(text="Total invites and total valid invites do not include this week's invites. They are "
                               "updated at the end of the week."
                               "\nAn invite is considered valid if they earn "
-                              f"{format(2 * member_req, ',d')} guild experience at the end of the week. "
+                              f"{format(2 * NON_STAFF_RANKS[0].requirement, ',d')} guild experience at the end of the week. "
                               "If they joined in the middle of the week, their guild experience will be scaled up.")
         return embed
 
@@ -360,7 +360,7 @@ class String:
             username = self.username
             name, uuid = await get_uuid_by_name(username)
         if not name:
-            return unknown_ign_embed
+            return UNKNOWN_IGN_EMBED
 
         reason = self.string or ""
 
@@ -380,7 +380,7 @@ class String:
             if monetary_value is None:
                 return discord.Embed(title="Monetary Value Required",
                                      description="Please provide the amount of money (in dollars) they have spent on the server.",
-                                     color=neg_color)
+                                     color=NEG_COLOR)
 
             resident_days = (1 + (monetary_value - 10) / 8) * 30
 
@@ -413,7 +413,7 @@ class String:
         else:
             return discord.Embed(title="Invalid Reason",
                                  description="Please choose a valid reason for the Elite Member role.",
-                                 color=neg_color)
+                                 color=NEG_COLOR)
 
         is_indefinite = True if any([is_booster, is_creator, is_gvg]) else False
 
@@ -421,11 +421,11 @@ class String:
                                   is_gvg=is_gvg, is_indefinite=is_indefinite, expiry=expiry)
 
         if not any([is_sponsor, is_booster, is_creator, is_gvg]):
-            embed = discord.Embed(title=f"Elite Member Removed: {name}", color=neutral_color)
+            embed = discord.Embed(title=f"Elite Member Removed: {name}", color=NEUTRAL_COLOR)
             embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
             return embed
 
-        embed = discord.Embed(title=f"Elite Member: {name}", color=neutral_color)
+        embed = discord.Embed(title=f"Elite Member: {name}", color=NEUTRAL_COLOR)
         embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
         embed.add_field(name="Reason", value=reason, inline=False)
         embed.add_field(name="Indefinite", value=str(is_indefinite), inline=True)
