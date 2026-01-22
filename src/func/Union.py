@@ -8,10 +8,10 @@ from typing import Union as typingUnion, Tuple
 import discord
 
 from src.utils.calculation_utils import check_tag, get_monthly_gexp
-from src.utils.consts import (active_req, allies, discord_not_linked_embed, guild_handle, neg_color, neutral_color,
-                              pos_color, registration_channel_id,
-                              staff_impersonation_embed, ticket_categories,
-                              unknown_ign_embed, join_request_embed, guildless_embed)
+from src.utils.consts import (NON_STAFF_RANKS, ALLIES, DISCORD_NOT_LINKED_EMBED, GUILD_HANDLE, NEG_COLOR, NEUTRAL_COLOR,
+                              POS_COLOR, REGISTRATION_CHANNEL_ID,
+                              STAFF_IMPERSONATION_EMBED, TICKET_CATEGORIES,
+                              UNKNOWN_IGN_EMBED, JOIN_REQUEST_EMBED, GUILDLESS_EMBED)
 from src.utils.db_utils import update_member, insert_new_member, get_db_uuid_username, set_do_ping_db, \
     get_member_gexp_history, get_elite_member, get_do_ping
 from src.utils.discord_utils import (create_ticket, has_tag_perms,
@@ -31,13 +31,13 @@ class Union:
             reason = f"Responsible moderator: {author}"
 
         await self.user.add_roles(discord.utils.get(guild_roles, name="Muted"))
-        return discord.Embed(title="Muted!", description=f"{self.user} was muted by {author}!", color=neg_color)
+        return discord.Embed(title="Muted!", description=f"{self.user} was muted by {author}!", color=NEG_COLOR)
 
     async def unmute(self, guild_roles) -> discord.Embed:
         await self.user.remove_roles(discord.utils.get(guild_roles, name="Muted"))
         embed = discord.Embed(title="Unmuted!",
                               description=f"{self.user} has been unmuted!",
-                              color=neutral_color)
+                              color=NEUTRAL_COLOR)
         return embed
 
     async def kick(self, author: discord.User, reason: str = None) -> discord.Embed:
@@ -48,7 +48,7 @@ class Union:
         await self.user.kick(reason=reason)
         return discord.Embed(title="Kicked!",
                              description=f"{self.user} was kicked by {author}",
-                             color=neg_color)
+                             color=NEG_COLOR)
 
     async def ban(self, guild: discord.Guild, author: discord.User, reason: str = None) -> discord.Embed:
         # Default reason is responsible moderator
@@ -58,7 +58,7 @@ class Union:
         await guild.ban(self.user, reason=reason)
         return discord.Embed(title="Banned!",
                              description=f"{self.user} was banned by {author}",
-                             color=neg_color)
+                             color=NEG_COLOR)
 
     async def softban(self, guild: discord.Guild, author: discord.User, reason: str = None) -> discord.Embed:
         # Default reason is responsible moderator
@@ -69,7 +69,7 @@ class Union:
         await guild.unban(self.user, reason=reason)
         return discord.Embed(title="Softbanned!",
                              description=f"{self.user} was softbanned by {author}",
-                             color=neg_color)
+                             color=NEG_COLOR)
 
     async def unban(self, guild: discord.Guild, author: discord.User, reason: str = None) -> discord.Embed:
         # Default reason is responsible moderator
@@ -79,7 +79,7 @@ class Union:
         await guild.unban(self.user, reason=reason)
         return discord.Embed(title="Unbanned!",
                              description=f"{self.user} was unbanned by {author}",
-                             color=neg_color)
+                             color=NEG_COLOR)
 
     async def sync(self, ctx: discord.ApplicationContext, name: str, tag: str = None,
                    is_fs=False) -> discord.Embed | str:
@@ -99,7 +99,7 @@ class Union:
 
         # Invalid username
         if not ign:
-            return unknown_ign_embed
+            return UNKNOWN_IGN_EMBED
 
         # Initialize vars for storing changes
         roles_to_add = []
@@ -112,7 +112,7 @@ class Union:
 
         # Account is not linked to discord
         if not await is_linked_discord(player_data, self.user) and is_fs is False:
-            embed = discord_not_linked_embed.copy()
+            embed = DISCORD_NOT_LINKED_EMBED.copy()
             return embed.add_field(name="Do the above and then enter the following in chat:",
                                    value=f"`{str(self.user.name)}`")
 
@@ -131,7 +131,7 @@ class Union:
                 return tag_check_reason
 
         # User is a member
-        if guild_name == guild_handle:
+        if guild_name == GUILD_HANDLE:
             roles_to_add.append(bot.member_role)
             roles_to_remove.extend([bot.guest, bot.ally, bot.new_member_role, bot.processing])
 
@@ -142,25 +142,28 @@ class Union:
                     break
 
         # User is an ally
-        elif guild_name in allies:
+        elif guild_name in ALLIES:
             if not can_tag:
                 new_nick += f" {await get_gtag(guild_name)}"
-            roles_to_remove.extend([bot.new_member_role, bot.member_role, bot.new_member_role, bot.processing])
+            roles_to_remove.extend(
+                [bot.new_member_role, bot.member_role, bot.new_member_role, bot.processing, bot.achievable_rank_0,
+                 bot.achievable_rank_1])
             roles_to_add.extend([bot.guest, bot.ally])
 
         # User is a guest
         else:
             # Filter people who have not been approved to join the discord
-            if ctx.channel.id == registration_channel_id and not is_fs:
+            if ctx.channel.id == REGISTRATION_CHANNEL_ID and not is_fs:
                 return "You cannot use this command in a registration ticket!\nKindly await staff assistance!"
 
             roles_to_add.append(bot.guest)
-            roles_to_remove.extend([bot.member_role, bot.new_member_role, bot.ally])
+            roles_to_remove.extend(
+                [bot.member_role, bot.new_member_role, bot.ally, bot.achievable_rank_0, bot.achievable_rank_1])
 
         # Create embed
         embed = discord.Embed(title=f"{ign}'s nick, roles, and tag have been successfully changed!",
                               description="If this wasn't the change you anticipated, please create a ticket!",
-                              color=neutral_color)
+                              color=NEUTRAL_COLOR)
         embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
         embed.set_footer(text=f"• Member of {guild_name}" + "\n• Removed: " + ", ".join(
             [role.name for role in roles_to_remove]) + "\n• Added: " + ", ".join([role.name for role in roles_to_add]))
@@ -177,17 +180,17 @@ class Union:
         discord.Embed, None]:
         await ctx.defer()
         # Make sure it is only used in registration channel
-        if ctx.channel.id != registration_channel_id:
+        if ctx.channel.id != REGISTRATION_CHANNEL_ID:
             return "This command can only be used in the registration channel!\nThe command you are looking for is `/sync`", None
 
         ign, uuid = await get_uuid_by_name(name)
 
         if not ign:
-            return unknown_ign_embed, None
+            return UNKNOWN_IGN_EMBED, None
 
         # Filter out people impersonating staff
         if ign in bot.staff_names:
-            return staff_impersonation_embed, None
+            return STAFF_IMPERSONATION_EMBED, None
 
         username, uuid, check_already_registered = await get_db_uuid_username(uuid=uuid, get_discord_id=True)
 
@@ -202,7 +205,7 @@ class Union:
         guild_name = "Guildless" if not guild_data else guild_data["name"]
 
         embed = discord.Embed(
-            title="Registration successful!", color=neutral_color)
+            title="Registration successful!", color=NEUTRAL_COLOR)
         embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
         embed.add_field(name=ign, value=f"Member of {guild_name}" if guild_name != "Guildless" else "Guildless")
 
@@ -210,18 +213,18 @@ class Union:
             original_owner = check_already_registered
             await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
             ticket = await create_ticket(ctx.author, f"ticket-{ign}",
-                                         category_name=ticket_categories["registrees"])
+                                         category_name=TICKET_CATEGORIES["registrees"])
             await ticket.purge(limit=1000)
             await ticket.edit(name=f"duplicate-registration-{ign}", topic=f"{ctx.author.id}|",
                               category=discord.utils.get(ctx.guild.categories,
-                                                         name=ticket_categories["registrees"]))
+                                                         name=TICKET_CATEGORIES["registrees"]))
             guest_ticket = ticket
 
             embed = discord.Embed(title="Conflict during registration!",
                                   description=f"The account associated with {ign} is currently registered to "
                                               f"<@{original_owner}>\n" +
                                               f"Member of {guild_name}" if guild_name != "Guildless" else "Guildless",
-                                  color=neg_color)
+                                  color=NEG_COLOR)
             embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
             embed.set_footer(text="If you no longer have access to the other discord account/"
                                   "would like to transfer to this discord account, let staff know. "
@@ -232,29 +235,29 @@ class Union:
             original_username = discord_account_already_linked[0]
             await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
             ticket = await create_ticket(ctx.author, f"ticket-{ign}",
-                                         category_name=ticket_categories["registrees"])
+                                         category_name=TICKET_CATEGORIES["registrees"])
             await ticket.purge(limit=1000)
             await ticket.edit(name=f"duplicate-registration-{ign}-{original_username}", topic=f"{ctx.author.id}|",
                               category=discord.utils.get(ctx.guild.categories,
-                                                         name=ticket_categories["registrees"]))
+                                                         name=TICKET_CATEGORIES["registrees"]))
             guest_ticket = ticket
 
             embed = discord.Embed(title="Conflict during registration!",
                                   description=f"<@{self.user.id}> is already registered to {original_username}. \
                                   Miscellaneous does not support multiple accounts for a single discord account.\n",
-                                  color=neg_color)
+                                  color=NEG_COLOR)
             embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
             embed.set_footer(text="If you no longer have access to the other minecraft account/"
                                   "would like to transfer to this discord account, let staff know. "
                                   "They will use `/forcesync`.")
             await ticket.send(embed=embed)
         # User is a member
-        elif guild_name == guild_handle:
+        elif guild_name == GUILD_HANDLE:
             await ctx.author.add_roles(bot.member_role, reason="Registration - Member")
             guest_ticket = None
 
         # User is in an allied guild
-        elif guild_name in allies:
+        elif guild_name in ALLIES:
             await ctx.author.add_roles(bot.guest, bot.ally, reason="Registration - Ally")
 
             # Add guild tag as nick
@@ -267,11 +270,11 @@ class Union:
         else:
             await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
             ticket = await create_ticket(ctx.author, f"ticket-{ign}",
-                                         category_name=ticket_categories["registrees"])
+                                         category_name=TICKET_CATEGORIES["registrees"])
             await ticket.purge(limit=1000)
             await ticket.edit(name=f"join-request-{ign}", topic=f"{ctx.author.id}|",
                               category=discord.utils.get(ctx.guild.categories,
-                                                         name=ticket_categories["registrees"]))
+                                                         name=TICKET_CATEGORIES["registrees"]))
             guest_ticket = ticket
 
             class Join_Misc_Buttons(discord.ui.Button):
@@ -286,7 +289,7 @@ class Union:
                     if interaction.custom_id == "Yes":
                         await ticket.purge(limit=100)
                         await ticket.send(
-                            embed=join_request_embed.set_author(name=f"{ign} wishes to join Miscellaneous"))
+                            embed=JOIN_REQUEST_EMBED.set_author(name=f"{ign} wishes to join Miscellaneous"))
                         await interaction.user.add_roles(bot.guest, reason="Registration - Guest")
 
                         if guild_name != "Guildless":
@@ -304,7 +307,7 @@ class Union:
                                       "**This ticket will be deleted in 10 seconds.** "
                                       "\n\n*If you need assistance with anything else,"
                                       " create a new ticket using* `,new`",
-                                color=neg_color))
+                                color=NEG_COLOR))
                         await asyncio.sleep(10)
                         await discord.TextChannel.delete(ticket)
 
@@ -317,27 +320,27 @@ class Union:
                 view.add_item(Join_Misc_Buttons(button))
 
             await ticket.send(
-                embed=discord.Embed(title="Do you wish to join Miscellaneous in-game?", color=neutral_color),
+                embed=discord.Embed(title="Do you wish to join Miscellaneous in-game?", color=NEUTRAL_COLOR),
                 view=view)
 
         # Remove new member role, edit nick and delete message
         await ctx.author.remove_roles(bot.new_member_role, reason="Register")
         await ctx.author.edit(nick=ign)
 
-        return (embed, guest_ticket) if guild_name != guild_handle else (embed, None)
+        return (embed, guest_ticket) if guild_name != GUILD_HANDLE else (embed, None)
 
     async def add(self, ctx: discord.ApplicationContext) -> discord.Embed | str:
-        if ctx.channel.category.name not in ticket_categories.values():
+        if ctx.channel.category.name not in TICKET_CATEGORIES.values():
             return "This command can only be used in tickets!"
 
         # Set perms
         await ctx.channel.set_permissions(self.user, send_messages=True, read_messages=True, add_reactions=True,
                                           embed_links=True, attach_files=True, read_message_history=True,
                                           external_emojis=True)
-        return discord.Embed(title=f"{self.user.name} has been added to the ticket!", color=pos_color)
+        return discord.Embed(title=f"{self.user.name} has been added to the ticket!", color=POS_COLOR)
 
     async def remove(self, ctx: discord.ApplicationContext) -> discord.Embed | str:
-        if ctx.channel.category.name not in ticket_categories.values():
+        if ctx.channel.category.name not in TICKET_CATEGORIES.values():
             return "This command can only be used in tickets!"
 
         # Set perms
@@ -345,11 +348,11 @@ class Union:
                                           add_reactions=False, embed_links=False,
                                           attach_files=False,
                                           read_message_history=False, external_emojis=False)
-        return discord.Embed(title=f"{self.user.name} has been removed from the ticket!", color=pos_color)
+        return discord.Embed(title=f"{self.user.name} has been removed from the ticket!", color=POS_COLOR)
 
     async def avatar(self) -> discord.Embed:
         embed = discord.Embed(
-            title=f"{self.user}'s avatar:", color=neutral_color)
+            title=f"{self.user}'s avatar:", color=NEUTRAL_COLOR)
         return embed.set_image(url=self.user.avatar)
 
     async def whois(self) -> discord.Embed:
@@ -358,7 +361,7 @@ class Union:
             title=username,
             description=f"Discord Username: {self.user.name}\n"
                         f"Discord Nick: {self.user.nick}",
-            color=neutral_color
+            color=NEUTRAL_COLOR
         )
         embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
         embed.set_footer(text=f"UUID: {uuid}")
@@ -369,7 +372,7 @@ class Union:
         embed = discord.Embed(
             title="Ping Settings Updated!",
             description=f"You will **{'now' if bool(setting) else 'not'}** be pinged in automatic daily and weekly leaderboard messages!",
-            color=neutral_color
+            color=NEUTRAL_COLOR
         )
         embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
         return embed
@@ -382,12 +385,12 @@ class Union:
         guild = await get_player_guild(uuid)
 
         if not guild:
-            return guildless_embed
-        if guild["name"] != guild_handle:
+            return GUILDLESS_EMBED
+        if guild["name"] != GUILD_HANDLE:
             return discord.Embed(
                 title="You are not a member of Miscellaneous!",
                 description=f"Member of {guild['name']}",
-                color=neg_color
+                color=NEG_COLOR
             )
 
         member = next((m for m in guild["members"] if m["uuid"] == uuid), None)
@@ -409,7 +412,7 @@ class Union:
             description=f"**Discord Username:** {self.user.name}\n"
                         f"**Discord Nick:** {self.user.nick}\n"
                         f"**Mentions:** {'✅' if (await get_do_ping(uuid))[1] else '❌'}\n",
-            color=neutral_color
+            color=NEUTRAL_COLOR
         )
         if any([is_booster, is_sponsor, is_gvg, is_creator]):
             expiry_str = expiry if not is_indefinite else None
