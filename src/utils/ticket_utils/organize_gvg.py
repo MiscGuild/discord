@@ -2,7 +2,7 @@ import discord
 
 import src.utils.ui_utils as uiutils
 from src.utils.calculation_utils import get_guild_level
-from src.utils.consts import neutral_color, ticket_categories, guild_handle
+from src.utils.consts import NEUTRAL_COLOR, TICKET_CATEGORIES, GUILD_HANDLE
 from src.utils.request_utils import get_player_guild
 
 
@@ -13,12 +13,12 @@ async def organize_gvg(ticket: discord.TextChannel, interaction: discord.Interac
     if not guild:
         fields.extend(
             [["What is the name of your guild?", "", discord.InputTextStyle.short, "Guild Name"]])
-        embed = discord.Embed(title="GvG Request", color=neutral_color)
+        embed = discord.Embed(title="GvG Request", color=NEUTRAL_COLOR)
     else:
         embed = discord.Embed(
-            title=f"{ign} wishes to organize a GvG with {guild_handle} on behalf of {guild['name']}",
+            title=f"{ign} wishes to organize a GvG with {GUILD_HANDLE} on behalf of {guild['name']}",
             description=f"Guild Level: {await get_guild_level(guild['exp'])}",
-            color=neutral_color)
+            color=NEUTRAL_COLOR)
     fields.extend(
         [["What are your preferred gamemodes", "", discord.InputTextStyle.short, "Gamemode(s)"],
          ["Do you have any special rules?", "", discord.InputTextStyle.long, "Rule(s)"],
@@ -29,4 +29,4 @@ async def organize_gvg(ticket: discord.TextChannel, interaction: discord.Interac
 
     await ticket.edit(name=f"gvg-request-{ign}", topic=f"{interaction.user.id if interaction else user.id}|",
                       category=discord.utils.get((interaction.guild if interaction else ticket.guild).categories,
-                                                 name=ticket_categories["generic"]))
+                                                 name=TICKET_CATEGORIES["generic"]))
