@@ -6,8 +6,8 @@ from discord.ext import commands, bridge
 from src.func.General import General
 from src.func.String import String
 from src.func.Union import Union
-from src.utils.consts import information_message, information_requirements_embed, rules_messages, \
-    elite_member_categories
+from src.utils.consts import INFORMATION_MESSAGE, INFORMATION_REQUIREMENTS_EMBED, RULES_MESSAGES, \
+    ELITE_MEMBER_CATEGORIES
 from src.utils.ui_utils import tickets
 
 
@@ -58,12 +58,12 @@ class Staff(commands.Cog, name="staff"):
     @bridge.bridge_command()
     @commands.has_permissions(administrator=True)
     async def information(self, ctx: discord.ApplicationContext) -> None:
-        await ctx.send(content=information_message, embed=information_requirements_embed)
+        await ctx.send(content=INFORMATION_MESSAGE, embed=INFORMATION_REQUIREMENTS_EMBED)
 
     @bridge.bridge_command()
     @commands.has_permissions(administrator=True)
     async def rules(self, ctx: discord.ApplicationContext) -> None:
-        for message in rules_messages:
+        for message in RULES_MESSAGES:
             await ctx.send(content=message)
 
     @bridge.bridge_command(name="update_elite_member", description="Update a user's Elite Member role!")
@@ -78,7 +78,7 @@ class Staff(commands.Cog, name="staff"):
         name="reason",
         description="Why do they deserve the Elite Member role?",
         required=True,
-        choices=[discord.OptionChoice(name=x, value=x) for x in elite_member_categories],
+        choices=[discord.OptionChoice(name=x, value=x) for x in ELITE_MEMBER_CATEGORIES],
     )
     @bridge.bridge_option(
         name="monetary_value",
