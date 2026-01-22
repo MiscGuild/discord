@@ -8,7 +8,7 @@ from discord.ext import tasks
 from src.func.General import General
 from src.func.Integer import Integer
 from src.utils.calculation_utils import get_guild_gexp_data
-from src.utils.consts import weekly_lb_channel, daily_lb_channel, guild_handle
+from src.utils.consts import WEEKLY_LB_CHANNEL_ID, DAILY_LB_CHANNEL_ID, GUILD_HANDLE
 from src.utils.db_utils import (select_all, set_member_gexp_history, get_all_guild_members, remove_guild_member,
                                 get_all_elite_members, delete_elite_member)
 from src.utils.discord_utils import update_recruiter_role
@@ -81,7 +81,7 @@ async def before_scheduler() -> None:
 
 async def send_gexp_lb() -> None:
     file = await Integer(integer=1).gtop(is_automatic=True)
-    await bot.get_channel(daily_lb_channel).send(file)
+    await bot.get_channel(DAILY_LB_CHANNEL_ID).send(file)
 
     # If it's Monday (UTC), send weekly leaderboard
     if datetime.now(timezone.utc).weekday() == 0:
@@ -95,8 +95,8 @@ async def send_gexp_lb() -> None:
             f"- {current_date.strftime('%d %B %Y')}**"
         )
 
-        await bot.get_channel(weekly_lb_channel).send(week_message)
-        await bot.get_channel(weekly_lb_channel).send(
+        await bot.get_channel(WEEKLY_LB_CHANNEL_ID).send(week_message)
+        await bot.get_channel(WEEKLY_LB_CHANNEL_ID).send(
             await General().weeklylb(is_automatic=True)
         )
 
@@ -123,7 +123,7 @@ async def update_invites() -> None:
 
 
 async def update_gexp() -> None:
-    guild_data = await get_guild_by_name(guild_handle)
+    guild_data = await get_guild_by_name(GUILD_HANDLE)
     if not guild_data:
         return
 
