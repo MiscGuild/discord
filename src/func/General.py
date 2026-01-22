@@ -11,15 +11,15 @@ import discord.ui
 
 from src.func.Union import Union
 from src.utils.calculation_utils import get_gexp_sorted, generate_lb_text
-from src.utils.consts import (accepted_staff_application_embed, active_req,
-                              error_color, guild_handle,
-                              invalid_guild_embed, log_channel_id, member_req,
-                              milestone_emojis, milestones_channel, neg_color,
-                              neutral_color, pos_color, ticket_deleted_embed,
-                              registration_channel_id, registration_embed,
-                              staff_application_questions, ticket_categories,
-                              dnkl_entries_not_found,
-                              positive_responses, allies, milestone_categories)
+from src.utils.consts import (ACCEPTED_STAFF_APPLICATION_EMBED,
+                              ERROR_COLOR, GUILD_HANDLE,
+                              INVALID_GUILD_EMBED, LOG_CHANNEL_ID,
+                              MILESTONE_EMOJIS, MILESTONES_CHANNEL_ID, NEG_COLOR,
+                              NEUTRAL_COLOR, POS_COLOR, TICKET_DELETED_EMBED,
+                              REGISTRATION_CHANNEL_ID, REGISTRATION_EMBED,
+                              STAFF_APPLICATION_QUESTIONS, TICKET_CATEGORIES,
+                              DNKL_ENTRIES_NOT_FOUND,
+                              POSITIVE_RESPONSES, ALLIES, MILESTONE_CATEGORIES, NON_STAFF_RANKS)
 from src.utils.db_utils import insert_new_giveaway, select_all, \
     get_db_uuid_username, update_member, get_all_elite_members, delete_elite_member, get_dnkl_list
 from src.utils.discord_utils import (create_ticket,
@@ -36,10 +36,10 @@ class General:
     @staticmethod
     async def weeklylb(is_automatic=False) -> discord.Embed | str:
         # Get guild data
-        guild_data = await get_guild_by_name(guild_handle)
+        guild_data = await get_guild_by_name(GUILD_HANDLE)
 
         if not guild_data:
-            return invalid_guild_embed
+            return INVALID_GUILD_EMBED
 
         member_gexp = await get_gexp_sorted(guild_data)
 
@@ -55,7 +55,7 @@ class General:
         rows = await select_all("SELECT * FROM dnkl")
 
         if not rows:
-            return dnkl_entries_not_found
+            return DNKL_ENTRIES_NOT_FOUND
 
         # Create embed
         content = ""
@@ -65,7 +65,7 @@ class General:
             content += f"{username} ||{uuid}||\n"
 
         return discord.Embed(title="The people on the do-not-kick-list are as follows:", description=content,
-                             color=neutral_color).set_footer(text=f"Total: {len(content.split())}")
+                             color=NEUTRAL_COLOR).set_footer(text=f"Total: {len(content.split())}")
 
     @staticmethod
     async def rolecheck(ctx: discord.ApplicationContext, send_ping: bool) -> None:
@@ -76,8 +76,8 @@ class General:
 
         discord_member_uuids = [x[0] for x in await select_all("SELECT uuid FROM members")]
         # Define arrays for guild and ally uuids and names
-        guild_members = (await get_guild_by_name(guild_handle))["members"]
-        guild_uuids = await get_guild_uuids(guild_handle)
+        guild_members = (await get_guild_by_name(GUILD_HANDLE))["members"]
+        guild_uuids = await get_guild_uuids(GUILD_HANDLE)
 
         # Allies dict; {uuid: {username, gtag}}
         allies_dict = {}
@@ -85,7 +85,7 @@ class General:
         # Guild dict; {uuid: {username, gexp}}
         guild = {}
 
-        for ally in allies:
+        for ally in ALLIES:
             await progress_message.edit(content=f"Fetching ally UUIDs and usernames - {ally}")
             ally_uuids = await get_guild_uuids(ally)
             gtag = (await get_player_guild(ally_uuids[-1]))["tag"]
@@ -93,7 +93,7 @@ class General:
                 if uuid not in discord_member_uuids:
                     continue
                 allies_dict[uuid] = {"username": (await get_db_uuid_username(uuid=uuid))[0], "tag": gtag}
-        await progress_message.edit(content=f"Fetching {guild_handle}'s UUIDs and usernames")
+        await progress_message.edit(content=f"Fetching {GUILD_HANDLE}'s UUIDs and usernames")
 
         for uuid in guild_uuids:
             if uuid not in discord_member_uuids:
@@ -119,7 +119,8 @@ class General:
                     await update_member(discord_member.id, uuid, username)
 
             if not uuid and not username:
-                await discord_member.remove_roles(bot.member_role, bot.ally, bot.guest, bot.active_role)
+                await discord_member.remove_roles(bot.member_role, bot.ally, bot.guest, bot.achievable_rank_0,
+                                                  bot.achievable_rank_1)
                 await discord_member.add_roles(bot.new_member_role)
                 continue
             has_tag_permission = await has_tag_perms(discord_member)
@@ -148,11 +149,13 @@ class General:
 
                 # Edit roles
                 await discord_member.add_roles(bot.guest, bot.ally)
-                await discord_member.remove_roles(bot.new_member_role, bot.member_role, bot.active_role)
+                await discord_member.remove_roles(bot.new_member_role, bot.member_role, bot.achievable_rank_0,
+                                                  bot.achievable_rank_1)
                 continue
 
             elif not uuid:
-                await discord_member.remove_roles(bot.member_role, bot.ally, bot.guest, bot.active_role)
+                await discord_member.remove_roles(bot.member_role, bot.ally, bot.guest, bot.achievable_rank_0,
+                                                  bot.achievable_rank_1)
                 await discord_member.add_roles(bot.new_member_role)
                 continue
 
@@ -161,23 +164,23 @@ class General:
                 if not has_tag_permission and discord_member.nick != username:
                     await discord_member.edit(nick=username)
                 await discord_member.add_roles(bot.guest)
-                await discord_member.remove_roles(bot.new_member_role, bot.member_role, bot.active_role, bot.ally)
+                await discord_member.remove_roles(bot.new_member_role, bot.member_role, bot.achievable_rank_0,
+                                                  bot.achievable_rank_1, bot.ally)
                 continue
-        # Send ping to new mem
-        # ber role in registration channel
+
         if send_ping:
-            await bot.get_channel(registration_channel_id).send(bot.new_member_role.mention, embed=registration_embed)
+            await bot.get_channel(REGISTRATION_CHANNEL_ID).send(bot.new_member_role.mention, embed=REGISTRATION_EMBED)
 
         await progress_message.edit(content="Rolecheck complete!")
 
     @staticmethod
     async def delete(ctx: discord.ApplicationContext) -> None | str:
-        embed = discord.Embed(title="This ticket will be deleted in 10 seconds!", color=neg_color)
+        embed = discord.Embed(title="This ticket will be deleted in 10 seconds!", color=NEG_COLOR)
 
-        if not ctx.channel.category or ctx.channel.category.name not in ticket_categories.values():
+        if not ctx.channel.category or ctx.channel.category.name not in TICKET_CATEGORIES.values():
             return "This command cannot be used here"
 
-        elif ctx.channel.category.name == ticket_categories["registrees"]:
+        elif ctx.channel.category.name == TICKET_CATEGORIES["registrees"]:
             member = await get_ticket_creator(ctx.channel)
             if member:
                 ign, uuid = await get_uuid_by_name(await name_grabber(member))
@@ -199,28 +202,28 @@ class General:
             await log_event(f"{ctx.channel.name} was deleted by {ctx.author}")
             ticket_details = await get_ticket_properties(ctx.channel)
             if ticket_details:
-                await bot.get_channel(log_channel_id).send(file=transcript_for_logs)
+                await bot.get_channel(LOG_CHANNEL_ID).send(file=transcript_for_logs)
                 try:
                     await (await bot.fetch_user(ticket_details[0])).send(
-                        embed=ticket_deleted_embed.set_footer(text=ctx.channel.name), file=transcript_for_user)
+                        embed=TICKET_DELETED_EMBED.set_footer(text=ctx.channel.name), file=transcript_for_user)
                 except PermissionError:
-                    await bot.get_channel(log_channel_id).send(
+                    await bot.get_channel(LOG_CHANNEL_ID).send(
                         f"Failed to send transcript to {await bot.fetch_user(ticket_details[0])}!")
 
     @staticmethod
     async def accept(ctx: discord.ApplicationContext) -> discord.Embed | str:
-        if ctx.channel.category.name not in ticket_categories.values():
+        if ctx.channel.category.name not in TICKET_CATEGORIES.values():
             return "This command can only be used in tickets!"
-        return accepted_staff_application_embed
+        return ACCEPTED_STAFF_APPLICATION_EMBED
 
     @staticmethod
     async def transcript(ctx: discord.ApplicationContext) -> str | discord.Embed | discord.File:
-        if ctx.channel.category.name not in ticket_categories.values():
+        if ctx.channel.category.name not in TICKET_CATEGORIES.values():
             return "This command can only be used in tickets!"
         # Create transcript
         transcript = await create_transcript(ctx.channel)
         if not transcript:
-            return discord.Embed(title="Transcript creation failed!", color=error_color)
+            return discord.Embed(title="Transcript creation failed!", color=ERROR_COLOR)
         # Transcript is valid
         return transcript
 
@@ -245,15 +248,15 @@ class General:
         logo = response if not response.lower() == "none" else None
 
         if logo:
-            return discord.Embed(title=organization_name, description=description, color=neutral_color).set_thumbnail(
+            return discord.Embed(title=organization_name, description=description, color=NEUTRAL_COLOR).set_thumbnail(
                 url=logo)
-        return discord.Embed(title=organization_name, description=description, color=neutral_color)
+        return discord.Embed(title=organization_name, description=description, color=NEUTRAL_COLOR)
 
     @staticmethod
     async def deny(ctx: discord.ApplicationContext, channel: discord.TextChannel) -> tuple[discord.Embed, None] | tuple[
         discord.Embed, discord.File]:
         # Copy real question list and append 0th element for general critiquing
-        application_questions = staff_application_questions.copy()
+        application_questions = STAFF_APPLICATION_QUESTIONS.copy()
         application_questions[0] = "General critiquing"
         application_embed_id = (await get_ticket_properties(channel))[1]
         application_embed = (await channel.fetch_message(int(application_embed_id))).embeds[0]
@@ -268,7 +271,7 @@ class General:
 
         # Define the embed to be sent to the applicant
         denial_embed = discord.Embed(title="Your staff application has been denied!",
-                                     description="The reasons have been listed below", color=error_color)
+                                     description="The reasons have been listed below", color=ERROR_COLOR)
 
         while True:
             while True:
@@ -303,7 +306,7 @@ class General:
             continue_critiquing = continue_critiquing.content.lower()
 
             # User does not want to critique more questions
-            if continue_critiquing not in positive_responses:
+            if continue_critiquing not in POSITIVE_RESPONSES:
                 transcript = await create_transcript(channel)
 
                 # Notify the user that the transcript failed
@@ -317,9 +320,9 @@ class General:
     async def inactive() -> list[discord.Embed] | discord.Embed:
 
         # Fetch guid data
-        guild_data = await get_guild_by_name(guild_handle)
+        guild_data = await get_guild_by_name(GUILD_HANDLE)
         if not guild_data:
-            return invalid_guild_embed
+            return INVALID_GUILD_EMBED
 
         # Retrieve DNKL users so they can be filtered out
         dnkl_uuids = [x[1] for x in await get_dnkl_list()]
@@ -333,7 +336,7 @@ class General:
                 await delete_elite_member(uuid)
 
         # Define dicts for each category of users
-        to_promote_elite, to_demote_elite, inactive, dnkl, skipped_users = {}, {}, {}, {}, []
+        to_promote_super, to_demote_super, to_promote_elite, to_demote_elite, inactive, dnkl, skipped_users = {}, {}, {}, {}, {}, {}, []
 
         # Loop through all guild members with a session to fetch names
         for member in guild_data["members"]:
@@ -351,7 +354,7 @@ class General:
             name = name.replace("_", "\\_")
 
             # Gather data
-            guild_rank = member["rank"]
+            guild_rank = member["rank"].lower()
             weekly_exp = sum(member["expHistory"].values())
             name += f" [{guild_rank}]\n" + \
                     str(datetime.fromtimestamp(
@@ -378,11 +381,10 @@ class General:
                     if days_since_join <= 7 and weekly_exp > ((member_req / 7) * days_since_join):
                         continue
 
-                    inactive[name] = weekly_exp
+                inactive[name] = weekly_exp
 
         # Define embeds array to be returned
         embeds = []
-
         # Loop through dicts, descriptions and colors
         for _dict, title, color in [[dnkl, "Please verify if these DNKL entries have expired:", neutral_color],
                                     [to_promote_elite, "Promote the following users to Elite Member:", pos_color],
@@ -391,12 +393,10 @@ class General:
                                     [inactive, "Following are the users to be kicked:", neg_color]]:
             # Filter categories with no users
             if _dict:
-                # Sort values from lowest-highest
                 _dict = sorted(
                     _dict.items(), key=lambda item: item[1], reverse=True)
                 length = len(_dict)
 
-                # Create embed, append fields with data
                 embed = discord.Embed(
                     title=title, description=f"Total: {length}", color=color)
                 for user in _dict:
@@ -624,7 +624,7 @@ class General:
         confirmation = await bot.wait_for("message",
                                           check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
         confirmation = confirmation.content.lower()
-        if confirmation not in positive_responses:
+        if confirmation not in POSITIVE_RESPONSES:
             return "Giveaway cancelled!"
 
         # Send the giveaway in destination channel and add 🎉 reaction
@@ -650,12 +650,12 @@ class General:
         if not all_giveaways:
             return discord.Embed(title="There have been no giveaways in the last 10 days!",
                                  description="To make a new giveaway, use the command `,giveawaycreate`",
-                                 color=neg_color)
+                                 color=NEG_COLOR)
         else:
             # Define embed
             embed = discord.Embed(title="Giveaways:",
                                   description="Listed below are all giveaways from the last 10 days.",
-                                  color=neutral_color)
+                                  color=NEUTRAL_COLOR)
 
             # Add info to embed
             for giveaway in all_giveaways:
@@ -677,14 +677,14 @@ class General:
         class MilestoneTypeSelect(discord.ui.Select):
             def __init__(self):
                 super().__init__()
-                for key, value in milestone_emojis.items():
-                    self.add_option(label=milestone_categories[key], emoji=f"{value}")
+                for key, value in MILESTONE_EMOJIS.items():
+                    self.add_option(label=MILESTONE_CATEGORIES[key], emoji=f"{value}")
 
             # Override default callback
             async def callback(self, interaction: discord.Interaction):
                 # Set option var and delete Select, so it cannot be used twice
                 option = list(interaction.data.values())[0][0]
-                option_emoji = milestone_emojis.get(option.lower())
+                option_emoji = MILESTONE_EMOJIS.get(option.lower())
 
                 await interaction.response.send_message(f"**Milestone Category:** {option}"
                                                         f"\n**What is {name}'s milestone?**\n"
@@ -703,26 +703,26 @@ class General:
                 "Please give the bot up to 10 minutes to add the milestone. Once it has done it, you'll receive a completion message.")
             await channel.edit(topic=str(channel_description))
             milestone_registration = discord.Embed(title="Milestone Registered!",
-                                                   description=milestone_string[:-1], color=neutral_color)
+                                                   description=milestone_string[:-1], color=NEUTRAL_COLOR)
 
             return milestone_registration
 
         if gamemode and milestone:
-            if gamemode.lower() in [x for x in milestone_emojis.keys()]:
-                emoji = milestone_emojis.get(gamemode.lower())
+            if gamemode.lower() in [x for x in MILESTONE_EMOJIS.keys()]:
+                emoji = MILESTONE_EMOJIS.get(gamemode.lower())
                 embed = await milestone_ticket_update(ctx, channel, emoji, milestone)
             else:
                 embed = discord.Embed(title="Invalid gamemode inserted!",
                                       description=f"All the possible gamemodes are as follows:",
-                                      color=neg_color).set_footer(
-                    text=f"{f'{chr(10)}'.join([x.title() for x in milestone_emojis.keys()])}")  # chr(10) is a new line character
+                                      color=NEG_COLOR).set_footer(
+                    text=f"{f'{chr(10)}'.join([x.title() for x in MILESTONE_EMOJIS.keys()])}")  # chr(10) is a new line character
             return embed, None
         # Create view and embed, send to ticket
         view = discord.ui.View()
         view.add_item(MilestoneTypeSelect())
         embed = discord.Embed(title=f"Under what category does {name}'s milestone fall?",
                               description="Please select your reason from the dropdown given below!",
-                              color=neutral_color)
+                              color=NEUTRAL_COLOR)
         return embed, view
 
     @staticmethod
@@ -741,7 +741,7 @@ class General:
                 super().__init__()
                 index = 1
                 for milestone in all_milestones:
-                    category = [k for k, v in milestone_emojis.items() if v == milestone.split(" ")[0]][0]
+                    category = [k for k, v in MILESTONE_EMOJIS.items() if v == milestone.split(" ")[0]][0]
                     self.add_option(label=f"{name} {milestone.split(' ', 2)[2]}",
                                     value=f"{index} {category} {milestone.split(' ', 2)[2]}",
                                     emoji=milestone.split(" ")[0])
@@ -754,7 +754,7 @@ class General:
                 index = int(option[0])
                 category = option[1]
                 old_milestone = option[2]
-                emoji = milestone_emojis[category]
+                emoji = MILESTONE_EMOJIS[category]
 
                 await interaction.response.send_message(
                     f"**Milestone Category:** {category}\n"
@@ -773,14 +773,14 @@ class General:
                 await ctx.channel.edit(topic="|".join(channel_details))
 
                 await ctx.send(embed=discord.Embed(title="Milestone Registered!",
-                                                   description=new_milestone_message, color=neutral_color))
+                                                   description=new_milestone_message, color=NEUTRAL_COLOR))
 
         # Create view and embed, send to ticket
         view = discord.ui.View()
         view.add_item(MilestoneTypeSelect())
         embed = discord.Embed(title=f"Which of the following milestones would you like to update?",
                               description="Please select your reason from the dropdown given below!",
-                              color=neutral_color)
+                              color=NEUTRAL_COLOR)
         return embed, view
 
     @staticmethod
@@ -791,7 +791,7 @@ class General:
         milestone_message = f"**Weekly Milestones**\nThis is week __{day_number}__ of weekly milestones\n\n"
         count = 0
         for channel in bot.guild.text_channels:
-            if channel.category.name == ticket_categories["milestone"]:
+            if channel.category.name == TICKET_CATEGORIES["milestone"]:
                 channel_details = await get_ticket_properties(channel)
                 # Has a list in the format ["MEMBER ID","MILESTONE 1", "MILESTONE 2"....}
                 player_milestones = channel_details[1:-1]
@@ -800,13 +800,13 @@ class General:
                     count += 1
                     milestone_message = milestone_message + milestone + "!\n"
                     if count >= 15:
-                        await bot.get_channel(milestones_channel).send(milestone_message)
+                        await bot.get_channel(MILESTONES_CHANNEL_ID).send(milestone_message)
                         milestone_message = ""
                         count = 0
                 await discord.TextChannel.delete(channel)
         milestone_message = milestone_message + "\n**Congrats to everyone this week. If you wish to submit a milestone, look over at <#650248396480970782>!**"
-        await bot.get_channel(milestones_channel).send(milestone_message)
-        return f"{count} milestones have been compiled and sent in {bot.get_channel(milestones_channel)}"
+        await bot.get_channel(MILESTONES_CHANNEL_ID).send(milestone_message)
+        return f"{count} milestones have been compiled and sent in {bot.get_channel(MILESTONES_CHANNEL_ID)}"
 
     @staticmethod
     async def elite_members() -> discord.Embed | str:
@@ -814,7 +814,7 @@ class General:
         if not elite_members:
             return "There are no elite members currently."
 
-        embed = discord.Embed(title="Elite Members", color=pos_color)
+        embed = discord.Embed(title="Elite Members", color=POS_COLOR)
         boosters, sponsors, gvg, creators = [], [], [], []
         for uuid, is_booster, is_sponsor, is_gvg, is_creator, is_indefinite, expiry in elite_members:
             name = await get_name_by_uuid(uuid)
