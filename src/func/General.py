@@ -129,10 +129,12 @@ class General:
             # Member of guild
             if uuid in guild.keys():
                 weekly_exp = guild[uuid]["gexp"]
-                if weekly_exp >= active_req:  # Meets active req
-                    await discord_member.add_roles(bot.active_role)
-                elif weekly_exp < active_req and bot.active_role in discord_member.roles:  # Doesn't meet active req
-                    await discord_member.remove_roles(bot.active_role)
+
+                for rank_obj in NON_STAFF_RANKS[1:]:
+                    if weekly_exp >= rank_obj.requirement:
+                        await discord_member.add_roles(rank_obj.discord_role)
+                    else:
+                        await discord_member.remove_roles(rank_obj.discord_role)
 
                 if nick != username and not has_tag_permission:
                     await discord_member.edit(nick=username)
@@ -359,39 +361,48 @@ class General:
             name += f" [{guild_rank}]\n" + \
                     str(datetime.fromtimestamp(
                         int(str(member["joined"])[:-3])))[0:10]
-            guild_rank = member["rank"]
+
+            if guild_rank == NON_STAFF_RANKS[-1].name and weekly_exp < NON_STAFF_RANKS[-1].requirement:
+                to_demote_super[name] = weekly_exp
+
+            elif weekly_exp > NON_STAFF_RANKS[-1].requirement:
+                to_promote_super[name] = weekly_exp
+
+            elif uuid in elite_member_uuids and guild_rank == NON_STAFF_RANKS[-2].name:
+                continue
+
+            elif guild_rank == NON_STAFF_RANKS[-2].name and weekly_exp < NON_STAFF_RANKS[-2].requirement:
+                to_demote_elite[name] = weekly_exp
+
+            elif guild_rank == NON_STAFF_RANKS[-3].name and weekly_exp >= NON_STAFF_RANKS[-2].requirement:
+                to_promote_elite[name] = weekly_exp
+
+            elif guild_rank == NON_STAFF_RANKS[-3].name and uuid in elite_member_uuids:
+                to_promote_elite[name] = weekly_exp
 
             if uuid in dnkl_uuids:
                 dnkl[name] = weekly_exp
-
-            # Elite members who are not on the elite members list and are not active
-            elif guild_rank == "Elite Member" and uuid not in elite_member_uuids and weekly_exp < active_req:
-                to_demote_elite[name] = weekly_exp
-
-            # Members who need to be promoted
-            elif guild_rank == "Member" and weekly_exp >= active_req:
-                to_promote_elite[name] = weekly_exp
-
-            # Members who do not meet the requirements
-            elif weekly_exp < member_req:
-                if guild_rank == "Member":
-                    # Filter new members who meet their requirements
-                    days_since_join = (
-                            datetime.now() - datetime.fromtimestamp(member["joined"] / 1000.0)).days
-                    if days_since_join <= 7 and weekly_exp > ((member_req / 7) * days_since_join):
-                        continue
+            elif weekly_exp < NON_STAFF_RANKS[-3].requirement and guild_rank == NON_STAFF_RANKS[-3].name:
+                days_since_join = (
+                        datetime.now() - datetime.fromtimestamp(member["joined"] / 1000.0)).days
+                if days_since_join <= 7 and weekly_exp > ((NON_STAFF_RANKS[-3].requirement / 7) * days_since_join):
+                    continue
 
                 inactive[name] = weekly_exp
 
         # Define embeds array to be returned
         embeds = []
         # Loop through dicts, descriptions and colors
-        for _dict, title, color in [[dnkl, "Please verify if these DNKL entries have expired:", neutral_color],
-                                    [to_promote_elite, "Promote the following users to Elite Member:", pos_color],
-                                    [to_demote_elite, "Demote the following users from Elite Member:",
-                                     neg_color],
-                                    [inactive, "Following are the users to be kicked:", neg_color]]:
-            # Filter categories with no users
+        for _dict, title, color in [[dnkl, "Please verify if these DNKL entries have expired:", NEUTRAL_COLOR],
+                                    [to_promote_super, f"Promote the following users to {NON_STAFF_RANKS[-1].name}:",
+                                     POS_COLOR],
+                                    [to_demote_super, f"Demote the following users from {NON_STAFF_RANKS[-1].name}:",
+                                     NEG_COLOR],
+                                    [to_promote_elite, f"Promote the following users to {NON_STAFF_RANKS[-2].name}:",
+                                     POS_COLOR],
+                                    [to_demote_elite, f"Demote the following users from {NON_STAFF_RANKS[-2].name}:",
+                                     NEG_COLOR],
+                                    [inactive, "Following are the users to be kicked:", NEG_COLOR]]:
             if _dict:
                 _dict = sorted(
                     _dict.items(), key=lambda item: item[1], reverse=True)
