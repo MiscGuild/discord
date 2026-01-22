@@ -5,8 +5,8 @@ from random import shuffle, choice
 from typing import List
 
 from src.utils.calculation_utils import get_player_gexp, get_gexp_sorted
-from src.utils.consts import guild_handle, member_req, active_req, rank_upgrade_channel, \
-    rank_upgrade_winner_announcement
+from src.utils.consts import GUILD_HANDLE, NON_STAFF_RANKS, RANK_UPGRADE_CHANNEL_ID, \
+    RANK_UPGRADE_WINNER_MESSAGE
 from src.utils.data_classes import InvitationStats
 from src.utils.db_utils import select_one, insert_new_inviter, add_invitee, get_db_uuid_username, get_invites
 from src.utils.request_utils import get_player_guild, get_guild_by_name, get_name_by_uuid, get_uuid_by_name
@@ -24,7 +24,7 @@ async def validate_invites(inviter_ign, invitee_ign) -> str:
     guild_data = await get_player_guild(inviter_uuid)
     guild_name = "Guildless" if not guild_data else guild_data["name"]
 
-    if guild_name != guild_handle:
+    if guild_name != GUILD_HANDLE:
         return f"{inviter_ign} is a member of {guild_name}\nThis reference will not count."
 
     inviter = await select_one("SELECT current_invitee_uuids FROM invites WHERE inviter_uuid = (?)",
@@ -41,7 +41,7 @@ async def validate_invites(inviter_ign, invitee_ign) -> str:
 
 
 async def check_invitation_validity(invitations: list) -> List[str]:
-    guild_data = await get_guild_by_name(guild_handle)
+    guild_data = await get_guild_by_name(GUILD_HANDLE)
     members = {}
     for member in guild_data["members"]:
         members[member["uuid"]] = member["joined"]
@@ -54,29 +54,29 @@ async def check_invitation_validity(invitations: list) -> List[str]:
         _, weekly_gexp, _ = await get_player_gexp(invitee_uuid, guild_data)
 
         # Player earns more than double the member requirement
-        if weekly_gexp > (member_req * 2):
+        if weekly_gexp > (NON_STAFF_RANKS[0].requirement * 2):
             weekly_valid_invites.append(invitee_uuid)
             continue
 
         # Player has joined less than 7 days ago. Their gexp scaled up is double the member requirement.
         days_since_join = (datetime.now(timezone.utc) - datetime.fromtimestamp(members[invitee_uuid] / 1000.0,
                                                                                tz=timezone.utc)).days
-        if days_since_join <= 7 and ((weekly_gexp * 2) > ((member_req / 7) * days_since_join)):
+        if days_since_join <= 7 and ((weekly_gexp * 2) > ((NON_STAFF_RANKS[0].requirement / 7) * days_since_join)):
             weekly_valid_invites.append(invitee_uuid)
 
     return weekly_valid_invites
 
 
 async def get_entries(gexp) -> int:
-    if gexp >= active_req:
+    if gexp >= NON_STAFF_RANKS[-2].requirement:
         return round(50 * (1 - exp(-gexp / 500000)))
-    elif gexp >= member_req:
+    elif gexp >= NON_STAFF_RANKS[0].requirement:
         return 1
     return 0
 
 
 async def generate_rank_upgrade(weekly_invites: list) -> None:
-    guild_data = await get_guild_by_name(guild_handle)
+    guild_data = await get_guild_by_name(GUILD_HANDLE)
     members = await get_gexp_sorted(guild_data)
     entries = {}
     total_gexp = sum([gexp for uuid, gexp in members])
@@ -124,7 +124,7 @@ async def generate_rank_upgrade(weekly_invites: list) -> None:
         f"- {current_date.strftime('%d %B %Y')}**"
     )
 
-    announcement = rank_upgrade_winner_announcement.format(
+    announcement = RANK_UPGRADE_WINNER_MESSAGE.format(
         date=date,
         winner=winner,
         winner_gexp=format(winner_gexp, ',d'),
@@ -135,7 +135,7 @@ async def generate_rank_upgrade(weekly_invites: list) -> None:
         total_entries=format(sum(entries.values()), ',d')
     )
 
-    await bot.get_channel(rank_upgrade_channel).send(announcement)
+    await bot.get_channel(RANK_UPGRADE_CHANNEL_ID).send(announcement)
 
 
 async def get_invitation_stats(uuid: str) -> InvitationStats:
