@@ -232,6 +232,12 @@ async def after_cache_ready() -> None:
     bot.tag_allowed_roles = (bot.achievable_rank_0, bot.achievable_rank_1, bot.staff, bot.former_staff,
                              bot.server_booster, bot.rich_kid, bot.gvg, bot.veteran, bot.recruiter)
 
+    INGAME_RANKS[0].discord_role = bot.member_role
+    INGAME_RANKS[1].discord_role = bot.achievable_rank_0
+    INGAME_RANKS[2].discord_role = bot.achievable_rank_1
+    INGAME_RANKS[3].discord_role = bot.staff
+    INGAME_RANKS[4].discord_role = bot.admin
+
     from src.utils.loop_utils import check_giveaways, before_scheduler
     check_giveaways.start()
     await before_scheduler()
