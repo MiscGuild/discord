@@ -144,7 +144,7 @@ class Union:
 
                 for rank_obj in NON_STAFF_RANKS[1:]:
                     if gexp > rank_obj.requirement:
-                        roles_to_add.append(rank_obj.discord_rank)
+                        roles_to_add.append(rank_obj.discord_role)
 
                 break
 
