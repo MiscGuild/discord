@@ -202,7 +202,7 @@ class Union:
         username, uuid, check_already_registered = await get_db_uuid_username(uuid=uuid, get_discord_id=True)
 
         discord_account_already_linked = await get_db_uuid_username(discord_id=check_already_registered)
-        if not check_already_registered and not any(discord_account_already_linked):
+        if not check_already_registered and not all(discord_account_already_linked):
             await insert_new_member(discord_id=self.user.id,
                                     uuid=uuid,
                                     username=ign)
