@@ -51,7 +51,7 @@ async def get_do_ping(uuid: str) -> Tuple[int, bool]:
     return (res[0], res[1]) if res else (0, 0)
 
 
-async def set_do_ping_db(discord_id: int, do_pings: int) -> str:
+async def set_do_ping_db(discord_id: int, do_pings: int) -> str | None:
     await bot.db.execute("UPDATE members set do_pings = ? WHERE discord_id = ?", (do_pings, discord_id))
     await bot.db.commit()
 

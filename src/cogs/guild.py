@@ -23,10 +23,10 @@ class Guild(commands.Cog, name="guild"):
         """Invoke guild related commands!"""
         member_id = await check_if_mention(name)
         if not name and not member_id:
-            username, uuid = await get_db_uuid_username(discord_id=ctx.author.id)
+            username, uuid, _ = await get_db_uuid_username(discord_id=ctx.author.id)
             res = await String(uuid=uuid, username=username).gmember(ctx)
         elif member_id:
-            username, uuid = await get_db_uuid_username(discord_id=member_id)
+            username, uuid, _ = await get_db_uuid_username(discord_id=member_id)
             res = await String(uuid=uuid, username=username).gmember(ctx)
         else:
             res = await String(string=name).gmember(ctx)
@@ -55,10 +55,10 @@ class Guild(commands.Cog, name="guild"):
         if name and len(name) == 32:
             uuid = name
         if not name and not discord_member:
-            username, uuid = await get_db_uuid_username(discord_id=ctx.author.id)
+            username, uuid, _ = await get_db_uuid_username(discord_id=ctx.author.id)
             res = await String(uuid=uuid, username=username).gmember(ctx)
         elif discord_member:
-            username, uuid = await get_db_uuid_username(discord_id=discord_member.id)
+            username, uuid, _ = await get_db_uuid_username(discord_id=discord_member.id)
             res = await String(uuid=uuid, username=username).gmember(ctx)
         else:
             if uuid:
@@ -137,10 +137,10 @@ class Guild(commands.Cog, name="guild"):
         if name and len(name) == 32:
             uuid = name
         if not name and not discord_member:
-            username, uuid = await get_db_uuid_username(discord_id=ctx.author.id)
+            username, uuid, _ = await get_db_uuid_username(discord_id=ctx.author.id)
             res = await String(uuid=uuid, username=username).invites()
         elif discord_member:
-            username, uuid = await get_db_uuid_username(discord_id=discord_member.id)
+            username, uuid, _ = await get_db_uuid_username(discord_id=discord_member.id)
             res = await String(uuid=uuid, username=username).invites()
         else:
             if uuid:
