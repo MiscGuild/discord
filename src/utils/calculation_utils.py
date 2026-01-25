@@ -47,6 +47,7 @@ async def get_days_in_guild(joined: str) -> int:
 
 
 async def get_color_by_gexp(rank: str, weekly_gexp: int) -> Tuple[int, str, str]:
+    rank = rank.lower()
     if rank == NON_STAFF_RANKS[-1].name and weekly_gexp >= NON_STAFF_RANKS[-1].requirement:
         return 0x00fbff, "rgba(0,251,255, 0.3)", "rgba(0,251,255, 0.3)"
 
