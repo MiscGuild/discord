@@ -394,13 +394,17 @@ class General:
         embeds = []
         # Loop through dicts, descriptions and colors
         for _dict, title, color in [[dnkl, "Please verify if these DNKL entries have expired:", NEUTRAL_COLOR],
-                                    [to_promote_super, f"Promote the following users to {NON_STAFF_RANKS[-1].name}:",
+                                    [to_promote_super,
+                                     f"Promote the following users to {NON_STAFF_RANKS[-1].name.capitalize()}:",
                                      POS_COLOR],
-                                    [to_demote_super, f"Demote the following users from {NON_STAFF_RANKS[-1].name}:",
+                                    [to_demote_super,
+                                     f"Demote the following users from {NON_STAFF_RANKS[-1].name.capitalize()}:",
                                      NEG_COLOR],
-                                    [to_promote_elite, f"Promote the following users to {NON_STAFF_RANKS[-2].name}:",
+                                    [to_promote_elite,
+                                     f"Promote the following users to {NON_STAFF_RANKS[-2].name.capitalize()}:",
                                      POS_COLOR],
-                                    [to_demote_elite, f"Demote the following users from {NON_STAFF_RANKS[-2].name}:",
+                                    [to_demote_elite,
+                                     f"Demote the following users from {NON_STAFF_RANKS[-2].name.capitalize()}:",
                                      NEG_COLOR],
                                     [inactive, "Following are the users to be kicked:", NEG_COLOR]]:
             if _dict:
