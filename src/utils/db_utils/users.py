@@ -20,7 +20,7 @@ async def check_and_update_username(uuid: str, username: str) -> None:
 
 
 async def get_username_from_uuid(uuid: str) -> Tuple[str, str] | Tuple[None, str] | Tuple[None, None]:
-    if uuid == "0":
+    if uuid == "0" or not uuid:
         return None, None
     res = await select_one("SELECT username from users WHERE uuid = (?)", (uuid,))
     if res:
