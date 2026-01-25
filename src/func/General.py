@@ -365,7 +365,7 @@ class General:
             if guild_rank == NON_STAFF_RANKS[-1].name and weekly_exp < NON_STAFF_RANKS[-1].requirement:
                 to_demote_super[name] = weekly_exp
 
-            elif weekly_exp > NON_STAFF_RANKS[-1].requirement:
+            elif weekly_exp > NON_STAFF_RANKS[-1].requirement and guild_rank != NON_STAFF_RANKS[-1].name:
                 to_promote_super[name] = weekly_exp
 
             elif uuid in elite_member_uuids and guild_rank == NON_STAFF_RANKS[-2].name:
