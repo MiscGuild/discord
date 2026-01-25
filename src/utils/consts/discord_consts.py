@@ -112,16 +112,16 @@ ACCEPTED_STAFF_APPLICATION_EMBED = discord.Embed(title="Congratulations, your st
                                                  color=NEUTRAL_COLOR)
 
 REQUIREMENTS_EMBED = discord.Embed(title="Miscellaneous Guild Requirements",
-                                   description="These requirements are subject to change!",
+                                   description="",
                                    color=NEUTRAL_COLOR)
 for rank_obj in NON_STAFF_RANKS:
-    REQUIREMENTS_EMBED.add_field(name=rank_obj.name,
+    REQUIREMENTS_EMBED.add_field(name=rank_obj.name.capitalize(),
                                  value=f"•  {format(rank_obj.requirement, ',d')} Weekly Guild Experience", inline=False)
 
 REQUIREMENTS_EMBED.add_field(name="Do-not-kick-list Eligibility",
                              value=f"•  {format(DNKL_REQ, ',d')} Weekly Guild Experience",
                              inline=False).set_footer(
-    text="If you fail to meet these requirements, you will be kicked!")
+    text=f"If you fail to meet the {NON_STAFF_RANKS[0].name} requirements, you will be kicked!\nThese requirements are subject to change!")
 
 DNKL_ENTRIES_NOT_FOUND = discord.Embed(title="No entries!",
                                        description="There are no users on the do-not-kick-list!",
