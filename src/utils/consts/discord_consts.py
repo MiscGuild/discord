@@ -141,16 +141,43 @@ Founded by <@307402461734240257> in 2014, Miscellaneous is an all games Hypixel 
 > - <:hypixellogo:1352069969738989680> [Guild Thread](https://hypixel.net/threads/853102/)
 > - <:githublogo:1352069949837021215> [GitHub Projects](https://github.com/MiscGuild)
 > - <:discord:977349801412788266> Discord: `https://discord.gg/bHFWukp`
-## Requirements
+
 """
-INFORMATION_REQUIREMENTS_EMBED = discord.Embed(title="", color=0x4f5058)
-for rank_obj in NON_STAFF_RANKS:
-    INFORMATION_REQUIREMENTS_EMBED.add_field(name=rank_obj.name,
-                                             value=f"•  {format(rank_obj.requirement, ',d')} Weekly Guild Experience",
-                                             inline=False)
-INFORMATION_REQUIREMENTS_EMBED.add_field(name="Do-not-kick-list Eligibility",
-                                         value=f"•  {format(DNKL_REQ, ',d')} Weekly Guild Experience",
-                                         inline=False)
+
+INFORMATION_MESSAGE_2 = """
+
+## Guild Ranks
+### Staff Ranks
+> <@&522590584188436481> - This is the owner of the guild. 
+> <@&522588118251995147> - These are administrators of the guild. They have full permissions to manage the guild and are second in line for ownership.
+> <@&522590574734213120> - These are moderators of the guild. They help manage the guild and assist members with any issues they may have.
+> <@&522588122807271424> - These are helpers of the guild. They assist moderators and help members with any issues they may have.
+
+### Supporter Ranks
+> <@&752801730424733777> - This is a special rank given to members who boost the server. They receive this rank for the duration of their boost.
+> <@&789456510480678913> - This is a special rank given to members who have supported the guild financially. They receive this rank for a duration based on the amount they have contributed.
+"""
+
+INFORMATION_MESSAGE_3 = """
+
+### Recognition Ranks
+> <@&529772028803416074> - This is a rank given to people who have been in the guild or been active in the guild discord for 2+ years.
+> <@&805877036001918986> - This is a rank given to people who have contributed code to the guild's open-source projects on GitHub.
+> <@&655438444742311998> - This is a rank given to Youtubers with more than 5,000 subscribers.
+> <@&773573387666194472> - This is a rank given to exceptional members of the GvG team.
+> <@&1225191222440628374> - This is a rank given to members who regularly recruit new members to the guild.
+
+### Member Ranks
+> <@&1463663287940944057> - This is the highest general rank in the guild. Members with this rank have met the highest weekly guild experience requirement.
+> <@&812001155012886578> - This is the mid-tier general rank in the guild. Members with this rank have met the mid-level weekly guild experience requirement or have qualified through other means.
+> <@&522588110501183490> - This is the entry-level general rank for all members of Miscellaneous.
+
+### General Discord Ranks
+> <@&522587159191093249> - This is a rank given to all guests who have registered in the guild discord.
+> <@&810206853358420048> - This is a rank given to all members of allied guilds.
+> <@&780281882494631967> - This is a rank given to guild masters of allied guilds.
+"""
+
 
 TICKETS_MESSAGES = ["""# Tickets
 Tickets can be created for one of the following reasons:
