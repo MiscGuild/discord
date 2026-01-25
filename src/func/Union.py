@@ -85,12 +85,12 @@ class Union:
                    is_fs=False) -> discord.Embed | str:
         await ctx.defer()
         if is_fs and not name:
-            username, uuid = await get_db_uuid_username(discord_id=self.user.id)
+            username, uuid, _ = await get_db_uuid_username(discord_id=self.user.id)
             ign = await get_name_by_uuid(uuid, is_sync=True)
             if username != ign:
                 await update_member(self.user.id, uuid, ign)
         elif not name:
-            username, uuid = await get_db_uuid_username(discord_id=self.user.id)
+            username, uuid, _ = await get_db_uuid_username(discord_id=self.user.id)
             ign = await get_name_by_uuid(uuid, is_sync=True)
             if username != ign:
                 await update_member(self.user.id, uuid, ign)
@@ -202,7 +202,7 @@ class Union:
         username, uuid, check_already_registered = await get_db_uuid_username(uuid=uuid, get_discord_id=True)
 
         discord_account_already_linked = await get_db_uuid_username(discord_id=check_already_registered)
-        if not check_already_registered and not any(discord_account_already_linked):
+        if not check_already_registered and not all(discord_account_already_linked):
             await insert_new_member(discord_id=self.user.id,
                                     uuid=uuid,
                                     username=ign)
@@ -363,7 +363,7 @@ class Union:
         return embed.set_image(url=self.user.avatar)
 
     async def whois(self) -> discord.Embed:
-        username, uuid = await get_db_uuid_username(discord_id=self.user.id)
+        username, uuid, _ = await get_db_uuid_username(discord_id=self.user.id)
         embed = discord.Embed(
             title=username,
             description=f"Discord Username: {self.user.name}\n"
@@ -385,7 +385,7 @@ class Union:
         return embed
 
     async def me(self):
-        username, uuid = await get_db_uuid_username(discord_id=self.user.id)
+        username, uuid, _ = await get_db_uuid_username(discord_id=self.user.id)
         is_booster, is_sponsor, is_gvg, is_creator, is_indefinite, expiry = await get_elite_member(uuid) or (
             False, False, False, False, False, None)
         historical_gexp_data = await get_member_gexp_history(uuid)

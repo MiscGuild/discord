@@ -6,8 +6,8 @@ from discord.ext import commands, bridge
 from src.func.General import General
 from src.func.String import String
 from src.func.Union import Union
-from src.utils.consts import INFORMATION_MESSAGE, INFORMATION_REQUIREMENTS_EMBED, RULES_MESSAGES, \
-    ELITE_MEMBER_CATEGORIES
+from src.utils.consts import INFORMATION_MESSAGE, INFORMATION_MESSAGE_2, INFORMATION_MESSAGE_3, REQUIREMENTS_EMBED, \
+    RULES_MESSAGES, ELITE_MEMBER_CATEGORIES
 from src.utils.ui_utils import tickets
 
 
@@ -57,8 +57,12 @@ class Staff(commands.Cog, name="staff"):
 
     @bridge.bridge_command()
     @commands.has_permissions(administrator=True)
-    async def information(self, ctx: discord.ApplicationContext) -> None:
-        await ctx.send(content=INFORMATION_MESSAGE, embed=INFORMATION_REQUIREMENTS_EMBED)
+    async def information(self, ctx: discord.ApplicationContext, send_embed_only=False) -> None:
+        if not send_embed_only:
+            await ctx.send(content=INFORMATION_MESSAGE)
+            await ctx.send(content=INFORMATION_MESSAGE_2)
+            await ctx.send(content=INFORMATION_MESSAGE_3)
+        await ctx.send(embed=REQUIREMENTS_EMBED)
 
     @bridge.bridge_command()
     @commands.has_permissions(administrator=True)

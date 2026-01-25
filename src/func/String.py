@@ -355,7 +355,7 @@ class String:
     async def elite_member(self, discord_member: discord.Member = None, monetary_value: int = None,
                            is_automatic: bool = False) -> discord.Embed:
         if discord_member:
-            name, uuid = await get_db_uuid_username(discord_id=discord_member.id)
+            name, uuid, _ = await get_db_uuid_username(discord_id=discord_member.id)
         else:
             username = self.username
             name, uuid = await get_uuid_by_name(username)

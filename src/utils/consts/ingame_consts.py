@@ -9,31 +9,31 @@ config = toml.load("config.toml")
 # Gexp requirements
 ingame_ranks_dict = config["ingame_ranks"]
 RANK_1 = IngameRank(
-    name=ingame_ranks_dict["rank_1"]["name"],
+    name=ingame_ranks_dict["rank_1"]["name"].lower(),
     requirement=ingame_ranks_dict["rank_1"]["requirement"],
     is_staff=ingame_ranks_dict["rank_1"]["is_staff"],
     discord_role=None
 )
 RANK_2 = IngameRank(
-    name=ingame_ranks_dict["rank_2"]["name"],
+    name=ingame_ranks_dict["rank_2"]["name"].lower(),
     requirement=ingame_ranks_dict["rank_2"]["requirement"],
     is_staff=ingame_ranks_dict["rank_2"]["is_staff"],
     discord_role=None
 )
 RANK_3 = IngameRank(
-    name=ingame_ranks_dict["rank_3"]["name"],
+    name=ingame_ranks_dict["rank_3"]["name"].lower(),
     requirement=ingame_ranks_dict["rank_3"]["requirement"],
     is_staff=ingame_ranks_dict["rank_3"]["is_staff"],
     discord_role=None
 )
 MOD = IngameRank(
-    name=ingame_ranks_dict["rank_4"]["name"],
+    name=ingame_ranks_dict["rank_4"]["name"].lower(),
     requirement=ingame_ranks_dict["rank_4"]["requirement"],
     is_staff=ingame_ranks_dict["rank_4"]["is_staff"],
     discord_role=None
 )
 ADMIN = IngameRank(
-    name=ingame_ranks_dict["rank_5"]["name"],
+    name=ingame_ranks_dict["rank_5"]["name"].lower(),
     requirement=ingame_ranks_dict["rank_5"]["requirement"],
     is_staff=ingame_ranks_dict["rank_5"]["is_staff"],
     discord_role=None

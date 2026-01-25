@@ -98,7 +98,7 @@ class Hypixel(commands.Cog, name="hypixel"):
         if name and len(name) == 32:
             res = await String(uuid=name).dnklcheck()
         elif not name:
-            username, uuid = await get_db_uuid_username(discord_id=ctx.author.id)
+            username, uuid, _ = await get_db_uuid_username(discord_id=ctx.author.id)
             res = await String(uuid=uuid).dnklcheck()
         else:
             res = await String(string=name).dnklcheck()

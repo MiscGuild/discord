@@ -112,16 +112,16 @@ ACCEPTED_STAFF_APPLICATION_EMBED = discord.Embed(title="Congratulations, your st
                                                  color=NEUTRAL_COLOR)
 
 REQUIREMENTS_EMBED = discord.Embed(title="Miscellaneous Guild Requirements",
-                                   description="These requirements are subject to change!",
+                                   description="",
                                    color=NEUTRAL_COLOR)
 for rank_obj in NON_STAFF_RANKS:
-    REQUIREMENTS_EMBED.add_field(name=rank_obj.name,
+    REQUIREMENTS_EMBED.add_field(name=rank_obj.name.capitalize(),
                                  value=f"•  {format(rank_obj.requirement, ',d')} Weekly Guild Experience", inline=False)
 
 REQUIREMENTS_EMBED.add_field(name="Do-not-kick-list Eligibility",
                              value=f"•  {format(DNKL_REQ, ',d')} Weekly Guild Experience",
                              inline=False).set_footer(
-    text="If you fail to meet these requirements, you will be kicked!")
+    text=f"If you fail to meet the {NON_STAFF_RANKS[0].name} requirements, you will be kicked!\nThese requirements are subject to change!")
 
 DNKL_ENTRIES_NOT_FOUND = discord.Embed(title="No entries!",
                                        description="There are no users on the do-not-kick-list!",
@@ -141,16 +141,43 @@ Founded by <@307402461734240257> in 2014, Miscellaneous is an all games Hypixel 
 > - <:hypixellogo:1352069969738989680> [Guild Thread](https://hypixel.net/threads/853102/)
 > - <:githublogo:1352069949837021215> [GitHub Projects](https://github.com/MiscGuild)
 > - <:discord:977349801412788266> Discord: `https://discord.gg/bHFWukp`
-## Requirements
+
 """
-INFORMATION_REQUIREMENTS_EMBED = discord.Embed(title="", color=0x4f5058)
-for rank_obj in NON_STAFF_RANKS:
-    INFORMATION_REQUIREMENTS_EMBED.add_field(name=rank_obj.name,
-                                             value=f"•  {format(rank_obj.requirement, ',d')} Weekly Guild Experience",
-                                             inline=False)
-INFORMATION_REQUIREMENTS_EMBED.add_field(name="Do-not-kick-list Eligibility",
-                                         value=f"•  {format(DNKL_REQ, ',d')} Weekly Guild Experience",
-                                         inline=False)
+
+INFORMATION_MESSAGE_2 = """
+
+## Guild Ranks
+### Staff Ranks
+> <@&522590584188436481> - This is the owner of the guild. 
+> <@&522588118251995147> - These are administrators of the guild. They have full permissions to manage the guild and are second in line for ownership.
+> <@&522590574734213120> - These are moderators of the guild. They help manage the guild and assist members with any issues they may have.
+> <@&522588122807271424> - These are helpers of the guild. They assist moderators and help members with any issues they may have.
+
+### Supporter Ranks
+> <@&752801730424733777> - This is a special rank given to members who boost the server. They receive this rank for the duration of their boost.
+> <@&789456510480678913> - This is a special rank given to members who have supported the guild financially. They receive this rank for a duration based on the amount they have contributed.
+"""
+
+INFORMATION_MESSAGE_3 = """
+
+### Recognition Ranks
+> <@&529772028803416074> - This is a rank given to people who have been in the guild or been active in the guild discord for 2+ years.
+> <@&805877036001918986> - This is a rank given to people who have contributed code to the guild's open-source projects on GitHub.
+> <@&655438444742311998> - This is a rank given to Youtubers with more than 5,000 subscribers.
+> <@&773573387666194472> - This is a rank given to exceptional members of the GvG team.
+> <@&1225191222440628374> - This is a rank given to members who regularly recruit new members to the guild.
+
+### Member Ranks
+> <@&1463663287940944057> - This is the highest general rank in the guild. Members with this rank have met the highest weekly guild experience requirement.
+> <@&812001155012886578> - This is the mid-tier general rank in the guild. Members with this rank have met the mid-level weekly guild experience requirement or have qualified through other means.
+> <@&522588110501183490> - This is the entry-level general rank for all members of Miscellaneous.
+
+### General Discord Ranks
+> <@&522587159191093249> - This is a rank given to all guests who have registered in the guild discord.
+> <@&810206853358420048> - This is a rank given to all members of allied guilds.
+> <@&780281882494631967> - This is a rank given to guild masters of allied guilds.
+"""
+
 
 TICKETS_MESSAGES = ["""# Tickets
 Tickets can be created for one of the following reasons:
@@ -174,19 +201,19 @@ Tickets can be created for one of the following reasons:
 3. Inside your ticket, the bot will ask you why you made the ticket. Choose your reason from the dropdown list provided.
 4. Once you have picked your reason, you might need to answer a few of the bot's followup prompts."""]
 
-RESIDENT_EMBED = discord.Embed(title=f"How can I get {NON_STAFF_RANKS[-2].name}?",
-                               description=f"To be eligible for {NON_STAFF_RANKS[-2].name}, you must satisfy at least one of the following requirements:",
+RESIDENT_EMBED = discord.Embed(title=f"How can I get {NON_STAFF_RANKS[-2].name.capitalize()}?",
+                               description=f"To be eligible for {NON_STAFF_RANKS[-2].name.capitalize()}, you must satisfy at least one of the following requirements:",
                                color=NEUTRAL_COLOR).add_field(name="Youtuber",
-                                                              value=f"If you're a youtuber with more than 5,000 subscribers, you will receive {NON_STAFF_RANKS[-2].name} indefinitely.",
+                                                              value=f"If you're a youtuber with more than 5,000 subscribers, you will receive {NON_STAFF_RANKS[-2].name.capitalize()} indefinitely.",
                                                               inline=False).add_field(name="Event Sponsor",
-                                                                                      value=f"Spend Money on the guild by doing giveaways or sponsoring events. The length of your {NON_STAFF_RANKS[-2].name} status will depend on the amount you spend.",
+                                                                                      value=f"Spend Money on the guild by doing giveaways or sponsoring events. The length of your {NON_STAFF_RANKS[-2].name.capitalize()} status will depend on the amount you spend.",
                                                                                       inline=False).add_field(
     name="Server Booster",
     value=f"If you boost the server, you will be given {NON_STAFF_RANKS[-2].name} status for the duration of your boost. This status is contingent upon maintaining your boost and will be revoked if you discontinue boosting.",
     inline=False).add_field(name="GvG Team",
-                            value=f"If you are an exceptional member of the GvG team, you will be granted {NON_STAFF_RANKS[-2].name} status indefinitely, unless you are removed from the team.",
+                            value=f"If you are an exceptional member of the GvG team, you will be granted {NON_STAFF_RANKS[-2].name.capitalize()} status indefinitely, unless you are removed from the team.",
                             inline=False).add_field(name="Active Member",
-                                                    value=f"If you earn more than {format(NON_STAFF_RANKS[-2].requirement, ',d')} weekly guild experience, you will be given {NON_STAFF_RANKS[-2].name}.").set_footer(
+                                                    value=f"If you earn more than {format(NON_STAFF_RANKS[-2].requirement, ',d')} weekly guild experience, you will be given {NON_STAFF_RANKS[-2].name.capitalize()}.").set_footer(
     text=f"Unless otherwise specified, all residents must get {format(0, ',d')} weekly guild experience.")
 
 GVG_INFO_EMBED = discord.Embed(title="GvG Information",
@@ -267,7 +294,7 @@ REQUIREMENTS_TEXT = ""
 for rank_obj in NON_STAFF_RANKS:
     REQUIREMENTS_TEXT += f"__{rank_obj.name}__\n"
     REQUIREMENTS_TEXT += f"➤ {format(rank_obj.requirement, ',d')} Weekly Guild Experience\n"
-REQUIREMENTS_TEXT += f"You will join the guild as a {NON_STAFF_RANKS[0].name}"
+REQUIREMENTS_TEXT += f"You will join the guild as a {NON_STAFF_RANKS[0].name.capitalize()}"
 
 JOIN_REQUEST_EMBED = discord.Embed(color=NEUTRAL_COLOR).add_field(name="Our requirements are as follows:",
                                                                   value=REQUIREMENTS_TEXT,

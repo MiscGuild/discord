@@ -112,7 +112,7 @@ class General:
                 continue
 
             nick = await name_grabber(discord_member)
-            username, uuid = await get_db_uuid_username(discord_id=discord_member.id)
+            username, uuid, _ = await get_db_uuid_username(discord_id=discord_member.id)
             if not uuid and username:
                 username, uuid = await get_uuid_by_name(username)
                 if username and uuid:
@@ -365,7 +365,7 @@ class General:
             if guild_rank == NON_STAFF_RANKS[-1].name and weekly_exp < NON_STAFF_RANKS[-1].requirement:
                 to_demote_super[name] = weekly_exp
 
-            elif weekly_exp > NON_STAFF_RANKS[-1].requirement:
+            elif weekly_exp > NON_STAFF_RANKS[-1].requirement and guild_rank != NON_STAFF_RANKS[-1].name:
                 to_promote_super[name] = weekly_exp
 
             elif uuid in elite_member_uuids and guild_rank == NON_STAFF_RANKS[-2].name:
@@ -394,13 +394,17 @@ class General:
         embeds = []
         # Loop through dicts, descriptions and colors
         for _dict, title, color in [[dnkl, "Please verify if these DNKL entries have expired:", NEUTRAL_COLOR],
-                                    [to_promote_super, f"Promote the following users to {NON_STAFF_RANKS[-1].name}:",
+                                    [to_promote_super,
+                                     f"Promote the following users to {NON_STAFF_RANKS[-1].name.capitalize()}:",
                                      POS_COLOR],
-                                    [to_demote_super, f"Demote the following users from {NON_STAFF_RANKS[-1].name}:",
+                                    [to_demote_super,
+                                     f"Demote the following users from {NON_STAFF_RANKS[-1].name.capitalize()}:",
                                      NEG_COLOR],
-                                    [to_promote_elite, f"Promote the following users to {NON_STAFF_RANKS[-2].name}:",
+                                    [to_promote_elite,
+                                     f"Promote the following users to {NON_STAFF_RANKS[-2].name.capitalize()}:",
                                      POS_COLOR],
-                                    [to_demote_elite, f"Demote the following users from {NON_STAFF_RANKS[-2].name}:",
+                                    [to_demote_elite,
+                                     f"Demote the following users from {NON_STAFF_RANKS[-2].name.capitalize()}:",
                                      NEG_COLOR],
                                     [inactive, "Following are the users to be kicked:", NEG_COLOR]]:
             if _dict:
