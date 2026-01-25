@@ -201,19 +201,19 @@ Tickets can be created for one of the following reasons:
 3. Inside your ticket, the bot will ask you why you made the ticket. Choose your reason from the dropdown list provided.
 4. Once you have picked your reason, you might need to answer a few of the bot's followup prompts."""]
 
-RESIDENT_EMBED = discord.Embed(title=f"How can I get {NON_STAFF_RANKS[-2].name}?",
-                               description=f"To be eligible for {NON_STAFF_RANKS[-2].name}, you must satisfy at least one of the following requirements:",
+RESIDENT_EMBED = discord.Embed(title=f"How can I get {NON_STAFF_RANKS[-2].name.capitalize()}?",
+                               description=f"To be eligible for {NON_STAFF_RANKS[-2].name.capitalize()}, you must satisfy at least one of the following requirements:",
                                color=NEUTRAL_COLOR).add_field(name="Youtuber",
-                                                              value=f"If you're a youtuber with more than 5,000 subscribers, you will receive {NON_STAFF_RANKS[-2].name} indefinitely.",
+                                                              value=f"If you're a youtuber with more than 5,000 subscribers, you will receive {NON_STAFF_RANKS[-2].name.capitalize()} indefinitely.",
                                                               inline=False).add_field(name="Event Sponsor",
-                                                                                      value=f"Spend Money on the guild by doing giveaways or sponsoring events. The length of your {NON_STAFF_RANKS[-2].name} status will depend on the amount you spend.",
+                                                                                      value=f"Spend Money on the guild by doing giveaways or sponsoring events. The length of your {NON_STAFF_RANKS[-2].name.capitalize()} status will depend on the amount you spend.",
                                                                                       inline=False).add_field(
     name="Server Booster",
     value=f"If you boost the server, you will be given {NON_STAFF_RANKS[-2].name} status for the duration of your boost. This status is contingent upon maintaining your boost and will be revoked if you discontinue boosting.",
     inline=False).add_field(name="GvG Team",
-                            value=f"If you are an exceptional member of the GvG team, you will be granted {NON_STAFF_RANKS[-2].name} status indefinitely, unless you are removed from the team.",
+                            value=f"If you are an exceptional member of the GvG team, you will be granted {NON_STAFF_RANKS[-2].name.capitalize()} status indefinitely, unless you are removed from the team.",
                             inline=False).add_field(name="Active Member",
-                                                    value=f"If you earn more than {format(NON_STAFF_RANKS[-2].requirement, ',d')} weekly guild experience, you will be given {NON_STAFF_RANKS[-2].name}.").set_footer(
+                                                    value=f"If you earn more than {format(NON_STAFF_RANKS[-2].requirement, ',d')} weekly guild experience, you will be given {NON_STAFF_RANKS[-2].name.capitalize()}.").set_footer(
     text=f"Unless otherwise specified, all residents must get {format(0, ',d')} weekly guild experience.")
 
 GVG_INFO_EMBED = discord.Embed(title="GvG Information",
@@ -294,7 +294,7 @@ REQUIREMENTS_TEXT = ""
 for rank_obj in NON_STAFF_RANKS:
     REQUIREMENTS_TEXT += f"__{rank_obj.name}__\n"
     REQUIREMENTS_TEXT += f"➤ {format(rank_obj.requirement, ',d')} Weekly Guild Experience\n"
-REQUIREMENTS_TEXT += f"You will join the guild as a {NON_STAFF_RANKS[0].name}"
+REQUIREMENTS_TEXT += f"You will join the guild as a {NON_STAFF_RANKS[0].name.capitalize()}"
 
 JOIN_REQUEST_EMBED = discord.Embed(color=NEUTRAL_COLOR).add_field(name="Our requirements are as follows:",
                                                                   value=REQUIREMENTS_TEXT,
