@@ -114,10 +114,10 @@ class String:
             # Fetch remaining data
             historical_gexp_data = await get_member_gexp_history(uuid)
             monthly_gexp = 0
-            yearly_gexp = 0
+            all_time_gexp = 0
             average_weekly_gexp = 0
             days = 0
-            historical_yearly_gexp = None
+            historical_all_time_gexp = None
             historical_monthly_gexp = None
             historical_average_weekly_gexp = None
 
@@ -127,11 +127,11 @@ class String:
                 avg_weekly = (total * 7 / days) if days else 0
 
                 if is_current_guild_member:
-                    yearly_gexp = total
+                    all_time_gexp = total
                     monthly_gexp = await get_monthly_gexp(historical_gexp_data)
                     average_weekly_gexp = avg_weekly
                 else:
-                    historical_yearly_gexp = total
+                    historical_all_time_gexp = total
                     historical_monthly_gexp = await get_monthly_gexp(historical_gexp_data)
                     historical_average_weekly_gexp = avg_weekly
 
@@ -151,7 +151,7 @@ class String:
             general_information_text = f"`✚` **Rank**: `{rank}`\n"
             general_information_text += f"`✚` **Joined**: `{join_date}`\n"
             general_information_text += f"`✚` **Quests Completed**: `{quest_participation}`\n"
-            general_information_text += f"`✚` **Yearly Guild Experience**: `{format(yearly_gexp, ',d')}`\n"
+            general_information_text += f"`✚` **All-time Guild Experience**: `{format(all_time_gexp, ',d')}`\n"
             general_information_text += f"`✚` **Monthly Guild Experience**: `{format(monthly_gexp, ',d')}`\n\n"
             general_information_text += f"`✚` **Weekly Guild Experience**: `{format(weekly_gexp, ',d')}`\n"
             general_information_text += f"`✚` **Average Weekly Guild Experience**: `{format(round(average_weekly_gexp), ',d')}`\n"
@@ -185,11 +185,11 @@ class String:
                             }
                             }
 
-            if historical_yearly_gexp is not None and historical_monthly_gexp is not None and historical_average_weekly_gexp is not None:
+            if historical_all_time_gexp is not None and historical_monthly_gexp is not None and historical_average_weekly_gexp is not None:
                 embed.set_footer(
                     text=f"This user used to be in {GUILD_HANDLE}.\n"
                          f"Time in {GUILD_HANDLE}: {days} days\n"
-                         f"Historical Yearly GEXP: {format(historical_yearly_gexp, ',d')}\n"
+                         f"Historical All-time GEXP: {format(historical_all_time_gexp, ',d')}\n"
                          f"Historical Monthly GEXP: {format(historical_monthly_gexp, ',d')}\n"
                          f"Historical Average Weekly GEXP: {format(int(historical_average_weekly_gexp), ',d')}"
                 )
