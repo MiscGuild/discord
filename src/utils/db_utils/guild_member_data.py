@@ -31,10 +31,10 @@ async def set_member_gexp_history(uuid: str, gexp_history: dict) -> dict:
 
     sorted_history = dict(sorted(current_history.items(), reverse=True))
 
-    limited_history = dict(list(sorted_history.items())[:365])  # Keeps the 365 most recent entries
+    # limited_history = dict(list(sorted_history.items())[:365])  # Keeps the 365 most recent entries
 
     await bot.db.execute("UPDATE guild_member_data SET gexp_history = ? WHERE uuid = ?",
-                         (json.dumps(limited_history), uuid))
+                         (json.dumps(sorted_history), uuid))
     await bot.db.commit()
 
-    return limited_history
+    return sorted_history
