@@ -102,7 +102,7 @@ class Tickets(commands.Cog, name="tickets"):
             await ctx.respond(res)
 
     @bridge.bridge_command()
-    @commands.has_role("Admin")
+    @commands.has_permissions(ban_members=True)
     async def accept(self, ctx: discord.ApplicationContext) -> None:
         """Accept a staff application!"""
         res = await General().accept(ctx)
@@ -112,7 +112,7 @@ class Tickets(commands.Cog, name="tickets"):
             await ctx.respond(embed=res)
 
     @bridge.bridge_command()
-    @commands.has_any_role("Admin", "Moderator")
+    @commands.has_permissions(ban_members=True)
     @bridge.bridge_option(
         name="channel",
         description="The name of the channel where the staff application is",
