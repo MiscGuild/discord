@@ -80,7 +80,8 @@ MEMBER_TICKET_REASONS = {
     "I am going to be inactive": "<:dnkl:877657298703634483>",
     "I won a rank upgrade": "💰",
     "I want to join the staff team": "🤵",
-    "I want to join the GvG team": "⚔️"
+    "I want to join the GvG team": "⚔️",
+    f"I want to submit a clip for {GUILD_HANDLE}'s YT": "<:youtube:1011088525506117642>"
 }
 
 GENERAL_TICKET_REASONS = {
