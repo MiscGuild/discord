@@ -1,6 +1,7 @@
 # ! __all__ EXCLUDES the functions inside tickets.py
 
 from .ally_request import ally_request
+from .clip_submission import clip_submission
 from .dnkl import dnkl
 from .gvg_application import gvg_application
 from .join_guild import join_guild
@@ -25,5 +26,6 @@ __all__ = [
     'query',
     'staff_application',
     'rank_upgrade',
-    'problem'
+    'problem',
+    'clip_submission'
 ]

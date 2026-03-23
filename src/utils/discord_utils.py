@@ -137,6 +137,8 @@ async def handle_ticket_reason(reason: str, ticket: discord.TextChannel,
         await staff_application(ticket, interaction, user, ign)
     elif "gvg_team" in reason:
         await gvg_application(ticket, interaction, ign, uuid, user)
+    elif "clip_for_yt" in reason:
+        await clip_submission(ticket, interaction, user, ign)
     elif "join_guild" in reason or f"join_{GUILD_HANDLE.lower()}" in reason:
         await join_guild(ticket, interaction, user, ign)
     elif "organize_gvg" in reason or "organize_a_gvg" in reason:
@@ -229,6 +231,7 @@ async def after_cache_ready() -> None:
     bot.recruiter = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["recruiter"])
     bot.qotd = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["qotd_ping"])
     bot.geoguessr = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["geoguessr"])
+    bot.yt_channel_manager = discord.utils.get(bot.guild.channels, id=CONFIG["discord_roles"]["yt_channel_manager"])
     bot.tag_allowed_roles = (bot.achievable_rank_0, bot.achievable_rank_1, bot.staff, bot.former_staff,
                              bot.server_booster, bot.rich_kid, bot.gvg, bot.veteran, bot.recruiter)
 

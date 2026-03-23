@@ -1,6 +1,7 @@
 # The following file contains: on_member_join, on_error, on_command_error, reactionroles, tickets, on_interaction
 import traceback
 from __main__ import bot
+from asyncio import sleep
 
 import discord
 from discord.ext import commands
@@ -120,6 +121,7 @@ class Listener:
             return
 
         try:
+            await sleep(1)
             await thread.join()
         except discord.Forbidden:
             await self.bot.get_channel(ERROR_CHANNEL_ID).send(
