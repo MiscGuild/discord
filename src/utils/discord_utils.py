@@ -137,6 +137,8 @@ async def handle_ticket_reason(reason: str, ticket: discord.TextChannel,
         await staff_application(ticket, interaction, user, ign)
     elif "gvg_team" in reason:
         await gvg_application(ticket, interaction, ign, uuid, user)
+    elif "clip_for_yt" in reason:
+        await clip_submission(ticket, interaction, user, ign)
     elif "join_guild" in reason or f"join_{GUILD_HANDLE.lower()}" in reason:
         await join_guild(ticket, interaction, user, ign)
     elif "organize_gvg" in reason or "organize_a_gvg" in reason:
