@@ -10,7 +10,7 @@ async def clip_submission(ticket: discord.TextChannel, interaction: discord.Inte
     # Edit category and send info embed with requirements
     await ticket.edit(name=f"YT-clip-{ign}", topic=f"{interaction.user.id if interaction else user.id}|",
                       category=discord.utils.get((interaction.guild if interaction else ticket.guild).categories,
-                                                 name=TICKET_CATEGORIES["registrees"]))
+                                                 name=TICKET_CATEGORIES["other"]))
     await ticket.set_permissions(bot.yt_channel_manager, send_messages=True, read_messages=True,
                                  add_reactions=True, embed_links=True,
                                  attach_files=True,
