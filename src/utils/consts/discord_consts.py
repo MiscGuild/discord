@@ -404,3 +404,27 @@ _
 
 _
 Please do not read the messages below before you complete the GeoGuessr Challenge!"""
+
+CLIP_SUBMISSION_TICKET = """# Clip Submission 
+Hello {name}! Thank you for creating this ticket to submit a clip!
+
+We accept funny, impressive, or unexpected moments as clips that would be great for a compilation on [Miscellaneous' YouTube Channel](https://www.youtube.com/channel/UCdJeroujDBAWviBHzfx0Qqw).
+
+Please include the following: 
+- The clip (a file or link)
+- A short description of what happens
+- Gamemode
+- Category (Funny/Impressive/Unexpected/Other)
+
+The clip must meet the following requirements: 
+> - The clip must be in HD (720p minimum, 1080p preferred)
+> - The clip must have a minimum length of 5–10 seconds and a maximum of 60 seconds.
+> - The clip should not include excessive lag or stuttering.
+> - The clip must not contain offensive, hateful, or inappropriate content.
+> - The clip must be your own content or submitted with permission from the creator.
+> - The clip should not include edits, overlays, or watermarks that distract from the moment.
+
+Failure to meet these requirements may result in your clip not being selected.
+
+Thank you for your submission and good luck!
+-# The Miscellaneous YouTube channel team will evaluate your submission and get back to you as soon as possible."""
