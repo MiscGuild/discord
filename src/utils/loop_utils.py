@@ -28,7 +28,6 @@ async def check_giveaways() -> None:
     deletes = []
 
     for message_id, time_of_finish, is_active in all_giveaways:
-        # Parse as naive, then mark it as UTC-aware
         finish_at = datetime.strptime(time_of_finish, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
 
         if is_active and finish_at < now:
