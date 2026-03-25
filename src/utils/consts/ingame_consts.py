@@ -52,6 +52,7 @@ class ChatColor(Enum):
     LIGHT_PURPLE = "&d"
     WHITE = "&f"
     BLUE = "&9"
+    LIGHT_BLUE = "&b"
     DARK_GREEN = "&2"
     DARK_RED = "&4"
     DARK_AQUA = "&3"
