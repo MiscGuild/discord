@@ -1,16 +1,15 @@
 import io
 import logging
-import math
 import re
 import traceback
 from calendar import month_name
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from typing import Tuple, List
 
 import discord
 from discord.ext import commands
 
-from src.utils.consts import ChatColor, NON_STAFF_RANKS, NOT_OWNER_EMBED, \
+from src.utils.consts import NON_STAFF_RANKS, NOT_OWNER_EMBED, \
     MISSING_ROLES_EMBED, MISSING_PERMS_EMBED, MEMBER_NOT_FOUND_EMBED, BOT_MISSING_PERMS_EMBED, ERR_404_EMBED, \
     ERROR_REPLY_EXCEPTIONS
 from src.utils.db_utils import get_do_ping, get_db_uuid_username, get_all_usernames
@@ -60,65 +59,65 @@ async def get_color_by_gexp(rank: str, weekly_gexp: int) -> Tuple[int, str, str]
     return 0xff6464, "rgba(255, 100, 100,0.3)", "rgba(255, 100, 100,0.3)"
 
 
-async def get_hypixel_player_rank(player_data: dict) -> Tuple[str, str] | Tuple[None, None]:
-    if not player_data:
-        return None, None
+# async def get_hypixel_player_rank(player_data: dict) -> Tuple[str, str] | Tuple[None, None] | Tuple[ChatColor, str]:
+#     if not player_data:
+#         return None, None
+#
+#     if "prefix" in player_data and player_data["prefix"] in ["§d[PIG§b+++§d]", "§c[SLOTH]", "§c[OWNER]"]:
+#         return player_data["prefix"].replace("§", "&"), re.sub(r"(§.)", "", player_data["prefix"])
+#
+#     if "newPackageRank" in player_data:
+#         # Player is a YT/Admin
+#         if "rank" in player_data:
+#             if player_data["rank"] == "YOUTUBER":
+#                 return f"{ChatColor.RED}[{ChatColor.WHITE}YOUTUBE{ChatColor.RED}]", "[YOUTUBE]"
+#             elif player_data["rank"] == "ADMIN":
+#                 return f"{ChatColor.RED}[ADMIN]", "[ADMIN]"
+#
+#         rank = player_data["newPackageRank"]
+#
+#         # VIP - MVP+
+#         if rank == "VIP":
+#             return f"{ChatColor.GREEN}[VIP]", "[VIP]"
+#         elif rank == "VIP_PLUS":
+#             return f"{ChatColor.GREEN}[VIP{ChatColor.GOLD}+{ChatColor.GREEN}]", "[VIP+]"
+#         elif rank == "MVP":
+#             return f"{ChatColor.LIGHT_BLUE}[MVP]", "[MVP]"
+#         elif rank == "MVP_PLUS":
+#             if "monthlyPackageRank" in player_data:
+#                 # Had MVP++ but now is an MVP+
+#                 if player_data["monthlyPackageRank"] == "NONE":
+#                     # Custom + color
+#                     if "rankPlusColor" in player_data:
+#                         pluscolor = ChatColor[player_data["rankPlusColor"]].value
+#                         return f"{ChatColor.LIGHT_BLUE}[MVP{pluscolor}+{ChatColor.LIGHT_BLUE}]", "[MVP+]"
+#                     # Default + color
+#                     return f"{ChatColor.LIGHT_BLUE}[MVP{ChatColor.RED}+{ChatColor.LIGHT_BLUE}]", "[MVP+]"
+#
+#                 # Player is MVP++
+#                 # Gold/Aqua MVP++
+#                 if "rankPlusColor" not in player_data:
+#                     return f"{ChatColor.GOLD}[MVP{ChatColor.RED}++{ChatColor.GOLD}]" if "monthlyRankColor" not in player_data or player_data[
+#                         "monthlyRankColor"] == "GOLD" else f"{ChatColor.LIGHT_BLUE}[MVP{ChatColor.RED}++{ChatColor.LIGHT_BLUE}]", "[MVP++]"
+#
+#                 # MVP++ with custom + color
+#                 pluscolor = ChatColor[player_data["rankPlusColor"]].value
+#                 return f"{ChatColor.GOLD}[MVP{pluscolor}++{ChatColor.GOLD}]" if "monthlyRankColor" not in player_data or player_data[
+#                     "monthlyRankColor"] == "GOLD" else f"{ChatColor.LIGHT_BLUE}[MVP{pluscolor}++{ChatColor.LIGHT_BLUE}]", "[MVP++]"
+#
+#             # Player is MVP+
+#             # Custom + color
+#             if "rankPlusColor" in player_data:
+#                 pluscolor = ChatColor[player_data["rankPlusColor"]].value
+#                 return f"{ChatColor.LIGHT_BLUE}[MVP{pluscolor}+{ChatColor.LIGHT_BLUE}]", "[MVP+]"
+#             # Default + color
+#             return f"{ChatColor.LIGHT_BLUE}[MVP{ChatColor.RED}+{ChatColor.LIGHT_BLUE}]", "[MVP+]"
+#
+#     return ChatColor.WHITE, ""
 
-    if "prefix" in player_data and player_data["prefix"] in ["§d[PIG§b+++§d]", "§c[SLOTH]", "§c[OWNER]"]:
-        return player_data["prefix"].replace("§", "&"), re.sub(r"(§.)", "", player_data["prefix"])
-
-    if "newPackageRank" in player_data:
-        # Player is a youtuber/admin
-        if "rank" in player_data:
-            if player_data["rank"] == "YOUTUBER":
-                return "&c[&fYOUTUBE&c]", "[YOUTUBE]"
-            elif player_data["rank"] == "ADMIN":
-                return "&c[ADMIN]", "[ADMIN]"
-
-        rank = player_data["newPackageRank"]
-
-        # VIP - MVP+
-        if rank == "VIP":
-            return "&a[VIP]", "[VIP]"
-        elif rank == "VIP_PLUS":
-            return "&a[VIP&6+&a]", "[VIP+]"
-        elif rank == "MVP":
-            return "&b[MVP]", "[MVP]"
-        elif rank == "MVP_PLUS":
-            if "monthlyPackageRank" in player_data:
-                # Had MVP++ but now is an MVP+
-                if player_data["monthlyPackageRank"] == "NONE":
-                    # Custom + color
-                    if "rankPlusColor" in player_data:
-                        pluscolor = ChatColor[player_data["rankPlusColor"]].value
-                        return f"&b[MVP{pluscolor}+&b]", "[MVP+]"
-                    # Default + color
-                    return "&b[MVP&c+&b]", "[MVP+]"
-
-                # Player is MVP++
-                # Gold/Aqua MVP++
-                if "rankPlusColor" not in player_data:
-                    return "&6[MVP&c++&6]" if "monthlyRankColor" not in player_data or player_data[
-                        "monthlyRankColor"] == "GOLD" else "&b[MVP&c++&b]", "[MVP++]"
-
-                # MVP++ with custom + color
-                pluscolor = ChatColor[player_data["rankPlusColor"]].value
-                return f"&6[MVP{pluscolor}++&6]" if "monthlyRankColor" not in player_data or player_data[
-                    "monthlyRankColor"] == "GOLD" else f"&b[MVP{pluscolor}++&b]", "[MVP++]"
-
-            # Player is MVP+
-            # Custom + color
-            if "rankPlusColor" in player_data:
-                pluscolor = ChatColor[player_data["rankPlusColor"]].value
-                return f"&b[MVP{pluscolor}+&b]", "[MVP+]"
-            # Default + color
-            return "&b[MVP&c+&b]", "[MVP+]"
-
-    return "&7", ""
-
-
-async def calculate_network_level(total_exp: int) -> float:
-    return round((math.sqrt((2 * total_exp) + 30625) / 50) - 2.5, 2)
+#
+# async def calculate_network_level(total_exp: int) -> float:
+#     return round((math.sqrt((2 * total_exp) + 30625) / 50) - 2.5, 2)
 
 
 async def get_gexp_sorted(guild_data: dict) -> List[Tuple[str, int]]:
@@ -147,21 +146,10 @@ async def generate_lb_text(member_gexp: list, text: str, is_automatic) -> str:
         else:
             name = await get_name_by_uuid(uuid) if not username else username
 
-        # rank, _ = await get_hypixel_player_rank(
-        #    await get_hypixel_player(uuid=uuid))  # Ignores value without color formatting
-        # Add new entry to image content
-        ##text += f"&6{count}. {rank} {name} &2{format(gexp, ',d')} Guild Experience"
-
         text += f"> {count}. {name} - {format(gexp, ',d')} Guild Experience"
-        # Add new line
         if count < 10:
-            # text += "%5Cn"
             text += "\n"
 
-    # Replace characters for the URL
-    # text = text.replace("+", "%2B").replace("&", "%26").replace(" ", "%20").replace(",", "%2C")
-
-    # Return image
     return text
 
 
@@ -202,16 +190,17 @@ async def check_tag(tag: str) -> Tuple[bool, str] | Tuple[bool, None]:
     return True, None
 
 
-async def is_valid_date(date: str) -> Tuple[bool, int, int, int] | Tuple[bool, None, None, None]:
-    # Return False if parsing fails
-    try:
-        parsed = datetime.strptime(date, "%Y/%m/%d")
-        # Validate time is within the last week
-        if parsed < datetime.now(timezone.utc) - timedelta(days=7):
-            return False, None, None, None
-        return True, parsed.day, parsed.month, parsed.year
-    except ValueError:
-        return False, None, None, None
+#
+# async def is_valid_date(date: str) -> Tuple[bool, int, int, int] | Tuple[bool, None, None, None]:
+#     # Return False if parsing fails
+#     try:
+#         parsed = datetime.strptime(date, "%Y/%m/%d")
+#         # Validate time is within the last week
+#         if parsed < datetime.now(timezone.utc) - timedelta(days=7):
+#             return False, None, None, None
+#         return True, parsed.day, parsed.month, parsed.year
+#     except ValueError:
+#         return False, None, None, None
 
 
 async def extract_usernames(message: str) -> Tuple[str, str] | Tuple[None, str]:
