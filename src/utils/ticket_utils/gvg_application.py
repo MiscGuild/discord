@@ -88,7 +88,7 @@ async def gvg_application(ticket: discord.TextChannel, interaction: discord.Inte
         embed.add_field(name="Duels Kills", value=f"`{duels_kills}`")
 
     # User is not eligible for any team
-    elif not all(eligibility.values()):
+    elif not any(eligibility.values()):
         embed = discord.Embed(
             title="You are ineligible for the GvG Team as you do not meet the requirements!",
             description="If you think this is incorrect, please await staff assistance",
