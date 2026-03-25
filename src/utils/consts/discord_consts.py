@@ -179,7 +179,6 @@ INFORMATION_MESSAGE_3 = """
 > <@&780281882494631967> - This is a rank given to guild masters of allied guilds.
 """
 
-
 TICKETS_MESSAGES = ["""# Tickets
 Tickets can be created for one of the following reasons:
 ## Ticket Categories for Members 
@@ -255,11 +254,11 @@ NOT_OWNER_EMBED = discord.Embed(title=MISSING_PERMS_MSG,
                                 color=ERROR_COLOR)
 
 MISSING_ROLES_EMBED = discord.Embed(title=MISSING_PERMS_MSG,
-                                   description="You do not have the required roles to access this restricted command!",
+                                    description="You do not have the required roles to access this restricted command!",
                                     color=ERROR_COLOR)
 
 MISSING_PERMS_EMBED = discord.Embed(title=MISSING_PERMS_MSG,
-                                          description="You do not have the required permissions to access this restricted command!",
+                                    description="You do not have the required permissions to access this restricted command!",
                                     color=ERROR_COLOR)
 
 MEMBER_NOT_FOUND_EMBED = discord.Embed(title="Member not found",

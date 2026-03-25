@@ -8,7 +8,6 @@ from typing import Tuple, List, Callable, Any
 
 import aiohttp
 import discord
-import requests
 
 from src.utils.consts import ERROR_CHANNEL_ID, API_KEYS
 from src.utils.db_utils import get_db_uuid_username, check_and_update_username
@@ -155,13 +154,13 @@ async def get_hypixel_player(name: str = None, uuid: str = None) -> dict | None:
     return resp["player"]
 
 
-def session_get_name_by_uuid(session: requests.Session, uuid: str) -> str | None:
-    with session.get(f"https://sessionserver.mojang.com/session/minecraft/profile/{uuid}") as resp:
-        data = resp.json()
-
-        if resp.status_code != 200:
-            return None
-        return data["name"]
+# def session_get_name_by_uuid(session: requests.Session, uuid: str) -> str | None:
+#     with session.get(f"https://sessionserver.mojang.com/session/minecraft/profile/{uuid}") as resp:
+#         data = resp.json()
+#
+#         if resp.status_code != 200:
+#             return None
+#         return data["name"]
 
 
 async def get_player_guild(uuid: str) -> dict | None:
@@ -219,25 +218,25 @@ async def get_jpg_file(url: str) -> discord.File | None:
             await session.close()
     return discord.File(resp, "image.jpg")
 
-
-async def get_rank(uuid: str) -> str | None:
-    player = await get_hypixel_player(uuid=uuid)
-    if player is None:
-        return None
-    if "newPackageRank" in player:
-        rank = (player["newPackageRank"])
-        if rank == 'MVP_PLUS':
-            if "monthlyPackageRank" in player:
-                mvp_plus_plus = (player["monthlyPackageRank"])
-                if mvp_plus_plus == "NONE":
-                    return '[MVP+]'
-                return "[MVP++]"
-            return "[MVP+]"
-        if rank == 'MVP':
-            return '[MVP]'
-        if rank == 'VIP_PLUS':
-            return 'VIP+'
-        if rank == 'VIP':
-            return '[VIP]'
-
-    return None
+#
+# async def get_rank(uuid: str) -> str | None:
+#     player = await get_hypixel_player(uuid=uuid)
+#     if player is None:
+#         return None
+#     if "newPackageRank" in player:
+#         rank = (player["newPackageRank"])
+#         if rank == 'MVP_PLUS':
+#             if "monthlyPackageRank" in player:
+#                 mvp_plus_plus = (player["monthlyPackageRank"])
+#                 if mvp_plus_plus == "NONE":
+#                     return '[MVP+]'
+#                 return "[MVP++]"
+#             return "[MVP+]"
+#         if rank == 'MVP':
+#             return '[MVP]'
+#         if rank == 'VIP_PLUS':
+#             return 'VIP+'
+#         if rank == 'VIP':
+#             return '[VIP]'
+#
+#     return None
