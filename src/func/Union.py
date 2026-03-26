@@ -375,13 +375,16 @@ class Union:
         return embed
 
     async def do_pings(self, setting: int) -> discord.Embed:
-        uuid = await set_do_ping_db(self.user.id, setting)
+        await set_do_ping_db(self.user.id, setting)
+        member_lookup = RegisteredDiscordMember()
+        member = await member_lookup.from_discord_id(discord_id=self.user.id)
+
         embed = discord.Embed(
             title="Ping Settings Updated!",
             description=f"You will **{'now' if bool(setting) else 'not'}** be pinged in automatic daily and weekly leaderboard messages!",
             color=NEUTRAL_COLOR
         )
-        embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
+        embed.set_thumbnail(url=f'https://minotar.net/helm/{member.uuid}/512.png')
         return embed
 
     async def me(self):
