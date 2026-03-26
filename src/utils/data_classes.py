@@ -3,9 +3,6 @@ from typing import List, Optional
 
 import discord
 
-from src.utils.db_utils import get_username_from_uuid, get_discord_id_from_uuid, get_uuid_from_username, \
-    get_uuid_from_discord_id
-
 
 @dataclass
 class WeeklyStats:
@@ -69,6 +66,8 @@ class RegisteredDiscordMember:
         if uuid == "0":
             return cls()
 
+        from src.utils.db_utils import get_username_from_uuid, get_discord_id_from_uuid
+
         ign, resolved_uuid = await get_username_from_uuid(uuid)
         discord_id = None
 
@@ -83,6 +82,7 @@ class RegisteredDiscordMember:
             username: str,
             include_discord_id: bool = False,
     ) -> "RegisteredDiscordMember":
+        from src.utils.db_utils import get_discord_id_from_uuid, get_uuid_from_username
         ign, resolved_uuid = await get_uuid_from_username(username)
         discord_id = None
 
@@ -93,6 +93,7 @@ class RegisteredDiscordMember:
 
     @classmethod
     async def from_discord_id(cls, discord_id: int) -> "RegisteredDiscordMember":
+        from src.utils.db_utils import get_username_from_uuid, get_uuid_from_discord_id
         resolved_uuid = await get_uuid_from_discord_id(discord_id)
         ign, resolved_uuid = await get_username_from_uuid(resolved_uuid)
         return cls(ign=ign, uuid=resolved_uuid, discord_id=discord_id)
