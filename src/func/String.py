@@ -14,7 +14,8 @@ from src.utils.consts import (PREFIX, DNKL_CHANNEL_ID, DNKL_REQ, GUILDLESS_EMBED
                               NEG_COLOR, NEUTRAL_COLOR, POS_COLOR,
                               TICKET_CATEGORIES, UNKNOWN_IGN_EMBED, GUILD_HANDLE,
                               MISSING_PERMS_EMBED, NON_STAFF_RANKS)
-from src.utils.db_utils import (delete_dnkl, select_one, get_db_uuid_username,
+from src.utils.data_classes import RegisteredDiscordMember
+from src.utils.db_utils import (delete_dnkl, select_one,
                                 get_member_gexp_history, insert_elite_member, get_elite_member)
 from src.utils.referral_utils import get_invitation_stats
 from src.utils.request_utils import (get_player_guild, get_name_by_uuid, get_uuid_by_name)
@@ -338,17 +339,19 @@ class String:
 
     async def elite_member(self, discord_member: discord.Member = None, monetary_value: int = None,
                            is_automatic: bool = False) -> discord.Embed:
+        member_lookup = RegisteredDiscordMember()
         if discord_member:
-            name, uuid, _ = await get_db_uuid_username(discord_id=discord_member.id)
+            member = await member_lookup.from_discord_id(discord_id=discord_member.id)
         else:
             username = self.username
-            name, uuid = await get_uuid_by_name(username)
-        if not name:
+            member = await member_lookup.from_username(username=username)
+
+        if not member.ign:
             return UNKNOWN_IGN_EMBED
 
         reason = self.string or ""
 
-        (is_booster, is_sponsor, is_gvg, is_creator, is_indefinite, expiry) = await get_elite_member(uuid) or (
+        (is_booster, is_sponsor, is_gvg, is_creator, is_indefinite, expiry) = await get_elite_member(member.uuid) or (
             False, False, False, False, False, None)
         resident_days = 0
 
@@ -401,16 +404,16 @@ class String:
 
         is_indefinite = True if any([is_booster, is_creator, is_gvg]) else False
 
-        await insert_elite_member(uuid=uuid, is_booster=is_booster, is_sponsor=is_sponsor, is_creator=is_creator,
+        await insert_elite_member(uuid=member.uuid, is_booster=is_booster, is_sponsor=is_sponsor, is_creator=is_creator,
                                   is_gvg=is_gvg, is_indefinite=is_indefinite, expiry=expiry)
 
         if not any([is_sponsor, is_booster, is_creator, is_gvg]):
-            embed = discord.Embed(title=f"Elite Member Removed: {name}", color=NEUTRAL_COLOR)
-            embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
+            embed = discord.Embed(title=f"Elite Member Removed: {member.ign}", color=NEUTRAL_COLOR)
+            embed.set_thumbnail(url=f"https://minotar.net/helm/{member.uuid}/512.png")
             return embed
 
-        embed = discord.Embed(title=f"Elite Member: {name}", color=NEUTRAL_COLOR)
-        embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
+        embed = discord.Embed(title=f"Elite Member: {member.ign}", color=NEUTRAL_COLOR)
+        embed.set_thumbnail(url=f"https://minotar.net/helm/{member.uuid}/512.png")
         embed.add_field(name="Reason", value=reason, inline=False)
         embed.add_field(name="Indefinite", value=str(is_indefinite), inline=True)
         embed.add_field(name="Expiry", value=expiry if expiry else "None", inline=True)
