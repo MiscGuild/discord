@@ -3,6 +3,9 @@ from typing import List, Optional
 
 import discord
 
+from src.utils.db_utils import get_username_from_uuid, get_discord_id_from_uuid, get_uuid_from_username, \
+    get_uuid_from_discord_id
+
 
 @dataclass
 class WeeklyStats:
@@ -49,3 +52,47 @@ class IngameRank:
             "requirement": self.requirement,
             "is_staff": self.is_staff,
         }
+
+
+@dataclass
+class RegisteredDiscordMember:
+    ign: Optional[str] = None
+    uuid: Optional[str] = None
+    discord_id: Optional[int] = None
+
+    @classmethod
+    async def from_uuid(
+            cls,
+            uuid: str,
+            include_discord_id: bool = False,
+    ) -> "RegisteredDiscordMember":
+        if uuid == "0":
+            return cls()
+
+        ign, resolved_uuid = await get_username_from_uuid(uuid)
+        discord_id = None
+
+        if include_discord_id and resolved_uuid:
+            discord_id = await get_discord_id_from_uuid(resolved_uuid)
+
+        return cls(ign=ign, uuid=resolved_uuid, discord_id=discord_id)
+
+    @classmethod
+    async def from_username(
+            cls,
+            username: str,
+            include_discord_id: bool = False,
+    ) -> "RegisteredDiscordMember":
+        ign, resolved_uuid = await get_uuid_from_username(username)
+        discord_id = None
+
+        if include_discord_id and resolved_uuid:
+            discord_id = await get_discord_id_from_uuid(resolved_uuid)
+
+        return cls(ign=ign, uuid=resolved_uuid, discord_id=discord_id)
+
+    @classmethod
+    async def from_discord_id(cls, discord_id: int) -> "RegisteredDiscordMember":
+        resolved_uuid = await get_uuid_from_discord_id(discord_id)
+        ign, resolved_uuid = await get_username_from_uuid(resolved_uuid)
+        return cls(ign=ign, uuid=resolved_uuid, discord_id=discord_id)
