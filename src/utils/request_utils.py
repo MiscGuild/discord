@@ -154,15 +154,6 @@ async def get_hypixel_player(name: str = None, uuid: str = None) -> dict | None:
     return resp["player"]
 
 
-# def session_get_name_by_uuid(session: requests.Session, uuid: str) -> str | None:
-#     with session.get(f"https://sessionserver.mojang.com/session/minecraft/profile/{uuid}") as resp:
-#         data = resp.json()
-#
-#         if resp.status_code != 200:
-#             return None
-#         return data["name"]
-
-
 async def get_player_guild(uuid: str) -> dict | None:
     api_key = await get_hyapi_key()
     resp = await get_json_response(f"https://api.hypixel.net/guild?key={api_key}&player={uuid}")
