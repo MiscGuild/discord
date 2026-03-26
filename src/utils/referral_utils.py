@@ -7,8 +7,8 @@ from typing import List
 from src.utils.calculation_utils import get_player_gexp, get_gexp_sorted
 from src.utils.consts import GUILD_HANDLE, NON_STAFF_RANKS, RANK_UPGRADE_CHANNEL_ID, \
     RANK_UPGRADE_WINNER_MESSAGE
-from src.utils.data_classes import InvitationStats
-from src.utils.db_utils import select_one, insert_new_inviter, add_invitee, get_db_uuid_username, get_invites
+from src.utils.data_classes import InvitationStats, RegisteredDiscordMember
+from src.utils.db_utils import select_one, insert_new_inviter, add_invitee, get_invites
 from src.utils.request_utils import get_player_guild, get_guild_by_name, get_name_by_uuid, get_uuid_by_name
 
 
@@ -94,7 +94,10 @@ async def generate_rank_upgrade(weekly_invites: list) -> None:
     shuffle(weighted_entries)
     winner_uuid = choice(weighted_entries)
 
-    username, uuid, discord_id = await get_db_uuid_username(uuid=winner_uuid, get_discord_id=True)
+    member_lookup = RegisteredDiscordMember()
+    member = await member_lookup.from_uuid(uuid=winner_uuid)
+
+    username, uuid, discord_id = member.ign, member.uuid, member.discord_id
     if discord_id:
         winner = f"<@{discord_id}>"
     else:
