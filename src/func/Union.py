@@ -12,7 +12,8 @@ from src.utils.consts import (NON_STAFF_RANKS, ALLIES, DISCORD_NOT_LINKED_EMBED,
                               POS_COLOR, REGISTRATION_CHANNEL_ID,
                               STAFF_IMPERSONATION_EMBED, TICKET_CATEGORIES,
                               UNKNOWN_IGN_EMBED, JOIN_REQUEST_EMBED, GUILDLESS_EMBED)
-from src.utils.db_utils import update_member, insert_new_member, get_db_uuid_username, set_do_ping_db, \
+from src.utils.data_classes import RegisteredDiscordMember
+from src.utils.db_utils import update_member, insert_new_member, set_do_ping_db, \
     get_member_gexp_history, get_elite_member, get_do_ping
 from src.utils.discord_utils import (create_ticket, has_tag_perms,
                                      is_linked_discord)
@@ -84,18 +85,17 @@ class Union:
     async def sync(self, ctx: discord.ApplicationContext, name: str, tag: str = None,
                    is_fs=False) -> discord.Embed | str:
         await ctx.defer()
-        if is_fs and not name:
-            username, uuid, _ = await get_db_uuid_username(discord_id=self.user.id)
-            ign = await get_name_by_uuid(uuid, is_sync=True)
-            if username != ign:
-                await update_member(self.user.id, uuid, ign)
-        elif not name:
-            username, uuid, _ = await get_db_uuid_username(discord_id=self.user.id)
-            ign = await get_name_by_uuid(uuid, is_sync=True)
-            if username != ign:
-                await update_member(self.user.id, uuid, ign)
+
+        member_lookup = RegisteredDiscordMember()
+        if (is_fs and not name) or not name:
+            member = await member_lookup.from_discord_id(discord_id=self.user.id)
+            ign = await get_name_by_uuid(member.uuid, is_sync=True)
+            if member.ign != ign:
+                await update_member(self.user.id, member.uuid, ign)
         else:
-            ign, uuid = await get_uuid_by_name(name)
+            member = await member_lookup.from_username(username=name)
+
+        ign, uuid, discord_id = member.ign, member.uuid, member.discord_id
 
         # Invalid username
         if not ign:
@@ -199,15 +199,14 @@ class Union:
         if ign in bot.staff_names:
             return STAFF_IMPERSONATION_EMBED, None
 
-        username, uuid, check_already_registered = await get_db_uuid_username(uuid=uuid, get_discord_id=True)
+        member_lookup = RegisteredDiscordMember()
+        member = await member_lookup.from_uuid(uuid=uuid)
 
-        discord_account_already_linked = await get_db_uuid_username(discord_id=check_already_registered)
-        if not check_already_registered and not all(discord_account_already_linked):
+        if not all((member.ign, member.uuid, member.discord_id)):
             await insert_new_member(discord_id=self.user.id,
-                                    uuid=uuid,
-                                    username=ign)
-        # Fetch player & guild data
-        guild_data = await get_player_guild(uuid)
+                                    uuid=member.uuid,
+                                    username=member.ign)
+        guild_data = await get_player_guild(member.uuid)
 
         guild_name = "Guildless" if not guild_data else guild_data["name"]
 
@@ -216,8 +215,8 @@ class Union:
         embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
         embed.add_field(name=ign, value=f"Member of {guild_name}" if guild_name != "Guildless" else "Guildless")
 
-        if check_already_registered:
-            original_owner = check_already_registered
+        if member.discord_id:
+            original_owner = member.discord_id
             await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
             ticket = await create_ticket(ctx.author, f"ticket-{ign}",
                                          category_name=TICKET_CATEGORIES["registrees"])
@@ -237,9 +236,8 @@ class Union:
                                   "would like to transfer to this discord account, let staff know. "
                                   "They will use `/forcesync`.")
             await ticket.send(embed=embed)
-        elif any(discord_account_already_linked):
-            original_account_uuid = discord_account_already_linked[1]
-            original_username = discord_account_already_linked[0]
+        elif any((member.ign, member.uuid, member.discord_id)):
+            original_username = member.ign
             await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
             ticket = await create_ticket(ctx.author, f"ticket-{ign}",
                                          category_name=TICKET_CATEGORIES["registrees"])
@@ -363,15 +361,16 @@ class Union:
         return embed.set_image(url=self.user.avatar)
 
     async def whois(self) -> discord.Embed:
-        username, uuid, _ = await get_db_uuid_username(discord_id=self.user.id)
+        member_lookup = RegisteredDiscordMember()
+        member = await member_lookup.from_discord_id(discord_id=self.user.id)
         embed = discord.Embed(
-            title=username,
+            title=member.ign,
             description=f"Discord Username: {self.user.name}\n"
                         f"Discord Nick: {self.user.nick}",
             color=NEUTRAL_COLOR
         )
-        embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
-        embed.set_footer(text=f"UUID: {uuid}")
+        embed.set_thumbnail(url=f'https://minotar.net/helm/{member.uuid}/512.png')
+        embed.set_footer(text=f"UUID: {member.uuid}")
         return embed
 
     async def do_pings(self, setting: int) -> discord.Embed:
@@ -388,11 +387,13 @@ class Union:
         return embed
 
     async def me(self):
-        username, uuid, _ = await get_db_uuid_username(discord_id=self.user.id)
-        is_booster, is_sponsor, is_gvg, is_creator, is_indefinite, expiry = await get_elite_member(uuid) or (
+        member_lookup = RegisteredDiscordMember()
+        member = await member_lookup.from_discord_id(discord_id=self.user.id)
+
+        is_booster, is_sponsor, is_gvg, is_creator, is_indefinite, expiry = await get_elite_member(member.uuid) or (
             False, False, False, False, False, None)
-        historical_gexp_data = await get_member_gexp_history(uuid)
-        guild = await get_player_guild(uuid)
+        historical_gexp_data = await get_member_gexp_history(member.uuid)
+        guild = await get_player_guild(member.uuid)
 
         if not guild:
             return GUILDLESS_EMBED
@@ -403,7 +404,7 @@ class Union:
                 color=NEG_COLOR
             )
 
-        member = next((m for m in guild["members"] if m["uuid"] == uuid), None)
+        member = next((m for m in guild["members"] if m["uuid"] == member.uuid), None)
         weekly_gexp_history = member["expHistory"]
 
         guild_rank = member["rank"]
@@ -415,13 +416,13 @@ class Union:
             monthly_gexp = await get_monthly_gexp(historical_gexp_data)
             yearly_gexp = sum(historical_gexp_data.values())
 
-        invitation_stats = await get_invitation_stats(uuid)
+        invitation_stats = await get_invitation_stats(member.uuid)
 
         embed = discord.Embed(
-            title=username,
+            title=member.ign,
             description=f"**Discord Username:** {self.user.name}\n"
                         f"**Discord Nick:** {self.user.nick}\n"
-                        f"**Mentions:** {'✅' if (await get_do_ping(uuid))[1] else '❌'}\n",
+                        f"**Mentions:** {'✅' if (await get_do_ping(member.uuid))[1] else '❌'}\n",
             color=NEUTRAL_COLOR
         )
         if any([is_booster, is_sponsor, is_gvg, is_creator]):
@@ -452,5 +453,5 @@ class Union:
                               f"`✚` Total Valid: {format(invitation_stats.valid, ',d')}\n"
                               f"`✚` Total: {format(invitation_stats.total, ',d')}\n", inline=True)
 
-        embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
+        embed.set_thumbnail(url=f'https://minotar.net/helm/{member.uuid}/512.png')
         return embed
