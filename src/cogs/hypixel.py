@@ -5,7 +5,8 @@ from src.func.General import General
 from src.func.String import String
 from src.func.Union import Union
 from src.utils.calculation_utils import get_username_autocomplete
-from src.utils.db_utils import get_dnkl_list, get_db_uuid_username
+from src.utils.data_classes import RegisteredDiscordMember
+from src.utils.db_utils import get_dnkl_list
 
 
 async def get_dnkl_autocomplete(ctx: discord.AutocompleteContext):
@@ -98,8 +99,9 @@ class Hypixel(commands.Cog, name="hypixel"):
         if name and len(name) == 32:
             res = await String(uuid=name).dnklcheck()
         elif not name:
-            username, uuid, _ = await get_db_uuid_username(discord_id=ctx.author.id)
-            res = await String(uuid=uuid).dnklcheck()
+            member_lookup = RegisteredDiscordMember()
+            member = await member_lookup.from_discord_id(discord_id=ctx.author.id)
+            res = await String(uuid=member.uuid).dnklcheck()
         else:
             res = await String(string=name).dnklcheck()
 
