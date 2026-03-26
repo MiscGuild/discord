@@ -7,64 +7,75 @@ import aiosqlite
 async def connect_db():
     bot.db = await aiosqlite.connect("database.db")
 
-    await bot.db.execute("""CREATE TABLE IF NOT EXISTS users (
-        uuid TEXT PRIMARY KEY NOT NULL,
-        username TEXT NOT NULL);""")
+    await bot.db.execute("""CREATE TABLE IF NOT EXISTS users
+                            (
+                                uuid     TEXT PRIMARY KEY NOT NULL,
+                                username TEXT             NOT NULL
+                            );""")
 
     # Discord Member Table:
-    await bot.db.execute("""CREATE TABLE IF NOT EXISTS members (
-        discord_id integer PRIMARY KEY NOT NULL,
-        uuid text NOT NULL, 
-        username text,
-        do_pings integer DEFAULT 1,
-        FOREIGN KEY (uuid) REFERENCES users(uuid) ON DELETE CASCADE);""")
+    await bot.db.execute("""CREATE TABLE IF NOT EXISTS members
+                            (
+                                discord_id integer PRIMARY KEY NOT NULL,
+                                uuid       text                NOT NULL,
+                                username   text,
+                                do_pings   integer DEFAULT 1,
+                                FOREIGN KEY (uuid) REFERENCES users (uuid) ON DELETE CASCADE
+                            );""")
 
     # DNKL table:
-    await bot.db.execute("""CREATE TABLE IF NOT EXISTS dnkl (
-    message_id INTEGER PRIMARY KEY NOT NULL,
-    uuid TEXT NOT NULL,
-    FOREIGN KEY (uuid) REFERENCES users(uuid) ON DELETE CASCADE
-);""")
+    await bot.db.execute("""CREATE TABLE IF NOT EXISTS dnkl
+                            (
+                                message_id INTEGER PRIMARY KEY NOT NULL,
+                                uuid       TEXT                NOT NULL,
+                                FOREIGN KEY (uuid) REFERENCES users (uuid) ON DELETE CASCADE
+                            );""")
 
     # Giveaways table
-    await bot.db.execute("""CREATE TABLE IF NOT EXISTS giveaways (
-        message_id integer PRIMARY KEY NOT NULL,
-        channel_id integer NOT NULL,
-        prize text NOT NULL,
-        number_winners integer NOT NULL,
-        time_of_finish text NOT NULL,
-        required_gexp integer NOT NULL,
-        all_roles_required boolean NOT NULL,
-        required_roles text,
-        sponsors text NOT NULL,
-        is_active boolean NOT NULL)""")
+    await bot.db.execute("""CREATE TABLE IF NOT EXISTS giveaways
+                            (
+                                message_id         integer PRIMARY KEY NOT NULL,
+                                channel_id         integer             NOT NULL,
+                                prize              text                NOT NULL,
+                                number_winners     integer             NOT NULL,
+                                time_of_finish     text                NOT NULL,
+                                required_gexp      integer             NOT NULL,
+                                all_roles_required boolean             NOT NULL,
+                                required_roles     text,
+                                sponsors           text                NOT NULL,
+                                is_active          boolean             NOT NULL
+                            )""")
 
     # Invites table
-    await bot.db.execute("""CREATE TABLE IF NOT EXISTS invites(
-            inviter_uuid          text NOT NULL,
-            current_invitee_uuids text,
-            total_invites         integer,
-            total_valid_invites   integer,
-            foreign key (inviter_uuid) references users (uuid)
-        );""")
+    await bot.db.execute("""CREATE TABLE IF NOT EXISTS invites
+                            (
+                                inviter_uuid          text NOT NULL,
+                                current_invitee_uuids text,
+                                total_invites         integer,
+                                total_valid_invites   integer,
+                                foreign key (inviter_uuid) references users (uuid)
+                            );""")
 
     # Guild Members table
-    await bot.db.execute("""CREATE TABLE IF NOT EXISTS guild_member_data_temp (
-            uuid text NOT NULL,
-            gexp_history text,
-            foreign key (uuid) references users (uuid),
-            primary key (uuid)
-        );""")
+    await bot.db.execute("""CREATE TABLE IF NOT EXISTS guild_member_data_temp
+                            (
+                                uuid         text NOT NULL,
+                                gexp_history text,
+                                foreign key (uuid) references users (uuid),
+                                primary key (uuid)
+                            );""")
 
-    await bot.db.execute("""CREATE TABLE IF NOT EXISTS elite_members(
-        uuid text PRIMARY KEY ,
-        is_booster boolean NOT NULL DEFAULT 0,
-        is_sponsor boolean NOT NULL DEFAULT 0,
-        is_gvg boolean NOT NULL DEFAULT 0,
-        is_creator boolean NOT NULL DEFAULT 0,
-        is_indefinite boolean NOT NULL,
-        expiry text,
-        FOREIGN KEY (uuid) REFERENCES users(uuid) ON DELETE CASCADE)""")
+    await bot.db.execute("""CREATE TABLE IF NOT EXISTS elite_members
+                            (
+                                uuid          text PRIMARY KEY,
+                                is_booster    boolean NOT NULL DEFAULT 0,
+                                is_sponsor    boolean NOT NULL DEFAULT 0,
+                                is_gvg        boolean NOT NULL DEFAULT 0,
+                                is_creator    boolean NOT NULL DEFAULT 0,
+                                is_indefinite boolean NOT NULL,
+                                expiry        text,
+                                FOREIGN KEY (uuid) REFERENCES users (uuid) ON DELETE CASCADE
+                            )""")
 
     # Commit any changes
     await bot.db.commit()
