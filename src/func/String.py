@@ -191,45 +191,6 @@ class String:
                 )
             return embed.set_image(url=chart.get_url())
 
-    # async def info(self) -> discord.Embed:
-    #     if self.uuid and self.username:
-    #         uuid = self.uuid
-    #     else:
-    #         name, uuid = await get_uuid_by_name(self.string)
-    #         if not name:
-    #             return UNKNOWN_IGN_EMBED
-    #     player_data = await get_hypixel_player(name=uuid)
-    #     # Player doesn't exist
-    #     if not player_data:
-    #         return UNKNOWN_IGN_EMBED
-    #
-    #     # Gather info
-    #     ign = player_data["displayname"]
-    #     uuid = player_data["uuid"]
-    #     _, rank = await get_hypixel_player_rank(player_data)
-    #     nwl = await calculate_network_level(player_data["networkExp"])
-    #     karma = f"{int(player_data['karma']):,d}"
-    #     achievement_points = "-" if "achievementPoints" not in player_data else f"{int(player_data['achievementPoints']):,d}"
-    #     completed_challenges = "0" if "general_challenger" not in player_data[
-    #         "achievements"] else f"{int(player_data['achievements']['general_challenger']):,d}"
-    #     completed_quests = "-" if "quests" not in player_data else f"{len(player_data['quests']):,d}"
-    #     first_login = datetime.fromtimestamp(int(str(player_data["firstLogin"])[:-3]))
-    #     last_login = "Unknown" if "lastLogin" not in player_data else datetime.fromtimestamp(
-    #         int(str(player_data["lastLogin"])[:-3]))
-    #     guild = await get_player_guild(uuid)
-    #     gtag = "" if not guild or "tag" not in guild else f"[{guild['tag']}]"
-    #
-    #     embed = discord.Embed(title=f"{rank} {ign} {gtag}", url=f'https://plancke.io/hypixel/player/stats/{ign}',
-    #                           color=0x8368ff)
-    #     embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
-    #     embed.add_field(name="Network Level:", value=f"`{nwl}`", inline=True)
-    #     embed.add_field(name="Karma:", value=f"`{karma}`", inline=True)
-    #     embed.add_field(name="Achievement Points:", value=f"`{achievement_points}`", inline=False)
-    #     embed.add_field(name="Challenges Finished:", value=f"`{completed_challenges}`", inline=True)
-    #     embed.add_field(name="Quests Completed:", value=f"`{completed_quests}`", inline=True)
-    #     embed.add_field(name="First • Last login", value=f"`{first_login} • {last_login}`", inline=False)
-    #     return embed.set_image(url=f"https://gen.plancke.io/exp/{ign}.png")
-
     async def dnkladd(self, ctx: discord.ApplicationContext) -> discord.Embed | None:
         if self.uuid:
             ign = await get_name_by_uuid(self.uuid)
