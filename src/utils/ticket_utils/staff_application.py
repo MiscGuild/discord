@@ -12,7 +12,7 @@ async def staff_application(ticket: discord.TextChannel, interaction: discord.In
     await ticket.edit(name=f"staff-application-{ign}", topic=f"{interaction.user.id if interaction else user.id}|",
                       category=discord.utils.get((interaction.guild if interaction else ticket.guild).categories,
                                                  name=TICKET_CATEGORIES["generic"]))
-    await ticket.send("**Staff Applications are currently CLOSED!**")
+    await ticket.send("# Staff Applications are currently CLOSED!")
     return
     await ticket.send(embed=discord.Embed(title=f"{ign} wishes to apply for staff!",
                                           description="Please respond to the bot's prompts appropriately!",
