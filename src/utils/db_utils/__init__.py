@@ -8,7 +8,7 @@ from .guild_member_data import get_all_guild_members, remove_guild_member, get_m
     set_member_gexp_history
 from .invites import insert_new_inviter, add_invitee, get_invites
 from .members import insert_new_member, update_member, get_do_ping, set_do_ping_db, get_uuid_from_discord_id, \
-    get_discord_id_from_uuid, get_db_uuid_username
+    get_discord_id_from_uuid
 from .users import check_and_update_username, get_username_from_uuid, get_uuid_from_username, get_all_usernames
 
 __all__ = [
@@ -20,5 +20,5 @@ __all__ = [
     "insert_new_giveaway", "get_giveaway_status", "set_giveaway_inactive",
     "insert_new_inviter", "add_invitee", "get_invites",
     "get_all_guild_members", "remove_guild_member", "get_member_gexp_history", "set_member_gexp_history",
-    "get_all_elite_members", "get_elite_member", "insert_elite_member", "delete_elite_member", "get_db_uuid_username"
+    "get_all_elite_members", "get_elite_member", "insert_elite_member", "delete_elite_member"
 ]
