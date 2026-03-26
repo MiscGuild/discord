@@ -20,8 +20,9 @@ from src.utils.consts import (ACCEPTED_STAFF_APPLICATION_EMBED,
                               STAFF_APPLICATION_QUESTIONS, TICKET_CATEGORIES,
                               DNKL_ENTRIES_NOT_FOUND,
                               POSITIVE_RESPONSES, ALLIES, MILESTONE_CATEGORIES, NON_STAFF_RANKS)
+from src.utils.data_classes import RegisteredDiscordMember
 from src.utils.db_utils import insert_new_giveaway, select_all, \
-    get_db_uuid_username, update_member, get_all_elite_members, delete_elite_member, get_dnkl_list
+    update_member, get_all_elite_members, delete_elite_member, get_dnkl_list
 from src.utils.discord_utils import (create_ticket,
                                      get_ticket_creator, log_event,
                                      name_grabber, has_tag_perms)
@@ -92,7 +93,9 @@ class General:
             for uuid in ally_uuids:
                 if uuid not in discord_member_uuids:
                     continue
-                allies_dict[uuid] = {"username": (await get_db_uuid_username(uuid=uuid))[0], "tag": gtag}
+                member_lookup = RegisteredDiscordMember()
+                member = await member_lookup.from_uuid(uuid=uuid)
+                allies_dict[uuid] = {"username": member.ign, "tag": gtag}
         await progress_message.edit(content=f"Fetching {GUILD_HANDLE}'s UUIDs and usernames")
 
         for uuid in guild_uuids:
@@ -100,7 +103,9 @@ class General:
                 continue
             for player in guild_members:
                 if player["uuid"] == uuid:
-                    guild[uuid] = {"username": (await get_db_uuid_username(uuid=uuid))[0],
+                    member_lookup = RegisteredDiscordMember()
+                    member = await member_lookup.from_uuid(uuid=uuid)
+                    guild[uuid] = {"username": member.ign,
                                    "gexp": sum(player["expHistory"].values())}
 
         await ctx.send("If you see the bot is stuck on a member along with an error message, "
@@ -112,7 +117,9 @@ class General:
                 continue
 
             nick = await name_grabber(discord_member)
-            username, uuid, _ = await get_db_uuid_username(discord_id=discord_member.id)
+            member_lookup = RegisteredDiscordMember()
+            member = await member_lookup.from_discord_id(discord_id=discord_member.id)
+            uuid, username = member.uuid, member.ign
             if not uuid and username:
                 username, uuid = await get_uuid_by_name(username)
                 if username and uuid:

@@ -9,7 +9,8 @@ from src.utils.calculation_utils import get_qotd_day_number
 from src.utils.consts import (CONFIG, LOG_CHANNEL_ID, NEUTRAL_COLOR, TICKET_CATEGORIES,
                               GUEST_TICKET_REASONS, MEMBER_TICKET_REASONS, GENERAL_TICKET_REASONS, GUILD_HANDLE,
                               QOTD_THREAD_ID, GEOGUESSR_THREAD_ID, SPOILERS_AHEAD, INGAME_RANKS)
-from src.utils.db_utils import connect_db, get_db_uuid_username
+from src.utils.data_classes import RegisteredDiscordMember
+from src.utils.db_utils import connect_db
 from src.utils.request_utils import get_uuid_by_name
 from src.utils.ticket_utils import *
 from src.utils.ticket_utils.tickets import name_grabber
@@ -175,13 +176,16 @@ async def has_tag_perms(member: discord.Member) -> bool:
 
 
 async def update_recruiter_role(uuid: str, invites: int) -> None:
-    _, _, user_id = await get_db_uuid_username(uuid=uuid, get_discord_id=True)
-    if not user_id:
+    member_lookup = RegisteredDiscordMember()
+    member = await member_lookup.from_uuid(uuid)
+
+    discord_id = member.discord_id
+    if not discord_id:
         return
     member_ids = [x.id for x in bot.guild.members]
-    if user_id not in member_ids:
+    if discord_id not in member_ids:
         return
-    user = bot.guild.get_member(user_id)
+    user = bot.guild.get_member(discord_id)
     if invites > 5:
         await user.add_roles(bot.recruiter)
     else:

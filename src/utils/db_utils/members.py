@@ -2,7 +2,7 @@ from __main__ import bot
 from typing import Tuple
 
 from .connection import select_one
-from .users import check_and_update_username, get_username_from_uuid, get_uuid_from_username
+from .users import check_and_update_username
 
 
 async def get_uuid_from_discord_id(discord_id: int) -> str | None:
@@ -12,6 +12,7 @@ async def get_uuid_from_discord_id(discord_id: int) -> str | None:
         if uuid == "0":
             return None
         return uuid
+    return None
 
 
 async def get_discord_id_from_uuid(uuid: str) -> int | None:
@@ -51,46 +52,6 @@ async def get_do_ping(uuid: str) -> Tuple[int, bool]:
     return (res[0], res[1]) if res else (0, 0)
 
 
-async def set_do_ping_db(discord_id: int, do_pings: int) -> str | None:
+async def set_do_ping_db(discord_id: int, do_pings: int) -> None:
     await bot.db.execute("UPDATE members set do_pings = ? WHERE discord_id = ?", (do_pings, discord_id))
     await bot.db.commit()
-
-    return (await get_db_uuid_username(discord_id=discord_id))[0]
-
-
-async def get_db_uuid_username(discord_id: int = None, username: str = None, uuid: str = None,
-                               get_discord_id: bool = False) -> (tuple[None, None] | tuple[None, str] |
-                                                                 tuple[None, str, int | None] |
-                                                                 tuple[None, None, int] |
-                                                                 tuple[tuple[str, str] |
-                                                                       tuple[None, str] |
-                                                                       tuple[None, None], int] |
-                                                                 tuple[str, None]):
-    if uuid and uuid == "0":
-        return None, None
-    if uuid:
-        username, uuid = await get_username_from_uuid(uuid)
-        if not username and not get_discord_id:
-            return None, uuid
-
-        if get_discord_id:
-            discord_id = await get_discord_id_from_uuid(uuid)
-            if not username:
-                return None, uuid, discord_id
-
-            return username, uuid, discord_id
-
-        return username, uuid
-    if discord_id:
-        uuid = await get_uuid_from_discord_id(discord_id)
-        return *(await get_username_from_uuid(uuid)), discord_id
-    if username:
-        username, uuid = await get_uuid_from_username(username)
-        if not uuid:
-            return username, None
-        if get_discord_id:
-            discord_id = await get_discord_id_from_uuid(uuid)
-            return username, uuid, discord_id
-        return username, uuid
-
-    return None, None

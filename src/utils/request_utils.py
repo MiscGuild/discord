@@ -10,7 +10,8 @@ import aiohttp
 import discord
 
 from src.utils.consts import ERROR_CHANNEL_ID, API_KEYS
-from src.utils.db_utils import get_db_uuid_username, check_and_update_username
+from src.utils.data_classes import RegisteredDiscordMember
+from src.utils.db_utils import check_and_update_username
 
 
 def async_retry(max_attempts: int = 5, delay: float = 0.5):
@@ -41,7 +42,9 @@ async def get_hyapi_key() -> str:
 
 
 async def update_usernames(uuid: str, username: str) -> None:
-    db_username, uuid = await get_db_uuid_username(uuid=uuid)
+    member_lookup = RegisteredDiscordMember()
+    member = await member_lookup.from_uuid(uuid=uuid)
+    db_username, uuid = member.ign, member.uuid
     if db_username is None:
         return
     elif db_username != username:
@@ -118,7 +121,9 @@ async def get_mojang_profile_from_uuid(uuid: str) -> Tuple[str, str] | Tuple[Non
 
 async def get_name_by_uuid(uuid: str, is_sync: bool = False) -> str | None:
     if not is_sync:
-        username, uuid = await get_db_uuid_username(uuid=uuid)
+        member_lookup = RegisteredDiscordMember()
+        member = await member_lookup.from_uuid(uuid=uuid)
+        username, uuid = member.ign, member.uuid
         if username:
             return username
 
@@ -154,24 +159,13 @@ async def get_hypixel_player(name: str = None, uuid: str = None) -> dict | None:
     return resp["player"]
 
 
-# def session_get_name_by_uuid(session: requests.Session, uuid: str) -> str | None:
-#     with session.get(f"https://sessionserver.mojang.com/session/minecraft/profile/{uuid}") as resp:
-#         data = resp.json()
-#
-#         if resp.status_code != 200:
-#             return None
-#         return data["name"]
-
-
 async def get_player_guild(uuid: str) -> dict | None:
     api_key = await get_hyapi_key()
     resp = await get_json_response(f"https://api.hypixel.net/guild?key={api_key}&player={uuid}")
 
-    # Player is not in a guild
     if not resp or "guild" not in resp or not resp["guild"]:
         return None
 
-    # Player is in a guild
     return resp["guild"]
 
 

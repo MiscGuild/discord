@@ -14,7 +14,8 @@ from src.utils.consts import (PREFIX, DNKL_CHANNEL_ID, DNKL_REQ, GUILDLESS_EMBED
                               NEG_COLOR, NEUTRAL_COLOR, POS_COLOR,
                               TICKET_CATEGORIES, UNKNOWN_IGN_EMBED, GUILD_HANDLE,
                               MISSING_PERMS_EMBED, NON_STAFF_RANKS)
-from src.utils.db_utils import (delete_dnkl, select_one, get_db_uuid_username,
+from src.utils.data_classes import RegisteredDiscordMember
+from src.utils.db_utils import (delete_dnkl, select_one,
                                 get_member_gexp_history, insert_elite_member, get_elite_member)
 from src.utils.referral_utils import get_invitation_stats
 from src.utils.request_utils import (get_player_guild, get_name_by_uuid, get_uuid_by_name)
@@ -191,45 +192,6 @@ class String:
                 )
             return embed.set_image(url=chart.get_url())
 
-    # async def info(self) -> discord.Embed:
-    #     if self.uuid and self.username:
-    #         uuid = self.uuid
-    #     else:
-    #         name, uuid = await get_uuid_by_name(self.string)
-    #         if not name:
-    #             return UNKNOWN_IGN_EMBED
-    #     player_data = await get_hypixel_player(name=uuid)
-    #     # Player doesn't exist
-    #     if not player_data:
-    #         return UNKNOWN_IGN_EMBED
-    #
-    #     # Gather info
-    #     ign = player_data["displayname"]
-    #     uuid = player_data["uuid"]
-    #     _, rank = await get_hypixel_player_rank(player_data)
-    #     nwl = await calculate_network_level(player_data["networkExp"])
-    #     karma = f"{int(player_data['karma']):,d}"
-    #     achievement_points = "-" if "achievementPoints" not in player_data else f"{int(player_data['achievementPoints']):,d}"
-    #     completed_challenges = "0" if "general_challenger" not in player_data[
-    #         "achievements"] else f"{int(player_data['achievements']['general_challenger']):,d}"
-    #     completed_quests = "-" if "quests" not in player_data else f"{len(player_data['quests']):,d}"
-    #     first_login = datetime.fromtimestamp(int(str(player_data["firstLogin"])[:-3]))
-    #     last_login = "Unknown" if "lastLogin" not in player_data else datetime.fromtimestamp(
-    #         int(str(player_data["lastLogin"])[:-3]))
-    #     guild = await get_player_guild(uuid)
-    #     gtag = "" if not guild or "tag" not in guild else f"[{guild['tag']}]"
-    #
-    #     embed = discord.Embed(title=f"{rank} {ign} {gtag}", url=f'https://plancke.io/hypixel/player/stats/{ign}',
-    #                           color=0x8368ff)
-    #     embed.set_thumbnail(url=f'https://minotar.net/helm/{uuid}/512.png')
-    #     embed.add_field(name="Network Level:", value=f"`{nwl}`", inline=True)
-    #     embed.add_field(name="Karma:", value=f"`{karma}`", inline=True)
-    #     embed.add_field(name="Achievement Points:", value=f"`{achievement_points}`", inline=False)
-    #     embed.add_field(name="Challenges Finished:", value=f"`{completed_challenges}`", inline=True)
-    #     embed.add_field(name="Quests Completed:", value=f"`{completed_quests}`", inline=True)
-    #     embed.add_field(name="First • Last login", value=f"`{first_login} • {last_login}`", inline=False)
-    #     return embed.set_image(url=f"https://gen.plancke.io/exp/{ign}.png")
-
     async def dnkladd(self, ctx: discord.ApplicationContext) -> discord.Embed | None:
         if self.uuid:
             ign = await get_name_by_uuid(self.uuid)
@@ -377,17 +339,19 @@ class String:
 
     async def elite_member(self, discord_member: discord.Member = None, monetary_value: int = None,
                            is_automatic: bool = False) -> discord.Embed:
+        member_lookup = RegisteredDiscordMember()
         if discord_member:
-            name, uuid, _ = await get_db_uuid_username(discord_id=discord_member.id)
+            member = await member_lookup.from_discord_id(discord_id=discord_member.id)
         else:
             username = self.username
-            name, uuid = await get_uuid_by_name(username)
-        if not name:
+            member = await member_lookup.from_username(username=username)
+
+        if not member.ign:
             return UNKNOWN_IGN_EMBED
 
         reason = self.string or ""
 
-        (is_booster, is_sponsor, is_gvg, is_creator, is_indefinite, expiry) = await get_elite_member(uuid) or (
+        (is_booster, is_sponsor, is_gvg, is_creator, is_indefinite, expiry) = await get_elite_member(member.uuid) or (
             False, False, False, False, False, None)
         resident_days = 0
 
@@ -440,16 +404,16 @@ class String:
 
         is_indefinite = True if any([is_booster, is_creator, is_gvg]) else False
 
-        await insert_elite_member(uuid=uuid, is_booster=is_booster, is_sponsor=is_sponsor, is_creator=is_creator,
+        await insert_elite_member(uuid=member.uuid, is_booster=is_booster, is_sponsor=is_sponsor, is_creator=is_creator,
                                   is_gvg=is_gvg, is_indefinite=is_indefinite, expiry=expiry)
 
         if not any([is_sponsor, is_booster, is_creator, is_gvg]):
-            embed = discord.Embed(title=f"Elite Member Removed: {name}", color=NEUTRAL_COLOR)
-            embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
+            embed = discord.Embed(title=f"Elite Member Removed: {member.ign}", color=NEUTRAL_COLOR)
+            embed.set_thumbnail(url=f"https://minotar.net/helm/{member.uuid}/512.png")
             return embed
 
-        embed = discord.Embed(title=f"Elite Member: {name}", color=NEUTRAL_COLOR)
-        embed.set_thumbnail(url=f"https://minotar.net/helm/{uuid}/512.png")
+        embed = discord.Embed(title=f"Elite Member: {member.ign}", color=NEUTRAL_COLOR)
+        embed.set_thumbnail(url=f"https://minotar.net/helm/{member.uuid}/512.png")
         embed.add_field(name="Reason", value=reason, inline=False)
         embed.add_field(name="Indefinite", value=str(is_indefinite), inline=True)
         embed.add_field(name="Expiry", value=expiry if expiry else "None", inline=True)

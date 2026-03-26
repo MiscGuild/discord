@@ -6,7 +6,7 @@ from src.func.Integer import Integer
 from src.func.String import String
 from src.utils.calculation_utils import check_if_mention, get_username_autocomplete
 from src.utils.consts import GVG_INFO_EMBED, REQUIREMENTS_EMBED, RESIDENT_EMBED
-from src.utils.db_utils import get_db_uuid_username
+from src.utils.data_classes import RegisteredDiscordMember
 
 
 class Guild(commands.Cog, name="guild"):
@@ -22,12 +22,14 @@ class Guild(commands.Cog, name="guild"):
     async def g(self, ctx: bridge.BridgeContext, name: str | discord.Member = None) -> None:
         """Invoke guild related commands!"""
         member_id = await check_if_mention(name)
+
+        member_lookup = RegisteredDiscordMember()
         if not name and not member_id:
-            username, uuid, _ = await get_db_uuid_username(discord_id=ctx.author.id)
-            res = await String(uuid=uuid, username=username).gmember(ctx)
+            member = await member_lookup.from_discord_id(discord_id=ctx.author.id)
+            res = await String(uuid=member.uuid, username=member.ign).gmember(ctx)
         elif member_id:
-            username, uuid, _ = await get_db_uuid_username(discord_id=member_id)
-            res = await String(uuid=uuid, username=username).gmember(ctx)
+            member = await member_lookup.from_discord_id(discord_id=member_id)
+            res = await String(uuid=member.uuid, username=member.ign).gmember(ctx)
         else:
             res = await String(string=name).gmember(ctx)
         if isinstance(res, discord.Embed):
@@ -52,19 +54,23 @@ class Guild(commands.Cog, name="guild"):
                       discord_member: discord.Member = None) -> None:
         """View the given user's guild experience over the past week!"""
         uuid = None
+
+        member_lookup = RegisteredDiscordMember()
         if name and len(name) == 32:
             uuid = name
+            name = None
+
         if not name and not discord_member:
-            username, uuid, _ = await get_db_uuid_username(discord_id=ctx.author.id)
-            res = await String(uuid=uuid, username=username).gmember(ctx)
+            member = await member_lookup.from_discord_id(discord_id=ctx.author.id)
+            res = await String(uuid=member.uuid, username=member.ign).gmember(ctx)
         elif discord_member:
-            username, uuid, _ = await get_db_uuid_username(discord_id=discord_member.id)
-            res = await String(uuid=uuid, username=username).gmember(ctx)
-        else:
-            if uuid:
-                res = await String(uuid=uuid).gmember(ctx)
-            else:
-                res = await String(string=name).gmember(ctx)
+            member = await member_lookup.from_discord_id(discord_id=discord_member.id)
+            res = await String(uuid=member.uuid, username=member.ign).gmember(ctx)
+        elif uuid:
+            res = await String(uuid=uuid).gmember(ctx)
+        elif name:
+            res = await String(string=name).gmember(ctx)
+
         if isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
         elif isinstance(res, str):
@@ -134,14 +140,16 @@ class Guild(commands.Cog, name="guild"):
         await ctx.defer()
 
         uuid = None
+        member_lookup = RegisteredDiscordMember()
+
         if name and len(name) == 32:
             uuid = name
         if not name and not discord_member:
-            username, uuid, _ = await get_db_uuid_username(discord_id=ctx.author.id)
-            res = await String(uuid=uuid, username=username).invites()
+            member = await member_lookup.from_discord_id(discord_id=ctx.author.id)
+            res = await String(uuid=member.uuid, username=member.ign).invites()
         elif discord_member:
-            username, uuid, _ = await get_db_uuid_username(discord_id=discord_member.id)
-            res = await String(uuid=uuid, username=username).invites()
+            member = await member_lookup.from_discord_id(discord_id=discord_member.id)
+            res = await String(uuid=member.uuid, username=member.ign).invites()
         else:
             if uuid:
                 res = await String(uuid=uuid).invites()
