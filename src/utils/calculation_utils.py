@@ -12,7 +12,8 @@ from discord.ext import commands
 from src.utils.consts import NON_STAFF_RANKS, NOT_OWNER_EMBED, \
     MISSING_ROLES_EMBED, MISSING_PERMS_EMBED, MEMBER_NOT_FOUND_EMBED, BOT_MISSING_PERMS_EMBED, ERR_404_EMBED, \
     ERROR_REPLY_EXCEPTIONS
-from src.utils.db_utils import get_do_ping, get_db_uuid_username, get_all_usernames
+from src.utils.data_classes import RegisteredDiscordMember
+from src.utils.db_utils import get_do_ping, get_all_usernames
 from src.utils.request_utils import get_player_guild, get_name_by_uuid
 
 
@@ -59,75 +60,12 @@ async def get_color_by_gexp(rank: str, weekly_gexp: int) -> Tuple[int, str, str]
     return 0xff6464, "rgba(255, 100, 100,0.3)", "rgba(255, 100, 100,0.3)"
 
 
-# async def get_hypixel_player_rank(player_data: dict) -> Tuple[str, str] | Tuple[None, None] | Tuple[ChatColor, str]:
-#     if not player_data:
-#         return None, None
-#
-#     if "prefix" in player_data and player_data["prefix"] in ["§d[PIG§b+++§d]", "§c[SLOTH]", "§c[OWNER]"]:
-#         return player_data["prefix"].replace("§", "&"), re.sub(r"(§.)", "", player_data["prefix"])
-#
-#     if "newPackageRank" in player_data:
-#         # Player is a YT/Admin
-#         if "rank" in player_data:
-#             if player_data["rank"] == "YOUTUBER":
-#                 return f"{ChatColor.RED}[{ChatColor.WHITE}YOUTUBE{ChatColor.RED}]", "[YOUTUBE]"
-#             elif player_data["rank"] == "ADMIN":
-#                 return f"{ChatColor.RED}[ADMIN]", "[ADMIN]"
-#
-#         rank = player_data["newPackageRank"]
-#
-#         # VIP - MVP+
-#         if rank == "VIP":
-#             return f"{ChatColor.GREEN}[VIP]", "[VIP]"
-#         elif rank == "VIP_PLUS":
-#             return f"{ChatColor.GREEN}[VIP{ChatColor.GOLD}+{ChatColor.GREEN}]", "[VIP+]"
-#         elif rank == "MVP":
-#             return f"{ChatColor.LIGHT_BLUE}[MVP]", "[MVP]"
-#         elif rank == "MVP_PLUS":
-#             if "monthlyPackageRank" in player_data:
-#                 # Had MVP++ but now is an MVP+
-#                 if player_data["monthlyPackageRank"] == "NONE":
-#                     # Custom + color
-#                     if "rankPlusColor" in player_data:
-#                         pluscolor = ChatColor[player_data["rankPlusColor"]].value
-#                         return f"{ChatColor.LIGHT_BLUE}[MVP{pluscolor}+{ChatColor.LIGHT_BLUE}]", "[MVP+]"
-#                     # Default + color
-#                     return f"{ChatColor.LIGHT_BLUE}[MVP{ChatColor.RED}+{ChatColor.LIGHT_BLUE}]", "[MVP+]"
-#
-#                 # Player is MVP++
-#                 # Gold/Aqua MVP++
-#                 if "rankPlusColor" not in player_data:
-#                     return f"{ChatColor.GOLD}[MVP{ChatColor.RED}++{ChatColor.GOLD}]" if "monthlyRankColor" not in player_data or player_data[
-#                         "monthlyRankColor"] == "GOLD" else f"{ChatColor.LIGHT_BLUE}[MVP{ChatColor.RED}++{ChatColor.LIGHT_BLUE}]", "[MVP++]"
-#
-#                 # MVP++ with custom + color
-#                 pluscolor = ChatColor[player_data["rankPlusColor"]].value
-#                 return f"{ChatColor.GOLD}[MVP{pluscolor}++{ChatColor.GOLD}]" if "monthlyRankColor" not in player_data or player_data[
-#                     "monthlyRankColor"] == "GOLD" else f"{ChatColor.LIGHT_BLUE}[MVP{pluscolor}++{ChatColor.LIGHT_BLUE}]", "[MVP++]"
-#
-#             # Player is MVP+
-#             # Custom + color
-#             if "rankPlusColor" in player_data:
-#                 pluscolor = ChatColor[player_data["rankPlusColor"]].value
-#                 return f"{ChatColor.LIGHT_BLUE}[MVP{pluscolor}+{ChatColor.LIGHT_BLUE}]", "[MVP+]"
-#             # Default + color
-#             return f"{ChatColor.LIGHT_BLUE}[MVP{ChatColor.RED}+{ChatColor.LIGHT_BLUE}]", "[MVP+]"
-#
-#     return ChatColor.WHITE, ""
-
-#
-# async def calculate_network_level(total_exp: int) -> float:
-#     return round((math.sqrt((2 * total_exp) + 30625) / 50) - 2.5, 2)
-
-
 async def get_gexp_sorted(guild_data: dict) -> List[Tuple[str, int]]:
     member_gexp = {}
 
-    # Loop through all guild members' gexp, adding it to dict
     for member in guild_data["members"]:
         member_gexp[member["uuid"]] = sum(
             member["expHistory"].values())
-    # Sort member gexp
     member_gexp = sorted(member_gexp.items(), key=lambda item: item[1], reverse=True)
 
     return member_gexp
@@ -140,7 +78,11 @@ async def generate_lb_text(member_gexp: list, text: str, is_automatic) -> str:
         count += 1
 
         discord_id, do_pings = await get_do_ping(uuid)
-        username, uuid = await get_db_uuid_username(uuid=uuid)
+        member_lookup = RegisteredDiscordMember()
+        member = await member_lookup.from_uuid(uuid=uuid)
+
+        username = member.ign
+
         if discord_id and is_automatic and do_pings:
             name = f"<@{discord_id}>"
         else:
