@@ -1,8 +1,8 @@
 from __main__ import bot
 
 from .connection import select_all
-from .members import get_db_uuid_username
 from .users import check_and_update_username
+from ..data_classes import RegisteredDiscordMember
 
 
 async def insert_new_dnkl(message_id: int, uuid: str, username: str) -> None:
@@ -28,6 +28,7 @@ async def get_dnkl_list() -> list:
         return []
     players = []
     for row in rows:
-        username, uuid = await get_db_uuid_username(uuid=row[1])
-        players.append((username, uuid))
+        member_lookup = RegisteredDiscordMember()
+        member = await member_lookup.from_uuid(row[1])
+        players.append((member.ign, member.uuid))
     return players
