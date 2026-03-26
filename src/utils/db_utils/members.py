@@ -2,7 +2,7 @@ from __main__ import bot
 from typing import Tuple
 
 from .connection import select_one
-from .users import check_and_update_username, get_username_from_uuid, get_uuid_from_username
+from .users import check_and_update_username
 
 
 async def get_uuid_from_discord_id(discord_id: int) -> str | None:
@@ -12,6 +12,7 @@ async def get_uuid_from_discord_id(discord_id: int) -> str | None:
         if uuid == "0":
             return None
         return uuid
+    return None
 
 
 async def get_discord_id_from_uuid(uuid: str) -> int | None:
