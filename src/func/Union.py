@@ -90,6 +90,8 @@ class Union:
         if (is_fs and not name) or not name:
             member = await member_lookup.from_discord_id(discord_id=self.user.id)
             ign, uuid = await get_name_by_uuid(member.uuid, is_sync=True)
+            if not ign:
+                return UNKNOWN_IGN_EMBED
             if member.ign != ign:
                 await update_member(self.user.id, uuid, ign)
         else:
@@ -115,7 +117,6 @@ class Union:
             embed = DISCORD_NOT_LINKED_EMBED.copy()
             return embed.add_field(name="Do the above and then enter the following in chat:",
                                    value=f"`{str(self.user.name)}`")
-
         await update_member(discord_id=self.user.id,
                             uuid=uuid,
                             username=ign)
