@@ -67,8 +67,11 @@ class RegisteredDiscordMember:
             return cls()
 
         from src.utils.db_utils import get_username_from_uuid, get_discord_id_from_uuid
+        from src.utils.request_utils import get_mojang_profile_from_uuid
 
         ign, resolved_uuid = await get_username_from_uuid(uuid)
+        if not resolved_uuid:
+            ign, resolved_uuid = await get_mojang_profile_from_uuid(uuid)
         discord_id = None
 
         if include_discord_id and resolved_uuid:
@@ -83,7 +86,12 @@ class RegisteredDiscordMember:
             include_discord_id: bool = False,
     ) -> "RegisteredDiscordMember":
         from src.utils.db_utils import get_discord_id_from_uuid, get_uuid_from_username
+        from src.utils.request_utils import get_uuid_by_name
+
         ign, resolved_uuid = await get_uuid_from_username(username)
+        if not resolved_uuid:
+            ign, resolved_uuid = await get_uuid_by_name(username)
+
         discord_id = None
 
         if include_discord_id and resolved_uuid:
@@ -94,6 +102,11 @@ class RegisteredDiscordMember:
     @classmethod
     async def from_discord_id(cls, discord_id: int) -> "RegisteredDiscordMember":
         from src.utils.db_utils import get_username_from_uuid, get_uuid_from_discord_id
+        from src.utils.request_utils import get_mojang_profile_from_uuid
+
         resolved_uuid = await get_uuid_from_discord_id(discord_id)
-        ign, resolved_uuid = await get_username_from_uuid(resolved_uuid)
+        ign, _ = await get_username_from_uuid(resolved_uuid)
+        if not ign:
+            ign, resolved_uuid = await get_mojang_profile_from_uuid(resolved_uuid)
+
         return cls(ign=ign, uuid=resolved_uuid, discord_id=discord_id)
