@@ -89,9 +89,9 @@ class Union:
         member_lookup = RegisteredDiscordMember()
         if (is_fs and not name) or not name:
             member = await member_lookup.from_discord_id(discord_id=self.user.id)
-            ign = await get_name_by_uuid(member.uuid, is_sync=True)
+            ign, uuid = await get_name_by_uuid(member.uuid, is_sync=True)
             if member.ign != ign:
-                await update_member(self.user.id, member.uuid, ign)
+                await update_member(self.user.id, uuid, ign)
         else:
             member = await member_lookup.from_username(username=name)
 
