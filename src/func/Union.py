@@ -89,7 +89,7 @@ class Union:
         member_lookup = RegisteredDiscordMember()
         if (is_fs and not name) or not name:
             member = await member_lookup.from_discord_id(discord_id=self.user.id)
-            ign, uuid = await get_name_by_uuid(member.uuid, is_sync=True)
+            ign, uuid = await get_name_by_uuid(member.uuid, is_sync=True), member.uuid
             if not ign:
                 return UNKNOWN_IGN_EMBED
             if member.ign != ign:
@@ -197,14 +197,16 @@ class Union:
         if not member.ign:
             return UNKNOWN_IGN_EMBED, None
 
+        ign = member.ign
+
         # Filter out people impersonating staff
-        if member.ign in bot.staff_names:
+        if ign in bot.staff_names:
             return STAFF_IMPERSONATION_EMBED, None
 
         if not member.discord_id:
             await insert_new_member(discord_id=self.user.id,
                                     uuid=member.uuid,
-                                    username=member.ign)
+                                    username=ign)
         guild_data = await get_player_guild(member.uuid)
 
         guild_name = "Guildless" if not guild_data else guild_data["name"]
@@ -212,21 +214,22 @@ class Union:
         embed = discord.Embed(
             title="Registration successful!", color=NEUTRAL_COLOR)
         embed.set_thumbnail(url=f'https://minotar.net/helm/{member.uuid}/512.png')
-        embed.add_field(name=member.ign, value=f"Member of {guild_name}" if guild_name != "Guildless" else "Guildless")
+        embed.add_field(name=ign, value=f"Member of {guild_name}" if guild_name != "Guildless" else "Guildless")
 
-        if member.discord_id:
+        if member.discord_id and member.discord_id != self.user.id:
             original_owner = member.discord_id
+
             await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
-            ticket = await create_ticket(ctx.author, f"ticket-{member.ign}",
+            ticket = await create_ticket(ctx.author, f"ticket-{ign}",
                                          category_name=TICKET_CATEGORIES["registrees"])
             await ticket.purge(limit=1000)
-            await ticket.edit(name=f"duplicate-registration-{member.ign}", topic=f"{ctx.author.id}|",
+            await ticket.edit(name=f"duplicate-registration-{ign}", topic=f"{ctx.author.id}|",
                               category=discord.utils.get(ctx.guild.categories,
                                                          name=TICKET_CATEGORIES["registrees"]))
             guest_ticket = ticket
 
             embed = discord.Embed(title="Conflict during registration!",
-                                  description=f"The account associated with {member.ign} is currently registered to "
+                                  description=f"The account associated with {ign} is currently registered to "
                                               f"<@{original_owner}>\n" +
                                               f"Member of {guild_name}" if guild_name != "Guildless" else "Guildless",
                                   color=NEG_COLOR)
@@ -235,13 +238,13 @@ class Union:
                                   "would like to transfer to this discord account, let staff know. "
                                   "They will use `/forcesync`.")
             await ticket.send(embed=embed)
-        elif any((member.ign, member.uuid)):
-            original_username = member.ign
+        elif any((ign, member.uuid)):
+            original_username = ign
             await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
-            ticket = await create_ticket(ctx.author, f"ticket-{member.ign}",
+            ticket = await create_ticket(ctx.author, f"ticket-{ign}",
                                          category_name=TICKET_CATEGORIES["registrees"])
             await ticket.purge(limit=1000)
-            await ticket.edit(name=f"duplicate-registration-{member.ign}-{original_username}",
+            await ticket.edit(name=f"duplicate-registration-{ign}-{original_username}",
                               topic=f"{ctx.author.id}|",
                               category=discord.utils.get(ctx.guild.categories,
                                                          name=TICKET_CATEGORIES["registrees"]))
@@ -268,16 +271,16 @@ class Union:
             # Add guild tag as nick
             gtag = "" if "tag" not in guild_data else guild_data["tag"]
             if not ctx.author.nick or gtag not in ctx.author.nick:
-                ign = member.ign + " " + f"[{gtag}]"
+                ign = ign + " " + f"[{gtag}]"
             guest_ticket = None
 
         # User is a guest
         else:
             await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
-            ticket = await create_ticket(ctx.author, f"ticket-{member.ign}",
+            ticket = await create_ticket(ctx.author, f"ticket-{ign}",
                                          category_name=TICKET_CATEGORIES["registrees"])
             await ticket.purge(limit=1000)
-            await ticket.edit(name=f"join-request-{member.ign}", topic=f"{ctx.author.id}|",
+            await ticket.edit(name=f"join-request-{ign}", topic=f"{ctx.author.id}|",
                               category=discord.utils.get(ctx.guild.categories,
                                                          name=TICKET_CATEGORIES["registrees"]))
             guest_ticket = ticket
