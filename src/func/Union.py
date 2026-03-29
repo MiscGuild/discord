@@ -89,7 +89,7 @@ class Union:
         member_lookup = RegisteredDiscordMember()
         if (is_fs and not name) or not name:
             member = await member_lookup.from_discord_id(discord_id=self.user.id)
-            ign, uuid = await get_name_by_uuid(member.uuid, is_sync=True)
+            ign, uuid = await get_name_by_uuid(member.uuid, is_sync=True), member.uuid
             if not ign:
                 return UNKNOWN_IGN_EMBED
             if member.ign != ign:
