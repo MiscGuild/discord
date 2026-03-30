@@ -289,6 +289,9 @@ INVALID_GUILD_EMBED = discord.Embed(title="Invalid guild!",
 UNKNOWN_IGN_EMBED = discord.Embed(title="Please enter a valid Minecraft username!",
                                   color=ERROR_COLOR)
 
+UNKNOWN_GUILD_EMBED = discord.Embed(title="Please enter a valid Hypixel guild!",
+                                    color=ERROR_COLOR)
+
 DISCORD_NOT_LINKED_EMBED = discord.Embed(title="This account is not linked to your discord account!",
                                          description="Please follow the following steps to link your Hypixel profile with discord:\nGo to 'Your Profile' > Social Media > DISCORD",
                                          color=ERROR_COLOR)
