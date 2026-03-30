@@ -193,6 +193,7 @@ class Union:
 
         member_lookup = RegisteredDiscordMember()
         member = await member_lookup.from_username(username=name, include_discord_id=True)
+        registered_discord_member = await member_lookup.from_discord_id(discord_id=self.user.id)
 
         if not member.ign:
             return UNKNOWN_IGN_EMBED, None
@@ -203,10 +204,11 @@ class Union:
         if ign in bot.staff_names:
             return STAFF_IMPERSONATION_EMBED, None
 
-        if not member.discord_id:
+        if not member.discord_id and not registered_discord_member.discord_id:
             await insert_new_member(discord_id=self.user.id,
                                     uuid=member.uuid,
                                     username=ign)
+
         guild_data = await get_player_guild(member.uuid)
 
         guild_name = "Guildless" if not guild_data else guild_data["name"]
