@@ -423,7 +423,7 @@ class String:
             embed.add_field(name="Days Added", value=f"{resident_days}", inline=True)
         return embed
 
-    async def recruit(self) -> List[str] | discord.Embed:
+    async def recruit(self) -> List[str] | discord.Embed | None:
         guild = await get_guild_by_name(self.string)
 
         if not guild:
@@ -454,7 +454,8 @@ class String:
             join_date_string = str(datetime.fromtimestamp(int(str(join_date)[:-3])))[:10]
 
             recruitable_players.append((uuid, join_date_string, weekly_gexp, player_online_status))
-
+        if not recruitable_players:
+            return None
         online_players_header = (
             f"# {self.string.title()}\n\n"
             f"## Here's a list of all ONLINE players with more than "
