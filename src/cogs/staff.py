@@ -104,6 +104,36 @@ class Staff(commands.Cog, name="staff"):
         await ctx.send(content=messages[0])
         await ctx.send(content=messages[1], view=view)
 
+    @bridge.bridge_command()
+    @commands.has_permissions(kick_members=True)
+    @bridge.bridge_option(
+        name="guild_name",
+        description="The name of the guild",
+        required=True,
+        input_type=str
+    )
+    async def recruit(self, ctx: discord.ApplicationContext, *, guild_name: str) -> None:
+        """Get a list of recruitable players from the given guild"""
+        await ctx.defer()
+
+        res = await String(string=guild_name).recruit()
+
+        if isinstance(res, discord.Embed):
+            await ctx.respond(embed=res)
+
+        elif isinstance(res, str):
+            await ctx.respond(res)
+
+        elif isinstance(res, list):
+            if not res:
+                await ctx.respond("No recruitable players found.")
+                return
+
+            await ctx.respond(res[0])
+
+            for message in res[1:]:
+                await ctx.followup.send(message)
+
 
 def setup(bot):
     bot.add_cog(Staff(bot))

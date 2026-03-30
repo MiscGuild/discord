@@ -4,6 +4,7 @@ import inspect
 import os
 from __main__ import bot
 from datetime import datetime, timezone, timedelta
+from typing import List
 
 import discord
 from quickchart import QuickChart
@@ -13,12 +14,13 @@ from src.utils.calculation_utils import (get_color_by_gexp,
 from src.utils.consts import (PREFIX, DNKL_CHANNEL_ID, DNKL_REQ, GUILDLESS_EMBED,
                               NEG_COLOR, NEUTRAL_COLOR, POS_COLOR,
                               TICKET_CATEGORIES, UNKNOWN_IGN_EMBED, GUILD_HANDLE,
-                              MISSING_PERMS_EMBED, NON_STAFF_RANKS)
+                              MISSING_PERMS_EMBED, NON_STAFF_RANKS, UNKNOWN_GUILD_EMBED, ONLINE_STATUS_EMOJIS)
 from src.utils.data_classes import RegisteredDiscordMember
 from src.utils.db_utils import (delete_dnkl, select_one,
                                 get_member_gexp_history, insert_elite_member, get_elite_member)
 from src.utils.referral_utils import get_invitation_stats
-from src.utils.request_utils import (get_player_guild, get_name_by_uuid, get_uuid_by_name)
+from src.utils.request_utils import (get_player_guild, get_name_by_uuid, get_uuid_by_name, get_guild_by_name,
+                                     get_hypixel_online_status)
 from src.utils.ticket_utils.dnkl import dnkl_application
 
 
@@ -420,3 +422,70 @@ class String:
         if reason == "Event Sponsor":
             embed.add_field(name="Days Added", value=f"{resident_days}", inline=True)
         return embed
+
+    async def recruit(self) -> List[str] | discord.Embed:
+        guild = await get_guild_by_name(self.string)
+
+        if not guild:
+            return UNKNOWN_GUILD_EMBED
+
+        guild_players = guild["members"]
+
+        guild_players_dict = {}
+        for player in guild_players:
+            guild_players_dict[player["uuid"]] = (player["joined"], sum(player["expHistory"].values()))
+
+        recruitable_players = []
+        for uuid, values in guild_players_dict.items():
+            join_date, weekly_gexp = values
+            days_since_join = (
+                    datetime.now() - datetime.fromtimestamp(join_date / 1000.0)).days
+            days_since_join = days_since_join if days_since_join else 1
+            if days_since_join < 7 and weekly_gexp < (NON_STAFF_RANKS[0].requirement * 2) * days_since_join / 7:
+                continue
+            elif weekly_gexp < (NON_STAFF_RANKS[0].requirement * 2):
+                continue
+
+            if days_since_join < 7:
+                weekly_gexp = (weekly_gexp / days_since_join) * 7
+
+            player_online_status = await get_hypixel_online_status(uuid)
+
+            join_date_string = str(datetime.fromtimestamp(int(str(join_date)[:-3])))[:10]
+
+            recruitable_players.append((uuid, join_date_string, weekly_gexp, player_online_status))
+
+        online_players_header = (
+            f"# {self.string.title()}\n\n"
+            f"## Here's a list of all ONLINE players with more than "
+            f"{format(int(NON_STAFF_RANKS[0].requirement * 2), ',d')} weekly guild experience.\n"
+            f"-# Weekly guild experience is scaled to account for players who have recently joined.\n\n"
+            "```"
+            f"\n{'S':<3}  {'Player Name':<16}{'GEXP':>10}\t  {'Join Date'}\n"
+        )
+
+        messages = []
+        current_message = online_players_header
+
+        for uuid, join_date, gexp, online_status in recruitable_players[::-1]:
+            ign = await get_name_by_uuid(uuid)
+            status = ONLINE_STATUS_EMOJIS['online'] if online_status else ONLINE_STATUS_EMOJIS['offline']
+
+            # Optional: truncate long names so alignment stays clean
+            ign = ign[:16]
+
+            line = f"{status:<3} {ign:<16} {format(int(gexp), ',d'):>10}\t{join_date}\n"
+
+            # reserve 3 chars for closing ```
+            if len(current_message) + len(line) + 3 > 2000:
+                current_message += "```"
+                messages.append(current_message)
+                current_message = "```\n" + f"{'S':<3}  {'Player Name':<16}{'GEXP':>10}\t  {'Join Date'}\n" + line
+            else:
+                current_message += line
+
+        if current_message:
+            current_message += "```"
+            messages.append(current_message)
+
+        return messages

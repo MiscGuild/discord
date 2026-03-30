@@ -212,25 +212,10 @@ async def get_jpg_file(url: str) -> discord.File | None:
             await session.close()
     return discord.File(resp, "image.jpg")
 
-#
-# async def get_rank(uuid: str) -> str | None:
-#     player = await get_hypixel_player(uuid=uuid)
-#     if player is None:
-#         return None
-#     if "newPackageRank" in player:
-#         rank = (player["newPackageRank"])
-#         if rank == 'MVP_PLUS':
-#             if "monthlyPackageRank" in player:
-#                 mvp_plus_plus = (player["monthlyPackageRank"])
-#                 if mvp_plus_plus == "NONE":
-#                     return '[MVP+]'
-#                 return "[MVP++]"
-#             return "[MVP+]"
-#         if rank == 'MVP':
-#             return '[MVP]'
-#         if rank == 'VIP_PLUS':
-#             return 'VIP+'
-#         if rank == 'VIP':
-#             return '[VIP]'
-#
-#     return None
+
+async def get_hypixel_online_status(uuid: str) -> str | None:
+    api_key = await get_hyapi_key()
+    resp = await get_json_response(f"https://api.hypixel.net/v2/status?key={api_key}&uuid={uuid}")
+    if not resp:
+        return None
+    return resp["session"]["online"]
