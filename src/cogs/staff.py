@@ -118,17 +118,17 @@ class Staff(commands.Cog, name="staff"):
 
         res = await String(string=guild_name).recruit()
 
-        if isinstance(res, discord.Embed):
+        if not res:
+            await ctx.respond("No recruitable players found.")
+            return
+
+        elif isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
 
         elif isinstance(res, str):
             await ctx.respond(res)
 
         elif isinstance(res, list):
-            if not res:
-                await ctx.respond("No recruitable players found.")
-                return
-
             await ctx.respond(res[0])
 
             for message in res[1:]:
