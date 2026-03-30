@@ -69,6 +69,11 @@ MILESTONE_EMOJIS = {
     "other": "❓"
 }
 
+ONLINE_STATUS_EMOJIS = {
+    "online": "🟢",
+    "offline": "🔴",
+}
+
 GUEST_TICKET_REASONS = {
     f"I want to join {GUILD_HANDLE}": "<:Misc:540990817872117780>",
     f"I want to organize a GvG with {GUILD_HANDLE}": "⚔️",
