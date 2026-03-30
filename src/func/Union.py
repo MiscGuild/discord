@@ -218,7 +218,27 @@ class Union:
         embed.set_thumbnail(url=f'https://minotar.net/helm/{member.uuid}/512.png')
         embed.add_field(name=ign, value=f"Member of {guild_name}" if guild_name != "Guildless" else "Guildless")
 
-        if member.discord_id and member.discord_id != self.user.id:
+        if ign != registered_discord_member.ign:
+            await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
+            ticket = await create_ticket(ctx.author, f"ticket-{ign}",
+                                         category_name=TICKET_CATEGORIES["registrees"])
+            await ticket.purge(limit=1000)
+            await ticket.edit(name=f"duplicate-registration-{ign}", topic=f"{ctx.author.id}|",
+                              category=discord.utils.get(ctx.guild.categories,
+                                                         name=TICKET_CATEGORIES["registrees"]))
+            guest_ticket = ticket
+
+            embed = discord.Embed(title="Conflict during registration!",
+                                  description=f"This account is already associated with {registered_discord_member.ign}.\n " +
+                                              (f"Member of {guild_name}" if guild_name != "Guildless" else "Guildless"),
+                                  color=NEG_COLOR)
+            embed.set_thumbnail(url=f'https://minotar.net/helm/{member.uuid}/512.png')
+            embed.set_footer(text="Would you like to link this Minecraft account to your discord account? "
+                                  "If so, please let staff know. "
+                                  "They will use `/forcesync`.")
+            await ticket.send(embed=embed)
+
+        elif member.discord_id != self.user.id:
             original_owner = member.discord_id
 
             await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
