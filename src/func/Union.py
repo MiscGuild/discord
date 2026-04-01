@@ -218,7 +218,7 @@ class Union:
         embed.set_thumbnail(url=f'https://minotar.net/helm/{member.uuid}/512.png')
         embed.add_field(name=ign, value=f"Member of {guild_name}" if guild_name != "Guildless" else "Guildless")
 
-        if ign != registered_discord_member.ign:
+        if registered_discord_member.ign and ign != registered_discord_member.ign:
             await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
             ticket = await create_ticket(ctx.author, f"ticket-{ign}",
                                          category_name=TICKET_CATEGORIES["registrees"])
