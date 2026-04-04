@@ -1,8 +1,10 @@
+from __main__ import bot
+
 import discord
 
 import src.utils.ui_utils as uiutils
 from src.utils.calculation_utils import get_guild_level
-from src.utils.consts import NEUTRAL_COLOR, TICKET_CATEGORIES, GUILD_HANDLE
+from src.utils.consts import NEUTRAL_COLOR, GUILD_HANDLE
 from src.utils.request_utils import get_player_guild
 
 
@@ -27,6 +29,4 @@ async def organize_gvg(ticket: discord.TextChannel, interaction: discord.Interac
     await interaction.response.send_modal(
         modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, title="GvG Request", uuid=uuid))
 
-    await ticket.edit(name=f"gvg-request-{ign}", topic=f"{interaction.user.id if interaction else user.id}|",
-                      category=discord.utils.get((interaction.guild if interaction else ticket.guild).categories,
-                                                 name=TICKET_CATEGORIES["generic"]))
+    await ticket.edit(name=f"gvg-request-{ign}", category=bot.TICKET_CATEGORY_IDS["other"])
