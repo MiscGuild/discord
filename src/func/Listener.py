@@ -74,7 +74,8 @@ class Listener:
 
         if interaction.data["custom_id"] == "tickets":
             await interaction.response.send_message("Creating your ticket...", ephemeral=True)
-            ticket = await create_ticket(interaction.user, f"ticket-{interaction.user.name}")
+            ticket = await create_ticket(user=interaction.user, ticket_name=f"ticket-{interaction.user.name}",
+                                         ticket_topic=f"{interaction.user.id}|")
             await interaction.edit_original_response(
                 content=f"Ticket created!\n**Click the link below to view your ticket.**\n<#{ticket.id}>"
             )
