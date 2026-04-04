@@ -239,6 +239,11 @@ async def after_cache_ready() -> None:
     bot.tag_allowed_roles = (bot.achievable_rank_0, bot.achievable_rank_1, bot.staff, bot.former_staff,
                              bot.server_booster, bot.rich_kid, bot.gvg, bot.veteran, bot.recruiter)
 
+    bot.TICKET_CATEGORY_IDS = {}
+    for group, name in TICKET_CATEGORIES.items():
+        bot.TICKET_CATEGORY_IDS[group] = discord.utils.get(bot.guild.categories,
+                                                           name=name)
+
     INGAME_RANKS[0].discord_role = bot.member_role
     INGAME_RANKS[1].discord_role = bot.achievable_rank_0
     INGAME_RANKS[2].discord_role = bot.achievable_rank_1
