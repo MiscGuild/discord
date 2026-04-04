@@ -1,3 +1,4 @@
+import asyncio
 import calendar
 from __main__ import bot
 from datetime import datetime, timedelta
@@ -6,7 +7,7 @@ import discord
 import discord.ui as ui
 from discord.ui import Button, View
 
-from src.utils.consts import (NEG_COLOR, NEUTRAL_COLOR, TICKETS_MESSAGES)
+from src.utils.consts import (NEG_COLOR, NEUTRAL_COLOR, TICKETS_MESSAGES, JOIN_REQUEST_EMBED)
 from src.utils.db_utils import get_member_gexp_history
 from src.utils.request_utils import get_jpg_file
 
@@ -342,3 +343,41 @@ async def tickets() -> tuple[discord.File, list, any]:
                                  style=discord.ButtonStyle.blurple, emoji="✉️"))
 
     return image, TICKETS_MESSAGES, TicketView()
+
+
+class Join_Misc_Buttons(discord.ui.Button):
+    def __init__(self, button_fields: list, ign: str, ticket: discord.TextChannel, current_guild: str):
+        """
+        2 buttons for 2 registration actions. `custom_id` is needed for persistent views.
+        """
+        super().__init__(label=button_fields[0], custom_id=button_fields[1], style=button_fields[2])
+        self.ign = ign
+        self.ticket = ticket
+        self.current_guild = current_guild
+
+    async def callback(self, interaction: discord.Interaction):
+        # if bot.staff not in interaction.user.roles and ticket.id != interaction.channel_id: return
+        if interaction.custom_id == "Yes":
+            await self.ticket.purge(limit=100)
+            await self.ticket.send(
+                embed=JOIN_REQUEST_EMBED.set_author(name=f"{self.ign} wishes to join Miscellaneous"))
+            await interaction.user.add_roles(bot.guest, reason="Registration - Guest")
+
+            if self.current_guild != "Guildless":
+                await self.ticket.send(
+                    f"{interaction.user.mention} kindly leave your current guild so that"
+                    f" we can can invite you to Miscellaneous.")
+
+        elif interaction.custom_id == "No":
+            await self.ticket.purge(limit=100)
+            await interaction.user.remove_roles(bot.processing, reason="Registration - Guest")
+            await interaction.user.add_roles(bot.guest, reason="Registration - Guest")
+            await self.ticket.send(
+                embed=discord.Embed(
+                    title="You have been given the Guest role!\n"
+                          "**This ticket will be deleted in 10 seconds.** "
+                          "\n\n*If you need assistance with anything else,"
+                          " create a new self.ticket using* `,new`",
+                    color=NEG_COLOR))
+            await asyncio.sleep(10)
+            await discord.TextChannel.delete(self.ticket)
