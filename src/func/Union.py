@@ -192,34 +192,38 @@ class Union:
             return "This command can only be used in the registration channel!\nThe command you are looking for is `/sync`", None
 
         member_lookup = RegisteredDiscordMember()
-        member = await member_lookup.from_username(username=name, include_discord_id=True)
-        registered_discord_member = await member_lookup.from_discord_id(discord_id=self.user.id)
+        minecraft_account = await member_lookup.from_username(username=name, include_discord_id=True)
+        existing_registration = await member_lookup.from_discord_id(discord_id=self.user.id)
 
-        if not member.ign:
+        discord_acc_linked_to_diff_mc = True if existing_registration.uuid and existing_registration.uuid != minecraft_account.uuid else False
+        mc_acc_linked_to_diff_discord = True if minecraft_account.discord_id and minecraft_account.discord_id != self.user.id else False
+
+        if not minecraft_account.ign:
             return UNKNOWN_IGN_EMBED, None
 
-        ign = member.ign
+        ign = minecraft_account.ign
 
         # Filter out people impersonating staff
         if ign in bot.staff_names:
             return STAFF_IMPERSONATION_EMBED, None
 
-        if not member.discord_id and not registered_discord_member.discord_id:
+        if not minecraft_account.discord_id and not existing_registration.discord_id:
             await insert_new_member(discord_id=self.user.id,
-                                    uuid=member.uuid,
+                                    uuid=minecraft_account.uuid,
                                     username=ign)
 
-        guild_data = await get_player_guild(member.uuid)
+        guild_data = await get_player_guild(minecraft_account.uuid)
 
         guild_name = "Guildless" if not guild_data else guild_data["name"]
 
         embed = discord.Embed(
             title="Registration successful!", color=NEUTRAL_COLOR)
-        embed.set_thumbnail(url=f'https://minotar.net/helm/{member.uuid}/512.png')
+        embed.set_thumbnail(url=f'https://minotar.net/helm/{minecraft_account.uuid}/512.png')
         embed.add_field(name=ign, value=f"Member of {guild_name}" if guild_name != "Guildless" else "Guildless")
 
-        if registered_discord_member.ign and ign != registered_discord_member.ign:
-            await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
+        await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
+
+        if discord_acc_linked_to_diff_mc:
             ticket = await create_ticket(ctx.author, f"ticket-{ign}",
                                          category_name=TICKET_CATEGORIES["registrees"])
             await ticket.purge(limit=1000)
@@ -229,19 +233,18 @@ class Union:
             guest_ticket = ticket
 
             embed = discord.Embed(title="Conflict during registration!",
-                                  description=f"This account is already associated with {registered_discord_member.ign}.\n " +
+                                  description=f"<@{self.user.id}\n " +
                                               (f"Member of {guild_name}" if guild_name != "Guildless" else "Guildless"),
                                   color=NEG_COLOR)
-            embed.set_thumbnail(url=f'https://minotar.net/helm/{member.uuid}/512.png')
+            embed.set_thumbnail(url=f'https://minotar.net/helm/{minecraft_account.uuid}/512.png')
             embed.set_footer(text="Would you like to link this Minecraft account to your discord account? "
                                   "If so, please let staff know. "
                                   "They will use `/forcesync`.")
             await ticket.send(embed=embed)
 
-        elif member.discord_id != self.user.id:
-            original_owner = member.discord_id
+        elif mc_acc_linked_to_diff_discord:
+            original_owner = minecraft_account.discord_id
 
-            await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
             ticket = await create_ticket(ctx.author, f"ticket-{ign}",
                                          category_name=TICKET_CATEGORIES["registrees"])
             await ticket.purge(limit=1000)
@@ -255,14 +258,13 @@ class Union:
                                               f"<@{original_owner}>\n" +
                                               f"Member of {guild_name}" if guild_name != "Guildless" else "Guildless",
                                   color=NEG_COLOR)
-            embed.set_thumbnail(url=f'https://minotar.net/helm/{member.uuid}/512.png')
+            embed.set_thumbnail(url=f'https://minotar.net/helm/{minecraft_account.uuid}/512.png')
             embed.set_footer(text="If you no longer have access to the other discord account/"
                                   "would like to transfer to this discord account, let staff know. "
                                   "They will use `/forcesync`.")
             await ticket.send(embed=embed)
-        elif any((ign, member.uuid)):
+        elif any((ign, minecraft_account.uuid)):
             original_username = ign
-            await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
             ticket = await create_ticket(ctx.author, f"ticket-{ign}",
                                          category_name=TICKET_CATEGORIES["registrees"])
             await ticket.purge(limit=1000)
@@ -276,7 +278,7 @@ class Union:
                                   description=f"<@{self.user.id}> is already registered to {original_username}. \
                                   Miscellaneous does not support multiple accounts for a single discord account.\n",
                                   color=NEG_COLOR)
-            embed.set_thumbnail(url=f'https://minotar.net/helm/{member.uuid}/512.png')
+            embed.set_thumbnail(url=f'https://minotar.net/helm/{minecraft_account.uuid}/512.png')
             embed.set_footer(text="If you no longer have access to the other minecraft account/"
                                   "would like to transfer to this discord account, let staff know. "
                                   "They will use `/forcesync`.")
