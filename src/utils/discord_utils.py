@@ -39,13 +39,15 @@ async def get_ticket_creator(channel: discord.TextChannel) -> discord.Member:
     return bot.guild.get_member(int(channel.topic.split("|")[0]))
 
 
-async def create_ticket(user: discord.Member, ticket_name: str,
-                        category_name: str = TICKET_CATEGORIES["generic"], reason: str = None,
+async def create_ticket(user: discord.Member, ticket_name: str, ticket_topic: str,
+                        category_id: int = None, reason: str = None,
                         ctx=None) -> discord.TextChannel:
+    # Needs to be done here because function loading happens before cache is ready.
+    category_id = bot.TICKET_CATEGORY_IDS["generic"] if not category_id else category_id
+
     # Create ticket
-    ticket: discord.TextChannel = await bot.guild.create_text_channel(ticket_name,
-                                                                      category=discord.utils.get(bot.guild.categories,
-                                                                                                 name=category_name))
+    ticket: discord.TextChannel = await bot.guild.create_text_channel(name=ticket_name, topic=ticket_topic,
+                                                                      category=category_id)
     # Set perms
     await ticket.set_permissions(bot.guild.get_role(bot.guild.id), send_messages=False,
                                  read_messages=False)
@@ -69,7 +71,7 @@ async def create_ticket(user: discord.Member, ticket_name: str,
                                  read_message_history=False, external_emojis=False)
     if reason:
         await handle_ticket_reason(reason, ticket, interaction=None, user=user, ctx=ctx)
-    elif category_name != TICKET_CATEGORIES["registrees"]:
+    elif category_id != bot.TICKET_CATEGORY_IDS["registrees"]:
         await send_ticket_dropdown(ticket, user, ctx)
 
     # Return ticket for use
@@ -238,6 +240,11 @@ async def after_cache_ready() -> None:
     bot.yt_channel_manager = discord.utils.get(bot.guild.roles, id=CONFIG["discord_roles"]["yt_channel_manager"])
     bot.tag_allowed_roles = (bot.achievable_rank_0, bot.achievable_rank_1, bot.staff, bot.former_staff,
                              bot.server_booster, bot.rich_kid, bot.gvg, bot.veteran, bot.recruiter)
+
+    bot.TICKET_CATEGORY_IDS = {}
+    for group, name in TICKET_CATEGORIES.items():
+        bot.TICKET_CATEGORY_IDS[group] = discord.utils.get(bot.guild.categories,
+                                                           name=name)
 
     INGAME_RANKS[0].discord_role = bot.member_role
     INGAME_RANKS[1].discord_role = bot.achievable_rank_0

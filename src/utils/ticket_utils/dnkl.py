@@ -4,7 +4,7 @@ import discord
 
 import src.utils.ui_utils as uiutils
 from src.utils.calculation_utils import get_player_gexp
-from src.utils.consts import NEUTRAL_COLOR, TICKET_CATEGORIES, NEG_COLOR, UNKNOWN_IGN_EMBED, DNKL_CREATION_EMBED, \
+from src.utils.consts import NEUTRAL_COLOR, NEG_COLOR, UNKNOWN_IGN_EMBED, DNKL_CREATION_EMBED, \
     DNKL_REQ, MISSING_PERMS_EMBED, DNKL_CHANNEL_ID
 from src.utils.db_utils import insert_new_dnkl, update_dnkl, select_one, delete_dnkl
 from src.utils.ticket_utils.tickets import close_ticket
@@ -103,9 +103,8 @@ async def dnkl_approve(channel: discord.TextChannel, author: discord.User, ign: 
 async def dnkl(ticket: discord.TextChannel, interaction: discord.Interaction, user: discord.Member, ign: str,
                uuid: str):
     # Edit channel name and category
-    await ticket.edit(name=f"dnkl-{ign}", topic=f"{interaction.user.id if interaction else user.id}|",
-                      category=discord.utils.get((interaction.guild if interaction else ticket.guild).categories,
-                                                 name=TICKET_CATEGORIES["dnkl"]))
+    await ticket.edit(name=f"dnkl-{ign}",
+                      category=bot.TICKET_CATEGORY_IDS["dnkl"])
 
     # Notify user if they don't meet gexp req, however ask questions anyway
     _, weekly_gexp, days_in_guild = await get_player_gexp(uuid)

@@ -1,7 +1,7 @@
 import discord
 
 import src.utils.ui_utils as uiutils
-from src.utils.consts import NEUTRAL_COLOR, TICKET_CATEGORIES
+from src.utils.consts import NEUTRAL_COLOR
 
 
 async def player_report(ticket: discord.TextChannel, interaction: discord.Interaction, user: discord.Member, ign: str,
@@ -20,6 +20,4 @@ async def player_report(ticket: discord.TextChannel, interaction: discord.Intera
         modal=uiutils.ModalCreator(embed=embed, fields=fields, ign=ign, uuid=uuid,
                                    title="Player Report"))
 
-    await ticket.edit(name=f"report-{ign}", topic=f"{interaction.user.id if interaction else user.id}|",
-                      category=discord.utils.get((interaction.guild if interaction else ticket.guild).categories,
-                                                 name=TICKET_CATEGORIES["generic"]))
+    await ticket.edit(name=f"report-{ign}")

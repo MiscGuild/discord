@@ -239,7 +239,11 @@ class General:
     @staticmethod
     async def new(ctx: discord.ApplicationContext, reason: str = None) -> str:
         # Create ticket
-        ticket = await create_ticket(ctx.author, f"ticket-{await name_grabber(ctx.author)}", reason=reason, ctx=ctx)
+        ticket = await create_ticket(user=ctx.author,
+                                     ticket_name=f"ticket-{await name_grabber(ctx.author)}",
+                                     ticket_topic=f"{ctx.author.id}|",
+                                     reason=reason,
+                                     ctx=ctx)
 
         # Return message with link to ticket
         return f"Click the following link to go to your ticket! <#{ticket.id}>"

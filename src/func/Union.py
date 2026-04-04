@@ -1,6 +1,5 @@
 # The following file contains: mute, unmute, kick, ban, softban, unban, sync/forcesync, register, add, remove, avatar
 
-import asyncio
 from __main__ import bot
 from datetime import datetime, timezone
 from typing import Union as typingUnion, Tuple
@@ -9,9 +8,8 @@ import discord
 
 from src.utils.calculation_utils import check_tag, get_monthly_gexp
 from src.utils.consts import (NON_STAFF_RANKS, ALLIES, DISCORD_NOT_LINKED_EMBED, GUILD_HANDLE, NEG_COLOR, NEUTRAL_COLOR,
-                              POS_COLOR, REGISTRATION_CHANNEL_ID,
-                              STAFF_IMPERSONATION_EMBED, TICKET_CATEGORIES,
-                              UNKNOWN_IGN_EMBED, JOIN_REQUEST_EMBED, GUILDLESS_EMBED)
+                              POS_COLOR, REGISTRATION_CHANNEL_ID, TICKET_CATEGORIES, STAFF_IMPERSONATION_EMBED,
+                              UNKNOWN_IGN_EMBED, GUILDLESS_EMBED)
 from src.utils.data_classes import RegisteredDiscordMember
 from src.utils.db_utils import update_member, insert_new_member, set_do_ping_db, \
     get_member_gexp_history, get_elite_member, get_do_ping
@@ -20,6 +18,7 @@ from src.utils.discord_utils import (create_ticket, has_tag_perms,
 from src.utils.referral_utils import get_invitation_stats
 from src.utils.request_utils import (get_gtag, get_hypixel_player,
                                      get_player_guild, get_name_by_uuid)
+from src.utils.ui_utils import Join_Misc_Buttons
 
 
 class Union:
@@ -192,99 +191,82 @@ class Union:
             return "This command can only be used in the registration channel!\nThe command you are looking for is `/sync`", None
 
         member_lookup = RegisteredDiscordMember()
-        member = await member_lookup.from_username(username=name, include_discord_id=True)
-        registered_discord_member = await member_lookup.from_discord_id(discord_id=self.user.id)
+        minecraft_account = await member_lookup.from_username(username=name, include_discord_id=True)
+        existing_registration = await member_lookup.from_discord_id(discord_id=self.user.id)
 
-        if not member.ign:
+        discord_acc_linked_to_diff_mc = True if existing_registration.uuid and existing_registration.uuid != minecraft_account.uuid else False
+        mc_acc_linked_to_diff_discord = True if minecraft_account.discord_id and minecraft_account.discord_id != self.user.id else False
+
+        if not minecraft_account.ign:
             return UNKNOWN_IGN_EMBED, None
 
-        ign = member.ign
+        ign = minecraft_account.ign
+        uuid = minecraft_account.uuid
+        guest_ticket = None
 
         # Filter out people impersonating staff
         if ign in bot.staff_names:
             return STAFF_IMPERSONATION_EMBED, None
 
-        if not member.discord_id and not registered_discord_member.discord_id:
+        if not minecraft_account.discord_id and not existing_registration.discord_id:
             await insert_new_member(discord_id=self.user.id,
-                                    uuid=member.uuid,
+                                    uuid=minecraft_account.uuid,
                                     username=ign)
 
-        guild_data = await get_player_guild(member.uuid)
+        guild_data = await get_player_guild(minecraft_account.uuid)
 
         guild_name = "Guildless" if not guild_data else guild_data["name"]
 
         embed = discord.Embed(
             title="Registration successful!", color=NEUTRAL_COLOR)
-        embed.set_thumbnail(url=f'https://minotar.net/helm/{member.uuid}/512.png')
+        embed.set_thumbnail(url=f'https://minotar.net/helm/{minecraft_account.uuid}/512.png')
         embed.add_field(name=ign, value=f"Member of {guild_name}" if guild_name != "Guildless" else "Guildless")
 
-        if registered_discord_member.ign and ign != registered_discord_member.ign:
-            await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
-            ticket = await create_ticket(ctx.author, f"ticket-{ign}",
-                                         category_name=TICKET_CATEGORIES["registrees"])
-            await ticket.purge(limit=1000)
-            await ticket.edit(name=f"duplicate-registration-{ign}", topic=f"{ctx.author.id}|",
-                              category=discord.utils.get(ctx.guild.categories,
-                                                         name=TICKET_CATEGORIES["registrees"]))
-            guest_ticket = ticket
+        await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
 
-            embed = discord.Embed(title="Conflict during registration!",
-                                  description=f"This account is already associated with {registered_discord_member.ign}.\n " +
+        if discord_acc_linked_to_diff_mc:
+            ticket = await create_ticket(user=ctx.author,
+                                         ticket_name=f"duplicate-registration-{ign}",
+                                         ticket_topic=f"{ctx.author.id}|",
+                                         category_id=bot.TICKET_CATEGORY_IDS["registrees"])
+
+            embed = discord.Embed(title="Discord account already linked to a different minecraft account!",
+                                  description=f"<@{existing_registration.discord_id} your discord account is currently linked to {existing_registration.ign}. Would you like to transfer the registration over to {minecraft_account.ign}?" +
                                               (f"Member of {guild_name}" if guild_name != "Guildless" else "Guildless"),
                                   color=NEG_COLOR)
-            embed.set_thumbnail(url=f'https://minotar.net/helm/{member.uuid}/512.png')
-            embed.set_footer(text="Would you like to link this Minecraft account to your discord account? "
-                                  "If so, please let staff know. "
+            embed.set_thumbnail(url=f'https://minotar.net/helm/{minecraft_account.uuid}/512.png')
+            embed.set_footer(text="If so, please await staff assistance."
                                   "They will use `/forcesync`.")
+
+            guest_ticket = ticket
+
             await ticket.send(embed=embed)
 
-        elif member.discord_id != self.user.id:
-            original_owner = member.discord_id
+        elif mc_acc_linked_to_diff_discord:
+            original_owner = minecraft_account.discord_id
 
-            await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
-            ticket = await create_ticket(ctx.author, f"ticket-{ign}",
-                                         category_name=TICKET_CATEGORIES["registrees"])
-            await ticket.purge(limit=1000)
-            await ticket.edit(name=f"duplicate-registration-{ign}", topic=f"{ctx.author.id}|",
-                              category=discord.utils.get(ctx.guild.categories,
-                                                         name=TICKET_CATEGORIES["registrees"]))
-            guest_ticket = ticket
+            ticket = await create_ticket(user=ctx.author,
+                                         ticket_name=f"duplicate-registration-{ign}",
+                                         ticket_topic=f"{ctx.author.id}|",
+                                         category_id=bot.TICKET_CATEGORY_IDS["registrees"])
 
             embed = discord.Embed(title="Conflict during registration!",
                                   description=f"The account associated with {ign} is currently registered to "
                                               f"<@{original_owner}>\n" +
                                               f"Member of {guild_name}" if guild_name != "Guildless" else "Guildless",
                                   color=NEG_COLOR)
-            embed.set_thumbnail(url=f'https://minotar.net/helm/{member.uuid}/512.png')
+            embed.set_thumbnail(url=f'https://minotar.net/helm/{minecraft_account.uuid}/512.png')
             embed.set_footer(text="If you no longer have access to the other discord account/"
                                   "would like to transfer to this discord account, let staff know. "
                                   "They will use `/forcesync`.")
-            await ticket.send(embed=embed)
-        elif any((ign, member.uuid)):
-            original_username = ign
-            await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
-            ticket = await create_ticket(ctx.author, f"ticket-{ign}",
-                                         category_name=TICKET_CATEGORIES["registrees"])
-            await ticket.purge(limit=1000)
-            await ticket.edit(name=f"duplicate-registration-{ign}-{original_username}",
-                              topic=f"{ctx.author.id}|",
-                              category=discord.utils.get(ctx.guild.categories,
-                                                         name=TICKET_CATEGORIES["registrees"]))
+
             guest_ticket = ticket
 
-            embed = discord.Embed(title="Conflict during registration!",
-                                  description=f"<@{self.user.id}> is already registered to {original_username}. \
-                                  Miscellaneous does not support multiple accounts for a single discord account.\n",
-                                  color=NEG_COLOR)
-            embed.set_thumbnail(url=f'https://minotar.net/helm/{member.uuid}/512.png')
-            embed.set_footer(text="If you no longer have access to the other minecraft account/"
-                                  "would like to transfer to this discord account, let staff know. "
-                                  "They will use `/forcesync`.")
             await ticket.send(embed=embed)
+
         # User is a member
         elif guild_name == GUILD_HANDLE:
             await ctx.author.add_roles(bot.member_role, reason="Registration - Member")
-            guest_ticket = None
 
         # User is in an allied guild
         elif guild_name in ALLIES:
@@ -294,60 +276,23 @@ class Union:
             gtag = "" if "tag" not in guild_data else guild_data["tag"]
             if not ctx.author.nick or gtag not in ctx.author.nick:
                 ign = ign + " " + f"[{gtag}]"
-            guest_ticket = None
 
         # User is a guest
         else:
             await ctx.author.add_roles(bot.processing, reason="Registration - Processing")
-            ticket = await create_ticket(ctx.author, f"ticket-{ign}",
-                                         category_name=TICKET_CATEGORIES["registrees"])
-            await ticket.purge(limit=1000)
-            await ticket.edit(name=f"join-request-{ign}", topic=f"{ctx.author.id}|",
-                              category=discord.utils.get(ctx.guild.categories,
-                                                         name=TICKET_CATEGORIES["registrees"]))
+            ticket = await create_ticket(user=ctx.author,
+                                         ticket_name=f"join-request-{ign}",
+                                         ticket_topic=f"{ctx.author.id}|",
+                                         category_id=bot.TICKET_CATEGORY_IDS["registrees"])
+
             guest_ticket = ticket
-
-            class Join_Misc_Buttons(discord.ui.Button):
-                def __init__(self, button_fields: list):
-                    """
-                    2 buttons for 2 registration actions. `custom_id` is needed for persistent views.
-                    """
-                    super().__init__(label=button_fields[0], custom_id=button_fields[1], style=button_fields[2])
-
-                async def callback(self, interaction: discord.Interaction):
-                    # if bot.staff not in interaction.user.roles and ticket.id != interaction.channel_id: return
-                    if interaction.custom_id == "Yes":
-                        await ticket.purge(limit=100)
-                        await ticket.send(
-                            embed=JOIN_REQUEST_EMBED.set_author(name=f"{ign} wishes to join Miscellaneous"))
-                        await interaction.user.add_roles(bot.guest, reason="Registration - Guest")
-
-                        if guild_name != "Guildless":
-                            await ticket.send(
-                                f"{interaction.user.mention} kindly leave your current guild so that"
-                                f" we can can invite you to Miscellaneous.")
-
-                    elif interaction.custom_id == "No":
-                        await ticket.purge(limit=100)
-                        await interaction.user.remove_roles(bot.processing, reason="Registration - Guest")
-                        await interaction.user.add_roles(bot.guest, reason="Registration - Guest")
-                        await ticket.send(
-                            embed=discord.Embed(
-                                title="You have been given the Guest role!\n"
-                                      "**This ticket will be deleted in 10 seconds.** "
-                                      "\n\n*If you need assistance with anything else,"
-                                      " create a new ticket using* `,new`",
-                                color=NEG_COLOR))
-                        await asyncio.sleep(10)
-                        await discord.TextChannel.delete(ticket)
-
             view = discord.ui.View(timeout=None)
             buttons = [["Yes", "Yes", discord.enums.ButtonStyle.primary],
                        ["No", "No", discord.enums.ButtonStyle.red]]
             # Loop through the list of roles and add a new button to the view for each role.
             for button in buttons:
                 # Get the role from the guild by ID.
-                view.add_item(Join_Misc_Buttons(button))
+                view.add_item(Join_Misc_Buttons(button, ign=ign, ticket=guest_ticket, current_guild=guild_name))
 
             await ticket.send(
                 embed=discord.Embed(title="Do you wish to join Miscellaneous in-game?", color=NEUTRAL_COLOR),
