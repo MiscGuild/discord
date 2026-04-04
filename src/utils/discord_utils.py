@@ -39,13 +39,15 @@ async def get_ticket_creator(channel: discord.TextChannel) -> discord.Member:
     return bot.guild.get_member(int(channel.topic.split("|")[0]))
 
 
-async def create_ticket(user: discord.Member, ticket_name: str,
-                        category_name: str = TICKET_CATEGORIES["generic"], reason: str = None,
+async def create_ticket(user: discord.Member, ticket_name: str, ticket_topic: str,
+                        category_id: int = None, reason: str = None,
                         ctx=None) -> discord.TextChannel:
+    # Needs to be done here because function loading happens before cache is ready.
+    category_id = bot.TICKET_CATEGORY_IDS["generic"] if not category_id else category_id
+
     # Create ticket
-    ticket: discord.TextChannel = await bot.guild.create_text_channel(ticket_name,
-                                                                      category=discord.utils.get(bot.guild.categories,
-                                                                                                 name=category_name))
+    ticket: discord.TextChannel = await bot.guild.create_text_channel(name=ticket_name, topic=ticket_topic,
+                                                                      category=category_id)
     # Set perms
     await ticket.set_permissions(bot.guild.get_role(bot.guild.id), send_messages=False,
                                  read_messages=False)
@@ -69,7 +71,7 @@ async def create_ticket(user: discord.Member, ticket_name: str,
                                  read_message_history=False, external_emojis=False)
     if reason:
         await handle_ticket_reason(reason, ticket, interaction=None, user=user, ctx=ctx)
-    elif category_name != TICKET_CATEGORIES["registrees"]:
+    elif category_id != bot.TICKET_CATEGORY_IDS["registrees"]:
         await send_ticket_dropdown(ticket, user, ctx)
 
     # Return ticket for use
