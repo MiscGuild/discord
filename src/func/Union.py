@@ -267,6 +267,7 @@ class Union:
         # User is a member
         elif guild_name == GUILD_HANDLE:
             await ctx.author.add_roles(bot.member_role, reason="Registration - Member")
+            await ctx.author.remove_roles(bot.processing, bot.new_member_role, reason="Registration - Member")
 
         # User is in an allied guild
         elif guild_name in ALLIES:
