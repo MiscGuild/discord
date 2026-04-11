@@ -147,8 +147,9 @@ class General:
                     await discord_member.edit(nick=username)
 
                 # Edit roles
-                await discord_member.add_roles(bot.member_role)
-                await discord_member.remove_roles(bot.new_member_role, bot.guest, bot.ally)
+                await discord_member.add_roles(bot.member_role, reason=f"Rolecheck - Member of {GUILD_HANDLE}")
+                await discord_member.remove_roles(bot.new_member_role, bot.guest, bot.ally, bot.processing,
+                                                  reason=f"Rolecheck - Member of {GUILD_HANDLE}")
                 continue
 
             elif uuid in allies_dict.keys():
@@ -157,24 +158,27 @@ class General:
                     await discord_member.edit(nick=username + f' [{gtag}]')
 
                 # Edit roles
-                await discord_member.add_roles(bot.guest, bot.ally)
+                await discord_member.add_roles(bot.guest, bot.ally, reason=f"Rolecheck - Member of allied guild")
                 await discord_member.remove_roles(bot.new_member_role, bot.member_role, bot.achievable_rank_0,
-                                                  bot.achievable_rank_1)
+                                                  bot.achievable_rank_1, bot.processing,
+                                                  reason=f"Rolecheck - Member of allied guild")
                 continue
 
             elif not uuid:
+                await discord_member.add_roles(bot.new_member_role, reason=f"Rolecheck - Invalid UUID")
                 await discord_member.remove_roles(bot.member_role, bot.ally, bot.guest, bot.achievable_rank_0,
-                                                  bot.achievable_rank_1)
-                await discord_member.add_roles(bot.new_member_role)
+                                                  bot.achievable_rank_1, bot.processing,
+                                                  rolecheck=f"Rolecheck - Invalid UUID")
                 continue
 
             # Guests
             else:
                 if not has_tag_permission and discord_member.nick != username:
                     await discord_member.edit(nick=username)
-                await discord_member.add_roles(bot.guest)
+                await discord_member.add_roles(bot.guest, reason=f"Rolecheck - Guest")
                 await discord_member.remove_roles(bot.new_member_role, bot.member_role, bot.achievable_rank_0,
-                                                  bot.achievable_rank_1, bot.ally)
+                                                  bot.achievable_rank_1, bot.ally, bot.processing,
+                                                  reason=f"Rolecheck - Guest")
                 continue
 
         if send_ping:
