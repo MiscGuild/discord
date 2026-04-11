@@ -9,7 +9,7 @@ from src.func.General import General
 from src.func.Integer import Integer
 from src.utils.calculation_utils import get_guild_gexp_data
 from src.utils.consts import WEEKLY_LB_CHANNEL_ID, DAILY_LB_CHANNEL_ID, GUILD_HANDLE
-from src.utils.db_utils import (select_all, set_member_gexp_history, get_all_guild_members, get_all_elite_members,
+from src.utils.db_utils import (select_all, set_member_gexp_history, get_all_elite_members,
                                 delete_elite_member)
 from src.utils.discord_utils import update_recruiter_role
 from src.utils.giveaway_utils import roll_giveaway
@@ -130,13 +130,6 @@ async def update_gexp() -> None:
 
     for uuid, exp_history in gexp_data.items():
         await set_member_gexp_history(uuid, exp_history)
-
-    all_members_in_db = await get_all_guild_members()
-
-    for uuid in all_members_in_db:
-        uuid = uuid[0]
-        if uuid not in gexp_data:
-            continue
 
 
 async def update_elite_members() -> None:
