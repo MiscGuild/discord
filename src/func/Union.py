@@ -86,6 +86,7 @@ class Union:
         await ctx.defer()
 
         member_lookup = RegisteredDiscordMember()
+
         if (is_fs and not name) or not name:
             member = await member_lookup.from_discord_id(discord_id=self.user.id)
             ign, uuid = await get_name_by_uuid(member.uuid, is_sync=True), member.uuid
@@ -272,6 +273,7 @@ class Union:
         # User is in an allied guild
         elif guild_name in ALLIES:
             await ctx.author.add_roles(bot.guest, bot.ally, reason="Registration - Ally")
+            await ctx.author.remove_roles(bot.processing, bot.new_member_role, reason="Registration - Ally")
 
             # Add guild tag as nick
             gtag = "" if "tag" not in guild_data else guild_data["tag"]
