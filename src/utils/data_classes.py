@@ -105,6 +105,9 @@ class RegisteredDiscordMember:
         from src.utils.request_utils import get_mojang_profile_from_uuid
 
         resolved_uuid = await get_uuid_from_discord_id(discord_id=discord_id)
+        if not resolved_uuid:
+            return cls(ign=None, uuid=resolved_uuid, discord_id=discord_id)
+
         ign, _ = await get_username_from_uuid(uuid=resolved_uuid)
         if not ign:
             ign, resolved_uuid = await get_mojang_profile_from_uuid(resolved_uuid)
