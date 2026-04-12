@@ -209,7 +209,7 @@ class Union:
         if ign in bot.staff_names:
             return STAFF_IMPERSONATION_EMBED, None
 
-        if not minecraft_account.discord_id and not existing_registration.discord_id:
+        if not minecraft_account.discord_id and not existing_registration.uuid:
             await insert_new_member(discord_id=self.user.id,
                                     uuid=minecraft_account.uuid,
                                     username=ign)
