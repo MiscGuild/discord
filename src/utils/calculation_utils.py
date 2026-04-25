@@ -1,6 +1,5 @@
 import io
 import logging
-import re
 import traceback
 from calendar import month_name
 from datetime import datetime, timezone
@@ -145,23 +144,14 @@ async def check_tag(tag: str) -> Tuple[bool, str] | Tuple[bool, None]:
 #         return False, None, None, None
 
 
-async def extract_usernames(message: str) -> Tuple[str, str] | Tuple[None, str]:
-    words = message.split()
-    ign_unfiltered = words[1]
-    invitee_unfiltered = words[-1][:-1]
+async def extract_usernames(embed: discord.Embed) -> Tuple[str, str] | Tuple[None, str]:
+    invitee = embed.fields[0].value
+    inviter = embed.fields[1].value
 
-    # Define regular expressions for both formats
-    bold = r"\*\*(.*?)\*\*"
+    invitee = invitee.replace("\\_", "_")
+    inviter = inviter.replace("\\_", "_")
 
-    ign_format = re.match(bold, ign_unfiltered)
-    ign = ign_format.group(1).replace("\\_", "_")
-
-    invitee_format = re.match(bold, invitee_unfiltered)
-    if not invitee_format:
-        return None, ign
-    inviter = invitee_format.group(1).replace("\\_", "_")
-
-    return inviter, ign
+    return inviter, invitee
 
 
 async def get_guild_gexp_data(guild_data: dict) -> dict:
