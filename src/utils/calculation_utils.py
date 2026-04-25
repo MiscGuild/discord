@@ -131,19 +131,6 @@ async def check_tag(tag: str) -> Tuple[bool, str] | Tuple[bool, None]:
     return True, None
 
 
-#
-# async def is_valid_date(date: str) -> Tuple[bool, int, int, int] | Tuple[bool, None, None, None]:
-#     # Return False if parsing fails
-#     try:
-#         parsed = datetime.strptime(date, "%Y/%m/%d")
-#         # Validate time is within the last week
-#         if parsed < datetime.now(timezone.utc) - timedelta(days=7):
-#             return False, None, None, None
-#         return True, parsed.day, parsed.month, parsed.year
-#     except ValueError:
-#         return False, None, None, None
-
-
 async def extract_usernames(embed: discord.Embed) -> Tuple[str, str] | Tuple[None, str]:
     invitee = embed.fields[0].value
     inviter = embed.fields[1].value
