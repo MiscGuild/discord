@@ -88,10 +88,10 @@ class Listener:
         if not message.embeds:
             return
         embed = message.embeds[0]
-        if not embed.description or "invited" not in embed.description.lower():
+        if not embed.title or "invited" not in embed.title.lower():
             return
 
-        inviter, invitee = await extract_usernames(embed.description)
+        inviter, invitee = await extract_usernames(embed)
         if not all((inviter, invitee)):
             return
 
