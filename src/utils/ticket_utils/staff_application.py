@@ -9,8 +9,7 @@ MESSAGE_LIMIT = 2000
 SAFE_MESSAGE_LIMIT = 1900
 
 RATING_EMOJIS = [
-    "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣",
-    "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟",
+    "⬇️", "➖", "⬆️"
 ]
 
 
@@ -181,7 +180,7 @@ async def staff_application(
 
     await ticket.send(
         "---\n"
-        "**Staff team:** Please rate each application answer message out of 10 using the reactions above.",
+        "**Staff team:** Please rate each application answer message using the reactions above.",
         allowed_mentions=discord.AllowedMentions.none(),
     )
 
