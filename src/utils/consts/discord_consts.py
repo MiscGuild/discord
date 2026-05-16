@@ -370,18 +370,18 @@ This rank upgrade must be claimed within a week of this message by creating a ti
 *To know how the winner is picked, go here https://discord.com/channels/522586672148381726/1152480866585554994/1164962591198683146*'''
 
 STAFF_APPLICATION_QUESTIONS = {
-    1: "What is your age?",
-    2: "How long have you been in the guild for?",
-    3: "Have you had any past infractions on Hypixel?",
-    4: "Why have you decided to apply for staff?",
-    5: "What has brought you to Miscellaneous, and what has kept you here?",
-    6: "What is something you could suggest that would improve the guild?",
-    7: "You have just started as a helper and a moderator starts arguing with another member. This argument starts to get serious quite quickly. What do you do?",
-    8: "Suppose it's your first week of being a helper and you guild-mute a well-known player. Your guild-mates start spamming you calling you a bad moderator and telling you to unmute them. What would you do?",
-    9: "Upon joining a game and you discover that a guild member is in your game and is hacking. What do you do?",
-    10: "Have you been staff in any other guild or on any server? If yes, which one?",
+    1: "Are you mature enough to handle staff responsibilities, and can you give an example? (Also mention your age)",
+    2: "Have you had any past infractions on Hypixel or within the guild? If yes, what happened and what have you learned from it?",
+    3: f"Why do you want to become staff in {GUILD_HANDLE} specifically, and what do you hope to contribute beyond simply moderating chat?",
+    4: "What has brought you to Miscellaneous, and what has kept you here?",
+    5: "What is one issue you think the guild currently has, and how would you realistically help improve it as staff?",
+    6: "A staff member and a guild member begin arguing publicly, and the situation is making other members uncomfortable. How would you handle the situation while respecting both sides?",
+    7: "You mute a popular guild member for breaking the rules, and several members pressure you to undo it. How would you respond, and how would you explain your decision?",
+    8: "You notice a guild member breaking Hypixel rules in-game, but they are also your friend. What would you do, and why?",
+    9: "Have you been staff in any other guild or on any server? If yes, which one?",
+    10: "A guild member is being annoying but technically has not broken any rules. How would you handle it?",
     11: "How much time do you have to contribute to the role? (Per day)",
-    12: "Tell us about a time you made a mistake within the last year. How did you deal with it? What did you learn?",
+    12: "Tell us about a time you handled a situation poorly or made a mistake. What happened, how did you take responsibility, and what would you do differently now?",
     13: "Anything else you like would us to know?"
 }
 
