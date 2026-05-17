@@ -369,6 +369,10 @@ This rank upgrade must be claimed within a week of this message by creating a ti
 
 *To know how the winner is picked, go here https://discord.com/channels/522586672148381726/1152480866585554994/1164962591198683146*'''
 
+STAFF_APPLICATION_DENIAL = "Hello {},\n\nThank you for your interest in applying for staff! Unfortunately, your application has been denied. " \
+                           "If you would like to re-apply, please make sure to meet all the requirements and answer all questions thoroughly. " \
+                           "You can in 2 weeks re-apply by creating a new ticket and following the prompts.\n\nBest of luck in your future endeavors!\n"
+
 STAFF_APPLICATION_QUESTIONS = {
     1: "Are you mature enough to handle staff responsibilities, and can you give an example? (Also mention your age)",
     2: "Have you had any past infractions on Hypixel or within the guild? If yes, what happened and what have you learned from it?",

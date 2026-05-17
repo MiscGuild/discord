@@ -5,6 +5,7 @@ import io
 import re
 from __main__ import bot
 from datetime import datetime, timedelta, timezone
+from typing import Tuple
 
 import discord
 import discord.ui
@@ -17,9 +18,10 @@ from src.utils.consts import (ACCEPTED_STAFF_APPLICATION_EMBED,
                               MILESTONE_EMOJIS, MILESTONES_CHANNEL_ID, NEG_COLOR,
                               NEUTRAL_COLOR, POS_COLOR, TICKET_DELETED_EMBED,
                               REGISTRATION_CHANNEL_ID, REGISTRATION_EMBED,
-                              STAFF_APPLICATION_QUESTIONS, TICKET_CATEGORIES,
+                              TICKET_CATEGORIES,
                               DNKL_ENTRIES_NOT_FOUND,
-                              POSITIVE_RESPONSES, ALLIES, MILESTONE_CATEGORIES, NON_STAFF_RANKS)
+                              POSITIVE_RESPONSES, ALLIES, MILESTONE_CATEGORIES, NON_STAFF_RANKS,
+                              STAFF_APPLICATION_DENIAL)
 from src.utils.data_classes import RegisteredDiscordMember
 from src.utils.db_utils import insert_new_giveaway, select_all, \
     update_member, get_all_elite_members, delete_elite_member, get_dnkl_list
@@ -204,8 +206,8 @@ class General:
         await ctx.respond(embed=embed)
         single_use_transcript = await create_transcript(ctx.channel)
         transcript_bytes = single_use_transcript.fp.read()
-        transcript_for_user = discord.File(io.BytesIO(transcript_bytes), filename=ctx.channel.name + "-transcript.txt")
-        transcript_for_logs = discord.File(io.BytesIO(transcript_bytes), filename=ctx.channel.name + "-transcript.txt")
+        transcript_for_user = discord.File(io.BytesIO(transcript_bytes), filename=ctx.channel.name + "-transcript.html")
+        transcript_for_logs = discord.File(io.BytesIO(transcript_bytes), filename=ctx.channel.name + "-transcript.html")
 
         await asyncio.sleep(10)
         await discord.TextChannel.delete(ctx.channel)
@@ -270,68 +272,23 @@ class General:
         return discord.Embed(title=organization_name, description=description, color=NEUTRAL_COLOR)
 
     @staticmethod
-    async def deny(ctx: discord.ApplicationContext, channel: discord.TextChannel) -> tuple[discord.Embed, None] | tuple[
-        discord.Embed, discord.File]:
-        # Copy real question list and append 0th element for general critiquing
-        application_questions = STAFF_APPLICATION_QUESTIONS.copy()
-        application_questions[0] = "General critiquing"
-        application_embed_id = (await get_ticket_properties(channel))[1]
-        application_embed = (await channel.fetch_message(int(application_embed_id))).embeds[0]
+    async def deny(channel: discord.TextChannel, reason: str = None) -> Tuple[
+        str, discord.File | None]:
         member = await get_ticket_creator(channel)
 
-        if not member.nick:
-            nick = member.name
+        denial_message = STAFF_APPLICATION_DENIAL.format(f"<@{member.id}>")
+
+        if reason:
+            denial_message += f"\n\n**Reason for denial:** {reason}\n"
+
+        transcript = await create_transcript(channel)
+
+        if not transcript:
+            denial_message += "\n\n*Failed to create transcript of the application.*"
         else:
-            nick = member.nick
+            denial_message += "-# You should find a transcript of your application attached to this message, so you can review your answers and improve them for next time!"
 
-        await ctx.send(embed=application_embed.set_footer(text=""))
-
-        # Define the embed to be sent to the applicant
-        denial_embed = discord.Embed(title="Your staff application has been denied!",
-                                     description="The reasons have been listed below", color=ERROR_COLOR)
-
-        while True:
-            while True:
-                await ctx.send(
-                    "What is the question number of the reply that you would like to critique?"
-                    "\nIf you would like to critique something in general, reply with `0`")
-                question = await bot.wait_for("message",
-                                              check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
-                try:
-                    question = application_questions[int(question.content)]
-                    break
-                except KeyError:
-                    await ctx.send("Please respond with a valid question number.")
-
-            await ctx.send(f"`{question}`\n**What was the issue that you found with {nick}'s reply?**")
-            issue_found = await bot.wait_for("message",
-                                             check=lambda x: x.channel == ctx.channel and x.author == ctx.author)
-
-            # Update embed and send preview
-            denial_embed.add_field(name=question,
-                                   value=issue_found.content,
-                                   inline=False)
-
-            await ctx.send(embed=denial_embed)
-
-            # Ask user if they want to critique more questions and wait for reply
-            await ctx.send("Would you like to critique more questions? (y/n)")
-
-            continue_critiquing = await bot.wait_for("message",
-                                                     check=lambda
-                                                         x: x.channel == ctx.channel and x.author == ctx.author)
-            continue_critiquing = continue_critiquing.content.lower()
-
-            # User does not want to critique more questions
-            if continue_critiquing not in POSITIVE_RESPONSES:
-                transcript = await create_transcript(channel)
-
-                # Notify the user that the transcript failed
-                if not transcript:
-                    return denial_embed.set_footer(text="Transcript creation failed!"), None
-
-                return denial_embed.set_footer(text="You may reapply in 2 weeks.\
-                                               \nFollowing is the transcript so that you can refer to it while reapplying."), transcript
+        return denial_message, transcript if transcript else None
 
     @staticmethod
     async def inactive() -> list[discord.Embed] | discord.Embed:
