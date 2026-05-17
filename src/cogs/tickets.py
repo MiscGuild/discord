@@ -119,13 +119,18 @@ class Tickets(commands.Cog, name="tickets"):
         required=True,
         input_type=discord.TextChannel
     )
-    async def deny(self, ctx: discord.ApplicationContext, channel: discord.TextChannel) -> discord.Message | None:
+    @bridge.bridge_option(
+        name="reason",
+        description="The reason for denying the application",
+        required=False,
+        input_type=str
+    )
+    async def deny(self, ctx: discord.ApplicationContext, channel: discord.TextChannel, reason: str) -> None:
         """Deny a staff application!"""
-        # Get result and send file if it is returned
-        embed, file = await General().deny(ctx, channel)
-        await channel.send(embed=embed)
-        if file:
-            return await channel.send(file=file)
+        denial_text, file = await General().deny(channel, reason)
+        await ctx.respond(f"Denied application in {channel.mention}!", ephemeral=True)
+        await channel.send(denial_text, file=file)
+
 
     @bridge.bridge_command()
     @bridge.bridge_option(
