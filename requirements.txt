@@ -12,11 +12,11 @@ grapheme==0.6.0
 idna==3.3
 multidict==6.0.2
 py-cord==2.8.0
+typing-extensions>=4.12.0,<5
 pytz==2022.2.1
 quickchart.io==2.0.0
 requests==2.31.0
 toml==0.10.2
-typing-extensions==4.7.1
 urllib3==2.0.4
 yarl==1.22.0
 zope.interface==6.0
