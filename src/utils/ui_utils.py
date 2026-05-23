@@ -11,7 +11,7 @@ import discord
 import discord.ui as ui
 from discord.ui import Button, View
 
-from src.utils.consts import (NEG_COLOR, NEUTRAL_COLOR, TICKETS_MESSAGES, JOIN_REQUEST_EMBED)
+from src.utils.consts import (NEG_COLOR, NEUTRAL_COLOR, TICKETS_MESSAGES, REQUIREMENTS_TEXT)
 from src.utils.db_utils import get_member_gexp_history
 from src.utils.request_utils import get_jpg_file
 
@@ -363,8 +363,21 @@ class Join_Misc_Buttons(discord.ui.Button):
         # if bot.staff not in interaction.user.roles and ticket.id != interaction.channel_id: return
         if interaction.custom_id == "Yes":
             await self.ticket.purge(limit=100)
-            await self.ticket.send(
-                embed=JOIN_REQUEST_EMBED.set_author(name=f"{self.ign} wishes to join Miscellaneous"))
+            builder = (
+                DesignerBuilder(timeout=None)
+                .container()
+                .text(f"# <@{interaction.user.id}> wishes to join Miscellaneous!")
+                .text(f"IGN: `{self.ign}`")
+                .text("## Requirements")
+                .text(REQUIREMENTS_TEXT)
+                .text(
+                    "If you don't think you can meet the requirements, we'd recommend still applying. Worst case scenario, you get kicked for inactivity after a week or so, and you can always reapply later when you think you meet the requirements.")
+                .text(
+                    "-# Please be patient while the staff team reviews your request. We will try to get back to you within a couple hours, but it may take longer during busy periods.")
+                .end()
+            )
+            await self.ticket.send(view=builder.build())
+
             await interaction.user.add_roles(bot.guest, reason="Registration - Guest")
 
             if self.current_guild != "Guildless":
