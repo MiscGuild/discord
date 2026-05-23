@@ -300,14 +300,10 @@ DISCORD_NOT_LINKED_EMBED.set_image(
 
 REQUIREMENTS_TEXT = ""
 for rank_obj in NON_STAFF_RANKS:
-    REQUIREMENTS_TEXT += f"__{rank_obj.name}__\n"
+    REQUIREMENTS_TEXT += f"__{rank_obj.name.capitalize()}__\n"
     REQUIREMENTS_TEXT += f"➤ {format(rank_obj.requirement, ',d')} Weekly Guild Experience\n"
 REQUIREMENTS_TEXT += f"You will join the guild as a {NON_STAFF_RANKS[0].name.capitalize()}"
 
-JOIN_REQUEST_EMBED = discord.Embed(color=NEUTRAL_COLOR).add_field(name="Our requirements are as follows:",
-                                                                  value=REQUIREMENTS_TEXT,
-                                                                  inline=False).set_footer(
-    text="Staff should invite you to the guild within 2 hours.\nWhile you wait, you can explore the guild discord!")
 
 DNKL_CREATION_EMBED = discord.Embed(title="Do-not-kick-list",
                                     description="In order to create a do-not-kick-list entry, you need to have a valid reason and meet the DNKL requirements.",
