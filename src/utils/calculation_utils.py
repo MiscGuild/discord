@@ -88,8 +88,8 @@ async def generate_lb_text(member_gexp: list, text: str, is_automatic) -> str:
             name = await get_name_by_uuid(uuid) if not username else username
 
         text += f"> {count}. {name} - {format(gexp, ',d')} Guild Experience"
-        if count < 10:
-            text += "\n"
+        text += "\n"
+    text += "-# If you don't want to be pinged, use `/do_pings` to toggle your ping preference."
 
     return text
 

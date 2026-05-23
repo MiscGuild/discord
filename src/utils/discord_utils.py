@@ -14,6 +14,7 @@ from src.utils.db_utils import connect_db
 from src.utils.request_utils import get_uuid_by_name
 from src.utils.ticket_utils import *
 from src.utils.ticket_utils.tickets import name_grabber
+from src.utils.ui_utils import DesignerBuilder
 
 
 async def is_linked_discord(player_data: dict, user: discord.User) -> bool:
@@ -79,26 +80,35 @@ async def create_ticket(user: discord.Member, ticket_name: str, ticket_topic: st
 
 
 async def send_ticket_dropdown(ticket: discord.TextChannel, user: discord.Member, ctx=None) -> None:
-    # Send the dropdown for ticket creation
     class TicketTypeSelect(ui.Select):
         def __init__(self):
-            super().__init__()
+            options = []
 
             if bot.guest in user.roles:
-                for key, value in GUEST_TICKET_REASONS.items():
-                    self.add_option(label=key, emoji=value)
+                options.extend(GUEST_TICKET_REASONS.items())
 
-            # Add milestone, DNKL application, staff application, GvG application if user is a member
             if bot.member_role in user.roles:
-                for key, value in MEMBER_TICKET_REASONS.items():
-                    self.add_option(label=key, emoji=value)
+                options.extend(MEMBER_TICKET_REASONS.items())
 
-            # Add default options
-            for key, value in GENERAL_TICKET_REASONS.items():
-                self.add_option(label=key, emoji=value)
+            options.extend(GENERAL_TICKET_REASONS.items())
+
+            if len(options) > 25:
+                raise ValueError(f"Too many ticket dropdown options: {len(options)}. Discord max is 25.")
+
+            super().__init__(
+                placeholder="Select a ticket reason...",
+                min_values=1,
+                max_values=1,
+            )
+
+            for key, value in options:
+                self.add_option(label=key, value=key, emoji=value)
 
         # Override default callback
         async def callback(self, interaction: discord.Interaction):
+            if interaction.user.id != user.id:
+                await interaction.response.send_message("This dropdown is not for you.", ephemeral=True)
+                return
             ign, uuid = await get_uuid_by_name(await name_grabber(interaction.user))
             # Set option var and delete Select so it cannot be used twice
             option = list(interaction.data.values())[0][0]
@@ -106,13 +116,15 @@ async def send_ticket_dropdown(ticket: discord.TextChannel, user: discord.Member
                 limit=100)  # Deleting the interaction like this so that we can respond to the interaction later
             await handle_ticket_reason(option, ticket, interaction, user, ctx)
 
-    # Create view and embed, send to ticket
-    view = discord.ui.View()
-    view.add_item(TicketTypeSelect())
-    embed = discord.Embed(title="Why did you make this ticket?",
-                          description="Please select your reason from the dropdown given below!",
-                          color=NEUTRAL_COLOR)
-    await ticket.send(embed=embed, view=view)
+    builder = (
+        DesignerBuilder(timeout=None)
+        .container()
+        .text("### Please select your reason for creating this ticket from the dropdown below!")
+        .select(TicketTypeSelect())
+        .end()
+    )
+
+    await ticket.send(view=builder.build())
 
 
 async def handle_ticket_reason(reason: str, ticket: discord.TextChannel,
