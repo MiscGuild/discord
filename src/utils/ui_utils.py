@@ -1,7 +1,11 @@
+from __future__ import annotations
+
 import asyncio
 import calendar
 from __main__ import bot
 from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Optional, Self
 
 import discord
 import discord.ui as ui
@@ -381,3 +385,128 @@ class Join_Misc_Buttons(discord.ui.Button):
                     color=NEG_COLOR))
             await asyncio.sleep(10)
             await discord.TextChannel.delete(self.ticket)
+
+
+class DesignerBuilder:
+    """
+    Basic generic builder for Pycord DesignerView / Components V2.
+
+    Core idea:
+        - add(...) supports any raw Pycord UI item.
+        - helpers only exist for common things.
+        - local files are stored in self.files and sent with the view.
+    """
+
+    def __init__(self, *, timeout: Optional[float] = None):
+        self.view = discord.ui.DesignerView(timeout=timeout)
+        self.files: list[discord.File] = []
+        self._stack: list[discord.ui.Item] = []
+
+    @property
+    def parent(self):
+        return self._stack[-1] if self._stack else self.view
+
+    def add(self, item) -> Self:
+        """
+        Add any supported Pycord UI item to the current parent.
+
+        This is the generic escape hatch.
+        """
+        self.parent.add_item(item)
+        return self
+
+    def container(
+            self,
+            *,
+            color: Optional[int] = None,
+            spoiler: bool = False,
+            id: Optional[int] = None,
+    ) -> Self:
+        container = discord.ui.Container(
+            color=color,
+            spoiler=spoiler,
+            id=id,
+        )
+
+        self.add(container)
+        self._stack.append(container)
+        return self
+
+    def end(self) -> Self:
+        """
+        Close the current container/parent scope.
+        """
+        if not self._stack:
+            raise RuntimeError("No open component scope to close.")
+
+        self._stack.pop()
+        return self
+
+    def text(self, content: str, *, id: Optional[int] = None) -> Self:
+        item = discord.ui.TextDisplay(content, id=id)
+        return self.add(item)
+
+    def select(self, select: discord.ui.Select):
+        return self.add(discord.ui.ActionRow(select))
+
+    def separator(
+            self,
+            *,
+            divider: bool = True,
+            large: bool = False,
+            id: Optional[int] = None,
+    ) -> Self:
+        spacing = (
+            discord.SeparatorSpacingSize.large
+            if large
+            else discord.SeparatorSpacingSize.small
+        )
+
+        return self.add(
+            discord.ui.Separator(
+                divider=divider,
+                spacing=spacing,
+                id=id,
+            )
+        )
+
+    def gallery(
+            self,
+            *urls: str,
+            id: Optional[int] = None,
+    ) -> Self:
+        """
+        Add an image/video gallery.
+
+        urls can be:
+            - normal CDN/HTTP URLs
+            - attachment://filename.png
+        """
+        items = [discord.MediaGalleryItem(url) for url in urls]
+        return self.add(discord.ui.MediaGallery(*items, id=id))
+
+    def image(self, url: str, *, id: Optional[int] = None) -> Self:
+        """
+        Convenience method for a single image.
+        """
+        return self.gallery(url, id=id)
+
+    def attach(self, path: str | Path, *, filename: Optional[str] = None) -> str:
+        """
+        Attach a local file and return its attachment:// URL.
+
+        Example:
+            image_url = builder.attach("banner.png")
+            builder.image(image_url)
+        """
+        path = Path(path)
+        filename = filename or path.name
+
+        self.files.append(discord.File(path, filename=filename))
+        return f"attachment://{filename}"
+
+    def build(self) -> discord.ui.DesignerView:
+        if self._stack:
+            raise RuntimeError("You forgot to close a container with .end().")
+
+        return self.view
