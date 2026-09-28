@@ -6,10 +6,29 @@ from discord.ext import commands, bridge
 
 from src.utils.consts import PREFIX, NEUTRAL_COLOR
 
+# Discord's own embed limits. The description is the roomiest Markdown
+# area an embed has, so help leans on it rather than on fields.
+DESCRIPTION_LIMIT = 4096
+
+# The client also stops rendering a description somewhere around fifty
+# lines, regardless of how few characters are left, so packing has to
+# respect height as well as width.
+LINE_LIMIT = 40
+
+ARGUMENT_LEGEND = (
+    "[] represent compulsory fields\n"
+    "<> represent optional fields\n"
+    "Do not type the brackets!"
+)
+
 
 async def send_embed(ctx: discord.ApplicationContext, embed):
     """
-    Handles sending help embeds.
+    Sends an embed, falling back to progressively more private delivery.
+
+    The bot can be allowed to talk but not to embed, or allowed to talk
+    nowhere in the channel at all, so each fallback is a step more
+    private than the last.
     """
     try:
         await ctx.respond(embed=embed)
@@ -29,44 +48,99 @@ async def send_embed(ctx: discord.ApplicationContext, embed):
             )
 
 
+async def send_embeds(ctx: discord.ApplicationContext, embeds):
+    """
+    Sends every embed in turn, reusing the single-embed fallback chain.
+
+    A module listing can outgrow one description, so these go out one at
+    a time instead of as a single multi-embed message.
+    """
+    for embed in embeds:
+        await send_embed(ctx, embed)
+
+
 class Help(commands.Cog):
-    """Shows this help embed!"""
+    """Browse the bot's commands, or read up on a single one."""
 
     def __init__(self, bot):
         self.bot = bot
 
     @staticmethod
-    def get_prefix_commands(cog):
+    def get_cog_commands(cog):
         """
-        Pycord bridge cogs can contain both the prefix and slash variants
-        of a command.
+        Collects every command in a cog that help should display.
 
-        We only want the prefix Command objects here because they have
-        clean_params, help, aliases, etc.
+        Pycord bridge cogs register both a prefix and a slash variant of
+        the same command, sharing a qualified name. We keep the prefix
+        variant, because it carries clean_params, help and aliases, and
+        discard the slash twin.
+
+        Cog.get_commands() only returns top-level commands, so group
+        subcommands are flattened in here as well.
         """
-        return [
-            command
-            for command in cog.get_commands()
-            if isinstance(command, commands.Command)
-        ]
+        collected = []
+        seen = set()
+
+        for command in cog.get_commands():
+            if not isinstance(command, (commands.Command, discord.SlashCommand)):
+                continue
+
+            if command.qualified_name in seen:
+                continue
+
+            seen.add(command.qualified_name)
+            collected.append(command)
+
+            if isinstance(command, commands.GroupMixin):
+                for subcommand in command.walk_commands():
+                    if not isinstance(subcommand, commands.Command):
+                        continue
+
+                    seen.add(subcommand.qualified_name)
+                    collected.append(subcommand)
+
+        return collected
+
+    @staticmethod
+    def get_parameters(command):
+        """
+        Yields a (name, required) pair for each user-facing parameter.
+
+        Prefix commands expose clean_params, while slash-only commands
+        expose their declared options instead.
+        """
+        if isinstance(command, commands.Command):
+            for name, param in command.clean_params.items():
+                yield name, param.default is inspect.Parameter.empty
+        else:
+            for option in command.options:
+                yield option.name, option.required
+
+    @staticmethod
+    def get_description(command):
+        """
+        Returns a command's full help text.
+
+        Prefix commands carry it on .help, but slash-only commands do
+        not, so their callback docstring is read directly.
+        """
+        if isinstance(command, commands.Command):
+            return command.help
+
+        return inspect.getdoc(command.callback)
 
     @staticmethod
     def get_syntax(command):
         """
-        Builds command syntax.
+        Builds command syntax, including any group prefix.
 
         [] = required
         <> = optional
         """
-        syntax = f"{PREFIX}{command.name}"
+        syntax = f"{PREFIX}{command.qualified_name}"
 
-        for name, param in command.clean_params.items():
-            if param.default is inspect.Parameter.empty:
-                # No default -> required argument
-                syntax += f" [{name}]"
-            else:
-                # Has default -> optional argument
-                syntax += f" <{name}>"
+        for name, required in Help.get_parameters(command):
+            syntax += f" [{name}]" if required else f" <{name}>"
 
         return syntax
 
@@ -77,6 +151,152 @@ class Help(commands.Cog):
                 getattr(command, "enabled", True)
                 and not getattr(command, "hidden", False)
         )
+
+    @staticmethod
+    def get_aliases(command):
+        """
+        Returns a command's aliases.
+
+        Slash-only commands do not support aliases, so this may be empty.
+        """
+        return getattr(command, "aliases", [])
+
+    @staticmethod
+    def find_command(bot, name):
+        """
+        Looks up a single command by name, subcommands included.
+
+        Bot.get_command() only finds top-level prefix commands, so the
+        cogs are searched by qualified name as well. That second pass is
+        what lets ",help g member" and ",help register" resolve at all.
+        """
+        parts = name.lower().split()
+        command = bot.get_command(parts[0])
+
+        for depth in range(len(parts) - 1):
+            if not isinstance(command, commands.GroupMixin):
+                return None
+
+            command = command.get_command(parts[depth + 1])
+
+        if command is not None:
+            return command
+
+        target = name.lower()
+
+        for cog in bot.cogs.values():
+            for candidate in Help.get_cog_commands(cog):
+                if candidate.qualified_name.lower() == target:
+                    return candidate
+
+        return None
+
+    @staticmethod
+    def split_summary(text):
+        """
+        Splits a command's help text into a summary and further details.
+
+        The first line is the summary. Everything after the blank line
+        that follows it is the detail, which help renders dimmer and
+        smaller. The detail is unwrapped back onto a single line, so a
+        command costs a predictable number of lines however its docstring
+        happened to be wrapped in the source.
+        """
+        text = (text or "").strip()
+
+        if not text:
+            return "No description available.", ""
+
+        lines = text.splitlines()
+        summary = lines[0].strip()
+        details = " ".join(line.strip() for line in lines[1:]).strip()
+
+        return summary, details
+
+    @staticmethod
+    def get_command_body(command):
+        """
+        Renders a command's help text, with detail marked as subtext.
+
+        Discord's -# makes a line smaller and grey, which is the
+        clearest way to push the supporting detail below the summary
+        without relying on bold. The syntax itself is not included here;
+        callers place that in the title or as a heading.
+        """
+        summary, details = Help.split_summary(Help.get_description(command))
+
+        body = summary
+
+        if details:
+            body += f"\n-# {details}"
+
+        aliases = Help.get_aliases(command)
+
+        if aliases:
+            body += f"\n-# Aliases: {', '.join(aliases)}"
+
+        return body
+
+    @staticmethod
+    def get_command_section(command):
+        """
+        Renders one command as a Markdown block for a module listing.
+
+        A heading is used for the syntax rather than bold text, because
+        Discord only renders headings in an embed's description and
+        title. The block is kept as a self-contained string so the caller
+        can pack whole blocks, rather than text that has already been
+        glued together and can no longer be split cleanly.
+        """
+        return f"### {Help.get_syntax(command)}\n{Help.get_command_body(command)}"
+
+    @staticmethod
+    def pack_sections(title: str, sections, color) -> list:
+        """
+        Packs Markdown sections into as few embeds as Discord will render.
+
+        Two limits apply, not one. A description holds at most 4096
+        characters, and the client separately gives up after roughly
+        fifty lines, so packing against characters alone silently
+        truncates the tail of a long cog listing. Whole sections are
+        kept together either way, so no command is ever split in half.
+        """
+        embeds = []
+        current = ""
+        continued = False
+
+        for section in sections:
+            if len(section) > DESCRIPTION_LIMIT:
+                section = f"{section[:DESCRIPTION_LIMIT - 1]}…"
+
+            candidate = f"{current}\n\n{section}" if current else section
+
+            if current and (
+                    len(candidate) > DESCRIPTION_LIMIT
+                    or candidate.count("\n") + 1 > LINE_LIMIT
+            ):
+                embeds.append(
+                    discord.Embed(
+                        title=f"{title} (cont.)" if continued else title,
+                        description=current,
+                        color=color
+                    )
+                )
+                continued = True
+                current = section
+            else:
+                current = candidate
+
+        if current:
+            embeds.append(
+                discord.Embed(
+                    title=f"{title} (cont.)" if continued else title,
+                    description=current,
+                    color=color
+                )
+            )
+
+        return embeds
 
     @bridge.bridge_command()
     @bridge.bridge_option(
@@ -93,40 +313,37 @@ class Help(commands.Cog):
             ctx: discord.ApplicationContext,
             module=None
     ) -> None:
-        """Shows all modules of the Miscellaneous bot."""
+        """Browse every command, or drill into a single one.
+
+        Run with nothing to list every module and its summary.
+        Pass a module (e.g. `moderation`) to see all of its commands, or
+        a command (e.g. `ban`, `g member`) for its syntax and aliases.
+        """
 
         if not module:
-            emb = discord.Embed(
-                title="Commands and modules",
-                color=discord.Color.blue(),
-                description=(
-                    f"Use `{PREFIX}help <module/command>` to gain more "
-                    f"information about that module :smiley:\n"
-                )
-            )
+            lines = [
+                f"Use `{PREFIX}help <module/command>` to gain more "
+                f"information about that module :smiley:"
+            ]
 
             cogs_desc = ""
 
             for cog_name, cog in self.bot.cogs.items():
-                prefix_commands = self.get_prefix_commands(cog)
+                cog_commands = self.get_cog_commands(cog)
 
                 # Only display the cog if it has at least one
-                # visible prefix/bridge command.
+                # visible command.
                 if any(
                         self.command_is_visible(command)
-                        for command in prefix_commands
+                        for command in cog_commands
                 ):
-                    description = cog.__doc__ or ""
+                    description = (cog.__doc__ or "").strip()
                     cogs_desc += (
-                        f"`{cog_name.capitalize()}` {description}\n"
+                        f"### {cog_name.capitalize()}\n{description}\n\n"
                     )
 
             if cogs_desc:
-                emb.add_field(
-                    name="Modules",
-                    value=cogs_desc,
-                    inline=False
-                )
+                lines += ["", cogs_desc.rstrip()]
 
             commands_desc = ""
 
@@ -135,64 +352,38 @@ class Help(commands.Cog):
                         not command.cog_name
                         and self.command_is_visible(command)
                 ):
-                    commands_desc += (
-                        f"{command.name} - "
-                        f"{command.help or 'No description available.'}\n"
+                    summary, _ = self.split_summary(
+                        self.get_description(command)
                     )
+                    commands_desc += f"### {command.name}\n{summary}\n\n"
 
             if commands_desc:
-                emb.add_field(
-                    name="Not belonging to a module",
-                    value=commands_desc,
-                    inline=False
-                )
+                lines += [
+                    "",
+                    "-# Not belonging to a module",
+                    "",
+                    commands_desc.rstrip()
+                ]
 
-            await send_embed(ctx, emb)
-            return
-
-        if len(module.split()) > 1:
             emb = discord.Embed(
-                title="That's too much.",
-                description=(
-                    "Please request only one module or one command "
-                    "at once :sweat_smile:"
-                ),
-                color=discord.Color.orange()
+                title="Commands and modules",
+                description="\n".join(lines),
+                color=discord.Color.blue()
             )
 
             await send_embed(ctx, emb)
             return
 
-        command = self.bot.get_command(module)
+        command = self.find_command(self.bot, module)
 
         if command and self.command_is_visible(command):
-            syntax = self.get_syntax(command)
-
             emb = discord.Embed(
-                title="Help",
+                title=f"`{self.get_syntax(command)}`",
+                description=self.get_command_body(command),
                 color=NEUTRAL_COLOR
             )
 
-            emb.add_field(
-                name=f"`{syntax}`",
-                value=command.help or "No description available.",
-                inline=False
-            )
-
-            if command.aliases:
-                emb.add_field(
-                    name="Aliases",
-                    value=", ".join(command.aliases),
-                    inline=False
-                )
-
-            emb.set_footer(
-                text=(
-                    "[] represent compulsory fields\n"
-                    "<> represent optional fields\n"
-                    "Do not type the brackets!"
-                )
-            )
+            emb.set_footer(text=ARGUMENT_LEGEND)
 
             await send_embed(ctx, emb)
             return
@@ -208,40 +399,28 @@ class Help(commands.Cog):
                 break
 
         if matched_cog:
-            emb = discord.Embed(
-                title=f"{matched_cog_name.capitalize()} - Commands",
-                description=matched_cog.__doc__ or "",
+            # IMPORTANT:
+            # Only list the prefix variants where they exist.
+            #
+            # get_cog_commands() discards the slash twin of every bridge
+            # command, because BridgeSlashGroup exposes neither
+            # clean_params nor help.
+            sections = [
+                self.get_command_section(command)
+                for command in self.get_cog_commands(matched_cog)
+                if self.command_is_visible(command)
+            ]
+
+            embeds = self.pack_sections(
+                title=f"{matched_cog_name.capitalize()} — Commands",
+                sections=sections,
                 color=discord.Color.green()
             )
 
-            # IMPORTANT:
-            # Only retrieve the prefix variants.
-            #
-            # This prevents BridgeSlashGroup from reaching
-            # command.clean_params.
-            prefix_commands = self.get_prefix_commands(matched_cog)
+            for embed in embeds:
+                embed.set_footer(text=ARGUMENT_LEGEND)
 
-            for command in prefix_commands:
-                if not self.command_is_visible(command):
-                    continue
-
-                syntax = self.get_syntax(command)
-
-                emb.add_field(
-                    name=f"`{syntax}`",
-                    value=command.help or "No description available.",
-                    inline=False
-                )
-
-            emb.set_footer(
-                text=(
-                    "[] represent compulsory fields\n"
-                    "<> represent optional fields\n"
-                    "Do not type the brackets!"
-                )
-            )
-
-            await send_embed(ctx, emb)
+            await send_embeds(ctx, embeds)
             return
 
         cogs_desc = ""
@@ -251,7 +430,7 @@ class Help(commands.Cog):
 
             if "Hidden" not in description:
                 cogs_desc += (
-                    f"`{cog_name.capitalize()}` {description}\n"
+                    f"### {cog_name.capitalize()}\n{description.strip()}\n\n"
                 )
 
         emb = discord.Embed(
@@ -264,11 +443,7 @@ class Help(commands.Cog):
         )
 
         if cogs_desc:
-            emb.add_field(
-                name="Here is a list of all the fields and their descriptions",
-                value=cogs_desc,
-                inline=False
-            )
+            emb.description += f"\n\n{cogs_desc.rstrip()}"
 
         emb.set_footer(
             text=(
