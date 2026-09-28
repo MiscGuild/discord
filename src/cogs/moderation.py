@@ -7,7 +7,7 @@ from src.func.Union import Union
 
 class Moderation(commands.Cog, name="moderation"):
     """
-    Everything to do with discord Moderation.
+    Mute, kick, ban and purge members. Needs moderator permissions.
     """
 
     def __init__(self, bot):
@@ -28,7 +28,11 @@ class Moderation(commands.Cog, name="moderation"):
         input_type=str
     )
     async def mute(self, ctx: discord.ApplicationContext, member: discord.Member, *, reason: str = None) -> None:
-        """Mute the mentioned user indefinitely!"""
+        """Times a member out by applying the `Muted` role.
+
+        The mute is **indefinite** — there is no duration or timeout.
+        Clear it again with `/unmute` when they are done.
+        """
         await ctx.respond(embed=await Union(user=member).mute(ctx.author, ctx.guild.roles, reason))
 
     @bridge.bridge_command()
@@ -40,7 +44,11 @@ class Moderation(commands.Cog, name="moderation"):
         input_type=discord.Member
     )
     async def unmute(self, ctx: discord.ApplicationContext, member: discord.Member) -> None:
-        """Unmute the mentioned user!"""
+        """Removes the `Muted` role from a member.
+
+        Only reverses the mute itself. It does not restore any earlier
+        timeout, nickname or role state.
+        """
         await ctx.respond(embed=await Union(user=member).unmute(ctx.guild.roles))
 
     @bridge.bridge_command()
@@ -58,7 +66,11 @@ class Moderation(commands.Cog, name="moderation"):
         input_type=str
     )
     async def kick(self, ctx: discord.ApplicationContext, member: discord.Member, *, reason: str = None) -> None:
-        """Kick the mentioned user!"""
+        """Kicks a member from the server.
+
+        They can rejoin with an invite, but their roles are not restored
+        automatically — run `/rolecheck` to re-sync the whole server.
+        """
         await ctx.respond(embed=await Union(user=member).kick(ctx.author, reason))
 
     @bridge.bridge_command()
@@ -76,7 +88,11 @@ class Moderation(commands.Cog, name="moderation"):
         input_type=str
     )
     async def ban(self, ctx: discord.ApplicationContext, member: discord.Member, *, reason: str = None) -> None:
-        """Ban the mentioned user!"""
+        """Permanently bans a member from the server.
+
+        This is a full ban, not a timeout. Reverse a mistake with
+        `/unban`.
+        """
         await ctx.respond(embed=await Union(user=member).ban(ctx.guild, ctx.author, reason))
 
     @bridge.bridge_command()
@@ -94,7 +110,11 @@ class Moderation(commands.Cog, name="moderation"):
         input_type=str
     )
     async def softban(self, ctx: discord.ApplicationContext, member: discord.Member, *, reason: str = None) -> None:
-        """Softban the mentioned user!"""
+        """Bans then immediately unbans a member.
+
+        Effectively removes them and clears their recent messages while
+        still letting them rejoin. Use `/ban` for a real removal.
+        """
         await ctx.respond(embed=await Union(user=member).softban(ctx.guild, ctx.author, reason))
 
     @bridge.bridge_command()
@@ -112,7 +132,11 @@ class Moderation(commands.Cog, name="moderation"):
         input_type=str
     )
     async def unban(self, ctx: discord.ApplicationContext, user: discord.User, *, reason: str = None) -> None:
-        """Unban the mentioned user!"""
+        """Lifts an existing ban on a user.
+
+        Works on someone who has already left the server. It does not
+        restore the roles or nickname they had before.
+        """
         await ctx.respond(embed=await Union(user=user).unban(ctx.guild, ctx.author, reason))
 
     @bridge.bridge_command()
@@ -130,7 +154,12 @@ class Moderation(commands.Cog, name="moderation"):
         input_type=str
     )
     async def purge(self, ctx: discord.ApplicationContext, amount: int, *, reason: str = None) -> None:
-        """Clears the given number of messages!"""
+        """Bulk-deletes messages from the channel.
+
+        Nothing is sent back here — a transcript of what was deleted is
+        saved to the log channel instead. Discord refuses to bulk-delete
+        messages older than 14 days, so you may get fewer than asked.
+        """
         await Integer(integer=amount).purge(ctx, reason)
 
 

@@ -1,6 +1,7 @@
 import asyncio
 import random
 import re
+import traceback
 from __main__ import bot
 from functools import wraps
 from io import BytesIO
@@ -26,7 +27,8 @@ def async_retry(max_attempts: int = 5, delay: float = 0.5):
                     if result:
                         return result
                 except Exception as e:
-                    pass
+                    print(f"Error occurred in {func.__name__}: {e}")
+                    traceback.print_exc()
                 if attempt < max_attempts:
                     await asyncio.sleep(delay)
 
@@ -169,6 +171,7 @@ async def get_player_guild(uuid: str) -> dict | None:
     return resp["guild"]
 
 
+@async_retry(max_attempts=3, delay=3)
 async def get_guild_by_name(name: str) -> dict | None:
     api_key = await get_hyapi_key()
     resp = await get_json_response(f"https://api.hypixel.net/guild?key={api_key}&name={name}")

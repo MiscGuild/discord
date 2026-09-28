@@ -8,7 +8,7 @@ from src.func.Union import Union
 
 class General(commands.Cog, name="general"):
     """
-    Contains source, avatar.
+    Source code, avatars, player profiles and ping preferences.
     """
 
     def __init__(self, bot):
@@ -23,7 +23,13 @@ class General(commands.Cog, name="general"):
         input_type=str
     )
     async def source(self, ctx: discord.ApplicationContext, *, command: str = None) -> None:
-        """View the source code for the bot or a specific command"""
+        """Links to the bot's source code on GitHub.
+
+        With no argument you get the repository link. Pass a command
+        name to jump straight to its implementation, e.g. `ban` or
+        `g member`. The link covers the command's wrapper, not the
+        helper it calls.
+        """
         await ctx.respond(await String(string=command).source())
 
     @bridge.bridge_command()
@@ -34,7 +40,11 @@ class General(commands.Cog, name="general"):
         input_type=discord.Member
     )
     async def avatar(self, ctx: discord.ApplicationContext, user: discord.Member = None) -> None:
-        """See the avatar of a given user!"""
+        """Shows a member's Discord avatar.
+
+        Defaults to your own avatar if no member is given. Members
+        without a custom avatar show Discord's default one.
+        """
         await ctx.respond(embed=await Union(user=user or ctx.author).avatar())
 
     @commands.slash_command()
@@ -45,7 +55,12 @@ class General(commands.Cog, name="general"):
         required=True
     )
     async def do_pings(self, ctx: discord.ApplicationContext, setting: int) -> None:
-        """Used to enable/disable pings in automatic daily and weekly leaderboard messages!"""
+        """Choose whether you get pinged in automatic leaderboard posts.
+
+        Only affects the scheduled daily and weekly gexp leaderboards.
+        Running `/g top` or `/g weekly` yourself never pings anyone,
+        whatever this is set to.
+        """
         await ctx.respond(embed=await Union(ctx.author).do_pings(setting=setting))
 
     @bridge.bridge_command()
@@ -56,7 +71,11 @@ class General(commands.Cog, name="general"):
         input_type=discord.Member
     )
     async def whois(self, ctx: discord.ApplicationContext, member: discord.Member = None) -> None:
-        """Used to find a player's minecraft username and uuid using their discord account."""
+        """Links a Discord account to its Minecraft username and UUID.
+
+        Reads the bot's own database, so the member has to have synced
+        or registered first. Unregistered members come back blank.
+        """
         await ctx.respond(embed=await Union(member or ctx.author).whois())
 
     @bridge.bridge_command()
@@ -67,7 +86,12 @@ class General(commands.Cog, name="general"):
         input_type=discord.Member
     )
     async def me(self, ctx: discord.ApplicationContext, user: discord.Member = None) -> None:
-        """View a user's profile"""
+        """Shows a member's Miscellaneous profile.
+
+        Covers their rank, Elite Member status, guild experience history
+        and invitation stats. Anyone you pass here is shown publicly,
+        invite stats included. Defaults to your own profile.
+        """
         await ctx.respond(embed=await Union(user or ctx.author).me())
 
 

@@ -10,13 +10,19 @@ from src.utils.db_utils import get_dnkl_list
 
 
 async def get_dnkl_autocomplete(ctx: discord.AutocompleteContext):
+    """
+    Suggests do-not-kick list entries by name.
+
+    The value is the player's UUID, so the name is re-resolved live once
+    the command runs.
+    """
     dnkl_list = await get_dnkl_list()
     return [discord.OptionChoice(name, value) for name, value in dnkl_list]
 
 
 class Hypixel(commands.Cog, name="hypixel"):
     """
-    All discord related Hypixel commands.
+    Sync your Discord profile and manage the do-not-kick list.
     """
 
     def __init__(self, bot):
@@ -36,15 +42,28 @@ class Hypixel(commands.Cog, name="hypixel"):
         input_type=str
     )
     async def sync(self, ctx: discord.ApplicationContext, name: str = None, tag: str = None) -> None:
-        """Update your discord nick, tag and roles!"""
+        """Updates your nickname, tag and roles from your Hypixel profile.
+
+        Link your Discord account under *Social Media → DISCORD* on your
+        Hypixel profile first. Pass a `tag` to append one to your
+        nickname — that needs a tag-permitted role, and it is capped at
+        six characters with no profanity. Your nickname is overwritten
+        every time.
+        """
         res = await Union(user=ctx.author).sync(ctx, name, tag)
         if isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
         elif isinstance(res, str):
             await ctx.respond(res)
 
-    @bridge.bridge_group(name="dnkl", description="Manage dnkl-related things", invoke_without_command=True)
+    @bridge.bridge_group(name="dnkl", description="Check, add and remove players on the do-not-kick list",
+                         invoke_without_command=True)
     async def dnkl(self, ctx: bridge.BridgeContext):
+        """
+        Manage the do-not-kick list.
+
+        Running it on its own just points you at the subcommands.
+        """
         if ctx.invoked_subcommand is None:  # Ensures this runs only if no subcommand is called
             await ctx.respond("Use `/dnkl add`, `/dnkl remove`, or `/dnkl list`, or `/dnkl check`.")
 
@@ -58,7 +77,13 @@ class Hypixel(commands.Cog, name="hypixel"):
         input_type=str
     )
     async def dnkl_add(self, ctx: discord.ApplicationContext, name: str) -> None:
-        """Add a user to the do-not-kick list!"""
+        """Starts a do-not-kick application for a player.
+
+        Asks for a start date, a length and a reason right here in the
+        channel you run it in, then posts a summary for staff to
+        approve or deny. Aiming for over three weeks is refused
+        outright, and so is "Banned on Hypixel".
+        """
         if name and len(name) == 32:
             res = await String(uuid=name).dnkladd(ctx)
         else:
@@ -77,12 +102,20 @@ class Hypixel(commands.Cog, name="hypixel"):
         required=False
     )
     async def dnkl_remove(self, ctx: discord.ApplicationContext, player: str) -> None:
-        """Remove a player from the do-not-kick list"""
+        """Removes a player from the do-not-kick list.
+
+        Deletes their database entry and the public announcement in the
+        do-not-kick channel.
+        """
         await ctx.respond(await String(uuid=player).dnklremove())
 
     @dnkl.command(name="list", aliases=['l'])
     async def dnkl_list(self, ctx: discord.ApplicationContext) -> None:
-        """View all users on the do-not-kick list!"""
+        """Lists everyone currently on the do-not-kick list.
+
+        Each entry shows their start date, how long they asked for and
+        the reason they gave.
+        """
         await ctx.respond(embed=await General().dnkllist())
 
     @dnkl.command(name="check", aliases=['chk', 'c'])
@@ -94,7 +127,12 @@ class Hypixel(commands.Cog, name="hypixel"):
         input_type=str
     )
     async def dnkl_check(self, ctx: discord.ApplicationContext, name: str = None) -> None:
-        """Check whether a player is on the do-not-kick list!"""
+        """Checks if a player meets the 100k weekly gexp requirement.
+
+        Shows their weekly gexp against the bar and defaults to your own
+        account. Clearing the bar is not a guarantee — staff still
+        decide each application on its own.
+        """
 
         if name and len(name) == 32:
             res = await String(uuid=name).dnklcheck()
