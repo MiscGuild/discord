@@ -3,6 +3,7 @@ from __main__ import bot
 import discord
 
 import src.utils.ui_utils as uiutils
+from src.utils.calculation_utils import create_stats_text
 from src.utils.consts import UNKNOWN_IGN_EMBED, NEUTRAL_COLOR, NEG_COLOR, GVG_REQUIREMENTS, \
     MISSING_PERMS_EMBED
 from src.utils.request_utils import get_hypixel_player
@@ -69,70 +70,151 @@ async def gvg_application(ticket: discord.TextChannel, interaction: discord.Inte
     duels_kills = player_data["Duels"]["kills"]
 
     # Define dict for eligibility and set each gamemode boolean
-    eligibility = {}
-    eligibility["bedwars"] = False if bw_wins < GVG_REQUIREMENTS["bw_wins"] and bw_fkdr < \
-                                      GVG_REQUIREMENTS["bw_fkdr"] else True
-    eligibility["skywars"] = False if sw_wins < GVG_REQUIREMENTS["sw_wins"] and sw_kdr < \
-                                      GVG_REQUIREMENTS["sw_kdr"] else True
-    eligibility["duels"] = False if duels_wlr < GVG_REQUIREMENTS["duels_wlr"] and duels_kills < \
-                                    GVG_REQUIREMENTS["duels_kills"] else True
+    # Define eligibility for each GvG team
+    eligibility = {
+        "bedwars": (
+                bw_wins >= GVG_REQUIREMENTS["bw_wins"]
+                and bw_fkdr >= GVG_REQUIREMENTS["bw_fkdr"]
+        ),
+        "skywars": (
+                sw_wins >= GVG_REQUIREMENTS["sw_wins"]
+                and sw_kdr >= GVG_REQUIREMENTS["sw_kdr"]
+        ),
+        "duels": (
+                duels_wlr >= GVG_REQUIREMENTS["duels_wlr"]
+                and duels_kills >= GVG_REQUIREMENTS["duels_kills"]
+        )
+    }
 
-    # Polyvalent eligibility
+    # Store the stats and requirements for each gamemode
+    gamemode_data = {
+        "bedwars": {
+            "name": "Bedwars",
+            "stats": [
+                ("Wins", bw_wins, GVG_REQUIREMENTS["bw_wins"]),
+                ("FKDR", bw_fkdr, GVG_REQUIREMENTS["bw_fkdr"])
+            ]
+        },
+
+        "skywars": {
+            "name": "Skywars",
+            "stats": [
+                ("Wins", sw_wins, GVG_REQUIREMENTS["sw_wins"]),
+                ("KDR", sw_kdr, GVG_REQUIREMENTS["sw_kdr"])
+            ]
+        },
+
+        "duels": {
+            "name": "Duels",
+            "stats": [
+                ("WLR", duels_wlr, GVG_REQUIREMENTS["duels_wlr"]),
+                ("Kills", duels_kills, GVG_REQUIREMENTS["duels_kills"])
+            ]
+        }
+    }
+
+
     if all(eligibility.values()):
-        embed = discord.Embed(title="You are eligible for the polyvalent team!", color=NEUTRAL_COLOR)
-        embed.set_footer(text="Please await staff assistance for further information!")
-        embed.add_field(name="Bedwars Wins", value=f"`{bw_wins}`")
-        embed.add_field(name="Bedwars FKDR", value=f"`{bw_fkdr}`")
-        embed.add_field(name="Skywars Wins", value=f"`{sw_wins}`")
-        embed.add_field(name="Skywars KDR", value=f"`{sw_kdr}`")
-        embed.add_field(name="Duels WLR", value=f"`{duels_wlr}`")
-        embed.add_field(name="Duels Wins", value=f"`{duels_wins}`")
-        embed.add_field(name="Duels Kills", value=f"`{duels_kills}`")
+        embed = discord.Embed(
+            title="✅ You are eligible for the Polyvalent GvG Team!",
+            description=(
+                "You meet the requirements for **all three GvG teams**.\n\n"
+                "Your statistics for each gamemode are shown below."
+            ),
+            color=NEUTRAL_COLOR
+        )
 
-    # User is not eligible for any team
+        for mode in ["bedwars", "skywars", "duels"]:
+            embed.add_field(
+                name=f"✅ {gamemode_data[mode]['name']} — Qualified",
+                value=await create_stats_text(gamemode_data, mode),
+                inline=False
+            )
+
+
     elif not any(eligibility.values()):
         embed = discord.Embed(
-            title="You are ineligible for the GvG Team as you do not meet the requirements!",
-            description="If you think this is incorrect, please await staff assistance",
-            color=NEG_COLOR)
-        embed.add_field(name="Bedwars Wins", value=f"`{bw_wins}`")
-        embed.add_field(name="Bedwars FKDR", value=f"`{bw_fkdr}`")
-        embed.add_field(name="Skywars Wins", value=f"`{sw_wins}`")
-        embed.add_field(name="Skywars KDR", value=f"`{sw_kdr}`")
-        embed.add_field(name="Duels WLR", value=f"`{duels_wlr}`")
-        embed.add_field(name="Duels Wins", value=f"`{duels_wins}`")
-        embed.add_field(name="Duels Kills", value=f"`{duels_kills}`")
-        await ticket.send(embed=discord.Embed(
-            title="You are ineligible for the GvG Team as you do not meet the requirements!",
-            description="Please await staff assistance for further information!",
-            color=NEG_COLOR))
+            title="❌ You currently do not meet the GvG Team requirements",
+            description=(
+                "Unfortunately, you do not currently meet the minimum "
+                "requirements for any of our GvG teams.\n\n"
+                "Below you can see your current statistics compared with "
+                "the requirements for each team."
+            ),
+            color=NEG_COLOR
+        )
 
-    # User is eligible for at least one gamemode
+        for mode in ["bedwars", "skywars", "duels"]:
+            embed.add_field(
+                name=f"❌ {gamemode_data[mode]['name']} — Not Qualified",
+                value=await create_stats_text(gamemode_data, mode),
+                inline=False
+            )
+
+
     else:
-        # loop through all GvG gamemodes
-        for mode, req1_name, req1, req2_name, req2 in [["bedwars", "Wins", bw_wins, "FKDR", bw_fkdr],
-                                                       ["skywars", "Wins", sw_wins, "KDR", sw_kdr],
-                                                       ["duels", "WLR", duels_wlr, "Kills",
-                                                        duels_kills]]:
-            # If user is eligible for that gamemode, create embed
+        eligible_teams = [
+            gamemode_data[mode]["name"]
+            for mode in eligibility
+            if eligibility[mode]
+        ]
+
+        embed = discord.Embed(
+            title="✅ You are eligible for one or more GvG teams!",
+            description=(
+                f"You currently qualify for: "
+                f"**{', '.join(eligible_teams)}**.\n\n"
+                "Your results for every GvG team are shown below. "
+                "For teams you did not qualify for, you can also see "
+                "the requirements you are currently missing."
+            ),
+            color=NEUTRAL_COLOR
+        )
+
+        # First show teams that the player qualifies for
+        for mode in ["bedwars", "skywars", "duels"]:
             if eligibility[mode]:
-                embed = discord.Embed(title=f"You are eiligible for the {mode.capitalize()} team!",
-                                      color=NEUTRAL_COLOR)
-                embed.set_footer(text="Please await staff assistance for further information!")
-                embed.add_field(name=req1_name, value=f"`{req1}`")
-                embed.add_field(name=req2_name, value=f"`{req2}`")
+                embed.add_field(
+                    name=f"✅ {gamemode_data[mode]['name']} — Qualified",
+                    value=await create_stats_text(gamemode_data, mode),
+                    inline=False
+                )
 
-                # Send embed and end loop
+        # Then show teams that the player did not qualify for
+        for mode in ["bedwars", "skywars", "duels"]:
+            if not eligibility[mode]:
+                embed.add_field(
+                    name=f"❌ {gamemode_data[mode]['name']} — Not Qualified",
+                    value=await create_stats_text(gamemode_data, mode),
+                    inline=False
+                )
 
-    GvGView = discord.ui.View(timeout=None)  # View for staff members to approve/deny the DNKL
-    buttons = (("Accept", "GvG_Application_Positive", discord.enums.ButtonStyle.green, gvg_approve),
-               ("Deny", "GvG_Application_Negative", discord.enums.ButtonStyle.red, gvg_deny))
-    # Loop through the list of roles and add a new button to the view for each role.
+    embed.set_footer(
+        text="Please await staff assistance for further information regarding your application."
+    )
+    GvGView = discord.ui.View(timeout=None)
+
+    buttons = (
+        ("Accept", "GvG_Application_Positive",
+         discord.enums.ButtonStyle.green, gvg_approve),
+        ("Deny", "GvG_Application_Negative",
+         discord.enums.ButtonStyle.red, gvg_deny)
+    )
+
     for button in buttons:
-        # Get the role from the guild by ID.
         GvGView.add_item(
-            uiutils.Button_Creator(channel=ticket, ign=ign, button=button, author=user, uuid=uuid,
-                                   function=button[3]))
+            uiutils.Button_Creator(
+                channel=ticket,
+                ign=ign,
+                button=button,
+                author=user,
+                uuid=uuid,
+                function=button[3]
+            )
+        )
 
-    await ticket.send("Staff, what do you wish to do with this application?", embed=embed,
-                      view=GvGView)
+    await ticket.send(
+        "Staff, what do you wish to do with this application?",
+        embed=embed,
+        view=GvGView
+    )
