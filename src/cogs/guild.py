@@ -11,16 +11,21 @@ from src.utils.data_classes import RegisteredDiscordMember
 
 class Guild(commands.Cog, name="guild"):
     """
-    Everything to do with Hypixel guilds. Commands to view guild experience, requirements and more!
+    Guild experience, leaderboards, requirements, invites and ranks.
     """
 
     def __init__(self, bot):
         self.bot = bot
 
-
-    @bridge.bridge_group(name="g", description="Invoke guild related commands!", invoke_without_command=True)
+    @bridge.bridge_group(name="g", description="View guild experience, leaderboards and requirements",
+                         invoke_without_command=True)
     async def g(self, ctx: bridge.BridgeContext, name: str | discord.Member = None) -> None:
-        """Invoke guild related commands!"""
+        """Shortcut for `/g member`.
+
+        Takes a username or a raw mention, or nothing at all for your own
+        stats. Pair it with `/g weekly` and `/g daily` for the
+        leaderboards.
+        """
         member_id = await check_if_mention(name)
 
         member_lookup = RegisteredDiscordMember()
@@ -52,7 +57,13 @@ class Guild(commands.Cog, name="guild"):
     )
     async def gmember(self, ctx: discord.ApplicationContext, name: str = None,
                       discord_member: discord.Member = None) -> None:
-        """View the given user's guild experience over the past week!"""
+        """Shows a player's guild experience for the week.
+
+        Includes their rank, a 7-day gexp graph and all-time totals.
+        Takes a username, a mention, or nothing for your own stats.
+        Outside `#commands` and tickets you get a one-line reply
+        instead, sent just to you.
+        """
         uuid = None
 
         member_lookup = RegisteredDiscordMember()
@@ -78,7 +89,10 @@ class Guild(commands.Cog, name="guild"):
 
     @g.command(name="weekly", aliases=["weekly_gexp_lb", "weeklylb", "wlb"])
     async def weekly_gexp_lb(self, ctx: discord.ApplicationContext) -> None:
-        """View the weekly guild experience leaderboard!"""
+        """Shows the top 10 guild experience earners this week.
+
+        Refreshes every Monday. Running it yourself never pings anyone.
+        """
         await ctx.defer()
         res = await General().weeklylb()
         if isinstance(res, str):
@@ -96,7 +110,11 @@ class Guild(commands.Cog, name="guild"):
         input_type=int
     )
     async def gtop(self, ctx: discord.ApplicationContext, day: int = 1) -> None:
-        """View the daily guild experience leaderboard!"""
+        """Shows the top 10 guild experience earners for a given day.
+
+        Pass `0`–`6` to go back that many days, where `0` is today and
+        `6` is a week ago. Defaults to yesterday.
+        """
         await ctx.defer()
         res = await Integer(integer=day).gtop()
         if isinstance(res, str):
@@ -108,17 +126,29 @@ class Guild(commands.Cog, name="guild"):
 
     @bridge.bridge_command(aliases=["req", "reqs"])
     async def requirements(self, ctx: discord.ApplicationContext) -> None:
-        """View guild experience requirements!"""
+        """Shows the weekly guild experience needed for each rank.
+
+        Omega 50k, Delta 200k, Gamma 400k, plus the 100k you need to be
+        eligible for the do-not-kick list.
+        """
         await ctx.respond(embed=REQUIREMENTS_EMBED)
 
     @bridge.bridge_command(aliases=["res", "elite", "elitemember", "em"])
     async def elite_member(self, ctx: discord.ApplicationContext) -> None:
-        """See the different ways of obtaining the elite member rank!"""
+        """Explains the four ways to reach Delta without grinding.
+
+        You can qualify as a YouTuber, Event Sponsor, Server Booster or
+        GvG Team Member instead of hitting 200k weekly gexp.
+        """
         await ctx.respond(embed=RESIDENT_EMBED)
 
     @bridge.bridge_command()
     async def gvg(self, ctx: discord.ApplicationContext):
-        """View information about GvG team and the requirements!!"""
+        """Explains Guild vs Guild and the stats needed to join the team.
+
+        You need 500 BedWars wins at 1.6 FKDR, 1000 SkyWars wins at
+        1.2 KDR, and 2000 Duels kills at 1.5 WLR.
+        """
         await ctx.respond(embed=GVG_INFO_EMBED)
 
     @bridge.bridge_command(aliases=["invite", "inv"])
@@ -136,7 +166,12 @@ class Guild(commands.Cog, name="guild"):
     )
     async def invites(self, ctx: discord.ApplicationContext, name: str = None,
                       discord_member: discord.Member = None) -> None:
-        """View a user's invitation stats"""
+        """Shows how many players a member has invited this week.
+
+        Marks each invite valid or invalid and shows the success rate.
+        An invite counts as valid if that player reaches 100k weekly
+        gexp by the end of the week.
+        """
         await ctx.defer()
 
         uuid = None
@@ -160,7 +195,12 @@ class Guild(commands.Cog, name="guild"):
 
     @bridge.bridge_command(name="elite_members")
     async def elite_members(self, ctx: discord.ApplicationContext) -> None:
-        """View all elite members and their categories!"""
+        """Lists every current Elite Member, grouped by category.
+
+        Split into Boosters, Sponsors, GvG and Creators. A member with
+        more than one category appears under each. See
+        `/elite_member` for how someone qualifies.
+        """
         embed = await General().elite_members()
         if isinstance(embed, discord.Embed):
             await ctx.respond(embed=embed)
