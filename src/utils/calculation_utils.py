@@ -131,6 +131,25 @@ async def check_tag(tag: str) -> Tuple[bool, str] | Tuple[bool, None]:
     return True, None
 
 
+async def create_stats_text(gamemode_data: dict, mode: str) -> str:
+    """
+    Creates the text displaying the player's stats compared
+    to the requirements for a particular gamemode.
+    """
+    text = ""
+
+    for stat_name, player_stat, requirement in gamemode_data[mode]["stats"]:
+        passed = player_stat >= requirement
+        status = "✅" if passed else "❌"
+
+        text += (
+            f"{status} **{stat_name}**\n"
+            f"Your Stats: `{player_stat}`\n"
+            f"Requirement: `{requirement}`\n\n"
+        )
+
+    return text
+
 async def extract_usernames(embed: discord.Embed) -> Tuple[str, str] | Tuple[None, str]:
     invitee = embed.fields[0].value
     inviter = embed.fields[1].value
