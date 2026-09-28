@@ -13,7 +13,7 @@ from src.utils.ui_utils import tickets
 
 class Staff(commands.Cog, name="staff"):
     """
-    Commands for Miscellaneous staff members.
+    Staff-only tools: role syncs, inactivity lists and server info.
     """
 
     def __init__(self, bot):
@@ -22,7 +22,13 @@ class Staff(commands.Cog, name="staff"):
     @bridge.bridge_command()
     @commands.has_permissions(kick_members=True)
     async def inactive(self, ctx: discord.ApplicationContext) -> None:
-        """View all inactive users in the guild!"""
+        """Lists members whose guild experience needs attention.
+
+        Splits them into who to promote to Delta or Gamma, who to
+        demote, and who has fallen below 50k weekly gexp and should be
+        kicked. Members who joined within a week and are on a normal
+        pace are left out. Nothing is changed here — it is a punch list.
+        """
         await ctx.defer()
         for embed in await General().inactive():
             await ctx.respond(embed=embed)
@@ -36,7 +42,12 @@ class Staff(commands.Cog, name="staff"):
         input_type=discord.Member
     )
     async def forcesync(self, ctx: discord.ApplicationContext, member: discord.Member, name: str = None) -> None:
-        """Update a user's discord nick, tag and roles for them!"""
+        """Force-syncs one member's nickname, tag and roles.
+
+        Skips the Hypixel Discord link check and rewrites everything to
+        match their Hypixel profile. Reach for this when `/sync` refuses
+        someone, or when a rolecheck got stuck on them.
+        """
         res = await Union(user=ctx.guild.get_member(member.id)).sync(ctx, name, None, True)
         if isinstance(res, discord.Embed):
             await ctx.respond(embed=res)
@@ -52,12 +63,24 @@ class Staff(commands.Cog, name="staff"):
         input_type=bool
     )
     async def rolecheck(self, ctx: discord.ApplicationContext, send_ping: bool = True) -> None:
-        """Sync the names and roles of everyone in the discord!"""
+        """Re-syncs every member's nickname and roles at once.
+
+        Rebuilds roles from each member's guild and weekly guild
+        experience, and renames everyone to their in-game name unless
+        they hold a role that allows a custom tag. On a large server
+        this takes several minutes — if it hangs on someone, run
+        `/forcesync` on them and start again.
+        """
         await General().rolecheck(ctx, send_ping)
 
     @bridge.bridge_command()
     @commands.has_permissions(administrator=True)
     async def information(self, ctx: discord.ApplicationContext, send_embed_only=False) -> None:
+        """Posts the server's introduction and rank guide.
+
+        Sends the guild's about page and the Discord rank guide, then
+        finishes with the weekly guild experience requirements.
+        """
         if not send_embed_only:
             await ctx.send(content=INFORMATION_MESSAGE)
             await ctx.send(content=INFORMATION_MESSAGE_2)
@@ -67,10 +90,15 @@ class Staff(commands.Cog, name="staff"):
     @bridge.bridge_command()
     @commands.has_permissions(administrator=True)
     async def rules(self, ctx: discord.ApplicationContext) -> None:
+        """Posts the in-game and Discord rule messages.
+
+        Every rule goes out as its own message so it is easy to read
+        and point at.
+        """
         for message in RULES_MESSAGES:
             await ctx.send(content=message)
 
-    @bridge.bridge_command(name="update_elite_member", description="Update a user's Elite Member role!")
+    @bridge.bridge_command(name="update_elite_member", description="Grant or revoke a player's Elite Member role")
     @commands.has_permissions(administrator=True)
     @bridge.bridge_option(
         name="username",
@@ -93,13 +121,24 @@ class Staff(commands.Cog, name="staff"):
     )
     async def update_elite_member(self, ctx: discord.ApplicationContext, username: str, reason: str,
                                   monetary_value: int = None) -> None:
+        """Grants or revokes a player's Elite Member status.
+
+        `reason` must be `Event Sponsor`, `GvG Team`, `YouTuber` or
+        `Server Booster`. Running it again with the same reason takes
+        the status away. Sponsors need a `monetary_value` of $10 or
+        more, and get time added in proportion to what they spent.
+        """
         await ctx.respond(
             embed=await String(string=reason, username=username).elite_member(monetary_value=monetary_value))
 
     @bridge.bridge_command()
     @commands.has_permissions(administrator=True)
     async def tickets(self, ctx: discord.ApplicationContext) -> None:
-        """Send a ticket help embed!"""
+        """Explains how the ticketing system works.
+
+        Lists every ticket reason available to members, to guests and to
+        everyone, plus a button that starts a new ticket.
+        """
         image, messages, view = await tickets()
         await ctx.send(content=messages[0])
         await ctx.send(content=messages[1], view=view)
@@ -113,7 +152,13 @@ class Staff(commands.Cog, name="staff"):
         input_type=str
     )
     async def recruit(self, ctx: discord.ApplicationContext, *, guild_name: str) -> None:
-        """Get a list of recruitable players from the given guild"""
+        """Lists recruitable players from another Hypixel guild.
+
+        Shows members sitting at 100,000 or more weekly guild
+        experience, with their online status and join date. Anyone who
+        joined under a week ago has to be ahead of a 50k/week pace, and
+        their gexp is scaled up for display.
+        """
         await ctx.defer()
 
         res = await String(string=guild_name).recruit()
