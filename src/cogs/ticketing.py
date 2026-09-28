@@ -8,9 +8,9 @@ from src.func.Union import Union
 from src.utils.consts import MILESTONE_CATEGORIES
 
 
-class Tickets(commands.Cog, name="tickets"):
+class Ticketing(commands.Cog, name="ticketing"):
     """
-    Everything to do with tickets.
+    Everything to do with ticketing.
     """
 
     def __init__(self, bot):
@@ -182,4 +182,4 @@ class Tickets(commands.Cog, name="tickets"):
 
 
 def setup(bot):
-    bot.add_cog(Tickets(bot))
+    bot.add_cog(Ticketing(bot))
