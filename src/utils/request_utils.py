@@ -171,7 +171,7 @@ async def get_player_guild(uuid: str) -> dict | None:
     return resp["guild"]
 
 
-@async_retry(max_attempts=3, delay=3)
+@async_retry(max_attempts=3, delay=30)
 async def get_guild_by_name(name: str) -> dict | None:
     api_key = await get_hyapi_key()
     resp = await get_json_response(f"https://api.hypixel.net/guild?key={api_key}&name={name}")
