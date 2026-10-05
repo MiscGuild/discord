@@ -43,6 +43,9 @@ async def validate_invites(inviter_ign, invitee_ign) -> str:
 async def check_invitation_validity(invitations: list) -> List[str]:
     guild_data = await get_guild_by_name(GUILD_HANDLE)
     members = {}
+    if not guild_data:
+        return []
+
     for member in guild_data["members"]:
         members[member["uuid"]] = member["joined"]
 
