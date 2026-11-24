@@ -14,6 +14,9 @@ ERROR_REPLY_EXCEPTIONS = (discord.Forbidden, discord.HTTPException, discord.NotF
 GUILD_HANDLE = CONFIG["guild_handle"]
 ALLIES = CONFIG["allies"]
 
+# Weekly rank upgrade giveaway toggle (defaults to enabled if missing from config)
+WEEKLY_RANK_UPGRADE_ENABLED = bool(CONFIG.get("weekly_rank_upgrade_enabled", True))
+
 # Colors
 NEG_COLOR = 0xff3333
 POS_COLOR = 0x00A86B

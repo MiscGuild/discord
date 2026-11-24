@@ -8,7 +8,7 @@ from discord.ext import tasks
 from src.func.General import General
 from src.func.Integer import Integer
 from src.utils.calculation_utils import get_guild_gexp_data
-from src.utils.consts import WEEKLY_LB_CHANNEL_ID, DAILY_LB_CHANNEL_ID, GUILD_HANDLE
+from src.utils.consts import WEEKLY_LB_CHANNEL_ID, DAILY_LB_CHANNEL_ID, GUILD_HANDLE, WEEKLY_RANK_UPGRADE_ENABLED
 from src.utils.db_utils import (select_all, set_member_gexp_history, get_all_elite_members,
                                 delete_elite_member)
 from src.utils.discord_utils import update_recruiter_role
@@ -115,7 +115,9 @@ async def update_invites() -> None:
             (total_invites, total_valid_invites, inviter_uuid))
     await bot.db.commit()
 
-    await generate_rank_upgrade(weekly_invitations)
+    # Invites are always tracked; the weekly giveaway only runs when enabled in config.toml
+    if WEEKLY_RANK_UPGRADE_ENABLED:
+        await generate_rank_upgrade(weekly_invitations)
 
 
 async def update_gexp() -> None:

@@ -33,6 +33,10 @@ staff_bridge_channel = 859916798111907875
 # The name of your Hypixel guild
 guild_handle = "Miscellaneous"
 
+# Toggle for the weekly rank upgrade giveaway. When false, invites are still tracked
+# but no weekly winner is drawn or announced.
+weekly_rank_upgrade_enabled = true
+
 
 # The requirements for joining the GvG team
 gvg_bw_fkdr = 1.6
